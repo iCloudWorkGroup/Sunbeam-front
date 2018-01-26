@@ -1,0 +1,22 @@
+{
+  "name": "sunbeam-front",
+  "version": "1.0.0",
+  "description": "Online Spreadsheet for Web",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iCloudWorkGroup/Sunbeam-front.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iCloudWorkGroup/Sunbeam-front/issues"
+  },
+  "homepage": "https://github.com/iCloudWorkGroup/Sunbeam-front#readme",
+  "devDependencies": {
+    "vue": "^2.5.13"
+  }
+}

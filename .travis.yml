@@ -9,7 +9,6 @@ before_install:
 - ssh-add ~/.ssh/id_rsa
 before_script:
 - mv -fv tools/deploy/ssh_config ~/.ssh/config
-- ssh sunbeam
 script:
 - git remote add deploy root@sunbeam:/usr/local/codelib/sunbeam-front.git
 - git push deploy $TRAVIS_BRANCH

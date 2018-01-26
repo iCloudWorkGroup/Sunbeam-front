@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- 6
+- 4
 before_install:
 - openssl aes-256-cbc -K $encrypted_d6c7aa5064d7_key -iv $encrypted_d6c7aa5064d7_iv
   -in tools/deploy/id_rsa.enc -out ~/.ssh/id_rsa -d
@@ -16,4 +16,4 @@ script:
 cache:
   directories:
   - node_modules
-dist: "precise",
+dist: "precise"

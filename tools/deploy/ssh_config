@@ -1,0 +1,6 @@
+Host sumbeam
+HostName excel-inc.acmr.com.cn
+Port 20065
+StrictHostKeyChecking no
+IdentityFile ~/.ssh/id_rsa
+IdentitiesOnly yes

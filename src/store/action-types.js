@@ -1,0 +1,2 @@
+export const RESTORE_CELL = 'RESTORE_CELL';
+export const RESTORE_SELECT = 'RESTORE_SELECT';

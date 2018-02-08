@@ -1,0 +1,96 @@
+{
+	"reload": {
+		"dataRowStartIndex": 0,
+		"dataColStartIndex": 0,
+		"aliasColCounter": "27",
+		"aliasRowCounter": "101",
+		"maxColPixel": 1819,
+		"maxRowPixel": 1999,
+		"returndata": {
+			"name": "新建excel",
+			"spreadSheet": [{
+				"name": "new Sheet",
+				"sheet": {
+					"cells": [{
+						"occupy": {
+							"col": 0,
+							"row": 0,
+							"x": ["1", "2"],
+							"y": ["1"]
+						},
+						"content":{
+
+						},
+						"customProp":{
+							
+						}
+					}, {
+						"occupy": {
+							"col": 0,
+							"row": 0,
+							"x": ["1", "2"],
+							"y": ["1"]
+						},
+						"content":{
+
+						},
+						"customProp":{
+							
+						}
+					}, {
+						"occupy": {
+							"col": 0,
+							"row": 1,
+							"x": ["1"],
+							"y": ["2"]
+						},
+						"content":{
+
+						},
+						"customProp":{
+							
+						}
+					}, {
+						"occupy": {
+							"col": 1,
+							"row": 1,
+							"x": ["2"],
+							"y": ["2"]
+						},
+						"content":{
+
+						},
+						"customProp":{
+							
+						}
+					}],
+					"glX": [{
+						"aliasX": "1",
+						"index": 0,
+						"left": 0
+					}, {
+						"aliasX": "2",
+						"index": 1,
+						"left": 80
+					}],
+					"glY": [{
+						"aliasY": "1",
+						"height": 19,
+						"index": 0,
+						"top": 0
+					}, {
+						"aliasY": "2",
+						"height": 19,
+						"index": 1,
+						"top": 20
+					}, {
+						"aliasY": "3",
+						"height": 19,
+						"index": 2,
+						"top": 40
+					}]
+				}
+			}]
+		}
+	}
+}

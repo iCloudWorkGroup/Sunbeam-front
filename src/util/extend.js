@@ -1,9 +1,16 @@
 export default function extend(...values) {
-	let target = {},
+	let target,
 		options, clone, name,
-		src, copy;
+		src, copy, i = 1;
 
-	for (let i = 0, len = values.length; i < len; i++) {
+	if (values.length === 1) {
+		target = {};
+		i = 0;
+	}else{
+		target = values[0];
+	}
+
+	for (let len = values.length; i < len; i++) {
 		// Only deal with non-null/undefined values
 		options = values[i];
 		// Extend the base object
@@ -12,7 +19,7 @@ export default function extend(...values) {
 			copy = options[name];
 
 			// Prevent never-ending loop
-			if (target === copy) {
+			if (target === copy || copy === 'undefined') {
 				continue;
 			}
 

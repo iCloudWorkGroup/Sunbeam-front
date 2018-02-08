@@ -7,7 +7,8 @@ module.exports = {
 	entry: './src/app.js',
 	output: {
 		filename: 'sm.js',
-		path: path.resolve(__dirname, 'dist')
+		path: path.resolve(__dirname, 'dist'),
+		publicPath: '/'
 	},
 	devtool: 'eval-source-map',
 	devServer: {

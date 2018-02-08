@@ -1,4 +1,4 @@
-import cfg from '../config';
+import cfg from '../../config';
 
 export default {
 	sort: 0,

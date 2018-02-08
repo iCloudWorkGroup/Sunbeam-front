@@ -1,4 +1,4 @@
-import cfg from '../config';
+import cfg from '../../config';
 
 export default {
 	occupy: {
@@ -14,11 +14,9 @@ export default {
 	content: {
 		texts: '',
 		displayTexts: '',
-		underline: false,
 		alignRow: 'left',
 		alignCol: 'middle',
-		wrap: false,
-		comment: null
+		wrap: false
 	},
 	font: {
 		size: '11',
@@ -29,7 +27,8 @@ export default {
 	},
 	decoration: {
 		underline: false,
-		bg: 'rgb(0, 0, 0)'
+		bg: 'rgb(0, 0, 0)',
+		comment: null
 	},
 	border: {
 		top: false,

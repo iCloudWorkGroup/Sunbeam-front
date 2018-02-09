@@ -3,7 +3,7 @@ import * as mutaionTypes from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
 
 export default {
-	[actionTypes.RESTORE_CELL] ({commit, state, rootState, rootGetters}, cells) {
+	[actionTypes.CELLS_RESTORE_CELL] ({commit, state, rootState, rootGetters}, cells) {
 		
 		if (!Array.isArray(cells)) {
 			cells = [cells];
@@ -80,6 +80,7 @@ export default {
 				width: width - 1,
 				height: height - 1
 			};
+
 			if(typeof cellIndex !== 'number'){
 				let colAlias, rowAlias;
 				for (let j = 0; j < aliasColList.length; j++) {
@@ -96,6 +97,7 @@ export default {
 				}
 				cell.physicsBox = physicsBox;
 				commit(mutaionTypes.INSERT_CELL, cell);
+				
 			}else{
 				commit(mutaionTypes.UPDATE_CELL, {
 					propName: 'physicsBox',

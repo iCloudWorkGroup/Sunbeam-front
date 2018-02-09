@@ -1,2 +1,3 @@
-export const RESTORE_CELL = 'RESTORE_CELL';
-export const INIT_SELECT = 'INIT_SELECT';
+export const CELLS_RESTORE_CELL = 'RESTORE_CELL';
+
+export const SELECTS_INIT_SELECT = 'INIT_SELECT';

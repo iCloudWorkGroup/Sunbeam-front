@@ -9,7 +9,7 @@ export default{
 		for (let i = 0, len = payload.length; i < len; i++) {
 			state.list.push(payload[i]);
 		}
-	}
+	},
 	[types.UPDATE_CELL](state, {cellIndex, propName, val}) {
 		let cell = state.list[cellIndex];
 		cell[propName] = val;

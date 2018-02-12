@@ -3,18 +3,22 @@ import * as mutaionTypes from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
 
 export default {
-	[actionTypes.CELLS_RESTORE_CELL] ({commit, state, rootState, rootGetters}, cells) {
+	/**
+	 * 还原单元格
+	 */
+	[actionTypes.CELLS_RESTORECELL] ({commit, dispatch, state, rootState, getters}, cells) {
 		
 		if (!Array.isArray(cells)) {
 			cells = [cells];
 		}
-
-		let colList = rootState.cols.list,
-			rowList = rootState.rows.list,
-			cellList = rootState.cells.list,
+		
+		let sheet = rootState.currentSheet,
+			colList = rootState.cols[sheet],
+			rowList = rootState.rows[sheet],
+			cellList = rootState.cells[sheet],
 			limitRowIndex = rowList.length - 1,
 			limitColIndex = colList.length - 1,
-			getPointInfo = rootGetters.getPointInfo;
+			getPointInfo = getters.getPointInfo;
 			
 
 		for (let i = 0, len = cells.length; i < len; i++) {
@@ -88,21 +92,26 @@ export default {
 						colAlias = aliasColList[j];
 						rowAlias = aliasRowList[k];
 						commit(mutaionTypes.UPDATE_POINTINFO, {
-							colAlias,
-							rowAlias,
-							type: 'cellIndex',
-							value: cellList.length
+							currentSheet: sheet,
+							info: {
+								colAlias,
+								rowAlias,
+								type: 'cellIndex',
+								value: cellList.length
+							}
 						});
 					}
 				}
 				cell.physicsBox = physicsBox;
-				commit(mutaionTypes.INSERT_CELL, cell);
-				
+				commit(mutaionTypes.INSERT_CELL, {currentSheet:sheet, cells:[cell]});
 			}else{
 				commit(mutaionTypes.UPDATE_CELL, {
-					propName: 'physicsBox',
-					value: physicsBox,
-					cellIndex
+					currentSheet:sheet,
+					cell: {
+						propName: 'physicsBox',
+						value: physicsBox,
+						cellIndex
+					}
 				});
 			}
 		}

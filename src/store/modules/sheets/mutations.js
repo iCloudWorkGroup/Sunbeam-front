@@ -1,7 +1,7 @@
 import * as types from '../../mutation-types';
 
 export default {
-	[types.UPDATE_ACTIVESHEET]() {
-		
+	[types.INSERT_SHEET](state, sheet) {
+		state.list.push(sheet);
 	}
 }

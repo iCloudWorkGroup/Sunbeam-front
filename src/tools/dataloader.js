@@ -2,13 +2,7 @@ import cfg from '../config';
 import cache from './cache';
 import extend from '../util/extend';
 import send from '../util/send';
-import rowDefault from '../store/defaults/row';
-import colDefault from '../store/defaults/col';
-import cellDefault from '../store/defaults/cell';
-import {
-	rowAliasGenerator,
-	colAliasGenerator
-} from './generator';
+import {rowAliasGenerator, colAliasGenerator} from './generator';
 
 
 export function initSpreadsheet(callback) {
@@ -52,7 +46,8 @@ function restoreSpreadsheet(callback) {
 		rows = [],
 		cells = [],
 		colLen,
-		rowLen;
+		rowLen,
+		sheet;
 
 	send({
 		url: 'reload',
@@ -73,58 +68,15 @@ function restoreSpreadsheet(callback) {
 
 			if (data.spreadSheet && data.spreadSheet[0] &&
 				(sheetData = data.spreadSheet[0].sheet)) {
-				rows = parseRow(sheetData.glY);
-				cols = parseCol(sheetData.glX);
-				cells = parseCell(sheetData.cells);
-				callback({rows, cols, cells});
+				sheet = {
+					alias: sheetData.alias || 'sheet1',
+					name: sheetData.name
+				};
+				rows = sheetData.glY;
+				cols = sheetData.glX;
+				cells = sheetData.cells;
+				callback({sheet, rows, cols, cells});
 			}
 		}
 	});
-}
-export function parseCell(data) {
-	let result = [],
-		cellData;
-	for (let i = 0, len = data.length; i < len; i++) {
-		cellData = data[i];
-		result.push(extend({}, cellDefault, {
-			occupy: cellData.occupy,
-			physicsBox: cellData.physicsBox,
-			content: {
-				texts: cellData.content.texts,
-				displayTexts: cellData.content.displayTexts,
-				alignRow: cellData.content.alignRow,
-				alignCol: cellData.content.alignCol,
-				wrap: cellData.wordWrap
-			},
-			font: {
-				size: cellData.content.size,
-				family: cellData.content.family,
-				color: cellData.content.color,
-				bd: cellData.content.bd,
-				italic: cellData.content.italic
-			},
-			decoration: {
-				underline: cellData.content.underline,
-				bg: cellData.customProp.background,
-				comment: cellData.customProp.comment
-			},
-			border: cellData.border,
-			format: cellData.format
-		}));
-	}
-	return result;
-}
-export function parseRow(data) {
-	let result = [];
-	for (let i = 0, len = data.length; i < len; i++) {
-		result.push(extend({}, rowDefault, data[i]));
-	}
-	return result;
-}
-export function parseCol(data) {
-	let result = [];
-	for (let i = 0, len = data.length; i < len; i++) {
-		result.push(extend({}, colDefault, data[i]));
-	}
-	return result;
 }

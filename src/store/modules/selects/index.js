@@ -8,7 +8,7 @@ import mutations from './mutations';
  * @type {Object}
  */
 const state = {
-
+	
 }
 
 export default {

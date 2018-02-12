@@ -4,7 +4,7 @@ export default {
 	aliasColCounter: '0',
 	//后台存储行列大小
 	localRowPosi: 0,
-	localColPosi: 0
+	localColPosi: 0,
 
 	//校验规则列表
 	validate: [],

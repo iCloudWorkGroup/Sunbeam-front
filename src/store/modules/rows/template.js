@@ -14,16 +14,16 @@ export default {
 	 * 上方为隐藏列（用于效果显示）
 	 * @type {Boolean}
 	 */
-	isTopAjacentHide: false,
+	topAjacentHide: false,
 	/**
 	 * 下方为隐藏列（用于效果显示）
 	 * @type {Boolean}
 	 */
-	isBottomAjacentHide: false,
+	bottomAjacentHide: false,
 	hidden: false,
 	/**
 	 * 正行操作属性
 	 * @type {Object}
 	 */
-	operProp: {}
+	oprProp: {}
 };

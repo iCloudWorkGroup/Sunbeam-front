@@ -1,7 +1,7 @@
-export function rangeBinary(val, arr, strandAttr, rangeAttr, startIndex, endIndex) {
+export function rangeBinary(val, array, strandAttr, rangeAttr, startIndex, endIndex) {
 	var middle,
 		start = startIndex ? startIndex : 0,
-		end = endIndex ? endIndex : arr.length,
+		end = endIndex ? endIndex : array.length,
 		findVal = Math.floor(val),
 		startVal, endVal,
 		middleIndex,
@@ -9,9 +9,9 @@ export function rangeBinary(val, arr, strandAttr, rangeAttr, startIndex, endInde
 	while (start < end) {
 		middleIndex = end + start >>> 1;
 		middle = array[middleIndex];
-		start = middle[strandAttr];
-		end = middle[rangeAttr] + start;
-		if (end < findValue) {
+		startVal = middle[strandAttr];
+		endVal = middle[rangeAttr] + startVal;
+		if (endVal < findVal) {
 			start = middleIndex + 1;
 		} else {
 			end = middleIndex;

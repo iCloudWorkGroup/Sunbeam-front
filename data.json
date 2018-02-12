@@ -10,6 +10,7 @@
 			"name": "新建excel",
 			"spreadSheet": [{
 				"name": "new Sheet",
+				"alias": "sheet1",
 				"sheet": {
 					"cells": [{
 						"occupy": {
@@ -17,12 +18,6 @@
 							"row": 0,
 							"x": ["1", "2"],
 							"y": ["1"]
-						},
-						"content":{
-
-						},
-						"customProp":{
-							
 						}
 					}, {
 						"occupy": {
@@ -30,12 +25,6 @@
 							"row": 0,
 							"x": ["1", "2"],
 							"y": ["1"]
-						},
-						"content":{
-
-						},
-						"customProp":{
-							
 						}
 					}, {
 						"occupy": {
@@ -43,12 +32,6 @@
 							"row": 1,
 							"x": ["1"],
 							"y": ["2"]
-						},
-						"content":{
-
-						},
-						"customProp":{
-							
 						}
 					}, {
 						"occupy": {
@@ -56,35 +39,34 @@
 							"row": 1,
 							"x": ["2"],
 							"y": ["2"]
-						},
-						"content":{
-
-						},
-						"customProp":{
-							
 						}
 					}],
 					"glX": [{
-						"aliasX": "1",
+						"alias": "1",
+						"sort": 0,
 						"index": 0,
 						"left": 0
 					}, {
-						"aliasX": "2",
+						"alias": "2",
+						"sort": 1,
 						"index": 1,
 						"left": 80
 					}],
 					"glY": [{
-						"aliasY": "1",
+						"alias": "1",
+						"sort": 0,
 						"height": 19,
 						"index": 0,
 						"top": 0
 					}, {
-						"aliasY": "2",
+						"alias": "2",
+						"sort": 1,
 						"height": 19,
 						"index": 1,
 						"top": 20
 					}, {
-						"aliasY": "3",
+						"alias": "3",
+						"sort": 2,
 						"height": 19,
 						"index": 2,
 						"top": 40

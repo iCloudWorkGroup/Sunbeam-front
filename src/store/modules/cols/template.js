@@ -12,17 +12,17 @@ export default {
 	 * 右为隐藏列（用于效果显示）
 	 * @type {Boolean}
 	 */
-	isRightAjacentHide: false,
+	rightAjacentHide: false,
 	/**
 	 * 左为隐藏列（用于效果显示）
 	 * @type {Boolean}
 	 */
-	isLeftAjacentHide: false,
+	leftAjacentHide: false,
 	active: false,
 	hidden: false,
 	/**
 	 * 记录整列操作
 	 * @type {Object}
 	 */
-	operProp: {}
+	oprProp: {}
 };

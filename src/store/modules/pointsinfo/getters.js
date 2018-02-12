@@ -1,7 +1,8 @@
 export default {
-	getPointInfo(state) {
+	getPointInfo(state, getters, rootState) {
 		return function(colAlias, rowAlias, type) {
-			let pointsInfo = state.col,
+			let currentSheet = rootState.currentSheet,
+				pointsInfo = state[currentSheet].col,
 				tmp;
 
 			if (pointsInfo[colAlias] && (tmp = pointsInfo[colAlias][rowAlias])) {

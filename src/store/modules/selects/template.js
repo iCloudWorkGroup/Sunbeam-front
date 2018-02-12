@@ -57,20 +57,18 @@ export default {
 		left: 0,
 	},
 	/**
+	 * 选中区域激活位置
+	 * @type {Object}
+	 */
+	activePosi: {
+		rowAlias: '0',
+		colAlias: '0',
+	},
+	/**
 	 * 选中区位置信息
 	 * @property {object} wholePosi
 	 */
 	wholePosi: {
-		/**
-		 * 点击位置
-		 * @type {String} initRowAlias
-		 */
-		initRowAlias: '0',
-		/**
-		 * 点击位置
-		 * @type {String} initColAlias
-		 */
-		initColAlias: '0',
 		/**
 		 * 开始位置
 		 * @property {String} startColAlias

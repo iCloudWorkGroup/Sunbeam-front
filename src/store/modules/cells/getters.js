@@ -2,20 +2,22 @@ import {rangeBinary} from '../../../util/binary';
 export default {
 	getFullOprRegion(state, getters, rootState) {
 		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}) {
-			let cells = state.list,
-				rows = rootState.row.list,
-				cols = rootState.col.list,
+			let currentSheet = rootState.currentSheet,
+				cells = state[currentSheet],
+				rows = rootState.rows[currentSheet],
+				cols = rootState.cols[currentSheet],
 				cellStartColIndex,
 				cellStartRowIndex,
 				cellEndColIndex,
 				cellEndRowIndex,
-				tmp,
-				flag = true,
+				cellList,
+				temp,
+				flag = true;
 
 			if (startRowIndex > endRowIndex) {
-				tmp = startRowIndex;
+				temp = startRowIndex;
 				startRowIndex = endRowIndex;
-				endRowIndex = tmp;
+				endRowIndex = temp;
 			}
 			if (startColIndex > endColIndex) {
 				temp = startColIndex;
@@ -43,12 +45,12 @@ export default {
 				flag = false;
 				cellList = getters.getCellsByVertical({startColIndex, startRowIndex, endColIndex, endRowIndex});
 
-				for (i = 0, len = cellList.length; i < len; i++) {
-					tmp = cellList.physicsBox;
-					cellStartRowIndex = rangeBinary(temp.top, rowList, 'top', 'height');
-					cellStartColIndex = rangeBinary(temp.left, colList, 'left', 'width');
-					cellEndRowIndex = rangeBinary(temp.top + temp.height, rowList, 'top', 'height');
-					cellEndColIndex = rangeBinary(temp.left + temp.width, colList, 'left', 'width');
+				for (let i = 0, len = cellList.length; i < len; i++) {
+					temp = cellList[i].physicsBox;
+					cellStartRowIndex = rangeBinary(temp.top, rows, 'top', 'height');
+					cellStartColIndex = rangeBinary(temp.left, cols, 'left', 'width');
+					cellEndRowIndex = rangeBinary(temp.top + temp.height, rows, 'top', 'height');
+					cellEndColIndex = rangeBinary(temp.left + temp.width, cols, 'left', 'width');
 					if (cellStartColIndex < startColIndex) {
 						startColIndex = cellStartColIndex;
 						flag = true;
@@ -75,30 +77,31 @@ export default {
 			};
 		}
 	},
-	getCellByVertical(state, getters, rootState) {
-		let cells = state.list;
+	getCellsByVertical(state, getters, rootState) {
+		let currentSheet = rootState.currentSheet,
+			cells = state[currentSheet];
 		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}){
 			let result = [],
-				pointInfo = rootState.points2Info.col,
-				rows = rootState.row.list,
-				cols = rootState.col.list,
-				index,
-				tmpObj = {},
+				pointInfo = rootState.pointsInfo[currentSheet].col,
+				rows = rootState.rows[currentSheet],
+				cols = rootState.cols[currentSheet],
+				index, temp,
+				tempObj = {},
 				rowAlias,
 				colAlias,
 				region;
 
-			strandX = cache.CellsPosition.strandX;
 			for (let i = startColIndex, len1 = endColIndex + 1; i < len1; i++) {
 				colAlias = cols[i].alias;
 				if (typeof pointInfo[colAlias] !== 'undefined') {
 					for (let j = startRowIndex, len2 = endRowIndex + 1; j < len2; j++) {
 						rowAlias = rows[j].alias;
-						if (typeof pointInfo[colAlias][rowAlias] !== 'undefined') {
-							index = pointInfo[colAlias][rowAlias];
+						if (typeof (temp = pointInfo[colAlias][rowAlias]) !== 'undefined' &&
+							temp.cellIndex !== null) {
+							index = temp.cellIndex;
 							if (!tempObj[index]) {
-								result.push(cells.at(index));
-								tmpObj[index] = 1;
+								result.push(cells[index]);
+								tempObj[index] = 1;
 							}
 						}
 					}

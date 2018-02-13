@@ -5,7 +5,10 @@
 	<title>Document</title>
 </head>
 <body>
-	<div id="app">
+	<div id="wrapper" style="position:relative;height:800px;width:800px">
+		<div id="app" style="position:absolute;top:0;bottom:0;left:0;right:0;">
+			<sheet-container :sheet-width="sheetWidth" :sheet-height="sheetHeight"></sheet-container>
+		</div>
 	</div>
 </body>
 </html>

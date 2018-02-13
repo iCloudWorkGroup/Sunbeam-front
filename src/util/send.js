@@ -12,7 +12,7 @@ export default function(options) {
 		async: false,
 		isPublic: true
 	}, options);
-	axios(options).then(function(response){
+	return axios(options).then(function(response){
 		options.success(response.data);
 	});
 }

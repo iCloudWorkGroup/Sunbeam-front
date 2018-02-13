@@ -13,7 +13,7 @@ const state = {
 
 export default {
 	state,
-	actions,
 	getters,
+	actions,
 	mutations
 };

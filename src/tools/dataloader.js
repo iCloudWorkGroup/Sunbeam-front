@@ -51,6 +51,7 @@ function restoreSpreadsheet(callback) {
 
 	send({
 		url: 'reload',
+		async: true,
 		success(data) {
 			if (!data || !data.returndata) {
 				return;

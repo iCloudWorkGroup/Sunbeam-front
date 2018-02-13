@@ -64,10 +64,6 @@
 			'col-head-container': ColHeadContainer,
 			'row-head-container': RowHeadContainer,
 			'edit-container': EditContainer
-		},
-		mounted() {
-			this.eidtContainerWidth = this.$el.offsetWidth - config.cornerLeft;
-			this.eidtContainerHeight = this.$el.offsetHeight - config.cornerHeight;
 		}
 	}
 </script>

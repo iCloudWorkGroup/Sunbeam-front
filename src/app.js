@@ -6,20 +6,22 @@ import {RESTORE} from './store/action-types';
 import SheetContainer from './components/sheetcontainer/sheetcontainer.vue';
 
 
-new Vue({
-	el: '#app',
-	data: {
-		sheetWidth: 0,
-		sheetHeight: 0
-	},
-	store,
-	components: {
-		'sheet-container': SheetContainer
-	},
-	created () {
-		let wrapper = document.getElementById('wrapper');
-		this.sheetWidth = wrapper.offsetWidth;
-		this.sheetHeight = wrapper.offsetHeight;
-		this.$store.dispatch(RESTORE);
-	}
+store.dispatch(RESTORE).then(() => {
+	new Vue({
+		el: '#app',
+		data: {
+			sheetWidth: 0,
+			sheetHeight: 0
+		},
+		store,
+		components: {
+			'sheet-container': SheetContainer
+		},
+		beforeCreate() {
+			let wrapper = document.getElementById('wrapper');
+			this.sheetWidth = wrapper.offsetWidth;
+			this.sheetHeight = wrapper.offsetHeight;
+		}
+	});
 });
+

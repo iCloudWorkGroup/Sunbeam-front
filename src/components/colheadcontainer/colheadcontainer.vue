@@ -8,13 +8,12 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import colHeadItem from '../colheaditem/colheaditem.vue';
+	import col from '../col/col.vue';
 
 	export default {
 		props: ['colContainerWidth'],
-
 		components: {
-			'col-head-item': colHeadItem
+			col,
 		},
 		computed: {
 			width() {
@@ -27,6 +26,9 @@
 			},
 			colList() {
 				return this.$store.getters.colList;
+			},
+			totalWidth() {
+
 			}
 		},
 		methods: {

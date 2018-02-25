@@ -1,6 +1,6 @@
 <template>
 	<div class="sheet-container" :style="{width: width + 'px',height: height + 'px'}">
-		<main-container :main-width="width" :main-height="height - 26"></main-container>
+		<main-container :main-width="width" :main-height="mainHeight"></main-container>
 		<!-- <sheet-list-container></sheet-list-container> -->
 	</div>
 </template>
@@ -18,6 +18,12 @@
 			},
 			height() {
 				return this.sheetHeight;
+			},
+			mainHeight() {
+				return this.sheetHeight -26;
+			},
+			listHeight() {
+				return 26;
 			}
 		},
 		components: {
@@ -29,7 +35,6 @@
 <style type="text/css">
 	.sheet-container{
 		position: relative; 
-		height: 100%; 
 		overflow: hidden;
 	}
 </style>

@@ -2,7 +2,10 @@ import cfg from '../config';
 import cache from './cache';
 import extend from '../util/extend';
 import send from '../util/send';
-import {rowAliasGenerator, colAliasGenerator} from './generator';
+import {
+	rowAliasGenerator,
+	colAliasGenerator
+} from './generator';
 
 
 export function initSpreadsheet(callback) {
@@ -76,7 +79,12 @@ function restoreSpreadsheet(callback) {
 				rows = sheetData.glY;
 				cols = sheetData.glX;
 				cells = sheetData.cells;
-				callback({sheet, rows, cols, cells});
+				callback({
+					sheet,
+					rows,
+					cols,
+					cells
+				});
 			}
 		}
 	});

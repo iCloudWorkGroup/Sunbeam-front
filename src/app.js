@@ -2,7 +2,9 @@ import './css/main.css';
 import './css/temp.css';
 import Vue from 'vue';
 import store from './store/index';
-import {RESTORE} from './store/action-types';
+import {
+	RESTORE
+} from './store/action-types';
 import SheetContainer from './components/sheetcontainer/sheetcontainer.vue';
 
 
@@ -24,4 +26,3 @@ store.dispatch(RESTORE).then(() => {
 		}
 	});
 });
-

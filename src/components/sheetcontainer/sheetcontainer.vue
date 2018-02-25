@@ -4,7 +4,6 @@
 		<!-- <sheet-list-container></sheet-list-container> -->
 	</div>
 </template>
-
 <script type="text/javascript">
 	import MainContainer from '../maincontainer/maincontainer.vue';
 

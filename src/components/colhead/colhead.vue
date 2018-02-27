@@ -1,39 +1,35 @@
 <template>
 	<div class="col-head-container" :style="{width: width + 'px'}">
 		<div class="col-head-bg col-head-height" :style="{width: totalWidth + 'px'}">
-			<div class="col-head-panel">
-				<col-head-item v-for="col in colList" :col="col"></col-head-item>
-			</div>
+			<col-head-panel></col-head-panel>
+			<div v-for="item in selectList" class="col-head-line" :style="{left: item.physicsBox.left + 'px', width: item.physicsBox.width -2 + 'px'}"></div>
 		</div>
 	</div>
 </template>
 <script type="text/javascript">
-	import col from '../col/col.vue';
+	import colHeadPanel from '../colheadpanel/colheadpanel.vue';
 
 	export default {
-		props: ['colContainerWidth'],
+		props: ['colHeadWidth'],
 		components: {
-			col,
+			'col-head-panel': colHeadPanel,
 		},
 		computed: {
 			width() {
-				return this.colContainerWidth;
+				return this.colHeadWidth;
 			},
 			totalWidth() {
 				let colList = this.$store.getters.colList,
 					lastCol = colList[colList.length - 1];
 				return lastCol.left + lastCol.width;
 			},
-			colList() {
-				return this.$store.getters.colList;
-			},
-			totalWidth() {
-
+			selectList() {
+				return this.$store.getters.selectList;
 			}
 		},
 		methods: {
 		}
-	}
+	};
 </script>
 <style>
 </style>

@@ -1,10 +1,9 @@
 import axios from 'axios';
 import cfg from '../config';
-import cache from '../tools/cache';
 import extend from './extend';
 
 export default function(options) {
-	options = extend({},{
+	options = extend({}, {
 		method: 'post',
 		baseURL: cfg.rootPath,
 		contentType: 'application/json; charset=UTF-8',
@@ -12,7 +11,7 @@ export default function(options) {
 		async: false,
 		isPublic: true
 	}, options);
-	return axios(options).then(function(response){
+	return axios(options).then(function(response) {
 		options.success(response.data);
 	});
 }

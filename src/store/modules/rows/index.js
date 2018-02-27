@@ -1,5 +1,6 @@
 import actions from './actions';
 import mutations from './mutations';
+import getters from './getters';
 
 /**
  * 状态值
@@ -12,6 +13,7 @@ const state = {
 
 export default {
 	state,
+	getters,
 	actions,
 	mutations
 };

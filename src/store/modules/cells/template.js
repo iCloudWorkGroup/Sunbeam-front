@@ -1,4 +1,4 @@
-import cfg from '../../config';
+import cfg from '../../../config';
 
 /**
  * 单元格对象默认值
@@ -28,7 +28,8 @@ export default {
 		alignRow: 'left',
 		alignCol: 'middle',
 		wordWrap: false,
-		underline: false
+		underline: false,
+		background: 'rgb(255, 255, 255)',
 	},
 	/**
 	 * 与容器相关属性
@@ -38,8 +39,7 @@ export default {
 		top: 0,
 		left: 0,
 		width: cfg.colWidth,
-		height: cfg.rowHeight
-		background: 'transparent',
+		height: cfg.rowHeight,
 		border: {
 			top: 0,
 			right: 0,

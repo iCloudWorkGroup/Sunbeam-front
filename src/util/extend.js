@@ -6,7 +6,7 @@ export default function extend(...values) {
 	if (values.length === 1) {
 		target = {};
 		i = 0;
-	}else{
+	} else {
 		target = values[0];
 	}
 
@@ -29,7 +29,7 @@ export default function extend(...values) {
 				} else {
 					clone = src && isObject(src) ? src : {};
 				}
-				target[name] = extend(copy, clone);
+				target[name] = extend(clone, copy);
 			} else {
 				target[name] = copy;
 			}

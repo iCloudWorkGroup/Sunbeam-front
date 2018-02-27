@@ -4,4 +4,4 @@ export default {
 	[types.UPDATE_ACTIVESHEET](state, alias) {
 		state.currentSheet = alias;
 	}
-}
+};

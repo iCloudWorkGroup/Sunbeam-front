@@ -21,4 +21,4 @@ export default {
 			currentSheet: rootState.currentSheet
 		});
 	}
-}
+};

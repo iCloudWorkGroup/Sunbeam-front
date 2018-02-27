@@ -1,9 +1,13 @@
 import {rangeBinary} from '../../../util/binary';
 export default {
+	cellList(state, getters, rootState) {
+		let currentSheet = rootState.currentSheet,
+			result = state[currentSheet];
+		return result;
+	},
 	getFullOprRegion(state, getters, rootState) {
 		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}) {
 			let currentSheet = rootState.currentSheet,
-				cells = state[currentSheet],
 				rows = rootState.rows[currentSheet],
 				cols = rootState.cols[currentSheet],
 				cellStartColIndex,
@@ -75,12 +79,13 @@ export default {
 				endRowIndex,
 				endColIndex
 			};
-		}
+		};
 	},
 	getCellsByVertical(state, getters, rootState) {
 		let currentSheet = rootState.currentSheet,
 			cells = state[currentSheet];
-		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}){
+			
+		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}) {
 			let result = [],
 				pointInfo = rootState.pointsInfo[currentSheet].col,
 				rows = rootState.rows[currentSheet],
@@ -88,8 +93,7 @@ export default {
 				index, temp,
 				tempObj = {},
 				rowAlias,
-				colAlias,
-				region;
+				colAlias;
 
 			for (let i = startColIndex, len1 = endColIndex + 1; i < len1; i++) {
 				colAlias = cols[i].alias;
@@ -108,6 +112,6 @@ export default {
 				}
 			}
 			return result;
-		}
+		};
 	}
-}
+};

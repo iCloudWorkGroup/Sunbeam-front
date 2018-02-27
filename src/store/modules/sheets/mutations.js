@@ -4,4 +4,4 @@ export default {
 	[types.INSERT_SHEET](state, sheet) {
 		state.list.push(sheet);
 	}
-}
+};

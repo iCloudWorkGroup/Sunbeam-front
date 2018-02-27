@@ -17,7 +17,7 @@ const state = {
 	 * @type {String}
 	 */
 	currentSheet: '',
-}
+};
 
 export default new Vuex.Store({
 	state,

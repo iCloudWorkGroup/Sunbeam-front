@@ -18,4 +18,4 @@ export default {
 	 * @type {Boolean}
 	 */
 	active: true
-}
+};

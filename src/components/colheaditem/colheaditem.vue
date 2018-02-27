@@ -1,5 +1,5 @@
 <template>
-	<div class="col-head-item" :style="{left: left + 'px',width: width + 'px'}">
+	<div class="col-head-item" :style="{left: left + 'px',width: width + 'px'}" :class="{active: active}">
 		<div class="item">{{displayName}}</div>	
 	</div>
 </template>
@@ -15,12 +15,15 @@
 			},
 			displayName() {
 				return this.col.displayName;
+			},
+			active() {
+				return this.col.activeState;
 			}
 		},
 		methods: {
 
 		}
-	}
+	};
 </script>
 <style type="text/css">
 	

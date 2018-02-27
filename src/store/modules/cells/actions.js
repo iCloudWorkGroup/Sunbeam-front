@@ -1,17 +1,18 @@
 import * as actionTypes from '../../action-types';
 import * as mutaionTypes from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
+import extend from '../../../util/extend';
+import template from './template';
 
 export default {
 	/**
 	 * 还原单元格
 	 */
-	[actionTypes.CELLS_RESTORECELL] ({commit, dispatch, state, rootState, getters}, cells) {
-		
+	[actionTypes.CELLS_RESTORECELL]({commit, dispatch, state, rootState, getters}, cells) {
 		if (!Array.isArray(cells)) {
 			cells = [cells];
 		}
-		
+
 		let sheet = rootState.currentSheet,
 			colList = rootState.cols[sheet],
 			rowList = rootState.rows[sheet],
@@ -19,7 +20,7 @@ export default {
 			limitRowIndex = rowList.length - 1,
 			limitColIndex = colList.length - 1,
 			getPointInfo = getters.getPointInfo;
-			
+
 
 		for (let i = 0, len = cells.length; i < len; i++) {
 			let cell,
@@ -33,7 +34,6 @@ export default {
 				cellIndex,
 				width = 0,
 				height = 0,
-				top, left,
 				physicsBox;
 
 			cell = cells[i];
@@ -68,13 +68,13 @@ export default {
 
 			for (let j = startColIndex; j < endColIndex + 1; j++) {
 				let col = colList[j];
-				if (!col.hidden){
+				if (!col.hidden) {
 					width += col.width + 1;
 				}
 			}
 			for (let j = startRowIndex; j < endRowIndex + 1; j++) {
 				let row = rowList[j];
-				if (!row.hidden){
+				if (!row.hidden) {
 					height += row.height + 1;
 				}
 			}
@@ -85,7 +85,7 @@ export default {
 				height: height - 1
 			};
 
-			if(typeof cellIndex !== 'number'){
+			if (typeof cellIndex !== 'number') {
 				let colAlias, rowAlias;
 				for (let j = 0; j < aliasColList.length; j++) {
 					for (let k = 0; k < aliasRowList.length; k++) {
@@ -103,10 +103,14 @@ export default {
 					}
 				}
 				cell.physicsBox = physicsBox;
-				commit(mutaionTypes.INSERT_CELL, {currentSheet:sheet, cells:[cell]});
-			}else{
+				cell = extend({}, template, cell);
+				commit(mutaionTypes.INSERT_CELL, {
+					currentSheet: sheet,
+					cells: [cell]
+				});
+			} else {
 				commit(mutaionTypes.UPDATE_CELL, {
-					currentSheet:sheet,
+					currentSheet: sheet,
 					cell: {
 						propName: 'physicsBox',
 						value: physicsBox,
@@ -116,4 +120,4 @@ export default {
 			}
 		}
 	}
-}
+};

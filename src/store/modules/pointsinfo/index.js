@@ -8,10 +8,10 @@ import mutations from './mutations';
  */
 const state = {
 	
-}
+};
 
 export default {
 	state,
 	getters,
 	mutations
-}
+};

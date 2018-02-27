@@ -3,24 +3,24 @@ import './css/temp.css';
 import Vue from 'vue';
 import store from './store/index';
 import {RESTORE} from './store/action-types';
-import SheetContainer from './components/sheetcontainer/sheetcontainer.vue';
+import Book from './components/book/book.vue';
 
 
 store.dispatch(RESTORE).then(() => {
 	new Vue({
 		el: '#app',
-		data: {
-			sheetWidth: 0,
-			sheetHeight: 0
-		},
 		store,
-		components: {
-			'sheet-container': SheetContainer
+		data: {
+			bookWidth: 0,
+			bookHeight: 0
 		},
-		beforeCreate() {
+		components: {
+			'book': Book
+		},
+		created() {
 			let wrapper = document.getElementById('wrapper');
-			this.sheetWidth = wrapper.offsetWidth;
-			this.sheetHeight = wrapper.offsetHeight;
+			this.bookWidth = wrapper.offsetWidth;
+			this.bookHeight = wrapper.offsetHeight;
 		}
 	});
 });

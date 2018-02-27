@@ -7,10 +7,10 @@ const state = {
 	 * @type {Array}
 	 */
 	list: []	
-}
+};
 
 export default {
 	state,
 	actions,
 	mutations
-}
+};

@@ -9,8 +9,8 @@ export default {
 			col: {},
 			row: {}
 		});
-	}, 
-	[types.UPDATE_POINTINFO](state, {currentSheet, info:{colAlias, rowAlias, type, value}}) {
+	},
+	[types.UPDATE_POINTINFO](state, {currentSheet, info: {colAlias, rowAlias, type, value}}) {
 		let colInfo = state[currentSheet].col,
 			rowInfo = state[currentSheet].row,
 			tmp;
@@ -19,17 +19,17 @@ export default {
 			tmp[type] = value;
 			tmp = rowInfo[rowAlias][colAlias];
 			tmp[type] = value;
-		}else{
-			if(!colInfo[colAlias]){
+		} else {
+			if (!colInfo[colAlias]) {
 				colInfo[colAlias] = {};
 			}
-			if(!rowInfo[rowAlias]){
+			if (!rowInfo[rowAlias]) {
 				rowInfo[rowAlias] = {};
 			}
 			tmp = colInfo[colAlias][rowAlias] = extend(template);
-			tmp[type] = value; 
+			tmp[type] = value;
 			tmp = rowInfo[rowAlias][colAlias] = extend(template);
-			tmp[type] = value; 
+			tmp[type] = value;
 		}
 	}
-}
+};

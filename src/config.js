@@ -1,5 +1,5 @@
 export default {
-	colWidth: 72,
+	colWidth: 71,
 	rowHeight: 20,
 	initRowNum: 100,
 	initColNum: 26,

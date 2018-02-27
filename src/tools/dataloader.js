@@ -2,38 +2,43 @@ import cfg from '../config';
 import cache from './cache';
 import extend from '../util/extend';
 import send from '../util/send';
+import rowTemplate from '../store/modules/rows/template';
+import colTemplate from '../store/modules/cols/template';
 import {rowAliasGenerator, colAliasGenerator} from './generator';
+import {getColDisplayName, getRowDisplayName} from './getdisplayname';
 
 
-export function initSpreadsheet(callback) {
+export function initSpreadsheet(fn) {
 	let build = 'false';
 
 	if (build === 'true') {
-		buildNewSpreadsheet(callback);
+		buildNewSpreadsheet(fn);
 		return;
 	}
-	restoreSpreadsheet(callback);
+	restoreSpreadsheet(fn);
 }
 
 
-function buildNewSpreadsheet(callback) {
+function buildNewSpreadsheet(fn) {
 	let rows = [],
 		cols = [],
 		cells = [],
 		sheet;
 
 	for (let i = 0, len = cfg.initRowNum; i < len; i++) {
-		rows.push(extend({}, rowDefault, {
-			alias: rowAliasGenerator()
+		rows.push(extend({}, rowTemplate, {
+			alias: rowAliasGenerator(),
+			displayName: getRowDisplayName(i)
 		}));
 	}
 	for (let i = 0, len = cfg.initColNum; i < len; i++) {
-		cols.push(extend({}, colDefault, {
-			alias: colAliasGenerator()
+		cols.push(extend({}, colTemplate, {
+			alias: colAliasGenerator(),
+			displayName: getColDisplayName(i)
 		}));
 	}
 
-	callback({
+	fn({
 		rows,
 		cols,
 		cells,
@@ -41,17 +46,14 @@ function buildNewSpreadsheet(callback) {
 	});
 }
 
-function restoreSpreadsheet(callback) {
+function restoreSpreadsheet(fn) {
 	var cols = [],
 		rows = [],
 		cells = [],
-		colLen,
-		rowLen,
 		sheet;
 
 	send({
 		url: 'reload',
-		async: true,
 		success(data) {
 			if (!data || !data.returndata) {
 				return;
@@ -76,7 +78,7 @@ function restoreSpreadsheet(callback) {
 				rows = sheetData.glY;
 				cols = sheetData.glX;
 				cells = sheetData.cells;
-				callback({sheet, rows, cols, cells});
+				fn({sheet, rows, cols, cells});
 			}
 		}
 	});

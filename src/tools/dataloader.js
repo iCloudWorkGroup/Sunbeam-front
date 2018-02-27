@@ -7,7 +7,6 @@ import colTemplate from '../store/modules/cols/template';
 import {rowAliasGenerator, colAliasGenerator} from './generator';
 import {getColDisplayName, getRowDisplayName} from './getdisplayname';
 
-
 export function initSpreadsheet(fn) {
 	let build = 'false';
 
@@ -78,6 +77,7 @@ function restoreSpreadsheet(fn) {
 				rows = sheetData.glY;
 				cols = sheetData.glX;
 				cells = sheetData.cells;
+
 				fn({sheet, rows, cols, cells});
 			}
 		}

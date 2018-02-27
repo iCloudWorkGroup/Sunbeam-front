@@ -6,6 +6,7 @@ import {RESTORE} from './store/action-types';
 import Book from './components/book/book.vue';
 
 
+
 store.dispatch(RESTORE).then(() => {
 	new Vue({
 		el: '#app',
@@ -24,4 +25,3 @@ store.dispatch(RESTORE).then(() => {
 		}
 	});
 });
-

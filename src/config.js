@@ -13,4 +13,9 @@ export default {
 	 * @property {int} outerTop
 	 */
 	cornerHeight: 20,
+	/**
+	 * 请求地址根路径
+	 * @type {String}
+	 */
+	rootPath: ''
 };

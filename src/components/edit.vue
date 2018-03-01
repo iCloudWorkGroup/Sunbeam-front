@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import EditPanel from '../editpanel/editpanel.vue';
+	import EditPanel from './edit-panel.vue';
 
 	export default {
 		props: ['editWidth', 'editHeight'],
@@ -17,7 +17,7 @@
 			}
 		},
 		components: {
-			'edit-panel': EditPanel
+			EditPanel
 		}
 	};
 </script>

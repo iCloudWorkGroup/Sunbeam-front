@@ -84,7 +84,9 @@ export default {
 				width: width - 1,
 				height: height - 1
 			};
-
+			/**
+			 * 更新坐标信息
+			 */
 			if (typeof cellIndex !== 'number') {
 				let colAlias, rowAlias;
 				for (let j = 0; j < aliasColList.length; j++) {

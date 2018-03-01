@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import CellItem from '../cellitem/cellitem.vue';
+	import CellItem from './cell-item.vue';
 	export default {
 		computed: {
 			cellList() {
@@ -12,7 +12,7 @@
 			}
 		},
 		components: {
-			'cell-item': CellItem
+			CellItem
 		}
 	};
 </script>

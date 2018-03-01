@@ -7,12 +7,12 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import rowHeadPanel from '../rowheadpanel/rowheadpanel.vue';
+	import RowHeadPanel from './row-head-panel.vue';
 
 	export default {
 		props: ['rowHeadHeight'],
 		components: {
-			'row-head-panel': rowHeadPanel,
+			RowHeadPanel,
 		},
 		computed: {
 			height() {

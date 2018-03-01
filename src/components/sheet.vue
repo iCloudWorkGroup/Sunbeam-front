@@ -27,11 +27,11 @@
 </template>
 
 <script type="text/javascript">
-	import config from '../../config';
-	import getScrollbarWidth from '../../util/getScrollbarWidth';
-	import ColHead from '../colhead/colhead.vue';
-	import RowHead from '../rowhead/rowhead.vue';
-	import Edit from '../edit/edit.vue';
+	import config from '../config';
+	import getScrollbarWidth from '../util/scrollbarWidth';
+	import ColHead from './col-head.vue';
+	import RowHead from './row-head.vue';
+	import Edit from './edit.vue';
 
 	export default {
 		props: [
@@ -64,9 +64,9 @@
 			};
 		},
 		components: {
-			'col-head': ColHead,
-			'row-head': RowHead,
-			'edit': Edit
+			ColHead,
+			RowHead,
+			Edit
 		}
 	};
 </script>

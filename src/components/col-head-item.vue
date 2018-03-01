@@ -1,5 +1,5 @@
 <template>
-	<div class="col-head-item" :style="{left: left + 'px',width: width + 'px'}" :class="{active: active}">
+	<div class="col-head-item" :style="{left: left + 'px', width: width + 'px'}" :class="{active: active}">
 		<div class="item">{{displayName}}</div>	
 	</div>
 </template>

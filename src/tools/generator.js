@@ -1,27 +1,31 @@
-import cache from './cache';
-
-export function rowAliasGenerator() {
-	return generator('row');
-}
-export function colAliasGenerator() {
-	return generator('row');
-}
-
-function generator(type) {
-	var alias,
-		num;
-	if (type === 'col') {
-		alias = cache.aliasColCounter;
-	} else {
-		alias = cache.aliasRowCounter;
+function* gen(counter) {
+	while (true) {
+		yield counter + '';
+		counter++;
 	}
-
-	num = parseInt(alias);
-	alias = (num + 1).toString();
-	if (type === 'col') {
-		cache.aliasColCounter = alias;
-	} else {
-		cache.aliasRowCounter = alias;
-	}
-	return alias;
 }
+
+function createGenerator(counter) {
+	let myGen = gen(counter);
+	return function() {
+		return myGen.next();
+	};
+}
+export default {
+	rowAliasGenerator(counter = 0) {
+		this.rowAliasGenerator = createGenerator(counter);
+		return counter;
+	},
+	colAliasGenerator(counter = 0) {
+		this.rowAliasGenerator = createGenerator(counter);
+		return counter;
+	},
+	cellAliasGenerator(counter = 0) {
+		this.rowAliasGenerator = createGenerator(counter);
+		return counter;
+	},
+	selectAliasGenerator(counter = 0) {
+		this.rowAliasGenerator = createGenerator(counter);
+		return counter;
+	}
+};

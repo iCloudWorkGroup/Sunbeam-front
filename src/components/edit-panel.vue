@@ -1,5 +1,5 @@
 <template>
-	<div class="edit-panel" @mousedown="locate" :style="{width: width + 'px', height: height + 'px'}">	
+	<div class="edit-panel" ref="panel" @mousedown="locate" :style="{width: width + 'px', height: height + 'px'}">	
 		<row-group></row-group>
 		<col-group></col-group>
 		<cell-group></cell-group>
@@ -7,11 +7,11 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import {SELECTS_UPDATESELECT} from '../../store/action-types';
-	import ColGroup from '../colgroup/colgroup.vue';
-	import RowGroup from '../rowgroup/rowgroup.vue';
-	import CellGroup from '../cellgroup/cellgroup.vue';
-	import SelectGroup from '../selectgroup/selectgroup.vue';
+	import {SELECTS_UPDATESELECT} from '../store/action-types';
+	import ColGroup from './col-group.vue';
+	import RowGroup from './row-group.vue';
+	import CellGroup from './cell-group.vue';
+	import SelectGroup from './select-group.vue';
 
 	export default {
 		props: ['editPanelWidth', 'editPanelHeight'],
@@ -28,18 +28,22 @@
 			}
 		},
 		components: {
-			'col-group': ColGroup,
-			'row-group': RowGroup,
-			'cell-group': CellGroup,
-			'select-group': SelectGroup
+			ColGroup,
+			RowGroup,
+			CellGroup,
+			SelectGroup
 		},
 		methods: {
 			locate(e) {
-				this.changeSelect(e.offsetX, e.offsetY);
+				let elem = this.$refs.panel,
+					box;
+
+				box = elem.getBoundingClientRect();
+				this.changeSelect(e.clientX - box.left, e.clientY - box.top);
 			},
-			changeSelect(offsetX, offsetY) {
-				let colIndex = this.$store.getters.getColIndex(offsetX),
-					rowIndex = this.$store.getters.getRowIndex(offsetY);
+			changeSelect(X, Y) {
+				let colIndex = this.$store.getters.getColIndex(X),
+					rowIndex = this.$store.getters.getRowIndex(Y);
 
 				this.$store.dispatch(SELECTS_UPDATESELECT, {
 					startColIndex:colIndex,

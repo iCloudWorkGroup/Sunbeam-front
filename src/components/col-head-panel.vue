@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import colHeadItem from '../colheaditem/colheaditem.vue';
+	import colHeadItem from './col-head-item.vue';
 	
 	export default {
 		components: {

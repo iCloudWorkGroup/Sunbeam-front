@@ -1,11 +1,11 @@
 <template>
-	<div class="book" :style="{width: width + 'px',height: height + 'px'}">
+	<div class="book" :width ="width + 'px'" :style="{ width: width + 'px', height: height + 'px'}">
 		<sheet :sheet-width="width" :sheet-height="sheetHeight"></sheet>
 		<!-- <tab></tab> -->
 	</div>
 </template>
 <script type="text/javascript">
-	import Sheet from '../sheet/sheet.vue';
+	import Sheet from './sheet.vue';
 
 	export default {
 		props: [
@@ -27,7 +27,7 @@
 			}
 		},
 		components: {
-			'sheet': Sheet
+			Sheet
 		}
 	};
 </script>

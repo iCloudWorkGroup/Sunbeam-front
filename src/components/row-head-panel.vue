@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import rowHeadItem from '../rowheaditem/rowheaditem.vue';
+	import rowHeadItem from './row-head-item.vue';
 	
 	export default {
 		components: {

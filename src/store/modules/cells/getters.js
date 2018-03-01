@@ -5,6 +5,10 @@ export default {
 			result = state[currentSheet];
 		return result;
 	},
+	/**
+	 * 返回合法的操作区域
+	 * 区域内只能包含完整的单元格
+	 */
 	getFullOprRegion(state, getters, rootState) {
 		return function({startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex}) {
 			let currentSheet = rootState.currentSheet,
@@ -81,6 +85,9 @@ export default {
 			};
 		};
 	},
+	/**
+	 * 查选区域内所有单元格(垂直方向)
+	 */
 	getCellsByVertical(state, getters, rootState) {
 		let currentSheet = rootState.currentSheet,
 			cells = state[currentSheet];

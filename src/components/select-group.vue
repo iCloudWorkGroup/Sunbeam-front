@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import SelectItem from '../selectitem/selectitem.vue';
+	import SelectItem from './select-item.vue';
 
 	export default {
 		computed: {
@@ -13,7 +13,7 @@
 			}
 		},
 		components: {
-			'select-item': SelectItem
+			SelectItem
 		}
 	};
 </script>

@@ -4,20 +4,16 @@ import extend from '../../../util/extend';
 import template from './template';
 
 export default {
-	[actionTypes.ROWS_ADDROWS]({
-		state,
-		rootState,
-		commit
-	}, rows) {
-		let tmp = [];
+	[actionTypes.ROWS_ADDROWS]({state, rootState, commit}, rows) {
+		let temp = [];
 		if (!Array.isArray(rows)) {
 			rows = [rows];
 		}
 		for (let i = 0, len = rows.length; i < len; i++) {
-			tmp.push(extend({}, template, rows[i]));
+			temp.push(extend({}, template, rows[i]));
 		}
 		commit(mutaionTypes.ADD_ROW, {
-			rows: tmp,
+			rows: temp,
 			currentSheet: rootState.currentSheet
 		});
 	}

@@ -4,8 +4,8 @@ import extend from '../util/extend';
 import send from '../util/send';
 import rowTemplate from '../store/modules/rows/template';
 import colTemplate from '../store/modules/cols/template';
-import {rowAliasGenerator, colAliasGenerator} from './generator';
-import {getColDisplayName, getRowDisplayName} from './getdisplayname';
+import generator from './generator';
+import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
 export function initSpreadsheet(fn) {
 	let build = 'false';
@@ -26,13 +26,13 @@ function buildNewSpreadsheet(fn) {
 
 	for (let i = 0, len = cfg.initRowNum; i < len; i++) {
 		rows.push(extend({}, rowTemplate, {
-			alias: rowAliasGenerator(),
+			alias: generator.rowAliasGenerator(),
 			displayName: getRowDisplayName(i)
 		}));
 	}
 	for (let i = 0, len = cfg.initColNum; i < len; i++) {
 		cols.push(extend({}, colTemplate, {
-			alias: colAliasGenerator(),
+			alias: generator.colAliasGenerator(),
 			displayName: getColDisplayName(i)
 		}));
 	}
@@ -63,9 +63,6 @@ function restoreSpreadsheet(fn) {
 			cache.localRowPosi = data.maxRowPixel;
 			cache.localColPosi = data.maxColPixel;
 
-			cache.aliasRowCounter = data.aliasRowCounter;
-			cache.aliasColCounter = data.aliasColCounter;
-
 			data = data.returndata;
 
 			if (data.spreadSheet && data.spreadSheet[0] &&
@@ -77,6 +74,11 @@ function restoreSpreadsheet(fn) {
 				rows = sheetData.glY;
 				cols = sheetData.glX;
 				cells = sheetData.cells;
+
+				generator.rowAliasGenerator(data.aliasRowCounter);
+				generator.colAliasGenerator(data.aliasColCounter);
+				generator.cellAliasGenerator('0');
+				generator.selectAliasGenerator('0');
 
 				fn({sheet, rows, cols, cells});
 			}

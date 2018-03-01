@@ -3,9 +3,11 @@ import './css/temp.css';
 import Vue from 'vue';
 import store from './store/index';
 import {RESTORE} from './store/action-types';
-import Book from './components/book/book.vue';
+import Book from './components/book.vue';
 
-
+Vue.filter('parsePixel', function(value) {
+	return value + 'px';
+});
 
 store.dispatch(RESTORE).then(() => {
 	new Vue({

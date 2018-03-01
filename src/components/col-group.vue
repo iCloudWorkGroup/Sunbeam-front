@@ -1,6 +1,8 @@
 <template>
 	<div class="col-group">
-		<div v-for="item in colList" :key="item.alias" class="col" :style="{left: item.left + 'px', width: item.width + 'px'}"></div>
+		<div v-for="item in colList" :key="item.alias" class="col" 
+		:style="{left: item.left + 'px', width: item.width + 'px'}">
+		</div>
 	</div>
 </template>
 <script type="text/javascript">

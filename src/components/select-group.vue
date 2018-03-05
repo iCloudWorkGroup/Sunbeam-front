@@ -1,6 +1,6 @@
 <template>
     <div class="select-group">
-        <select-item v-for="item in selectList" :item="item"></select-item>
+        <select-item v-for="item in selectList" :key="item" :item="item"></select-item>
     </div>
 </template>
 <script type="text/javascript">

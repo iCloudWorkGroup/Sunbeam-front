@@ -21,8 +21,7 @@ module.exports = {
 				'style-loader',
 				'css-loader'
 			]
-		},
-		{
+		}, {
 			test: /\.(js|vue)$/,
 			loader: 'eslint-loader',
 			enforce: 'pre',

@@ -1,4 +1,6 @@
-import { rangeBinary } from '../../../util/binary';
+import {
+    rangeBinary
+} from '../../../util/binary';
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
@@ -10,8 +12,13 @@ export default {
      * 区域内只能包含完整的单元格
      */
     getFullOprRegion(state, getters, rootState) {
-        return function({ startColIndex, startRowIndex, endColIndex =
-            startColIndex, endRowIndex = startRowIndex }) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex =
+            startColIndex,
+            endRowIndex = startRowIndex
+        }) {
             let currentSheet = rootState.currentSheet,
                 rows = rootState.rows[currentSheet],
                 cols = rootState.cols[currentSheet],
@@ -52,8 +59,12 @@ export default {
 
             while (flag) {
                 flag = false;
-                cellList = getters.getCellsByVertical({ startColIndex,
-                    startRowIndex, endColIndex, endRowIndex });
+                cellList = getters.getCellsByVertical({
+                    startColIndex,
+                    startRowIndex,
+                    endColIndex,
+                    endRowIndex
+                });
 
                 for (let i = 0, len = cellList.length; i < len; i++) {
                     temp = cellList[i].physicsBox;
@@ -98,8 +109,13 @@ export default {
         let currentSheet = rootState.currentSheet,
             cells = state[currentSheet];
 
-        return function({ startColIndex, startRowIndex, endColIndex =
-            startColIndex, endRowIndex = startRowIndex }) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex =
+            startColIndex,
+            endRowIndex = startRowIndex
+        }) {
             let result = [],
                 pointInfo = rootState.pointsInfo[currentSheet].col,
                 rows = rootState.rows[currentSheet],
@@ -115,9 +131,8 @@ export default {
                     for (let j = startRowIndex, len2 = endRowIndex + 1; j <
                         len2; j++) {
                         rowAlias = rows[j].alias;
-                        if (typeof(temp = pointInfo[colAlias][rowAlias]) !==
-                            'undefined' &&
-                            temp.cellIndex !== null) {
+                        temp = pointInfo[colAlias][rowAlias];
+                        if (typeof temp !== 'undefined' && temp.cellIndex !== null) {
                             index = temp.cellIndex;
                             if (!tempObj[index]) {
                                 result.push(cells[index]);

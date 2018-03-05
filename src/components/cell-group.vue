@@ -1,6 +1,6 @@
 <template>
     <div class="cell-group">
-        <cell-item v-for="item in cellList" :item="item"></cell-item>
+        <cell-item v-for="item in cellList" key="item" :item="item"></cell-item>
     </div>
 </template>
 <script type="text/javascript">

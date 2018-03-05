@@ -1,6 +1,6 @@
 <template>
     <div class="col-head-panel">
-        <col-head-item v-for="col in colList" :col="col"></col-head-item>
+        <col-head-item v-for="col in colList"  :key="col" :col="col"></col-head-item>
     </div>
 </template>
 <script type="text/javascript">

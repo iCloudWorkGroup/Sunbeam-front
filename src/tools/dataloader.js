@@ -5,7 +5,10 @@ import send from '../util/send';
 import rowTemplate from '../store/modules/rows/template';
 import colTemplate from '../store/modules/cols/template';
 import generator from './generator';
-import {getColDisplayName, getRowDisplayName} from '../util/displayname';
+import {
+	getColDisplayName,
+	getRowDisplayName
+} from '../util/displayname';
 
 export function initSpreadsheet(fn) {
 	let build = 'false';
@@ -80,7 +83,12 @@ function restoreSpreadsheet(fn) {
 				generator.cellAliasGenerator('0');
 				generator.selectAliasGenerator('0');
 
-				fn({sheet, rows, cols, cells});
+				fn({
+					sheet,
+					rows,
+					cols,
+					cells
+				});
 			}
 		}
 	});

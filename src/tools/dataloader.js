@@ -79,7 +79,15 @@ function restoreSpreadsheet(fn) {
 				generator.colAliasGenerator(data.aliasColCounter);
 				generator.cellAliasGenerator('0');
 				generator.selectAliasGenerator('0');
+				
+				cache.colRecord.push(cols[0].alias, cols[cols.length -1].alias);
+				cache.rowRecord.push(rows[0].alias, rows[rows.length -1].alias);
 
+				cache.regionRecord.set(cache.colRecord[0] + '_' + 
+						cache.colRecord[1] + '_' + 
+						cache.rowRecord[0] + '_'+ 
+						cache.rowRecord[1], true);
+				
 				fn({sheet, rows, cols, cells});
 			}
 		}

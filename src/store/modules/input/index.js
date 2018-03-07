@@ -1,16 +1,15 @@
 import getters from './getters';
+import actions from './actions';
 import mutations from './mutations';
 
 /**
- * 状态值
- * @type {Object}
+ * 选中区域状态值
  */
-const state = {
-	
-};
+const state = {};
 
 export default {
 	state,
 	getters,
+	actions,
 	mutations
 };

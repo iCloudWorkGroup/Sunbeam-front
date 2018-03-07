@@ -14,6 +14,15 @@ export default {
 	 */
 	cornerHeight: 20,
 	/**
+	 * 请求预加载区域宽度
+	 */
+	prestrainWidth: 50,
+	/**
+	 * 请求区域缓存宽度
+	 * @type {Number}
+	 */
+	scrollBufferWidth: 100,
+	/**
 	 * 请求地址根路径
 	 * @type {String}
 	 */

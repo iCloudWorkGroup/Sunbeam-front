@@ -1,6 +1,6 @@
 <template>
 	<div class="cell" 
-		:style="{top: top + 'px', 
+		:style="{top: top + 'px',
 				left: left + 'px', 
 				width: width + 'px', 
 				height: height + 'px'}">
@@ -12,7 +12,7 @@
 					color: content.color, textAlign: content.alignRow, 
 					textDecoration: content.underline, 
 					verticalAlign: content.alignCol}">
-			{{content.displayTexts}}
+			{{content.texts}}
 		</div>
 	</div>
 </template>
@@ -39,8 +39,7 @@
 	};
 </script>
 <style type="text/css">
-	.cell{
-		position: absolute;
+	.cell{position: absolute;
 		overflow: hidden;
 		cursor: default;
 		border: 1px solid transparent;

@@ -3,7 +3,7 @@ import * as mutationTypes from './mutation-types';
 import * as actionTypes from './action-types';
 
 export default {
-	[actionTypes.RESTORE]({state, dispatch, commit}) {
+	[actionTypes.RESTORE]({dispatch, commit}) {
 		return new Promise(resolve => {
 			initSpreadsheet(({
 				rows,
@@ -22,4 +22,4 @@ export default {
 			});
 		});
 	}
-};
+};	

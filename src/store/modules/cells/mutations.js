@@ -11,9 +11,15 @@ export default {
 			currentList.push(cells[i]);
 		}
 	},
-	[types.UPDATE_CELL](state, {currentSheet, cell:{cellIndex, propName, value}}) {
-		let currentList = state[currentSheet];
-		let cell = currentList[cellIndex];
-		cell[propName] = value;
+	[types.UPDATE_CELL](state, {currentSheet, cellInfo: {cellIndex, propName, value}}) {
+		let currentList = state[currentSheet],
+		 	cell = currentList[cellIndex];
+
+		propName = propName.split('.');
+		if (propName.length > 1) {
+			cell[propName[0]][propName[1]] = value;
+		} else {
+			cell[propName[0]] = value;
+		}
 	}
 };

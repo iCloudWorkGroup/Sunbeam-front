@@ -10,7 +10,7 @@
 	import ColHeadPanel from './col-head-panel.vue';
 
 	export default {
-		props: ['colHeadWidth'],
+		props: ['colHeadWidth' , 'scrollLeft'],
 		components: {
 			ColHeadPanel,
 		},
@@ -25,6 +25,11 @@
 			},
 			selectList() {
 				return this.$store.getters.selectList;
+			}
+		},
+		watch: {
+			scrollLeft(val) {
+				this.$el.scrollLeft = val;
 			}
 		},
 		methods: {

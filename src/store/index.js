@@ -8,6 +8,7 @@ import cells from './modules/cells/index';
 import selects from './modules/selects/index';
 import sheets from './modules/sheets/index';
 import pointsInfo from './modules/pointsinfo/index';
+import input from './modules/input/index';
 
 Vue.use(Vuex);
 
@@ -16,7 +17,7 @@ const state = {
 	 * 当前选中sheet的alias
 	 * @type {String}
 	 */
-	currentSheet: '',
+	currentSheet: ''
 };
 
 export default new Vuex.Store({
@@ -29,6 +30,7 @@ export default new Vuex.Store({
 		cells,
 		selects,
 		sheets,
-		pointsInfo
+		pointsInfo,
+		input
 	}
 });

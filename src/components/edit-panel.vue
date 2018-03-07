@@ -4,6 +4,7 @@
 		<col-group></col-group>
 		<cell-group></cell-group>
 		<select-group></select-group>
+		<input-box></input-box>
 	</div>
 </template>
 <script type="text/javascript">
@@ -12,6 +13,7 @@
 	import RowGroup from './row-group.vue';
 	import CellGroup from './cell-group.vue';
 	import SelectGroup from './select-group.vue';
+	import InputBox from './input-box.vue';
 
 	export default {
 		props: ['editPanelWidth', 'editPanelHeight'],
@@ -31,7 +33,8 @@
 			ColGroup,
 			RowGroup,
 			CellGroup,
-			SelectGroup
+			SelectGroup,
+			InputBox
 		},
 		methods: {
 			locate(e) {
@@ -46,9 +49,10 @@
 					rowIndex = this.$store.getters.getRowIndex(Y);
 
 				this.$store.dispatch(SELECTS_UPDATESELECT, {
-					startColIndex:colIndex,
-					startRowIndex:rowIndex
-				}, 'locate');
+					startColIndex: colIndex,
+					startRowIndex: rowIndex,
+					type: 'locate'
+				});
 			}
 		}
 	};

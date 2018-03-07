@@ -89,8 +89,8 @@ export default {
 		};
 		if (type === 'locate') {
 			select.activePosi = {
-				rowAlias: cols[startColIndex].alias,
-				colAlias: rows[startRowIndex].alias
+				colAlias: cols[startColIndex].alias,
+				rowAlias: rows[startRowIndex].alias
 			};
 			select.tempPosi = {
 				initColSort: startColIndex,

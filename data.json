@@ -14,7 +14,6 @@
 				"sheet": {
 					"cells": [{
 						"occupy": {
-							"alias": "1",
 							"col": 0,
 							"row": 0,
 							"x": ["1", "2"],
@@ -26,7 +25,6 @@
 						}
 					}, {
 						"occupy": {
-							"alias": "2",
 							"col": 0,
 							"row": 1,
 							"x": ["1"],
@@ -38,7 +36,6 @@
 						}
 					}, {
 						"occupy": {
-							"alias": "3",
 							"col": 1,
 							"row": 1,
 							"x": ["2"],
@@ -104,7 +101,8 @@
 						"index": 8,
 						"left": 576,
 						"displayName": "I"
-					}, {
+					}, 
+					{
 						"alias": "10",
 						"sort": 9,
 						"index": 9,
@@ -217,7 +215,8 @@
 						"index": 14,
 						"displayName": "15",
 						"top": 280
-					}, {
+					}, 
+					{
 						"alias": "16",
 						"sort": 15,
 						"height": 19,

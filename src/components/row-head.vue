@@ -10,7 +10,7 @@
 	import RowHeadPanel from './row-head-panel.vue';
 
 	export default {
-		props: ['rowHeadHeight'],
+		props: ['rowHeadHeight', 'scrollTop'],
 		components: {
 			RowHeadPanel,
 		},
@@ -25,6 +25,11 @@
 			},
 			selectList() {
 				return this.$store.getters.selectList;
+			}
+		},
+		watch: {
+			scrollTop() {
+				this.$el.scrollTop = this.scrollTop;
 			}
 		},
 		methods: {}

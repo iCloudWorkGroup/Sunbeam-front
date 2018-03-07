@@ -7,22 +7,21 @@
 						<div class="corner" ref="corner"></div>
 					</td>
 					<td>
-						<col-head :col-head-width="colHeadWidth"></col-head>
+						<col-head :scroll-left="scrollLeft" :col-head-width="colHeadWidth"></col-head>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<row-head :row-head-height="rowHeadHeight"></row-head>
+						<row-head :scroll-top="scrollTop" :row-head-height="rowHeadHeight"></row-head>
 					</td>
 					<td>
-						<edit :edit-width="editWidth" :edit-height="editHeight"></edit>
+						<edit @changeScrollTop="changeScrollTop" 
+							@changeScrollLeft="changeScrollLeft"
+							:edit-width="editWidth" :edit-height="editHeight"></edit>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-
-
-
 	</div>
 </template>
 
@@ -38,6 +37,13 @@
 			'sheetWidth',
 			'sheetHeight'
 		],
+		data() {
+			return {
+				scrollbarWidth: getScrollbarWidth(),
+				scrollTop: 0,
+				scrollLeft: 0
+			};
+		},
 		computed: {
 			width() {
 				return this.sheetWidth;
@@ -58,16 +64,20 @@
 				return this.sheetHeight - config.cornerHeight;
 			}
 		},
-		data() {
-			return {
-				scrollbarWidth: getScrollbarWidth()
-			};
-		},
 		components: {
 			ColHead,
 			RowHead,
 			Edit
-		}
+		},
+		methods: {
+			changeScrollTop(val){
+				this.scrollTop += val;
+
+			},
+			changeScrollLeft(val){
+				this.scrollLeft += val;
+			}
+		},
 	};
 </script>
 

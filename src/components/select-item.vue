@@ -1,5 +1,5 @@
 <template>
-	<div class="select-item" :style="styleObject">
+	<div class="select-item" @dblclick="edit" :style="styleObject">
 		<div class="box">
 			<div class="bg"></div>
 			<div class="expand"></div>
@@ -7,6 +7,8 @@
 	</div>
 </template>
 <script type="text/javascript">
+	import * as types from '../store/action-types';
+
 	export default {
 		props: ['item'],
 		computed: {
@@ -35,6 +37,13 @@
 					width: width + 'px',
 					height: height + 'px',
 				};
+			}
+		},
+		methods: {
+			edit() {
+				this.$store.dispatch(types.EDIT_SHOW, {
+					type: 'click'
+				});
 			}
 		}
 	};

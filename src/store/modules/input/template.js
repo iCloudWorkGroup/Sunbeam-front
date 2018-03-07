@@ -1,0 +1,20 @@
+export default {
+	colAlias: '-1',
+	rowAlias: '-1',
+	left: -9999,
+	top: -9999,
+	width: 0,
+	height: 0,
+	maxWidth: 0,
+	maxHeight: 0,
+	texts: '',
+	format: '',
+	size: '11',
+	family: 'SimSun',
+	color: 'rgb(0, 0, 0)',
+	weight: false,
+	italic: false,
+	underline: false,
+	background: 'rgb(255, 255, 255)',
+	editState: false
+}

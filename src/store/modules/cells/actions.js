@@ -1,6 +1,8 @@
 import * as actionTypes from '../../action-types';
 import * as mutaionTypes from '../../mutation-types';
-import {indexAttrBinary} from '../../../util/binary';
+import {
+	indexAttrBinary
+} from '../../../util/binary';
 import extend from '../../../util/extend';
 import template from './template';
 
@@ -39,6 +41,7 @@ export default {
 			cell = cells[i];
 			aliasColList = cell.occupy.x;
 			aliasRowList = cell.occupy.y;
+			
 			aliasCol = aliasColList[0];
 			aliasRow = aliasRowList[0];
 
@@ -105,6 +108,13 @@ export default {
 					}
 				}
 				cell.physicsBox = physicsBox;
+				/**
+				 * 该代码为保持与后台数据结构相同，后期删除
+				 */
+				cell.occupy.col = cell.occupy.x;
+				cell.occupy.row = cell.occupy.y;
+				delete cell.occupy.x;
+				delete cell.occupy.y;
 				cell = extend({}, template, cell);
 				commit(mutaionTypes.INSERT_CELL, {
 					currentSheet: sheet,
@@ -113,13 +123,68 @@ export default {
 			} else {
 				commit(mutaionTypes.UPDATE_CELL, {
 					currentSheet: sheet,
-					cell: {
+					cellInfo: {
 						propName: 'physicsBox',
 						value: physicsBox,
 						cellIndex
 					}
 				});
 			}
+		}
+	},
+	[actionTypes.CELLS_UPDATECELL]({commit, state, rootState, getters},
+		{colAlias, rowAlias, propName, propValue}) {
+		let getPointInfo = getters.getPointInfo,
+			currentSheet = rootState.currentSheet,
+			cellIndex;
+
+		cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex');
+
+		if (typeof cellIndex === 'number') {
+			commit(mutaionTypes.UPDATE_CELL, {
+				currentSheet: rootState.currentSheet,
+				cellInfo: {
+					cellIndex,
+					propName: propName,
+					value: propValue
+				}
+			});
+		} else {
+			let cell = extend(template),
+				colIndex = getters.getColIndexByAlias(colAlias),
+				rowIndex = getters.getColIndexByAlias(rowAlias),
+				col = getters.colList[colIndex],
+				row = getters.rowList[rowIndex];
+				
+			cell.occupy.col.push(colAlias);
+			cell.occupy.row.push(rowAlias);
+			cell.physicsBox = {
+				top: row.top,
+				left: col.left,
+				width: col.width,
+				height: row.height
+			};
+			propName = propName.split('.');
+			if (propName.length > 1) {
+				cell[propName[0]][propName[1]] = propValue;
+			} else {
+				cell[propName[0]] = propValue;
+			}
+			commit(mutaionTypes.INSERT_CELL, {
+				currentSheet,
+				cells: [cell]
+			});
+
+
+			commit(mutaionTypes.UPDATE_POINTINFO, {
+				currentSheet,
+				info: {
+					colAlias,
+					rowAlias,
+					type: 'cellIndex',
+					value: getters.cellList.length -1
+				}
+			});
 		}
 	}
 };

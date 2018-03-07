@@ -1,4 +1,4 @@
-import {rangeBinary} from '../../../util/binary';
+import {rangeBinary, indexAttrBinary} from '../../../util/binary';
 
 export default {
 	rowList(state, getters, rootState) {
@@ -11,6 +11,49 @@ export default {
 			let currentSheet = rootState.currentSheet,
 				list = state[currentSheet];
 			return rangeBinary(posi, list, 'top', 'height');
+		};
+	},
+	getRowIndexBySort(state, getters, rootState){
+		return function(sort) {
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet];
+			return indexAttrBinary(sort, list, 'sort');
+		};
+	},
+	getRowIndexByAlias(state, getters, rootState) {
+		return function(alias) {
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet];
+			for (let i = 0, len = list.length; i < len; i++) {
+				if (list[i].alias === alias) {
+					return i;
+				}
+			}
+			return -1;
+		};
+	},
+	getRowByAlias(state, getters, rootState){
+		return function(alias) {
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet];
+			for (let i = 0, len = list.length; i < len; i++) {
+				if (list[i].alias === alias) {
+					return list[i];
+				}
+			}
+			return -1;
+		};
+	},
+	getIndexByAlias(state, getters, rootState){
+		return function(alias) {
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet];
+			for (let i = 0, len = list.length; i < len; i++) {
+				if (list[i].alias === alias) {
+					return list[i];
+				}
+			}
+			return -1;
 		};
 	}
 };

@@ -5,10 +5,6 @@ import store from './store/index';
 import {RESTORE} from './store/action-types';
 import Book from './components/book.vue';
 
-Vue.filter('parsePixel', function(value) {
-	return value + 'px';
-});
-
 store.dispatch(RESTORE).then(() => {
 	new Vue({
 		el: '#app',

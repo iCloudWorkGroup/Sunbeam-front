@@ -12,7 +12,43 @@
 				"name": "new Sheet",
 				"alias": "sheet1",
 				"sheet": {
-					"cells": [],
+					"cells": [{
+						"occupy": {
+							"alias": "1",
+							"col": 0,
+							"row": 0,
+							"x": ["1", "2"],
+							"y": ["1"]
+						},
+						"content": {
+							"texts": "单元格1",
+							"displayTexts": "单元格1"
+						}
+					}, {
+						"occupy": {
+							"alias": "2",
+							"col": 0,
+							"row": 1,
+							"x": ["1"],
+							"y": ["2"]
+						},
+						"content": {
+							"texts": "单元格1",
+							"displayTexts": "单元格1"
+						}
+					}, {
+						"occupy": {
+							"alias": "3",
+							"col": 1,
+							"row": 1,
+							"x": ["2"],
+							"y": ["2"]
+						},
+						"content": {
+							"texts": "单元格1",
+							"displayTexts": "单元格1"
+						}
+					}],
 					"glX": [{
 						"alias": "1",
 						"sort": 0,

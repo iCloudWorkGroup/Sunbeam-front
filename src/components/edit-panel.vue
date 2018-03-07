@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
 	<div class="edit-panel" ref="panel" @mousedown="locate" :style="{width: width + 'px', height: height + 'px'}">	
 		<row-group></row-group>
 		<col-group></col-group>
@@ -40,14 +41,57 @@
 			locate(e) {
 				let elem = this.$refs.panel,
 					box;
+=======
+    <div class="edit-panel" ref="panel" @mousedown="locate" :style="{
+    width: width + 'px', 
+    height: height + 'px'}">
+        <row-group></row-group>
+        <col-group></col-group>
+        <cell-group></cell-group>
+        <select-group></select-group>
+    </div>
+</template>
+<script type="text/javascript">
+import { SELECTS_UPDATESELECT } from '../store/action-types';
+import ColGroup from './col-group.vue';
+import RowGroup from './row-group.vue';
+import CellGroup from './cell-group.vue';
+import SelectGroup from './select-group.vue';
 
-				box = elem.getBoundingClientRect();
-				this.changeSelect(e.clientX - box.left, e.clientY - box.top);
-			},
-			changeSelect(X, Y) {
-				let colIndex = this.$store.getters.getColIndex(X),
-					rowIndex = this.$store.getters.getRowIndex(Y);
+export default {
+    props: ['editPanelWidth', 'editPanelHeight'],
+    computed: {
+        width() {
+            let colList = this.$store.getters.colList,
+                lastCol = colList[colList.length - 1];
+            return lastCol.left + lastCol.width;
+        },
+        height() {
+            let rowList = this.$store.getters.rowList,
+                lastRow = rowList[rowList.length - 1];
+            return lastRow.top + lastRow.height;
+        }
+    },
+    components: {
+        ColGroup,
+        RowGroup,
+        CellGroup,
+        SelectGroup
+    },
+    methods: {
+        locate(e) {
+            let elem = this.$refs.panel,
+                box;
+>>>>>>> 7b1e5ae384a4e6b457779798e692161f09d57d00
 
+            box = elem.getBoundingClientRect();
+            this.changeSelect(e.clientX - box.left, e.clientY - box.top);
+        },
+        changeSelect(X, Y) {
+            let colIndex = this.$store.getters.getColIndex(X),
+                rowIndex = this.$store.getters.getRowIndex(Y);
+
+<<<<<<< HEAD
 				this.$store.dispatch(SELECTS_UPDATESELECT, {
 					startColIndex: colIndex,
 					startRowIndex: rowIndex,
@@ -56,9 +100,18 @@
 			}
 		}
 	};
+=======
+            this.$store.dispatch(SELECTS_UPDATESELECT, {
+                startColIndex: colIndex,
+                startRowIndex: rowIndex
+            }, 'locate');
+        }
+    }
+};
+>>>>>>> 7b1e5ae384a4e6b457779798e692161f09d57d00
 </script>
 <style type="text/css">
-	.edit-panel {
-		position: relative;
-	}
+.edit-panel {
+    position: relative;
+}
 </style>

@@ -24,13 +24,12 @@
 		</table>
 	</div>
 </template>
-
 <script type="text/javascript">
-	import config from '../config';
-	import getScrollbarWidth from '../util/scrollbarWidth';
-	import ColHead from './col-head.vue';
-	import RowHead from './row-head.vue';
-	import Edit from './edit.vue';
+import config from '../config';
+import getScrollbarWidth from '../util/scrollbarWidth';
+import ColHead from './col-head.vue';
+import RowHead from './row-head.vue';
+import Edit from './edit.vue';
 
 	export default {
 		props: [
@@ -80,18 +79,18 @@
 		},
 	};
 </script>
-
 <style type="text/css">
-	.sheet { 
-		position: absolute; 
-		top: 0; 
-		left: 0;
-	}
-	.corner { 
-		border-width: 0 1px 1px 0; 
-		border-color: #bfbfbf; 
-		border-style: solid; 
-		height: 19px; 
-		width: 36px; 
-	}
+.sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.corner {
+    border-width: 0 1px 1px 0;
+    border-color: #bfbfbf;
+    border-style: solid;
+    height: 19px;
+    width: 36px;
+}
 </style>

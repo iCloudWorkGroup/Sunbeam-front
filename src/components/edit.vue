@@ -148,7 +148,7 @@
 	};
 </script>
 <style type="text/css">
-	.scroll-box {
-		overflow: auto;
-	}
+.scroll-box {
+    overflow: auto;
+}
 </style>

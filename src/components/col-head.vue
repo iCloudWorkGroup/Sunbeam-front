@@ -1,13 +1,16 @@
 <template>
-	<div class="col-head-container" :style="{width: width + 'px'}">
-		<div class="col-head-bg col-head-height" :style="{width: totalWidth + 'px'}">
-			<col-head-panel></col-head-panel>
-			<div v-for="item in selectList" class="col-head-line" :style="{left: item.physicsBox.left + 'px', width: item.physicsBox.width - 2 + 'px'}"></div>
-		</div>
-	</div>
+    <div class="col-head-container" :style="{width: width + 'px'}">
+        <div class="col-head-bg col-head-height" :style="{
+        width: totalWidth + 'px'}">
+            <col-head-panel></col-head-panel>
+            <div class="col-head-line" v-for="item in selectList"  :style="{
+            left: item.physicsBox.left + 'px', 
+            width: item.physicsBox.width - 2 + 'px'}"></div>
+        </div>
+    </div>
 </template>
 <script type="text/javascript">
-	import ColHeadPanel from './col-head-panel.vue';
+    import ColHeadPanel from './col-head-panel.vue';
 
 	export default {
 		props: ['colHeadWidth' , 'scrollLeft'],

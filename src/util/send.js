@@ -2,13 +2,15 @@ import axios from 'axios';
 import cfg from '../config';
 import extend from './extend';
 import cache from '../tools/cache';
+import $ from 'jquery';
 
 export default function(options) {
 	if (options.isPublic) {
 		cache.sendQueueStep++;
 	}
 	options = extend({}, {
-		method: 'post',
+		type: 'post',
+		async: true,
 		baseURL: cfg.rootPath,
 		contentType: 'application/json; charset=UTF-8',
 		dataType: 'json',
@@ -17,10 +19,19 @@ export default function(options) {
 			'step': cache.sendQueueStep
 		}
 	}, options);
-	return axios(options).then(function(response) {
-		if (response.data.isLegal === false) {
+
+	options.url = cfg.rootPath + options.url;
+	options.beforeSend = function(request) {
+		request.setRequestHeader('step', cache.sendQueueStep);
+		request.setRequestHeader('excelId', '66d460b2-690f-4087-a230-698f084c917d');
+	}
+	let success = options.success;
+	options.success = function(data) {
+		if (data.isLegal === false) {
 			cache.sendQueueStep--;
 		}
-		options.success(response.data);
-	});
+		success.apply(this, arguments);
+	}
+
+	$.ajax(options);
 }

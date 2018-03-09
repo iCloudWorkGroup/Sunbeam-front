@@ -53,6 +53,9 @@ function restoreSpreadsheet(fn) {
 
 	send({
 		url: 'reload',
+		data: {
+
+		},
 		success(data) {
 			if (!data || !data.returndata) {
 				return;
@@ -62,6 +65,11 @@ function restoreSpreadsheet(fn) {
 
 			cache.localRowPosi = data.maxRowPixel;
 			cache.localColPosi = data.maxColPixel;
+
+			generator.rowAliasGenerator(parseInt(data.aliasRowCounter));
+			generator.colAliasGenerator(parseInt(data.aliasColCounter));
+			generator.cellAliasGenerator('0');
+			generator.selectAliasGenerator('0');
 
 			data = data.returndata;
 
@@ -75,10 +83,16 @@ function restoreSpreadsheet(fn) {
 				cols = sheetData.glX;
 				cells = sheetData.cells;
 
-				generator.rowAliasGenerator(data.aliasRowCounter);
-				generator.colAliasGenerator(data.aliasColCounter);
-				generator.cellAliasGenerator('0');
-				generator.selectAliasGenerator('0');
+				rows.forEach(function(row){
+					row.sort = row.index;
+					row.displayName = getRowDisplayName(row.sort);
+					row.alias = row.aliasY;
+				});
+				cols.forEach(function(col){
+					col.sort = col.index;
+					col.displayName = getColDisplayName(col.sort);
+					col.alias = col.aliasX;
+				});
 				
 				cache.colRecord.push(cols[0].alias, cols[cols.length -1].alias);
 				cache.rowRecord.push(rows[0].alias, rows[rows.length -1].alias);

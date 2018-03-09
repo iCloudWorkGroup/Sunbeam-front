@@ -1,6 +1,8 @@
 export const ROWS_ADDROWS = 'ROWS_ADDROWS';
+export const ROWS_GENERAT = 'ROWS_GENERAT';
 
 export const COLS_ADDCOLS = 'COLS_ADDCOLS';
+export const COLS_GENERAT = 'COLS_GENERAT';
 
 export const CELLS_RESTORECELL = 'CELLS_RESTORECELL';
 export const CELLS_UPDATECELL = 'CELLS_UPDATECELL';

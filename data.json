@@ -2,10 +2,10 @@
 	"reload": {
 		"dataRowStartIndex": 0,
 		"dataColStartIndex": 0,
-		"aliasColCounter": "10",
+		"aliasColCounter": "15",
 		"aliasRowCounter": "17",
-		"maxColPixel": 1819,
-		"maxRowPixel": 1999,
+		"maxColPixel": 1077,
+		"maxRowPixel": 339,
 		"returndata": {
 			"name": "新建excel",
 			"spreadSheet": [{

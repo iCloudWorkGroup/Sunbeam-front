@@ -90,5 +90,6 @@ export default {
 		 */
 		endRowAlias: '0'
 	},
-	type: 'selected'
+	type: 'selected',
+	alias: ''
 };

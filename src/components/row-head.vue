@@ -4,7 +4,7 @@
         <div class="row-head-bg row-head-width" :style="{
         height: totalHeight + 'px'}">
             <row-head-panel></row-head-panel>
-            <div class="row-head-line" v-for="item in selectList" :key="item"  :style="{
+            <div class="row-head-line" v-for="item in selectList" :key="item.alias"  :style="{
             top: item.physicsBox.top + 'px', 
             height: item.physicsBox.height - 2 + 'px'}"></div>
         </div>

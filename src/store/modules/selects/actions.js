@@ -1,6 +1,7 @@
 import extend from '../../../util/extend';
 import * as mutationTypes from '../../mutation-types';
 import * as actionTypes from '../../action-types';
+import generator from '../../../tools/generator';
 import template from './template';
 
 
@@ -42,6 +43,7 @@ export default {
 			endColAlias: cols[endColIndex].alias,
 			endRowAlias: rows[endRowIndex].alias
 		};
+		select.alias = generator.selectAliasGenerator().value;
 		commit(mutationTypes.INSERT_SELECT, {
 			currentSheet,
 			selects: [select]

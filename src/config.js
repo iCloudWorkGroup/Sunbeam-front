@@ -1,8 +1,10 @@
 export default {
 	colWidth: 71,
-	rowHeight: 20,
+	rowHeight: 19,
 	initRowNum: 100,
 	initColNum: 26,
+	maxRowNum: 1000,
+	maxColNum: 100,
 	/**
 	 * 页面左侧距离
 	 * @property {int} outerLeft
@@ -17,14 +19,15 @@ export default {
 	 * 请求预加载区域宽度
 	 */
 	prestrainWidth: 50,
+	prestrainHeight: 50,
 	/**
 	 * 请求区域缓存宽度
 	 * @type {Number}
 	 */
-	scrollBufferWidth: 100,
+	scrollBufferWidth: 150,
 	/**
 	 * 请求地址根路径
 	 * @type {String}
 	 */
-	rootPath: ''
+	rootPath: 'http://192.168.2.94:8080/sunbeam/'
 };

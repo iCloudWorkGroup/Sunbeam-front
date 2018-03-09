@@ -1,6 +1,7 @@
 import * as actionTypes from '../../action-types';
 import * as mutaionTypes from '../../mutation-types';
 import {indexAttrBinary } from '../../../util/binary';
+import {cellAliasGenerator} from '../../../tools/generator';
 import extend from '../../../util/extend';
 import template from './template';
 

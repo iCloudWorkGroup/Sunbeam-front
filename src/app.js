@@ -5,7 +5,16 @@ import store from './store/index';
 import {RESTORE} from './store/action-types';
 import Book from './components/book.vue';
 
-store.dispatch(RESTORE).then(() => {
+let wrapper = document.getElementById('wrapper'),
+	right = wrapper.offsetWidth,
+	bottom = wrapper.offsetHeight
+
+store.dispatch(RESTORE,{
+	left: 0,
+	top: 0,
+	right,
+	bottom
+}).then(() => {
 	new Vue({
 		el: '#app',
 		store,
@@ -17,7 +26,6 @@ store.dispatch(RESTORE).then(() => {
 			'book': Book
 		},
 		created() {
-			let wrapper = document.getElementById('wrapper');
 			this.bookWidth = wrapper.offsetWidth;
 			this.bookHeight = wrapper.offsetHeight;
 		}

@@ -7,14 +7,14 @@ import colTemplate from '../store/modules/cols/template';
 import generator from './generator';
 import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
-export function initSpreadsheet(fn) {
+export function initSpreadsheet(fn, data) {
 	let build = 'false';
 
 	if (build === 'true') {
 		buildNewSpreadsheet(fn);
 		return;
 	}
-	restoreSpreadsheet(fn);
+	restoreSpreadsheet(fn, data);
 }
 
 
@@ -45,7 +45,7 @@ function buildNewSpreadsheet(fn) {
 	});
 }
 
-function restoreSpreadsheet(fn) {
+function restoreSpreadsheet(fn, data) {
 	var cols = [],
 		rows = [],
 		cells = [],
@@ -53,9 +53,7 @@ function restoreSpreadsheet(fn) {
 
 	send({
 		url: 'reload',
-		data: {
-
-		},
+		data: JSON.stringify(data),
 		success(data) {
 			if (!data || !data.returndata) {
 				return;

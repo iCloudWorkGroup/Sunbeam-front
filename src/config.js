@@ -3,8 +3,8 @@ export default {
 	rowHeight: 19,
 	initRowNum: 100,
 	initColNum: 26,
-	maxRowNum: 1000,
-	maxColNum: 100,
+	maxRowNum: 3000,
+	maxColNum: 150,
 	/**
 	 * 页面左侧距离
 	 * @property {int} outerLeft
@@ -24,10 +24,11 @@ export default {
 	 * 请求区域缓存宽度
 	 * @type {Number}
 	 */
-	scrollBufferWidth: 150,
+	scrollBufferWidth: 200,
 	/**
 	 * 请求地址根路径
 	 * @type {String}
 	 */
-	rootPath: 'http://192.168.2.94:8080/sunbeam/'
+	rootPath: 'http://192.168.1.173:8080/sunbeam/'
+	// rootPath: 'http://localhost:8080/'
 };

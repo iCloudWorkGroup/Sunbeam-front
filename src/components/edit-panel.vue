@@ -1,7 +1,7 @@
 <template>
 	<div class="edit-panel" ref="panel" @mousedown="locate" :style="{width: width + 'px', height: height + 'px'}">	
-		<row-group></row-group>
-		<col-group></col-group>
+		<row-grid-group></row-grid-group>
+		<col-grid-group></col-grid-group>
 		<cell-group></cell-group>
 		<select-group></select-group>
 		<input-box></input-box>
@@ -9,8 +9,8 @@
 </template>
 <script type="text/javascript">
 	import {SELECTS_UPDATESELECT} from '../store/action-types';
-	import ColGroup from './col-group.vue';
-	import RowGroup from './row-group.vue';
+	import ColGridGroup from './col-grid-group.vue';
+	import RowGridGroup from './row-grid-group.vue';
 	import CellGroup from './cell-group.vue';
 	import SelectGroup from './select-group.vue';
 	import InputBox from './input-box.vue';
@@ -30,8 +30,8 @@
 			}
 		},
 		components: {
-			ColGroup,
-			RowGroup,
+			ColGridGroup,
+			RowGridGroup,
 			CellGroup,
 			SelectGroup,
 			InputBox

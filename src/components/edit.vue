@@ -29,6 +29,7 @@
 			//未处理冻结情况，添加冻结操作，需要通过计算，获取初始化值
 			this.colOccupy.push(colList[0].alias, lastCol.alias);
 			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
+			window.regionRecord =cache.regionRecord;
 		},	
 		computed: {
 			width() {
@@ -50,7 +51,7 @@
 				this.recordScrollLeft = this.$el.scrollLeft;
 
 				if (vertical !== 0) {
-					this.$emit('changeScrollTop', vertical);
+					this.$emit('changeScrollTop', this.recordScrollTop);
 					if (vertical > 0) {
 						this.scrollToBttom();
 					} else {
@@ -58,7 +59,7 @@
 					}
 					
 				} else {
-					this.$emit('changeScrollLeft', transverse);
+					this.$emit('changeScrollLeft', this.recordScrollLeft);
 					if (transverse > 0) {
 						this.scrollToRight();
 					} else {
@@ -67,7 +68,7 @@
 				}
 			},
 			scrollToBttom() {
-					let rowList = this.$store.getters.rowList,
+				let rowList = this.$store.getters.rowList,
 					maxBottom = cache.localRowPosi,
 					bufferHeight = config.scrollBufferWidth,
 					rowRecord = cache.rowRecord,
@@ -95,10 +96,11 @@
 				 * 当前视图边界值超过了已加载对象最大值
 				 * 需要请求数据
 				 */
-				if (currentMaxBottom < limitBottom) {
-					let self = this,
-						limitBottom = limitBottom + bufferHeight;
 
+				if (currentMaxBottom < limitBottom) {
+					let self = this;
+					
+					limitBottom = limitBottom + bufferHeight;
 					limitBottom = limitBottom < maxBottom ? limitBottom : maxBottom;
 					/**
 					 * 横向请求
@@ -203,8 +205,6 @@
 				for (let i = 0; i < counter; i++) {
 					rowOccupy.shift();
 				}
-				console.log('rowOccupy:' + rowOccupy);
-
 			},
 			scrollToTop(){
 				let rowOccupy = this.rowOccupy,
@@ -268,7 +268,6 @@
 				for (let i = 0; i < counter; i++) {
 					rowOccupy.pop();
 				}
-				console.log(cache.regionRecord);
 			},
 			scrollToRight() {
 				let colList = this.$store.getters.colList,
@@ -300,9 +299,9 @@
 				 * 需要请求数据
 				 */
 				if (currentMaxRight < limitRight) {
-					let self = this,
-						limitRight = limitRight + config.scrollBufferWidth;
-
+					let self = this;
+					
+					limitRight = limitRight + config.scrollBufferWidth;
 					limitRight = limitRight < maxRight ? limitRight : maxRight;
 					/**
 					 * 横向请求
@@ -497,15 +496,17 @@
 								(sheetData = data.spreadSheet[0].sheet)) {
 								if(fn){
 									let cols = sheetData.glX,
-										endColAlias = cols[cols.length - 1].alias;
+										endColAlias = cols[cols.length - 1].aliasX;
 
 									cols.forEach(function(col) {
+										col.sort = col.index;
+										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
 									this.$store.dispatch(types.COLS_ADDCOLS, cols);	
 									fn(endColAlias);
 								}
-								let cells = sheetData.cells;
+								let cells = sheetData.cells;	
 								this.$store.dispatch(types.CELLS_RESTORECELL, cells);
 
 							}
@@ -537,10 +538,12 @@
 							if (data.spreadSheet && data.spreadSheet[0] &&
 								(sheetData = data.spreadSheet[0].sheet)) {
 								if(fn){
-									let rows = sheetData.glX,
-										endRowAlias = rows[rows.length - 1].alias;
+									let rows = sheetData.glY,
+										endRowAlias = rows[rows.length - 1].aliasY;
 
 									rows.forEach(function(row) {
+										row.sort = row.index;
+										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
 									this.$store.dispatch(types.ROWS_ADDROWS, rows);	

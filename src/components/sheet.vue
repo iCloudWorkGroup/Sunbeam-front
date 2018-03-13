@@ -70,11 +70,11 @@ import Edit from './edit.vue';
 		},
 		methods: {
 			changeScrollTop(val){
-				this.scrollTop += val;
+				this.scrollTop = val;
 
 			},
 			changeScrollLeft(val){
-				this.scrollLeft += val;
+				this.scrollLeft = val;
 			}
 		},
 	};

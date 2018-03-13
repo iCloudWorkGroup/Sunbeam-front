@@ -58,7 +58,7 @@ export default {
                 continue;
             }
 
-            startColIndex = indexAttrBinary(cell.occupy.col, rowList, 'sort');
+            startColIndex = indexAttrBinary(cell.occupy.col, colList, 'sort');
             endColIndex = startColIndex + aliasColList.length - 1;
             delete cell.occupy.col;
 

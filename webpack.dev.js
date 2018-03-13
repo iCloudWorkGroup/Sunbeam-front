@@ -1,52 +1,30 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
-module.exports = {
-	entry: './src/app.js',
-	output: {
-		filename: 'sm.js',
-		path: path.resolve(__dirname, 'dist'),
-		publicPath: '/'
-	},
-	devtool: 'eval-source-map',
-	devServer: {
-		contentBase: './',
-	},
-	module: {
-		rules: [{
-			test: /\.css$/,
-			use: [
-				'style-loader',
-				'css-loader'
-			]
-		}, {
-			test: /\.(js|vue)$/,
-			loader: 'eslint-loader',
-			enforce: 'pre',
-			include: [path.resolve(__dirname, 'src')],
-			options: {
-				formatter: require('eslint-friendly-formatter'),
-			}
-		}, {
-			test: /\.vue$/,
-			loader: 'vue-loader'
-		}, {
-			test: /\.js$/,
-			loader: 'babel-loader',
-			exclude: /node_modules/
-		}]
-	},
-	plugins: [
-		new HtmlWebpackPlugin({
-			template: './src/index.html'
-		}),
-		new UglifyJSPlugin()
-	],
-	resolve: {
-		alias: {
-			vue: 'vue/dist/vue.js',
-		}
-	}
-}
+const path = require('path')
+const fs = require('fs')
+const webpack = require('webpack')
+const base = require('./webpack.base.js')
+const merge = require('webpack-merge')
+const baseConfig = merge(base, {
+  devtool: 'inline-source-map',
+  entry: fs.readdirSync(__dirname).reduce((entries, dir) => {
+    const fullDir = path.join(__dirname, dir)
+    const entry = path.join(fullDir, '/app.js')
+    if (fs.statSync(fullDir).isDirectory() &&
+      fs.existsSync(entry)) {
+      entries[dir] = ['webpack-hot-middleware/client', entry]
+    }
+    return entries
+  }, {}),
+  output: {
+    filename: 'bundle.web.js',
+    chunkFilename: '[name].chunk.js'
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime',
+      filename: 'runtime.js'
+    }),
+  ]
+})
+baseConfig.module.rules[0].loader = 'vue-loader'
+module.exports = baseConfig

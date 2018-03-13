@@ -15,11 +15,11 @@ export default {
 };
 </script>
 <style type="text/css">
-.row-group {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: inherit;
-    height: inherit;
-}
+    .row-group {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: inherit;
+        height: inherit;
+    }
 </style>

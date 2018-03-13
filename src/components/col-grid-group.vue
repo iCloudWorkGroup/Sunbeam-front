@@ -7,20 +7,20 @@
     </div>
 </template>
 <script type="text/javascript">
-export default {
-    computed: {
-        colList() {
-            return this.$store.getters.colList;
+    export default {
+        computed: {
+            colList() {
+                return this.$store.getters.colList;
+            }
         }
-    }
-};
+    };
 </script>
 <style type="text/css">
-.col-group {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: inherit;
-    height: inherit;
-}
+    .col-group {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: inherit;
+        height: inherit;
+    }
 </style>

@@ -479,7 +479,7 @@
 
 					send({
 						url: 'sheet/area',
-						async: false,
+						async: true,
 						isPublic: false,
 						data: JSON.stringify({
 							left,
@@ -522,7 +522,7 @@
 
 					send({
 						url: 'sheet/area',
-						async: false,
+						async: true,
 						isPublic: false,
 						data: JSON.stringify({
 							left,

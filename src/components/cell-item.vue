@@ -1,17 +1,7 @@
 <template>
-	<div class="cell" 
-		:style="{top: top + 'px',
-				left: left + 'px', 
-				width: width + 'px', 
-				height: height + 'px'}">
-        <div class="cell-content" :style="{background: content.background, 
-					fontFamily: content.family, 
-					fontSize: content.size + 'px', 
-					fontStyle: content.italic && 'italic', 
-					color: content.color, textAlign: content.alignRow, 
-					textDecoration: content.underline, 
-					verticalAlign: content.alignCol}">
-			{{content.texts}}
+	<div class="cell" :style="physicsBoxStyle">
+        <div class="cell-content" :style="contentStyle">
+			{{texts}}
 		</div>
 	</div>
 </template>
@@ -19,21 +9,30 @@
 export default {
     props: ['item'],
     computed: {
-        width() {
-            return this.item.physicsBox.width;
-        },
-        height() {
-            return this.item.physicsBox.height;
-        },
-        top() {
-            return this.item.physicsBox.top - 1;
-        },
-        left() {
-            return this.item.physicsBox.left - 1;
-        },
-        content() {
-            return this.item.content;
-        }
+    	contentStyle(){
+    		let content = this.item.content;
+    		return {
+				background: content.background, 
+				fontFamily: content.family, 
+				fontSize: content.size + 'px', 
+				fontStyle: content.italic && 'italic', 
+				color: content.color, textAlign: content.alignRow, 
+				textDecoration: content.underline, 
+				verticalAlign: content.alignCol
+    		}
+    	},
+    	physicsBoxStyle(){
+    		let physicsBox = this.item.physicsBox;
+			return {
+				top: physicsBox.top - 1 + 'px',
+				left: physicsBox.left - 1 + 'px',
+				width: physicsBox.width + 'px',
+				height: physicsBox.height + 'px'
+			}
+    	},
+    	texts(){
+    		return this.item.content.texts;
+    	}
     }
 };
 </script>

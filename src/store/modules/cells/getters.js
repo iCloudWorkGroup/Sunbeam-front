@@ -112,8 +112,7 @@ export default {
         return function({
             startColIndex,
             startRowIndex,
-            endColIndex =
-            startColIndex,
+            endColIndex = startColIndex,
             endRowIndex = startRowIndex
         }) {
             let result = [],
@@ -144,5 +143,21 @@ export default {
             }
             return result;
         };
+    },
+    userViewCellList(state, getters, rootState){
+        let currentSheet = rootState.currentSheet,
+            list = state[currentSheet],
+            userView = rootState.userView,
+            startRowIndex = getters.getRowIndex(userView.top),
+            endRowIndex = getters.getRowIndex(userView.bottom),
+            startColIndex = getters.getColIndex(userView.left),
+            endColIndex = getters.getColIndex(userView.right);
+
+        return getters.getCellsByVertical({
+            startRowIndex,
+            endRowIndex,
+            startColIndex,
+            endColIndex
+        });
     }
 };

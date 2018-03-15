@@ -1,6 +1,6 @@
 <template>
     <div class="col-group">
-        <div class="col" v-for="item in colList" :key="item.alias"  :style="{
+        <div class="col" v-for="item in userViewColList" :key="item.alias"  :style="{
 		left: item.left + 'px', 
 		width: item.width + 'px'}">
         </div>
@@ -11,6 +11,9 @@
         computed: {
             colList() {
                 return this.$store.getters.colList;
+            },
+            userViewColList(){
+                return this.$store.getters.userViewColList;
             }
         }
     };

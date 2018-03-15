@@ -8,7 +8,8 @@
 	import config from '../config';
 	import cache from '../tools/cache';
 	import send from '../util/send';
-	import * as types from '../store/action-types';
+	import * as actionTypes from '../store/action-types';
+	import * as mutationTypes from '../store/mutation-types';
 	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
 	export default {
@@ -30,6 +31,14 @@
 			this.colOccupy.push(colList[0].alias, lastCol.alias);
 			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
 		},	
+		mounted() {
+			this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+				left: 0,
+				top: 0,
+				right: this.$el.offsetWidth,
+				bottom: this.$el.offsetHeight
+			});
+		},
 		computed: {
 			width() {
 				return this.editWidth;
@@ -43,30 +52,58 @@
 		},
 		methods: {
 			onScroll() {
-				let	transverse = this.$el.scrollLeft - this.recordScrollLeft,
-					vertical = this.$el.scrollTop - this.recordScrollTop;
-					
+				let transverse = this.$el.scrollLeft - this.recordScrollLeft,
+					vertical = this.$el.scrollTop - this.recordScrollTop,
+					limitTop,
+					limitBottom,
+					limitLeft,
+					limitRight;
+
+				// if(vertical > 200){
+				// 	this.$el.scrollTop = '';
+				// }else if(vertical < -200){
+
+				// }
 				this.recordScrollTop = this.$el.scrollTop;
 				this.recordScrollLeft = this.$el.scrollLeft;
 
 				if (vertical !== 0) {
 					this.$emit('changeScrollTop', this.recordScrollTop);
+
+					limitTop = this.recordScrollTop,
+						limitBottom = limitTop + this.$el.offsetHeight + config.prestrainWidth,
+
+						this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+							top: limitTop,
+							bottom: limitBottom
+						});
+
 					if (vertical > 0) {
-						this.scrollToBttom();
+						this.scrollToBttom(limitTop, limitBottom);
 					} else {
-						this.scrollToTop();
+						this.scrollToTop(limitTop, limitBottom);
 					}
-					
+					//可视区域
 				} else {
 					this.$emit('changeScrollLeft', this.recordScrollLeft);
+
+					limitLeft = this.recordScrollLeft;
+					limitRight = limitLeft + this.$el.offsetWidth + config.prestrainHeight;
+
+
 					if (transverse > 0) {
-						this.scrollToRight();
+						this.scrollToRight(limitLeft, limitRight);
 					} else {
-						this.scrollToLeft();
+						this.scrollToLeft(limitLeft, limitRight);
 					}
+
+					this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+						left: limitLeft,
+						right: limitRight
+					});
 				}
 			},
-			scrollToBttom() {
+			scrollToBttom(limitTop, limitBottom) {
 				let rowList = this.$store.getters.rowList,
 					maxBottom = cache.localRowPosi,
 					bufferHeight = config.scrollBufferWidth,
@@ -75,8 +112,6 @@
 					regionRecord = cache.regionRecord,
 					lastRow = rowList[rowList.length - 1],
 					currentMaxBottom = lastRow.top + lastRow.height,
-					limitBottom = this.$el.scrollTop + this.$el.offsetHeight + config.prestrainWidth,
-					limitTop = this.$el.scrollTop,
 					occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
 					occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
 					occupyBottom = occupyEndRow.top + occupyEndRow.height,
@@ -177,7 +212,7 @@
 						tempAlias = rowList[rowList.length - 1].alias,
 						currentAlias;
 
-					this.$store.dispatch(types.ROWS_GENERAT, addRowNum);
+					this.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum);
 
 					currentAlias = rowList[rowList.length - 1].alias;
 
@@ -268,7 +303,7 @@
 					rowOccupy.pop();
 				}
 			},
-			scrollToRight() {
+			scrollToRight(limitLeft, limitRight) {
 				let colList = this.$store.getters.colList,
 					maxRight = cache.localColPosi,
 					bufferWidth = config.scrollBufferWidth,
@@ -277,8 +312,6 @@
 					regionRecord = cache.regionRecord,
 					lastCol = colList[colList.length - 1],
 					currentMaxRight = lastCol.left + lastCol.width,
-					limitRight = this.$el.scrollLeft + this.$el.offsetWidth + config.prestrainWidth,
-					limitLeft = this.$el.scrollLeft,
 					occupyEndColAlias = colOccupy[colOccupy.length - 1],
 					occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias),
 					occupyRight = occupyEndCol.left + occupyEndCol.width,
@@ -378,7 +411,7 @@
 						tempAlias = colList[colList.length - 1].alias,
 						currentAlias;
 
-					this.$store.dispatch(types.COLS_GENERAT, addColNum);
+					this.$store.dispatch(actionTypes.COLS_GENERAT, addColNum);
 
 					currentAlias = colList[colList.length - 1].alias;
 
@@ -405,16 +438,14 @@
 				for (let i = 0; i < counter; i++) {
 					colOccupy.shift();
 				}
-
+				return limitRight;
 			},
-			scrollToLeft(){
+			scrollToLeft(limitLeft, limitRight){
 				let colOccupy = this.colOccupy,
 					rowOccupy = this.rowOccupy,
 					occupyStartColAlias = colOccupy[0],
 					occupyStartCol = this.$store.getters.getColByAlias(occupyStartColAlias),
 					currentLeft = occupyStartCol.left,
-					limitLeft = this.$el.scrollLeft - config.prestrainWidth,
-					limitRight = this.$el.scrollLeft + this.$el.offsetWidth,
 					colRecord = cache.colRecord;
 
 				if(limitLeft < 0){
@@ -502,11 +533,11 @@
 										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
-									this.$store.dispatch(types.COLS_ADDCOLS, cols);	
+									this.$store.dispatch(actionTypes.COLS_ADDCOLS, cols);	
 									fn(endColAlias);
 								}
 								let cells = sheetData.cells;	
-								this.$store.dispatch(types.CELLS_RESTORECELL, cells);
+								this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 
 							}
 						}
@@ -545,11 +576,11 @@
 										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
-									this.$store.dispatch(types.ROWS_ADDROWS, rows);	
+									this.$store.dispatch(actionTypes.ROWS_ADDROWS, rows);	
 									fn(endRowAlias);
 								}
 								let cells = sheetData.cells;
-								this.$store.dispatch(types.CELLS_RESTORECELL, cells);
+								this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 							}
 						}
 					});

@@ -23,7 +23,7 @@ export default function(options) {
 	options.url = cfg.rootPath + options.url;
 	options.beforeSend = function(request) {
 		request.setRequestHeader('step', cache.sendQueueStep);
-		request.setRequestHeader('excelId', '66d460b2-690f-4087-a230-698f084c917d');
+		request.setRequestHeader('excelId', '9a5b0f4b-a1ca-4cd2-82de-580d876eb846');
 	}
 	let success = options.success;
 	options.success = function(data) {

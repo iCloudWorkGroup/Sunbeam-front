@@ -15,4 +15,6 @@ export const UPDATE_SELECT = 'UPDATE_SELECT';
 export const UPDATE_CELL_TEXTS = 'UPDATE_CELL_TEXTS';
 export const UPDATE_EDIT = 'UPDATE_EDIT';
 
+export const UPDATE_USERVIEW = 'UPDATE_USERVIEW';
+
 

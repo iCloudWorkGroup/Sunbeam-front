@@ -1,6 +1,6 @@
 <template>
     <div class="cell-group">
-        <cell-item v-for="item in cellList" :key="item.alias" :item="item"></cell-item>
+        <cell-item v-for="item in userViewCellList" :key="item.alias" :item="item"></cell-item>
     </div>
 </template>
 <script type="text/javascript">
@@ -9,6 +9,9 @@ export default {
     computed: {
         cellList() {
             return this.$store.getters.cellList;
+        },
+        userViewCellList(){
+            return this.$store.getters.userViewCellList;
         }
     },
     components: {

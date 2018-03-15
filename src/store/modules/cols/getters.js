@@ -10,6 +10,7 @@ export default {
 		return function(posi) {
 			let currentSheet = rootState.currentSheet,
 				list = state[currentSheet];
+
 			return rangeBinary(posi, list, 'left', 'width');
 		};
 	},
@@ -43,6 +44,14 @@ export default {
 			}
 			return -1;
 		};
+	},
+	userViewColList(state, getters, rootState){
+		let currentSheet = rootState.currentSheet,
+			list = state[currentSheet],
+			userView = rootState.userView,
+			start = getters.getColIndex(userView.left),
+			end = getters.getColIndex(userView.right);
 
+		return list.slice(start, end);
 	}
 };

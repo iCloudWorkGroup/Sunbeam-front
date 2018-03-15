@@ -55,5 +55,14 @@ export default {
 			}
 			return -1;
 		};
+	},
+	userViewRowList(state, getters, rootState){
+		let currentSheet = rootState.currentSheet,
+			list = state[currentSheet],
+			userView = rootState.userView,
+			start = getters.getRowIndex(userView.top),
+			end = getters.getRowIndex(userView.bottom);
+
+		return list.slice(start, end);
 	}
 };

@@ -18,13 +18,13 @@ export default {
 	/**
 	 * 请求预加载区域宽度
 	 */
-	prestrainWidth: 50,
-	prestrainHeight: 50,
+	prestrainWidth: 200,
+	prestrainHeight: 200,
 	/**
 	 * 请求区域缓存宽度
 	 * @type {Number}
 	 */
-	scrollBufferWidth: 200,
+	scrollBufferWidth: 500,
 	/**
 	 * 请求地址根路径
 	 * @type {String}

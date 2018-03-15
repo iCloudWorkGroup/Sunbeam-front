@@ -29,7 +29,6 @@
 			//未处理冻结情况，添加冻结操作，需要通过计算，获取初始化值
 			this.colOccupy.push(colList[0].alias, lastCol.alias);
 			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
-			window.regionRecord =cache.regionRecord;
 		},	
 		computed: {
 			width() {

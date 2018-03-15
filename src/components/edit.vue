@@ -59,11 +59,6 @@
 					limitLeft,
 					limitRight;
 
-				// if(vertical > 200){
-				// 	this.$el.scrollTop = '';
-				// }else if(vertical < -200){
-
-				// }
 				this.recordScrollTop = this.$el.scrollTop;
 				this.recordScrollLeft = this.$el.scrollLeft;
 

@@ -16,7 +16,8 @@ export default {
 				fontFamily: content.family, 
 				fontSize: content.size + 'px', 
 				fontStyle: content.italic && 'italic', 
-				color: content.color, textAlign: content.alignRow, 
+				color: content.color, 
+				textAlign: content.alignRow, 
 				textDecoration: content.underline, 
 				verticalAlign: content.alignCol
     		}

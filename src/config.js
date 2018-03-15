@@ -18,8 +18,8 @@ export default {
 	/**
 	 * 请求预加载区域宽度
 	 */
-	prestrainWidth: 200,
-	prestrainHeight: 100,
+	prestrainWidth: 100,
+	prestrainHeight: 50,
 	/**
 	 * 请求区域缓存宽度
 	 * @type {Number}

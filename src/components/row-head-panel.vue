@@ -4,11 +4,11 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import rowHeadItem from './row-head-item.vue';
+	import RowHeadItem from './row-head-item.vue';
 	
 	export default {
 		components: {
-			'row-head-item': rowHeadItem
+			RowHeadItem
 		},
 		computed: {
 			rowList() {

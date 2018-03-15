@@ -1,9 +1,14 @@
-import {initSpreadsheet} from '../tools/dataloader';
+import {
+	initSpreadsheet
+} from '../tools/dataloader';
 import * as mutationTypes from './mutation-types';
 import * as actionTypes from './action-types';
 
 export default {
-	[actionTypes.RESTORE]({dispatch, commit}, payload) {
+	[actionTypes.RESTORE]({
+		dispatch,
+		commit
+	}, payload) {
 		return new Promise(resolve => {
 			initSpreadsheet(({
 				rows,
@@ -22,4 +27,4 @@ export default {
 			}, payload);
 		});
 	}
-};	
+};

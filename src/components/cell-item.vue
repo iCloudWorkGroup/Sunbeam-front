@@ -1,39 +1,42 @@
 <template>
-	<div class="cell" :style="physicsBoxStyle">
-        <div class="cell-content" :style="contentStyle">
+	<div class="cell" :style="cellPosi">
+        <div class="cell-content" :style="cellProps">
 			{{texts}}
 		</div>
 	</div>
 </template>
 <script type="text/javascript">
+import {unit} from '../filters/unit'
 export default {
     props: ['item'],
     computed: {
-    	contentStyle(){
-    		let content = this.item.content;
-    		return {
-				background: content.background, 
-				fontFamily: content.family, 
-				fontSize: content.size + 'px', 
-				fontStyle: content.italic && 'italic', 
-				color: content.color, 
-				textAlign: content.alignRow, 
-				textDecoration: content.underline, 
-				verticalAlign: content.alignCol
+    	cellPosi(){
+    		const physicsBox = this.item.physicsBox;
+    		return  {
+    			top: unit(physicsBox.top - 1),
+				left: unit(physicsBox.left - 1), 
+				width: unit(physicsBox.width), 
+				height: unit(physicsBox.height)
     		}
     	},
-    	physicsBoxStyle(){
-    		let physicsBox = this.item.physicsBox;
-			return {
-				top: physicsBox.top - 1 + 'px',
-				left: physicsBox.left - 1 + 'px',
-				width: physicsBox.width + 'px',
-				height: physicsBox.height + 'px'
-			}
-    	},
-    	texts(){
-    		return this.item.content.texts;
-    	}
+        cellProps() {
+        	const cellContent = this.item.content,
+            isItalic = cellContent.italic ? 'italic ' : '';
+            return  {
+            	background: cellContent.background, 
+				font: unit(cellContent.size) +' '+ cellContent.family, 
+				color: cellContent.color, 
+				textAlign: cellContent.alignRow, 
+				textDecoration: cellContent.underline, 
+				verticalAlign: cellContent.alignCol
+            }
+        },
+        texts(){
+        	return this.item.content.texts	
+        }
+    },
+    filters:{
+    	unit
     }
 };
 </script>

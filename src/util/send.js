@@ -9,7 +9,7 @@ export default function(options) {
 		cache.sendQueueStep++;
 	}
 	options = extend({}, {
-		type: 'post',
+		type: 'POST',
 		async: true,
 		baseURL: cfg.rootPath,
 		contentType: 'application/json; charset=UTF-8',

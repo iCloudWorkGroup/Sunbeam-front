@@ -23,7 +23,7 @@ export default function(options) {
 	options.url = cfg.rootPath + options.url;
 	options.beforeSend = function(request) {
 		request.setRequestHeader('step', cache.sendQueueStep);
-		request.setRequestHeader('excelId', 'f777fd32-d2e6-4773-91ac-fff88e0c93ea');
+		request.setRequestHeader('excelId', window.SPREADSHEET_AUTHENTIC_KEY);
 	}
 	let success = options.success;
 	options.success = function(data) {
@@ -33,5 +33,5 @@ export default function(options) {
 		success.apply(this, arguments);
 	}
 
-	$.ajax(options);
+	return $.ajax(options);
 }

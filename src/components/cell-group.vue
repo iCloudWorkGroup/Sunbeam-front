@@ -1,6 +1,6 @@
 <template>
     <div class="cell-group">
-        <cell-item v-for="item in userViewCellList" :key="item.alias" :item="item"></cell-item>
+        <cell-item :class="item.alias" v-for="item in userViewCellList" :key="item.alias" :item="item"></cell-item>
     </div>
 </template>
 <script type="text/javascript">

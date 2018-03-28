@@ -1,9 +1,10 @@
-export function rangeBinary(val, array, strandAttr, rangeAttr, start = 0 , end = array.length - 1) {
+export function rangeBinary(val, array, strandAttr, rangeAttr, 
+	start = 0, end = array.length - 1) {
 	let middle,
 		findVal = Math.floor(val),
 		startVal, endVal,
 		middleIndex;
-		
+
 	while (start < end) {
 		middleIndex = end + start >>> 1;
 		middle = array[middleIndex];
@@ -17,7 +18,8 @@ export function rangeBinary(val, array, strandAttr, rangeAttr, start = 0 , end =
 	}
 	return start;
 }
-export function indexAttrBinary(value, array, attr, startIndex = 0, endIndex = array.length - 1) {
+export function indexAttrBinary(value, array, attr, startIndex = 0, 
+	endIndex = array.length - 1) {
 	let middleIndex;
 
 	if (array[startIndex][attr] > value) {

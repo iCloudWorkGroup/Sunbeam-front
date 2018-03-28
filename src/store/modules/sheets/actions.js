@@ -7,7 +7,10 @@ export default {
 	/**
 	 * 还原sheet
 	 */
-	[actionTypes.SHEET_INSERTSHEET]({commit, state}, sheet) {
+	[actionTypes.SHEET_INSERTSHEET]({
+		commit,
+		state
+	}, sheet) {
 		let list = state.list,
 			flag = true;
 		for (let i = 0, len1 = state.length; i < len1; i++) {
@@ -20,12 +23,18 @@ export default {
 			commit(mutationTypes.INSERT_SHEET, extend({}, template, sheet));
 		}
 	},
-	[actionTypes.SHEET_FROZEN]({commit, state, getters, rootState, dispatch}) {
+	[actionTypes.SHEET_FROZEN]({
+		commit,
+		state,
+		getters,
+		rootState,
+		dispatch
+	}) {
 		let currentSheet = rootState.currentSheet,
 			frozenState = state[currentSheet].frozenState,
 			selects = rootState.selects[currentSheet];
 
-		if(frozenState.isFrozen){
+		if (frozenState.isFrozen) {
 			return;
 		}
 
@@ -35,8 +44,8 @@ export default {
 			frozenColIndex,
 			frozenRowIndex;
 
-		selects.forEach(function(item){
-			if(item.type === 'selected'){
+		selects.forEach(function(item) {
+			if (item.type === 'selected') {
 				select = item;
 			}
 		});
@@ -49,27 +58,27 @@ export default {
 
 		let userView = rootState.userView,
 			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
-			userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
-			userViewRightIndex = getters.getColIndexByAlias(userView.right);
-			userViewLeftIndex = getters.getColIndexByAlias(userView.left);
+		userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
+		userViewRightIndex = getters.getColIndexByAlias(userView.right);
+		userViewLeftIndex = getters.getColIndexByAlias(userView.left);
 		//非可视范围，不能进行冻结
 		if (frozenRowIndex - userViewTopIndex < 0 ||
 			userViewBottomIndex - frozenRowIndex < 0 ||
 			frozenColIndex - userViewLeftIndex < 0 ||
-			userViewRightIndex - frozenColIndex < 0) 
+			userViewRightIndex - frozenColIndex < 0) {
 			return;
 		}
 		//左上角位置不能进行冻结
-		if(frozenRowIndex === userViewTopIndex && 
-			frozenColIndex === userViewLeftIndex){
+		if (frozenRowIndex === userViewTopIndex &&
+			frozenColIndex === userViewLeftIndex) {
 			return;
 		}
 
-		if(frozenColIndex === userViewLeftIndex){
+		if (frozenColIndex === userViewLeftIndex) {
 			dispatch(actionTypes.SHEET_FIRSTROWFROZEN, frozenRowIndex);
 			return;
 		}
-		if(frozenRowIndex === userViewTopIndex){
+		if (frozenRowIndex === userViewTopIndex) {
 			dispatch(actionTypes.SHEET_FIRSTCOLFROZEN, frozenColIndex);
 			return;
 		}
@@ -90,7 +99,7 @@ export default {
 			endColAlias: colList[frozenColIndex - 1].alias,
 			offsetTop: userViewRow.top,
 			offsetLeft: userViewCol.left,
-			width: frozenCol.left - userViewCol.left
+			width: frozenCol.left - userViewCol.left,
 			height: frozenRow.top - userViewRow.top
 		}, {
 			type: 'topRule',
@@ -116,23 +125,38 @@ export default {
 			offsetTop: frozenRow.top
 		});
 
-		commit(mutationTypes.UPDATE_FROZENSTATE,{
+		commit(mutationTypes.UPDATE_FROZENSTATE, {
 			isFrozen: true,
 			rowFrozen: true,
 			colFrozen: true,
 			rules: temp,
 			currentSheet
 		});
-	}, 
-	[actionTypes.SHEET_FIRSTCOLFROZEN]({commit, state, getters, rootState}, index) {
+	},
+	[actionTypes.SHEET_FIRSTCOLFROZEN]({
+		commit,
+		state,
+		getters,
+		rootState
+	}, index) {
 
 
-	}, 
-	[actionTypes.SHEET_FIRSTROWFROZEN]({commit, state, getters, rootState}, index) {
+	},
+	[actionTypes.SHEET_FIRSTROWFROZEN]({
+		commit,
+		state,
+		getters,
+		rootState
+	}, index) {
 
 
-	}, 
-	[actionTypes.SHEET_UNFROZEN]({commit, state, getters, rootState}, sheet) {
+	},
+	[actionTypes.SHEET_UNFROZEN]({
+		commit,
+		state,
+		getters,
+		rootState
+	}, sheet) {
 
 
 	}

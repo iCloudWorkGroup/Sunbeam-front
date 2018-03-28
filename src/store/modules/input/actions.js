@@ -4,7 +4,12 @@ import * as mutationTypes from '../../mutation-types';
 import * as actionTypes from '../../action-types';
 
 export default {
-	[actionTypes.EDIT_SHOW]({state, rootState, getters, commit}) {
+	[actionTypes.EDIT_SHOW]({
+		state,
+		rootState,
+		getters,
+		commit
+	}) {
 		let select = getters.selectList[0],
 			colAlias = select.activePosi.colAlias,
 			rowAlias = select.activePosi.rowAlias,
@@ -37,9 +42,9 @@ export default {
 				height: row.height
 			});
 		}
-		temp.maxWidth = colList[colList.length - 1].left + 
+		temp.maxWidth = colList[colList.length - 1].left +
 			colList[colList.length - 1].width - temp.left;
-		temp.maxHeight = rowList[rowList.length - 1].top + 
+		temp.maxHeight = rowList[rowList.length - 1].top +
 			rowList[rowList.length - 1].height - temp.top;
 		temp.editState = true;
 		commit(mutationTypes.UPDATE_EDIT, {
@@ -47,7 +52,13 @@ export default {
 			inputInfo: temp
 		});
 	},
-	[actionTypes.EDIT_HIDE]({state, rootState, getters, commit, dispatch}, texts) {
+	[actionTypes.EDIT_HIDE]({
+		state,
+		rootState,
+		getters,
+		commit,
+		dispatch
+	}, texts) {
 		let currentSheet = rootState.currentSheet,
 			currentState = state[currentSheet],
 			colAlias = currentState.colAlias,

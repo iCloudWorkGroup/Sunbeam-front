@@ -64,17 +64,16 @@
 						</edit>
 					</td>
 				</tr>
-
 			</tbody>
 		</table>
 	</div>
 </template>
 <script type="text/javascript">
-import config from '../config';
-import getScrollbarWidth from '../util/scrollbarWidth';
-import ColHead from './col-head.vue';
-import RowHead from './row-head.vue';
-import Edit from './edit.vue';
+	import config from '../config';
+	import getScrollbarWidth from '../util/scrollbarWidth';
+	import ColHead from './col-head.vue';
+	import RowHead from './row-head.vue';
+	import Edit from './edit.vue';
 
 	export default {
 		props: [
@@ -144,8 +143,8 @@ import Edit from './edit.vue';
 				return this.sheetHeight;
 			},
 			colHeadWidth() {
-				let frozenState = this.$store.getters.getFrozenState,
-					frozenState.rowFrozen;
+				let frozenState = this.$store.getters.getFrozenState;
+					// frozenState.rowFrozen;
 				return this.sheetWidth - config.cornerWidth - this.scrollbarWidth;
 			},
 			rowHeadHeight() {

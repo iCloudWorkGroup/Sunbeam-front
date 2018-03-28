@@ -144,7 +144,7 @@ export default {
             return result;
         };
     },
-    userViewCellList(state, getters, rootState){
+    userViewCellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
             list = state[currentSheet],
             userView = rootState.userView,

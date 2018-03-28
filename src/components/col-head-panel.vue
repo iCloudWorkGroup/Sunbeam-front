@@ -1,6 +1,6 @@
 <template>
     <div class="col-head-panel">
-        <col-head-item v-for="col in colList"  :key="col.alias" :col="col"></col-head-item>
+        <col-head-item v-for="col in userViewColList"  :key="col.alias" :col="col"></col-head-item>
     </div>
 </template>
 <script type="text/javascript">
@@ -14,6 +14,9 @@ export default {
         colList() {
             return this.$store.getters.colList;
         },
+        userViewColList() {
+            return this.$store.getters.userViewColList;
+        }
     }
 };
 </script>

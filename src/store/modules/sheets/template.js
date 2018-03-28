@@ -17,5 +17,14 @@ export default {
 	 * 活动状态
 	 * @type {Boolean}
 	 */
-	active: true
+	active: true,
+	/**
+	 * 冻结状态
+	 */
+	frozenState: {
+		isFrozen: false,
+		rowFrozen: false,
+		colFrozen: false,
+		rules: []
+	}
 };

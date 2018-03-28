@@ -6,7 +6,7 @@ const state = {
 	 * sheet列表
 	 * @type {Array}
 	 */
-	list: []	
+	list: []
 };
 
 export default {

@@ -8,7 +8,8 @@
 	import config from '../config';
 	import cache from '../tools/cache';
 	import send from '../util/send';
-	import * as types from '../store/action-types';
+	import * as actionTypes from '../store/action-types';
+	import * as mutationTypes from '../store/mutation-types';
 	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
 	export default {
@@ -18,7 +19,10 @@
 				colOccupy: [],
 				rowOccupy: [],
 				recordScrollTop: 0,
-				recordScrollLeft: 0
+				recordScrollLeft: 0,
+				timeoutId: '',
+				lastScrollHandleTime: 0,
+				currentPromise: null
 			}
 		},
 		created() {
@@ -30,6 +34,14 @@
 			this.colOccupy.push(colList[0].alias, lastCol.alias);
 			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
 		},	
+		mounted() {
+			this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+				left: 0,
+				top: 0,
+				right: this.$el.offsetWidth,
+				bottom: this.$el.offsetHeight
+			});
+		},
 		computed: {
 			width() {
 				return this.editWidth;
@@ -43,45 +55,117 @@
 		},
 		methods: {
 			onScroll() {
-				let	transverse = this.$el.scrollLeft - this.recordScrollLeft,
-					vertical = this.$el.scrollTop - this.recordScrollTop;
-					
-				this.recordScrollTop = this.$el.scrollTop;
-				this.recordScrollLeft = this.$el.scrollLeft;
+				const self = this;
+				let currentScrollLeft = this.$el.scrollLeft,
+					currentScrollTop = this.$el.scrollTop;
 
-				if (vertical !== 0) {
-					this.$emit('changeScrollTop', this.recordScrollTop);
-					if (vertical > 0) {
-						this.scrollToBttom();
-					} else {
-						this.scrollToTop();
-					}
-					
-				} else {
-					this.$emit('changeScrollLeft', this.recordScrollLeft);
-					if (transverse > 0) {
-						this.scrollToRight();
-					} else {
-						this.scrollToLeft();
-					}
+				this.$emit('changeScrollLeft', currentScrollLeft);
+				this.$emit('changeScrollTop', currentScrollTop);
+
+				
+				if(this.timeoutId === ''){
+					this.timeoutId = setTimeout(function(){
+						self.handleScroll(currentScrollLeft, currentScrollTop);
+					},50);
+				}else{
+					clearTimeout(this.timeoutId);
+					this.timeoutId = setTimeout(function(){
+						self.handleScroll(currentScrollLeft, currentScrollTop);
+					},50);
 				}
 			},
-			scrollToBttom() {
+			handleScroll(currentScrollLeft, currentScrollTop){
+				let currentPromise = this.currentPromise,
+					self = this;
+
+				currentPromise = currentPromise || new Promise(function(resolve){
+					resolve();
+				});
+
+				this.currentPromise = currentPromise.then(function(){
+					let transverse = currentScrollLeft - self.recordScrollLeft,
+						vertical = currentScrollTop - self.recordScrollTop,
+						limitTop,
+						limitBottom,
+						limitLeft,
+						limitRight,
+						p1, p2;
+
+					self.recordScrollTop = currentScrollTop;
+					self.recordScrollLeft = currentScrollLeft;
+
+					if (vertical !== 0) {
+						limitTop = self.recordScrollTop - config.prestrainHeight;
+						limitTop = limitTop > 0 ? limitTop : 0;
+						limitBottom = limitTop + self.$el.offsetHeight + config.prestrainHeight;
+
+						if (vertical > 0) {
+							p1 = new Promise(function(resolve) {
+								self.scrollToBottom(limitTop, limitBottom, resolve);
+							});
+						} else {
+							p1 = new Promise(function(resolve) {
+								self.scrollToTop(limitTop, limitBottom, resolve);
+							});
+						}
+						p1.then(function() {
+							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+								top: self.recordScrollTop,
+								bottom: limitBottom
+							});
+						});
+					}
+
+					if (transverse !== 0) {
+						limitLeft = self.recordScrollLeft - config.prestrainWidth;
+					    limitLeft = limitLeft > 0 ? limitLeft : 0;
+						limitRight = limitLeft + self.$el.offsetWidth + config.prestrainWidth;
+
+						if (transverse > 0) {
+							p2 = new Promise(function(resolve){
+								self.scrollToRight(limitLeft, limitRight, resolve);
+							});
+						} else {
+							p2 = new Promise(function(resolve){
+								self.scrollToLeft(limitLeft, limitRight, resolve);
+							});
+						}
+						p2.then(function() {
+							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+								left: self.recordScrollLeft,
+								right: limitRight
+							});
+						});
+
+					}
+					if(!p1){
+						p1 = new Promise((resolve) => {
+							resolve();
+						});
+					}
+					if(!p2){
+						p2 = new Promise((resolve) => {
+							resolve();
+						});
+					}
+					return Promise.all([p1, p2]);	
+				});
+			},
+			scrollToBottom(limitTop, limitBottom, resolve) {
 				let rowList = this.$store.getters.rowList,
 					maxBottom = cache.localRowPosi,
 					bufferHeight = config.scrollBufferWidth,
 					rowRecord = cache.rowRecord,
 					rowOccupy = this.rowOccupy,
+					colOccupy = this.colOccupy,
 					regionRecord = cache.regionRecord,
-					lastRow = rowList[rowList.length - 1],
-					currentMaxBottom = lastRow.top + lastRow.height,
-					limitBottom = this.$el.scrollTop + this.$el.offsetHeight + config.prestrainWidth,
-					limitTop = this.$el.scrollTop,
 					occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
 					occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
 					occupyBottom = occupyEndRow.top + occupyEndRow.height,
-					addRowNum = 0;
-
+					addRowNum = 0,
+					self = this,
+					promise;
+				
 				/**
 				 * 当前视图边界值超过了后台对象的最大值
 				 * 需要自动增加列
@@ -91,184 +175,211 @@
 					limitBottom = maxBottom;
 				}
 
+				promise = new Promise(function(currentResolve){
+					getNextRow(currentResolve);
+				}).then(function(){
+					return new Promise(function(currentResolve){
+						getRegion(currentResolve);
+					});
+				}).then(function(){
+					addRow();
+					removeOccupyRow();
+					resolve();
+				});
+
 				/**
 				 * 当前视图边界值超过了已加载对象最大值
-				 * 需要请求数据
+				 * 起始值为当前所占块下边界
+				 * 终止值为视图边界+缓存高度
 				 */
+				function getNextRow(resolve) {
+					let lastRow = rowList[rowList.length - 1],
+						currentMaxBottom = lastRow.top + lastRow.height;
 
-				if (currentMaxBottom < limitBottom) {
-					let self = this;
-					
-					limitBottom = limitBottom + bufferHeight;
-					limitBottom = limitBottom < maxBottom ? limitBottom : maxBottom;
-					/**
-					 * 横向请求
-					 * 起始值为当前所占块右边界
-					 * 终止值为视图边界+缓存宽度
-					 */
-					this.verticalRequest(currentMaxBottom + 1, limitBottom,
-						function(alias) {
-							let rowOccupy = self.rowOccupy,
-								colOccupy = self.colOccupy,
-								occupyBottomAlias = rowOccupy[rowOccupy.length - 1],
-								occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias),
-								temp = []; //记录请求区间跨域加载块
+					if (currentMaxBottom < limitBottom) {
 
-							for (let i = occupyBottomIndex, len = rowRecord.length; i < len; i++) {
-								temp.push(rowRecord[i]);
-								rowOccupy.push(rowRecord[i]);
-							}
+						limitBottom = limitBottom + bufferHeight;
+						limitBottom = limitBottom < maxBottom ? limitBottom : maxBottom;
 
-							temp.push(alias);
+						self.verticalRequest(currentMaxBottom + 1, limitBottom, resolve,
+							function(alias) {
+								let rowOccupy = self.rowOccupy,
+									colOccupy = self.colOccupy,
+									occupyBottomAlias = rowOccupy[rowOccupy.length - 1],
+									occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias),
+									temp = []; //记录请求区间跨域加载块
 
-							for (let i = 0, len1 = colOccupy.length - 1; i < len1; i++) {
-								for (let j = 0, len2 = temp.length - 1; j < len2; j++) {
-									let sign = colOccupy[i] + '_' + colOccupy[i + 1] + '_' +
+								for (let i = occupyBottomIndex, len = rowRecord.length; i < len; i++) {
+									temp.push(rowRecord[i]);
+									rowOccupy.push(rowRecord[i]);
+								}
+
+								temp.push(alias);
+
+								for (let i = 0, len1 = colOccupy.length - 1; i < len1; i++) {
+									for (let j = 0, len2 = temp.length - 1; j < len2; j++) {
+										let sign = colOccupy[i] + '_' + colOccupy[i + 1] + '_' +
 											temp[j] + '_' + temp[j + 1];
-									if (!regionRecord.get(sign)) {
-										regionRecord.set(sign, true);
+										if (!regionRecord.get(sign)) {
+											regionRecord.set(sign, true);
+										}
 									}
 								}
-							}
-							rowOccupy.push(alias);
-							rowRecord.push(alias);
-						});
-					/**
-					 * 当前视图边界值超出了，视图所占块的边界值
-					 * 需要判断超出边界区域是否已经加载过
-					 */
-				} else if (occupyBottom < limitBottom) {
-					let colOccupy = this.colOccupy,
-						temp = [occupyEndRowAlias],
-						i = rowRecord.indexOf(occupyEndRowAlias) + 1;
+								rowOccupy.push(alias);
+								rowRecord.push(alias);
 
-					for (let len = rowRecord.length; i < len; i++) {
-						let row = this.$store.getters.getRowByAlias(rowRecord[i]);
-						temp.push(row.alias);
-						rowOccupy.push(row.alias);
-						if (row.top + row.height > limitBottom) {
-							limitBottom = row.top + row.height;
+							});
+					} else {
+						resolve();
+					}
+				}
+
+				function getRegion(resolve){
+			 		if (occupyBottom < limitBottom) {
+						let temp = [occupyEndRowAlias],
+							i = rowRecord.indexOf(occupyEndRowAlias) + 1;
+
+						for (let len = rowRecord.length; i < len; i++) {
+							let row = self.$store.getters.getRowByAlias(rowRecord[i]);
+							temp.push(row.alias);
+							rowOccupy.push(row.alias);
+							if (row.top + row.height > limitBottom) {
+								limitBottom = row.top + row.height;
+								break;
+							}
+						}
+						let flag = false;
+						for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
+							for (let j = 0, len2 = colOccupy.length - 1; j < len2; j++) {
+								let sign = colOccupy[j] + '_' + colOccupy[j + 1] + '_' +
+										temp[i] + '_' + temp[i + 1];
+								if (!regionRecord.get(sign)) {
+									regionRecord.set(sign, true);
+									flag = true;
+								}
+							}
+						}
+						if (flag) {
+							self.verticalRequest(occupyBottom + 1, limitBottom, resolve);
+						}else{
+							resolve();
+						}
+					}else{
+						resolve();
+					}
+				}
+
+				function addRow() {
+					addRowNum = addRowNum + rowList.length < config.maxRowNum ?
+						addRowNum : config.maxRowNum - rowList.length;
+
+					if (addRowNum > 0) {
+						let colOccupy = this.colOccupy,
+							tempAlias = rowList[rowList.length - 1].alias,
+							currentAlias;
+
+						this.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum);
+
+						currentAlias = rowList[rowList.length - 1].alias;
+
+						for (let i = 0, len = colOccupy.length - 1; i < len; i++) {
+							let sign = colOccupy[i] + '_' + colOccupy[i + 1] + '_' +
+								tempAlias + '_' + currentAlias;
+							regionRecord.set(sign, true);
+						}
+						rowOccupy.push(currentAlias);
+						rowRecord.push(currentAlias);
+					}
+				}
+				function removeOccupyRow() {
+					let counter = 0,
+						flag = false;
+					for (let i = 0, len = rowOccupy.length; i < len; i++) {
+						let row = self.$store.getters.getRowByAlias(rowOccupy[i]);
+						if (row.top > limitTop) {
+							counter--;
 							break;
 						}
+						counter++;
 					}
-					let flag = false;
-					for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
-						for (let j = 0, len2 = colOccupy.length - 1; j < len2; j++) {
-							let sign = colOccupy[j] + '_' + colOccupy[j + 1] + '_' +
-									temp[i] + '_' + temp[i + 1];
-							if (!regionRecord.get(sign)) {
-								regionRecord.set(sign, true);
-								flag = true;
-							}
-						}
+					for (let i = 0; i < counter; i++) {
+						rowOccupy.shift();
 					}
-					if (flag) {
-						this.verticalRequest(occupyBottom + 1, limitBottom);
-					}
-				}
-				/**
-				 * 自动增加行
-				 */
-				addRowNum = addRowNum + rowList.length < config.maxRowNum ?
-					addRowNum : config.maxRowNum - rowList.length;
-
-				if (addRowNum > 0) {
-					let colOccupy = this.colOccupy,
-						tempAlias = rowList[rowList.length - 1].alias,
-						currentAlias;
-
-					this.$store.dispatch(types.ROWS_GENERAT, addRowNum);
-
-					currentAlias = rowList[rowList.length - 1].alias;
-
-					for (let i = 0, len = colOccupy.length - 1; i < len; i++) {
-						let sign = colOccupy[i] + '_' + colOccupy[i + 1] + '_' +
-							 tempAlias + '_' + currentAlias;
-						regionRecord.set(sign, true);
-					}
-					rowOccupy.push(currentAlias);
-					rowRecord.push(currentAlias);
-				}
-				//移除上方多余行
-				let counter = 0,
-					flag = false;
-				for (let i = 0, len = rowOccupy.length; i < len; i++) {
-					let row = this.$store.getters.getRowByAlias(rowOccupy[i]);
-					if (row.top > limitTop) {
-						counter--;
-						break;
-					}
-					counter++;
-				}
-
-				for (let i = 0; i < counter; i++) {
-					rowOccupy.shift();
 				}
 			},
-			scrollToTop(){
+			scrollToTop(limitTop, limitBottom, resolve){
 				let rowOccupy = this.rowOccupy,
 					colOccupy = this.colOccupy,
 					rowRecord = cache.rowRecord,
 					occupyStartRowAlias = rowOccupy[0],
 					occupyStartRow = this.$store.getters.getRowByAlias(occupyStartRowAlias),
 					currentTop = occupyStartRow.top,
-					limitTop = this.$el.scrollTop - config.prestrainHeight,
-					limitBottom = this.$el.scrollTop + this.$el.offsetHeight;
+					self = this;
 
+				new Promise(function(currentResolve){
+					getTop(currentResolve);
+				}).then(function(){
+					adjustOccupy();
+					resolve();
+				});
 
-				if(limitTop < 0){
-					limitTop = 0;
-				}
+				function getTop(resolve) {
+					if (limitTop < currentTop) {
+						let regionRecord = cache.regionRecord,
+							temp = [rowOccupy[0]],
+							i = rowRecord.indexOf(occupyStartRowAlias) - 1;
 
-				if (limitTop < currentTop) {
-					let regionRecord = cache.regionRecord,
-						temp = [rowOccupy[0]],
-						i = rowRecord.indexOf(occupyStartRowAlias) - 1;
-
-					if(i === -1){
-						return;
-					}
-					for (; i > -1; i--) {
-						let row = this.$store.getters.getRowByAlias(rowRecord[i]);
-						temp.unshift(row.alias);
-						rowOccupy.unshift(row.alias);
-						if (row.top <= limitTop) {
-							limitTop = row.top;
-							break;
+						if (i === -1) {
+							return;
 						}
-					}
-					let flag = false;
-					for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
-						for (let j = 0, len2 = colOccupy.length - 1; j < len2; j++) {
-							let sign = colOccupy[j] + '_' + colOccupy[j + 1] + '_' + 
-								temp[i] + '_' + temp[i + 1];
-							if (!regionRecord.get(sign)) {
-								regionRecord.set(sign, true);
-								flag = true;
+						for (; i > -1; i--) {
+							let row = self.$store.getters.getRowByAlias(rowRecord[i]);
+							temp.unshift(row.alias);
+							rowOccupy.unshift(row.alias);
+							if (row.top <= limitTop) {
+								limitTop = row.top;
+								break;
 							}
 						}
-					}
-					if (flag) {
-						this.verticalRequest(limitTop, currentTop - 1);
+						let flag = false;
+						for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
+							for (let j = 0, len2 = colOccupy.length - 1; j < len2; j++) {
+								let sign = colOccupy[j] + '_' + colOccupy[j + 1] + '_' +
+									temp[i] + '_' + temp[i + 1];
+								if (!regionRecord.get(sign)) {
+									regionRecord.set(sign, true);
+									flag = true;
+								}
+							}
+						}
+						if (flag) {
+							self.verticalRequest(limitTop, currentTop - 1, resolve);
+						}else{
+							resolve();
+						}
+					}else{
+						resolve();
 					}
 				}
 
-				//移除上方多余行
-				let counter = 0;
+				function adjustOccupy() {
+					//移除上方多余行
+					let counter = 0;
 
-				for (let i = rowOccupy.length -1; i > -1; i--) {
-					let row = this.$store.getters.getRowByAlias(rowOccupy[i]);
-					if (row.top + row.height < limitBottom) {
-						counter--;
-						break;
+					for (let i = rowOccupy.length - 1; i > -1; i--) {
+						let row = self.$store.getters.getRowByAlias(rowOccupy[i]);
+						if (row.top + row.height < limitBottom) {
+							counter--;
+							break;
+						}
+						counter++;
 					}
-					counter++;
-				}
-				for (let i = 0; i < counter; i++) {
-					rowOccupy.pop();
+					for (let i = 0; i < counter; i++) {
+						rowOccupy.pop();
+					}
 				}
 			},
-			scrollToRight() {
+			scrollToRight(limitLeft, limitRight, resolve) {
 				let colList = this.$store.getters.colList,
 					maxRight = cache.localColPosi,
 					bufferWidth = config.scrollBufferWidth,
@@ -277,12 +388,12 @@
 					regionRecord = cache.regionRecord,
 					lastCol = colList[colList.length - 1],
 					currentMaxRight = lastCol.left + lastCol.width,
-					limitRight = this.$el.scrollLeft + this.$el.offsetWidth + config.prestrainWidth,
-					limitLeft = this.$el.scrollLeft,
 					occupyEndColAlias = colOccupy[colOccupy.length - 1],
 					occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias),
 					occupyRight = occupyEndCol.left + occupyEndCol.width,
-					addColNum = 0;
+					addColNum = 0,
+					self = this,
+					promise;
 
 				/**
 				 * 当前视图边界值超过了后台对象的最大值
@@ -293,21 +404,33 @@
 					limitRight = maxRight;
 				}
 
+				promise = new Promise(function(currentResolve){
+					getNextCol(currentResolve);
+				}).then(function(){
+					return new Promise(function(currentResolve){
+						getRight(currentResolve);
+					});
+				}).then(function(){
+					addCol();
+					removeOccupyCol();
+					resolve();
+				});
+
 				/**
 				 * 当前视图边界值超过了已加载对象最大值
-				 * 需要请求数据
+				 * 起始值为当前所占块下边界
+				 * 终止值为视图边界+缓存高度
 				 */
-				if (currentMaxRight < limitRight) {
-					let self = this;
-					
-					limitRight = limitRight + config.scrollBufferWidth;
-					limitRight = limitRight < maxRight ? limitRight : maxRight;
+				function getNextCol(resolve) {
+					if (currentMaxRight < limitRight) {
+						limitRight = limitRight + config.scrollBufferWidth;
+						limitRight = limitRight < maxRight ? limitRight : maxRight;
 					/**
 					 * 横向请求
 					 * 起始值为当前所占块右边界
 					 * 终止值为视图边界+缓存宽度
 					 */
-					this.transverseRequest(currentMaxRight + 1, limitRight,
+					self.transverseRequest(currentMaxRight + 1, limitRight, resolve,
 						function(alias) {
 							let rowOccupy = self.rowOccupy,
 								colOccupy = self.colOccupy,
@@ -334,142 +457,163 @@
 							colOccupy.push(alias);
 							colRecord.push(alias);
 						});
-					/**
-					 * 当前视图边界值超出了，视图所占块的边界值
-					 * 需要判断超出边界区域是否已经加载过
-					 */
-				} else if (occupyRight < limitRight) {
-					let rowOccupy = this.rowOccupy,
-						temp = [occupyEndColAlias],
-						i = colRecord.indexOf(occupyEndColAlias) + 1;
-
-					for (let len = colRecord.length; i < len; i++) {
-						let col = this.$store.getters.getColByAlias(colRecord[i]);
-						temp.push(col.alias);
-						colOccupy.push(col.alias);
-						if (col.left + col.width > limitRight) {
-							limitRight = col.left + col.width;
-							break;
-						}
+					}else{
+						resolve();
 					}
-					let flag = false;
-					for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
-						for (let j = 0, len2 = rowOccupy.length - 1; j < len2; j++) {
-							let sign = temp[i] + '_' + temp[i + 1] + '_' +
-								rowOccupy[j] + '_' + rowOccupy[j + 1];
-							if (!regionRecord.get(sign)) {
-								regionRecord.set(sign, true);
-								flag = true;
+				}
+
+				function getRight(resolve) {
+					if (occupyRight < limitRight) {
+						let rowOccupy = self.rowOccupy,
+							temp = [occupyEndColAlias],
+							i = colRecord.indexOf(occupyEndColAlias) + 1;
+
+						for (let len = colRecord.length; i < len; i++) {
+							let col = self.$store.getters.getColByAlias(colRecord[i]);
+							temp.push(col.alias);
+							colOccupy.push(col.alias);
+							if (col.left + col.width > limitRight) {
+								limitRight = col.left + col.width;
+								break;
 							}
 						}
-					}
-					if (flag) {
-						this.transverseRequest(occupyRight + 1, limitRight);
+						let flag = false;
+						for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
+							for (let j = 0, len2 = rowOccupy.length - 1; j < len2; j++) {
+								let sign = temp[i] + '_' + temp[i + 1] + '_' +
+									rowOccupy[j] + '_' + rowOccupy[j + 1];
+								if (!regionRecord.get(sign)) {
+									regionRecord.set(sign, true);
+									flag = true;
+								}
+							}
+						}
+						if (flag) {
+							self.transverseRequest(occupyRight + 1, limitRight, resolve);
+						} else {
+							resolve();
+						}
+					} else {
+						resolve();
 					}
 				}
-				/**
-				 * 自动增加列
-				 */
-				addColNum = addColNum + colList.length < config.maxColNum ?
-					addColNum : config.maxColNum - colList.length;
 
-				if (addColNum > 0) {
-					let rowOccupy = this.rowOccupy,
-						tempAlias = colList[colList.length - 1].alias,
-						currentAlias;
+				function addCol() {
+					addColNum = addColNum + colList.length < config.maxColNum ?
+						addColNum : config.maxColNum - colList.length;
 
-					this.$store.dispatch(types.COLS_GENERAT, addColNum);
+					if (addColNum > 0) {
+						let rowOccupy = self.rowOccupy,
+							tempAlias = colList[colList.length - 1].alias,
+							currentAlias;
 
-					currentAlias = colList[colList.length - 1].alias;
+						self.$store.dispatch(actionTypes.COLS_GENERAT, addColNum);
 
-					for (let i = 0, len = rowOccupy.length - 1; i < len; i++) {
-						let sign = tempAlias + '_' + currentAlias + '_' +
-							rowOccupy[i] + '_' + rowOccupy[i + 1];
-							regionRecord.set(sign, true);
+						currentAlias = colList[colList.length - 1].alias;
+
+						for (let i = 0, len = rowOccupy.length - 1; i < len; i++) {
+							let sign = tempAlias + '_' + currentAlias + '_' +
+								rowOccupy[i] + '_' + rowOccupy[i + 1];
+								regionRecord.set(sign, true);
+						}
+						colOccupy.push(currentAlias);
+						colRecord.push(currentAlias);
 					}
-					colOccupy.push(currentAlias);
-					colRecord.push(currentAlias);
 				}
-				//移除左侧多余列
-				let counter = 0,
-					flag = false;
-				for (let i = 0, len = colOccupy.length; i < len; i++) {
-					let col = this.$store.getters.getColByAlias(colOccupy[i]);
-					if (col.left > limitLeft) {
-						counter--;
-						break;
+				function removeOccupyCol() {
+					//移除左侧多余列
+					let counter = 0,
+						flag = false;
+					for (let i = 0, len = colOccupy.length; i < len; i++) {
+						let col = self.$store.getters.getColByAlias(colOccupy[i]);
+						if (col.left > limitLeft) {
+							counter--;
+							break;
+						}
+						counter++;
 					}
-					counter++;
-				}
 
-				for (let i = 0; i < counter; i++) {
-					colOccupy.shift();
+					for (let i = 0; i < counter; i++) {
+						colOccupy.shift();
+					}
 				}
-
 			},
-			scrollToLeft(){
+			scrollToLeft(limitLeft, limitRight, resolve){
 				let colOccupy = this.colOccupy,
 					rowOccupy = this.rowOccupy,
 					occupyStartColAlias = colOccupy[0],
 					occupyStartCol = this.$store.getters.getColByAlias(occupyStartColAlias),
 					currentLeft = occupyStartCol.left,
-					limitLeft = this.$el.scrollLeft - config.prestrainWidth,
-					limitRight = this.$el.scrollLeft + this.$el.offsetWidth,
-					colRecord = cache.colRecord;
+					colRecord = cache.colRecord,
+					self = this;
 
-				if(limitLeft < 0){
-					limitLeft = 0;
-				}
+				new Promise(function(currentResolve){
+					getLeft(currentResolve);
+				}).then(function(){
+					adjustOccupy();
+					resolve();
+				});
 
-				if (limitLeft < currentLeft) {
-					let regionRecord = cache.regionRecord,
-						temp = [colOccupy[0]],
-						i = colRecord.indexOf(occupyStartColAlias) - 1;
-
-					if(i === -1){
-						return;
+				function getLeft(resolve) {
+					if (limitLeft < 0) {
+						limitLeft = 0;
 					}
-					for (; i > -1; i--) {
-						let col = this.$store.getters.getColByAlias(colRecord[i]);
-						temp.unshift(col.alias);
-						colOccupy.unshift(col.alias);
-						if (col.left <= limitLeft) {
-							limitLeft = col.left;
-							break;
+
+					if (limitLeft < currentLeft) {
+						let regionRecord = cache.regionRecord,
+							temp = [colOccupy[0]],
+							i = colRecord.indexOf(occupyStartColAlias) - 1;
+
+						if (i === -1) {
+							return;
 						}
-					}
-					let flag = false;
-					for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
-						for (let j = 0, len2 = rowOccupy.length - 1; j < len2; j++) {
-							let sign = temp[i] + '_' + temp[i + 1] + '_' +
-								rowOccupy[j] + '_' + rowOccupy[j + 1];
-							if (!regionRecord.get(sign)) {
-								regionRecord.set(sign, true);
-								flag = true;
+						for (; i > -1; i--) {
+							let col = self.$store.getters.getColByAlias(colRecord[i]);
+							temp.unshift(col.alias);
+							colOccupy.unshift(col.alias);
+							if (col.left <= limitLeft) {
+								limitLeft = col.left;
+								break;
 							}
 						}
-					}
-					if (flag) {
-						this.transverseRequest(limitLeft, currentLeft - 1);
+						let flag = false;
+						for (let i = 0, len1 = temp.length - 1; i < len1; i++) {
+							for (let j = 0, len2 = rowOccupy.length - 1; j < len2; j++) {
+								let sign = temp[i] + '_' + temp[i + 1] + '_' +
+									rowOccupy[j] + '_' + rowOccupy[j + 1];
+								if (!regionRecord.get(sign)) {
+									regionRecord.set(sign, true);
+									flag = true;
+								}
+							}
+						}
+						if (flag) {
+							this.transverseRequest(limitLeft, currentLeft - 1);
+						} else {
+							resolve();
+						}
+					} else {
+						resolve();
 					}
 				}
-
 				//移除右侧多余列
-				let counter = 0;
+				function adjustOccupy() {
+					let counter = 0;
 
-				for (let i = colOccupy.length -1; i > -1; i--) {
-					let col = this.$store.getters.getColByAlias(colOccupy[i]);
-					if (col.left + col.width < limitRight) {
-						counter--;
-						break;
+					for (let i = colOccupy.length -1; i > -1; i--) {
+						let col = self.$store.getters.getColByAlias(colOccupy[i]);
+						if (col.left + col.width < limitRight) {
+							counter--;
+							break;
+						}
+						counter++;
 					}
-					counter++;
-				}
-				for (let i = 0; i < counter; i++) {
-					colOccupy.pop();
+					for (let i = 0; i < counter; i++) {
+						colOccupy.pop();
+					}
 				}
 			},
-			transverseRequest(left, right, fn) {
+			transverseRequest(left, right, resolve, fn) {
 				let startRowAlias = this.rowOccupy[0],
 					endRowAlias = this.rowOccupy[this.rowOccupy.length - 1],
 					startRow = this.$store.getters.getRowByAlias(startRowAlias),
@@ -479,7 +623,6 @@
 
 					send({
 						url: 'sheet/area',
-						async: true,
 						isPublic: false,
 						data: JSON.stringify({
 							left,
@@ -502,17 +645,17 @@
 										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
-									this.$store.dispatch(types.COLS_ADDCOLS, cols);	
+									this.$store.dispatch(actionTypes.COLS_ADDCOLS, cols);	
 									fn(endColAlias);
 								}
 								let cells = sheetData.cells;	
-								this.$store.dispatch(types.CELLS_RESTORECELL, cells);
-
+								this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 							}
+							resolve();
 						}
 					});
 			},
-			verticalRequest(top, bottom, fn){
+			verticalRequest(top, bottom, resolve, fn){
 				let startColAlias = this.colOccupy[0],
 					endColAlias = this.colOccupy[this.colOccupy.length - 1],
 					startCol = this.$store.getters.getColByAlias(startColAlias),
@@ -520,9 +663,8 @@
 					left = startCol.left,
 					right = endCol.left + endCol.width;
 
-					send({
+					return send({
 						url: 'sheet/area',
-						async: true,
 						isPublic: false,
 						data: JSON.stringify({
 							left,
@@ -545,12 +687,13 @@
 										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
-									this.$store.dispatch(types.ROWS_ADDROWS, rows);	
+									this.$store.dispatch(actionTypes.ROWS_ADDROWS, rows);	
 									fn(endRowAlias);
 								}
 								let cells = sheetData.cells;
-								this.$store.dispatch(types.CELLS_RESTORECELL, cells);
+								this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 							}
+							resolve();
 						}
 					});
 			}

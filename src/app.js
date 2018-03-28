@@ -8,8 +8,12 @@ import {
 import Book from './components/book.vue';
 
 let wrapper = document.getElementById('wrapper'),
+	excelId = document.getElementById('excelId'),
 	right = wrapper.offsetWidth,
-	bottom = wrapper.offsetHeight
+	bottom = wrapper.offsetHeight;
+
+window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec';
+
 
 store.dispatch(RESTORE, {
 	left: 0,

@@ -91,7 +91,9 @@ function restoreSpreadsheet(fn, data) {
 					col.displayName = getColDisplayName(col.sort);
 					col.alias = col.aliasX;
 				});
-				
+				cells.forEach(function(cell){
+					cell.alias = generator.cellAliasGenerator();
+				});
 				cache.colRecord.push(cols[0].alias, cols[cols.length -1].alias);
 				cache.rowRecord.push(rows[0].alias, rows[rows.length -1].alias);
 

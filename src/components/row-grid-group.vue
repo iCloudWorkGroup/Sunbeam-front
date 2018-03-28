@@ -1,6 +1,6 @@
 <template>
     <div class="row-group">
-        <div v-for="item in rowList" class="row" :key="item.alias" :style="{
+        <div v-for="item in userViewRowList" class="row" :key="item.alias" :style="{
         top: item.top + 'px', 
         height: item.height + 'px'}"></div>
     </div>
@@ -10,6 +10,9 @@ export default {
     computed: {
         rowList() {
             return this.$store.getters.rowList;
+        },
+        userViewRowList() {
+            return this.$store.getters.userViewRowList;
         }
     }
 };

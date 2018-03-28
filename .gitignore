@@ -1,5 +1,8 @@
 # Custom
+
 mock/
+dist/
+
 # Logs
 logs
 *.log

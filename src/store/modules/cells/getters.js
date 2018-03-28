@@ -148,10 +148,10 @@ export default {
         let currentSheet = rootState.currentSheet,
             list = state[currentSheet],
             userView = rootState.userView,
-            startRowIndex = getters.getRowIndex(userView.top),
-            endRowIndex = getters.getRowIndex(userView.bottom),
-            startColIndex = getters.getColIndex(userView.left),
-            endColIndex = getters.getColIndex(userView.right);
+            startRowIndex = getters.getRowIndexByPosi(userView.top),
+            endRowIndex = getters.getRowIndexByPosi(userView.bottom),
+            startColIndex = getters.getColIndexPosi(userView.left),
+            endColIndex = getters.getColIndexPosi(userView.right);
 
         return getters.getCellsByVertical({
             startRowIndex,

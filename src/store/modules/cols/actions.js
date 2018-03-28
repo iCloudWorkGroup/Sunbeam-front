@@ -29,6 +29,7 @@ export default {
             currentSort = lastCol.sort + 1,
             initWidth = config.colWidth,
             temp = [];
+            
         for (let i = 0; i < num; i++) {
             temp.push(extend({}, template, {
                 alias: generator.colAliasGenerator(),

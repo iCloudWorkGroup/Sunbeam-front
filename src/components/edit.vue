@@ -110,7 +110,7 @@
 						}
 						p1.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								top: limitTop,
+								top: self.recordScrollTop,
 								bottom: limitBottom
 							});
 						});
@@ -132,7 +132,7 @@
 						}
 						p2.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								left: limitLeft,
+								left: self.recordScrollLeft,
 								right: limitRight
 							});
 						});

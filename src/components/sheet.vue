@@ -6,20 +6,65 @@
 					<td>
 						<div class="corner" ref="corner"></div>
 					</td>
+					<td v-if="colFrozen">
+						<col-head 
+							:rule="leftRule" 
+							:head-width="leftRule.width">	
+						</col-head>
+					</td>
 					<td>
-						<col-head :scroll-left="scrollLeft" :col-head-width="colHeadWidth"></col-head>
+						<col-head
+							:rule="mainRule" 
+							:scroll-left="scrollLeft" 
+							:col-head-width="colHeadWidth">	
+						</col-head>
+					</td>
+				</tr>
+				<tr v-if="rowFrozen">
+					<td>
+						<row-head
+							:rule="topRule"
+							:head-height="topRule.height"
+						></row-head>
+					</td>
+					<td v-if="colFrozen">
+						<edit :rule="cornerRule"
+							:edit-width="cornerRule.width" 
+							:edit-height="cornerRule.height"
+						></edit>
+					</td>
+					<td>
+						<edit :rule="topRule"
+							:edit-height="topRule.height"
+							:edit-width="colHeadWidth"
+							>
+						</edit>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<row-head :scroll-top="scrollTop" :row-head-height="rowHeadHeight"></row-head>
+						<row-head 
+							:rule="mainRule"
+							:scroll-top="scrollTop" 
+							:row-head-height="rowHeadHeight">
+						</row-head>
+					</td>
+					<td v-if="rowFrozen">
+						<edit
+							:edit-height="rowHeadHeight"
+							:edit-width="rowFrozen.width"
+						></edit>
 					</td>
 					<td>
-						<edit @changeScrollTop="changeScrollTop" 
-							@changeScrollLeft="changeScrollLeft"
-							:edit-width="editWidth" :edit-height="editHeight"></edit>
+						<edit :rule="mainRule"
+							:edit-width="editWidth" 
+							:edit-height="editHeight"
+							@changeScrollTop="changeScrollTop" 
+							@changeScrollLeft="changeScrollLeft">	
+						</edit>
 					</td>
 				</tr>
+
 			</tbody>
 		</table>
 	</div>
@@ -44,6 +89,54 @@ import Edit from './edit.vue';
 			};
 		},
 		computed: {
+			rowFrozen(){
+				let frozenState = this.$store.getters.getFrozenState;
+				return frozenState.rowFrozen;
+			},
+			colFrozen(){
+				let frozenState = this.$store.getters.getFrozenState;
+				return frozenState.colFrozen;
+			},
+			cornerRule() {
+				let rules = this.$store.getters.getFrozenState.rules,
+					rule;
+				rules.forEach(function(item) {
+					if (item.type === 'cornerRule') {
+						rule = item;
+					}
+				});
+				return item;
+			},
+			leftRule() {
+				let rules = this.$store.getters.getFrozenState.rules,
+					rule;
+				rules.forEach(function(item) {
+					if (item.type === 'leftRule') {
+						rule = item;
+					}
+				});
+				return item;
+			},
+			topRule() {
+				let rules = this.$store.getters.getFrozenState.rules,
+					rule;
+				rules.forEach(function(item) {
+					if (item.type === 'topRule') {
+						rule = item;
+					}
+				});
+				return item;
+			},
+			mainRule() {
+				let rules = this.$store.getters.getFrozenState.rules,
+					rule;
+				rules.forEach(function(item) {
+					if (item.type === 'mainRule') {
+						rule = item;
+					}
+				});
+				return item;
+			},
 			width() {
 				return this.sheetWidth;
 			},
@@ -51,15 +144,20 @@ import Edit from './edit.vue';
 				return this.sheetHeight;
 			},
 			colHeadWidth() {
+				let frozenState = this.$store.getters.getFrozenState,
+					frozenState.rowFrozen;
 				return this.sheetWidth - config.cornerWidth - this.scrollbarWidth;
 			},
 			rowHeadHeight() {
+
 				return this.sheetHeight - config.cornerHeight - this.scrollbarWidth;
 			},
 			editWidth() {
+
 				return this.sheetWidth - config.cornerWidth;
 			},
 			editHeight() {
+
 				return this.sheetHeight - config.cornerHeight;
 			}
 		},

@@ -45,8 +45,8 @@
             this.changeSelect(e.clientX - box.left, e.clientY - box.top);
         },
         changeSelect(X, Y) {
-            let colIndex = this.$store.getters.getColIndex(X),
-                rowIndex = this.$store.getters.getRowIndex(Y);
+            let colIndex = this.$store.getters.getColIndexByPosi(X),
+                rowIndex = this.$store.getters.getRowIndexByPosi(Y);
 
 				this.$store.dispatch(SELECTS_UPDATESELECT, {
 					startColIndex: colIndex,

@@ -16,8 +16,8 @@ export default {
         }
 
         let sheet = rootState.currentSheet,
-            colList = rootState.cols[sheet],
-            rowList = rootState.rows[sheet],
+            colList = rootState.cols[sheet].list,
+            rowList = rootState.rows[sheet].list,
             cellList = rootState.cells[sheet],
             limitRowIndex = rowList.length - 1,
             limitColIndex = colList.length - 1,

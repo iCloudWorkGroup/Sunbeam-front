@@ -1,6 +1,6 @@
 <template>
-	<div class="edit scroll-box" @scroll="onScroll" :style="{width: width + 'px', height: height + 'px'}">
-		<edit-panel></edit-panel>
+	<div class="edit" @scroll="onScroll" :style="{width: width + 'px', height: height + 'px'}">
+		<edit-panel :frozenRule="frozenRule"></edit-panel>
 	</div>
 </template>
 <script type="text/javascript">
@@ -13,8 +13,15 @@
 	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
 	export default {
-		props: ['editWidth', 'editHeight'],
+		props: ['editWidth',
+			'editHeight', 
+			'frozenRule',
+			'scrollTop',
+			'scrollLeft'
+		],
 		data() {
+			let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
+				offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
 			return {
 				colOccupy: [],
 				rowOccupy: [],
@@ -22,7 +29,9 @@
 				recordScrollLeft: 0,
 				timeoutId: '',
 				lastScrollHandleTime: 0,
-				currentPromise: null
+				currentPromise: null,
+				offsetLeft, 
+				offsetTop
 			}
 		},
 		created() {
@@ -35,12 +44,14 @@
 			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
 		},	
 		mounted() {
-			this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-				left: 0,
-				top: 0,
-				right: this.$el.offsetWidth,
-				bottom: this.$el.offsetHeight
-			});
+			if(!this.frozenRule || this.frozenRule.type==='mainRule'){
+				this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+					left: this.offsetLeft,
+					top: this.offsetTop,
+					right: this.offsetLeft + this.$el.offsetWidth,
+					bottom: this.offsetTop + this.$el.offsetHeight
+				});
+			}
 		},
 		computed: {
 			width() {
@@ -55,6 +66,10 @@
 		},
 		methods: {
 			onScroll() {
+				if (this.frozenRule && this.frozenRule.type !== 'mainRule') {
+					return;
+				}
+
 				const self = this;
 				let currentScrollLeft = this.$el.scrollLeft,
 					currentScrollTop = this.$el.scrollTop;
@@ -62,7 +77,6 @@
 				this.$emit('changeScrollLeft', currentScrollLeft);
 				this.$emit('changeScrollTop', currentScrollTop);
 
-				
 				if(this.timeoutId === ''){
 					this.timeoutId = setTimeout(function(){
 						self.handleScroll(currentScrollLeft, currentScrollTop);
@@ -81,7 +95,6 @@
 				currentPromise = currentPromise || new Promise(function(resolve){
 					resolve();
 				});
-
 				this.currentPromise = currentPromise.then(function(){
 					let transverse = currentScrollLeft - self.recordScrollLeft,
 						vertical = currentScrollTop - self.recordScrollTop,
@@ -97,7 +110,10 @@
 					if (vertical !== 0) {
 						limitTop = self.recordScrollTop - config.prestrainHeight;
 						limitTop = limitTop > 0 ? limitTop : 0;
-						limitBottom = limitTop + self.$el.offsetHeight + config.prestrainHeight;
+						limitTop += self.offsetTop;
+						limitBottom = limitTop + self.$el.offsetHeight 
+							+ config.prestrainHeight 
+							+ self.offsetTop;
 
 						if (vertical > 0) {
 							p1 = new Promise(function(resolve) {
@@ -110,7 +126,7 @@
 						}
 						p1.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								top: self.recordScrollTop,
+								top: self.recordScrollTop + self.offsetTop,
 								bottom: limitBottom
 							});
 						});
@@ -119,7 +135,10 @@
 					if (transverse !== 0) {
 						limitLeft = self.recordScrollLeft - config.prestrainWidth;
 					    limitLeft = limitLeft > 0 ? limitLeft : 0;
-						limitRight = limitLeft + self.$el.offsetWidth + config.prestrainWidth;
+					    limitLeft += self.offsetLeft;
+						limitRight = limitLeft + self.$el.offsetWidth 
+							+ config.prestrainWidth
+							+ self.offsetLeft;
 
 						if (transverse > 0) {
 							p2 = new Promise(function(resolve){
@@ -132,7 +151,7 @@
 						}
 						p2.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								left: self.recordScrollLeft,
+								left: self.recordScrollLeft + self.offsetLeft,
 								right: limitRight
 							});
 						});
@@ -588,7 +607,7 @@
 							}
 						}
 						if (flag) {
-							this.transverseRequest(limitLeft, currentLeft - 1);
+							self.transverseRequest(limitLeft, currentLeft - 1);
 						} else {
 							resolve();
 						}
@@ -697,11 +716,37 @@
 						}
 					});
 			}
-		}
+		},
+		watch: {
+			frozenRule(newVal, oldVal){
+				if(newVal){
+					this.$el.scrollTop = 0;
+					this.$el.scrollLeft = 0;
+					this.offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
+					this.offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+					this.handleScroll(0, 0);
+				}else{
+					this.offsetLeft = 0;
+					this.offsetTop = 0;
+					this.$el.scrollTop = oldVal.userViewTop;
+					this.$el.scrollLeft = oldVal.userViewLeft;
+					this.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
+				}
+			},
+			scrollLeft(val) {
+				this.$el.scrollLeft = val;
+			},
+			scrollTop(val) {
+				this.$el.scrollTop = val;
+			}
+		},
 	};
 </script>
 <style type="text/css">
-.scroll-box {
-    overflow: auto;
-}
+	.edit {
+		overflow: hidden;
+	}
+	.edit.scroll-box {
+	    overflow: auto;
+	}
 </style>

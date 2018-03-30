@@ -14,7 +14,7 @@ export default {
 			return rangeBinary(posi, list, 'left', 'width');
 		};
 	},
-	getColIndexBySort(state, getters, rootState){
+	getColIndexBySort(state, getters, rootState) {
 		return function(sort) {
 			let currentSheet = rootState.currentSheet,
 				list = state[currentSheet].list;
@@ -23,28 +23,27 @@ export default {
 	},
 	getColIndexByAlias(state, getters, rootState) {
 		return function(alias) {
-			let currentSheet = rootState.currentSheet,
-				map = state[currentSheet].map;
-
-			return map.get(alias);
-		};
-	},
-	getColByAlias(state, getters, rootState){
-		return function(alias) {
-			let col = getters.getRowByAlias(alias);
-
+			let col = getters.getColByAlias(alias),
+				list = state[rootState.currentSheet].list;
 			if (col) {
 				return rangeBinary(col.left, list, 'left', 'width');
 			}
 			return -1;
 		};
 	},
-	userViewColList(state, getters, rootState){
+	getColByAlias(state, getters, rootState) {
+		return function(alias) {
+			let currentSheet = rootState.currentSheet,
+				map = state[currentSheet].map;
+			return map.get(alias);
+		};
+	},
+	userViewColList(state, getters, rootState) {
 		let currentSheet = rootState.currentSheet,
 			list = state[currentSheet].list,
 			userView = rootState.userView,
-			start = getters.getColIndexPosi(userView.left),
-			end = getters.getColIndexPosi(userView.right);
+			start = getters.getColIndexByPosi(userView.left),
+			end = getters.getColIndexByPosi(userView.right);
 
 		return list.slice(start, end);
 	}

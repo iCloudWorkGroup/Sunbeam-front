@@ -20,8 +20,8 @@ export default {
             endRowIndex = startRowIndex
         }) {
             let currentSheet = rootState.currentSheet,
-                rows = rootState.rows[currentSheet],
-                cols = rootState.cols[currentSheet],
+                rows = rootState.rows[currentSheet].list,
+                cols = rootState.cols[currentSheet].list,
                 cellStartColIndex,
                 cellStartRowIndex,
                 cellEndColIndex,
@@ -117,8 +117,8 @@ export default {
         }) {
             let result = [],
                 pointInfo = rootState.pointsInfo[currentSheet].col,
-                rows = rootState.rows[currentSheet],
-                cols = rootState.cols[currentSheet],
+                rows = rootState.rows[currentSheet].list,
+                cols = rootState.cols[currentSheet].list,
                 index, temp,
                 tempObj = {},
                 rowAlias,
@@ -144,14 +144,73 @@ export default {
             return result;
         };
     },
+    topRegionCellList(state, getters, rootState){
+        let currentSheet = rootState.currentSheet,
+            list = state[currentSheet],
+            rules = getters.frozenState.rules,
+            userView = rootState.userView,
+            startRowIndex,
+            endRowIndex,
+            startColIndex,
+            endColIndex,
+            rule;
+
+            for (let i = 0, len = rules.length; i < len; i++) {
+                rule = rules[i];
+                if (rule.type === 'topRule') {
+                    break;
+                }
+            }
+
+            startRowIndex = rule.startRowIndex;
+            endRowIndex = rule.endRowIndex;
+            startColIndex = getters.getColIndexByPosi (userView.left);
+            endColIndex = getters.getColIndexByPosi (userView.right);
+
+        return getters.getCellsByVertical({
+            startRowIndex,
+            endRowIndex,
+            startColIndex,
+            endColIndex
+        });
+    },
+    leftRegionCellList(state, getters, rootState){
+        let currentSheet = rootState.currentSheet,
+            list = state[currentSheet],
+            rules = getters.frozenState.rules,
+            userView = rootState.userView,
+            startRowIndex,
+            endRowIndex,
+            startColIndex,
+            endColIndex,
+            rule;
+
+            for (let i = 0, len = rules.length; i < len; i++) {
+                rule = rules[i];
+                if (rule.type === 'leftRule') {
+                    break;
+                }
+            }
+            startRowIndex = getters.getRowIndexByPosi(userView.top);
+            endRowIndex = getters.getRowIndexByPosi(userView.bottom);
+            startColIndex = rule.startColIndex;
+            endColIndex = rule.endColIndex;
+
+        return getters.getCellsByVertical({
+            startRowIndex,
+            endRowIndex,
+            startColIndex,
+            endColIndex
+        });
+    },
     userViewCellList(state, getters, rootState){
         let currentSheet = rootState.currentSheet,
             list = state[currentSheet],
             userView = rootState.userView,
             startRowIndex = getters.getRowIndexByPosi(userView.top),
             endRowIndex = getters.getRowIndexByPosi(userView.bottom),
-            startColIndex = getters.getColIndexPosi(userView.left),
-            endColIndex = getters.getColIndexPosi(userView.right);
+            startColIndex = getters.getColIndexByPosi (userView.left),
+            endColIndex = getters.getColIndexByPosi (userView.right);
 
         return getters.getCellsByVertical({
             startRowIndex,

@@ -1,10 +1,9 @@
 <template>
-	<div class="edit-panel" ref="panel" @mousedown="locate" :style="{width: width + 'px', height: height + 'px'}">	
-		<row-grid-group></row-grid-group>
-		<col-grid-group></col-grid-group>
-		<cell-group></cell-group>
-		<select-group></select-group>
-		<input-box></input-box>
+	<div class="edit-panel" ref="panel" @mousedown="locate" :style="{width: width, height: height}">	
+		<row-grid-group :frozenRule="frozenRule"></row-grid-group>
+		<col-grid-group :frozenRule="frozenRule"></col-grid-group>
+		<cell-group :frozenRule="frozenRule"></cell-group>
+		<select-group :frozenRule="frozenRule"></select-group>
 	</div>
 </template>
 <script type="text/javascript">
@@ -16,17 +15,35 @@
 	import InputBox from './input-box.vue';
 
 	export default {
-		props: ['editPanelWidth', 'editPanelHeight'],
+		props: ['editPanelWidth', 'editPanelHeight', 'frozenRule'],
 		computed: {
 			width() {
 				let colList = this.$store.getters.colList,
-					lastCol = colList[colList.length - 1];
-				return lastCol.left + lastCol.width;
+					frozenRule = this.frozenRule,
+					startColIndex = frozenRule ? frozenRule.startColIndex : 0,
+					endColIndex,
+					lastCol;
+
+				endColIndex = frozenRule && frozenRule.endColIndex !== undefined ?
+					frozenRule.endColIndex : colList.length - 1;
+				lastCol = colList[endColIndex];
+
+				return lastCol.left + lastCol.width - colList[startColIndex].left + 'px';
 			},
 			height() {
 				let rowList = this.$store.getters.rowList,
-					lastRow = rowList[rowList.length - 1];
-				return lastRow.top + lastRow.height;
+					frozenRule = this.frozenRule,
+					startRowIndex = frozenRule ? frozenRule.startRowIndex: 0,
+					endRowIndex,
+					lastRow;
+
+
+				endRowIndex = frozenRule && frozenRule.endRowIndex !== undefined ?
+					frozenRule.endRowIndex : rowList.length - 1;
+				lastRow = rowList[endRowIndex];
+
+				return lastRow.top + lastRow.height - rowList[startRowIndex].top + 'px';
+
 			}
 		},
 		components: {

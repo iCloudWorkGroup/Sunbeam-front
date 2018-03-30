@@ -30,7 +30,8 @@ export default {
 	},
 	getRowIndexByAlias(state, getters, rootState) {
 		return function(alias) {
-			let row = getters.getRowByAlias(alias);
+			let row = getters.getRowByAlias(alias),
+				list = state[rootState.currentSheet].list;
 
 			if (row) {
 				return rangeBinary(row.top, list, 'top', 'height');
@@ -40,10 +41,10 @@ export default {
 	},
 	userViewRowList(state, getters, rootState){
 		let currentSheet = rootState.currentSheet,
-			list = state[currentSheet],
+			list = state[currentSheet].list,
 			userView = rootState.userView,
-			start = getters.getRowIndex(userView.top),
-			end = getters.getRowIndex(userView.bottom);
+			start = getters.getRowIndexByPosi(userView.top),
+			end = getters.getRowIndexByPosi(userView.bottom);
 
 		return list.slice(start, end);
 	}

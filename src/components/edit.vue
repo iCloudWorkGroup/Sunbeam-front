@@ -8,6 +8,7 @@
 	import config from '../config';
 	import cache from '../tools/cache';
 	import send from '../util/send';
+	import Vue from 'vue';
 	import * as actionTypes from '../store/action-types';
 	import * as mutationTypes from '../store/mutation-types';
 	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
@@ -66,27 +67,31 @@
 		},
 		methods: {
 			onScroll() {
-				if (this.frozenRule && this.frozenRule.type !== 'mainRule') {
-					return;
+				let temp = this.frozenRule,
+					self = this;
+				if (temp) {
+					if (temp.type === 'colRule') {
+
+						return;
+					} else if (temp.type === 'rowRule') {
+
+						return;
+					}
 				}
 
-				const self = this;
 				let currentScrollLeft = this.$el.scrollLeft,
 					currentScrollTop = this.$el.scrollTop;
 
 				this.$emit('changeScrollLeft', currentScrollLeft);
 				this.$emit('changeScrollTop', currentScrollTop);
 
-				if(this.timeoutId === ''){
-					this.timeoutId = setTimeout(function(){
-						self.handleScroll(currentScrollLeft, currentScrollTop);
-					},50);
-				}else{
+				if (this.timeoutId === '') {
 					clearTimeout(this.timeoutId);
-					this.timeoutId = setTimeout(function(){
-						self.handleScroll(currentScrollLeft, currentScrollTop);
-					},50);
 				}
+
+				this.timeoutId = setTimeout(function() {
+					self.handleScroll(currentScrollLeft, currentScrollTop);
+				}, 50);
 			},
 			handleScroll(currentScrollLeft, currentScrollTop){
 				let currentPromise = this.currentPromise,
@@ -719,19 +724,25 @@
 		},
 		watch: {
 			frozenRule(newVal, oldVal){
-				if(newVal){
-					this.$el.scrollTop = 0;
-					this.$el.scrollLeft = 0;
-					this.offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
-					this.offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
-					this.handleScroll(0, 0);
-				}else{
-					this.offsetLeft = 0;
-					this.offsetTop = 0;
-					this.$el.scrollTop = oldVal.userViewTop;
-					this.$el.scrollLeft = oldVal.userViewLeft;
-					this.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
-				}
+				let self = this;
+				Vue.nextTick(function(){
+					if(newVal){
+						self.$el.scrollTop = 0;
+						self.$el.scrollLeft = 0;
+						self.offsetLeft = self.frozenRule ? self.frozenRule.offsetLeft : 0,
+						self.offsetTop = self.frozenRule ? self.frozenRule.offsetTop : 0;
+						clearTimeout(self.timeoutId);
+						self.handleScroll(0, 0);
+					}else{
+						self.offsetLeft = 0;
+						self.offsetTop = 0;
+						self.$el.scrollTop = oldVal.userViewTop;
+						self.$el.scrollLeft = oldVal.userViewLeft;
+						clearTimeout(self.timeoutId);
+						self.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
+					}
+				});
+
 			},
 			scrollLeft(val) {
 				this.$el.scrollLeft = val;

@@ -8,8 +8,8 @@
 					</td>
 					<td v-if="colFrozen">
 						<col-head 
-							:frozen-rule="cornerRule" 
-							:col-head-width="cornerRule.width"
+							:frozen-rule="leftRule" 
+							:col-head-width="leftRule.width"
 							:scroll-left="0"
 							class="frozen-right-border">	
 						</col-head>
@@ -55,7 +55,7 @@
 							:row-head-height="rowHeadHeight">
 						</row-head>
 					</td>
-					<td v-if="rowFrozen">
+					<td v-if="colFrozen">
 						<edit
 							:frozen-rule="leftRule"
 							:edit-height="rowHeadHeight"

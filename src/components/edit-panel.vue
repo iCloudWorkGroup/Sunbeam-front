@@ -56,10 +56,18 @@
 		methods: {
 			locate(e) {
 				let elem = this.$refs.panel,
+					frozenRule = this.frozenRule,
+					offsetLeft = 0,
+					offsetTop = 0,
 					box;
 
+			if (frozenRule) {
+				offsetLeft = frozenRule.offsetLeft;
+				offsetTop = frozenRule.offsetTop;
+			}
             box = elem.getBoundingClientRect();
-            this.changeSelect(e.clientX - box.left, e.clientY - box.top);
+			this.changeSelect(e.clientX - box.left + offsetLeft,
+				e.clientY - box.top + offsetTop);
         },
         changeSelect(X, Y) {
             let colIndex = this.$store.getters.getColIndexByPosi(X),

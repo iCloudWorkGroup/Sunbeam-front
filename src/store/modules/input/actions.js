@@ -13,8 +13,8 @@ export default {
 			colIndex, rowIndex,
 			cellList, cell, temp = {};
 
-		colIndex = getters.getIndexByAlias(colAlias);
-		rowIndex = getters.getIndexByAlias(rowAlias);
+		colIndex = getters.getColIndexByAlias(colAlias);
+		rowIndex = getters.getRowIndexByAlias(rowAlias);
 
 		cellList = getters.getCellsByVertical({
 			startColIndex: colIndex,

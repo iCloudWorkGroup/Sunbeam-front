@@ -21,8 +21,8 @@
 				endIndex;
 
 			if(this.frozenRule){
-				startIndex = this.frozenRule.startColIndex;
-				endIndex = this.frozenRule.endColIndex;
+				startIndex = this.frozenRule.startRowIndex;
+				endIndex = this.frozenRule.endRowIndex;
 			}
 			return {
 				startIndex,

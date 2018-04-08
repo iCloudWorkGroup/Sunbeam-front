@@ -21,10 +21,10 @@ export function indexAttrBinary(value, array, attr, startIndex = 0, endIndex = a
 	let middleIndex;
 
 	if (array[startIndex][attr] > value) {
-		return -1;
+		return startIndex;
 	}
 	if (array[endIndex][attr] < value) {
-		return -1;
+		return endIndex + 1;
 	}
 	while (startIndex < endIndex) {
 		if (array[startIndex][attr] === value) {
@@ -42,5 +42,5 @@ export function indexAttrBinary(value, array, attr, startIndex = 0, endIndex = a
 			endIndex = middleIndex;
 		}
 	}
-	return -1;
+	return startIndex;
 }

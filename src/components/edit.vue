@@ -23,6 +23,7 @@
 		data() {
 			let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
 				offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+
 			return {
 				colOccupy: [],
 				rowOccupy: [],
@@ -34,23 +35,16 @@
 				offsetLeft, 
 				offsetTop
 			}
-		},
-		created() {
-			let colList = this.$store.getters.colList,
-				rowList = this.$store.getters.rowList,
-				lastCol = colList[colList.length - 1],
-				lastRow = rowList[rowList.length - 1];
-			//未处理冻结情况，添加冻结操作，需要通过计算，获取初始化值
-			this.colOccupy.push(colList[0].alias, lastCol.alias);
-			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
 		},	
 		mounted() {
-			if(!this.frozenRule || this.frozenRule.type==='mainRule'){
+			let frozenRule = this.frozenRule;
+			this.getOccupy();
+			if(!frozenRule || frozenRule.type==='mainRule'){
 				this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
 					left: this.offsetLeft,
 					top: this.offsetTop,
-					right: this.offsetLeft + this.$el.offsetWidth,
-					bottom: this.offsetTop + this.$el.offsetHeight
+					right: this.offsetLeft + this.$el.clientWidth + config.prestrainWidth,
+					bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
 				});
 			}
 		},
@@ -67,25 +61,18 @@
 		},
 		methods: {
 			onScroll() {
-				let temp = this.frozenRule,
+				let frozenRule = this.frozenRule,
 					self = this;
-				if (temp) {
-					if (temp.type === 'colRule') {
-
-						return;
-					} else if (temp.type === 'rowRule') {
-
-						return;
-					}
-				}
 
 				let currentScrollLeft = this.$el.scrollLeft,
 					currentScrollTop = this.$el.scrollTop;
 
-				this.$emit('changeScrollLeft', currentScrollLeft);
-				this.$emit('changeScrollTop', currentScrollTop);
+				if (!frozenRule || frozenRule.type === 'mainRule') {
+					this.$emit('changeScrollLeft', currentScrollLeft);
+					this.$emit('changeScrollTop', currentScrollTop);
 
-				if (this.timeoutId === '') {
+				}
+				if (this.timeoutId !== '') {
 					clearTimeout(this.timeoutId);
 				}
 
@@ -93,9 +80,18 @@
 					self.handleScroll(currentScrollLeft, currentScrollTop);
 				}, 50);
 			},
+
 			handleScroll(currentScrollLeft, currentScrollTop){
 				let currentPromise = this.currentPromise,
+					frozenRule = this.frozenRule,
+					endColIndex,
+					endRowIndex,
 					self = this;
+
+				if(frozenRule){
+					endColIndex = frozenRule.endColIndex;
+					endRowIndex = frozenRule.endRowIndex;
+				}
 
 				currentPromise = currentPromise || new Promise(function(resolve){
 					resolve();
@@ -112,11 +108,11 @@
 					self.recordScrollTop = currentScrollTop;
 					self.recordScrollLeft = currentScrollLeft;
 
-					if (vertical !== 0) {
+					if (vertical !== 0 && endRowIndex === undefined) {
 						limitTop = self.recordScrollTop - config.prestrainHeight;
 						limitTop = limitTop > 0 ? limitTop : 0;
 						limitTop += self.offsetTop;
-						limitBottom = limitTop + self.$el.offsetHeight 
+						limitBottom = limitTop + self.$el.clientHeight 
 							+ config.prestrainHeight 
 							+ self.offsetTop;
 
@@ -137,11 +133,11 @@
 						});
 					}
 
-					if (transverse !== 0) {
+					if (transverse !== 0 && endColIndex === undefined) {
 						limitLeft = self.recordScrollLeft - config.prestrainWidth;
 					    limitLeft = limitLeft > 0 ? limitLeft : 0;
 					    limitLeft += self.offsetLeft;
-						limitRight = limitLeft + self.$el.offsetWidth 
+						limitRight = limitLeft + self.$el.clientWidth 
 							+ config.prestrainWidth
 							+ self.offsetLeft;
 
@@ -186,6 +182,7 @@
 					occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
 					occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
 					occupyBottom = occupyEndRow.top + occupyEndRow.height,
+					frozenRule = this.frozenRule,
 					addRowNum = 0,
 					self = this,
 					promise;
@@ -194,7 +191,7 @@
 				 * 当前视图边界值超过了后台对象的最大值
 				 * 需要自动增加列
 				 */
-				if (limitBottom > maxBottom) {
+				if (limitBottom > maxBottom && (!frozenRule || frozenRule.type === 'mainRule')) {
 					addRowNum = Math.ceil((limitBottom - maxBottom + bufferHeight) / config.rowHeight);
 					limitBottom = maxBottom;
 				}
@@ -210,7 +207,6 @@
 					removeOccupyRow();
 					resolve();
 				});
-
 				/**
 				 * 当前视图边界值超过了已加载对象最大值
 				 * 起始值为当前所占块下边界
@@ -233,11 +229,11 @@
 									occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias),
 									temp = []; //记录请求区间跨域加载块
 
-								for (let i = occupyBottomIndex, len = rowRecord.length; i < len; i++) {
+								temp.push(rowRecord[occupyBottomIndex]);
+								for (let i = occupyBottomIndex + 1, len = rowRecord.length; i < len; i++) {
 									temp.push(rowRecord[i]);
 									rowOccupy.push(rowRecord[i]);
 								}
-
 								temp.push(alias);
 
 								for (let i = 0, len1 = colOccupy.length - 1; i < len1; i++) {
@@ -250,8 +246,11 @@
 									}
 								}
 								rowOccupy.push(alias);
-								rowRecord.push(alias);
-
+								if(rowRecord.indexOf(alias)=== -1){
+									rowRecord.push(alias);
+								}
+								let lastRow = rowList[rowList.length - 1];
+								occupyBottom = lastRow.top + lastRow.height;
 							});
 					} else {
 						resolve();
@@ -415,6 +414,7 @@
 					occupyEndColAlias = colOccupy[colOccupy.length - 1],
 					occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias),
 					occupyRight = occupyEndCol.left + occupyEndCol.width,
+					frozenRule = this.frozenRule,
 					addColNum = 0,
 					self = this,
 					promise;
@@ -423,7 +423,7 @@
 				 * 当前视图边界值超过了后台对象的最大值
 				 * 需要自动增加列
 				 */
-				if (limitRight > maxRight) {
+				if (limitRight > maxRight && (!frozenRule || frozenRule.type === 'mainRule')) {
 					addColNum = Math.ceil((limitRight - maxRight + bufferWidth) / config.colWidth);
 					limitRight = maxRight;
 				}
@@ -476,10 +476,11 @@
 										regionRecord.set(sign, true);
 									}
 								}
-
 							}
 							colOccupy.push(alias);
-							colRecord.push(alias);
+							if (colRecord.indexOf(alias) === -1) {
+								colRecord.push(alias);
+							}
 						});
 					}else{
 						resolve();
@@ -669,7 +670,7 @@
 										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
-									this.$store.dispatch(actionTypes.COLS_ADDCOLS, cols);	
+									this.$store.dispatch(actionTypes.COLS_INSERTCOLS, cols);	
 									fn(endColAlias);
 								}
 								let cells = sheetData.cells;	
@@ -711,7 +712,7 @@
 										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
-									this.$store.dispatch(actionTypes.ROWS_ADDROWS, rows);	
+									this.$store.dispatch(actionTypes.ROWS_INSERTROWS, rows);	
 									fn(endRowAlias);
 								}
 								let cells = sheetData.cells;
@@ -720,6 +721,74 @@
 							resolve();
 						}
 					});
+			},
+			getOccupy(){
+				let colList = this.$store.getters.colList,
+					rowList = this.$store.getters.rowList,
+					offsetLeft = this.offsetLeft,
+					offsetTop = this.offsetTop,
+					clientWidth = this.$el.clientWidth,
+					clientHeight = this.$el.clientHeight,
+					endColIndex,
+					endRowIndex,
+					startRowIndex = 0,
+					startColIndex = 0,
+					frozenRule = this.frozenRule,
+					getters = this.$store.getters;
+
+				if (frozenRule) {
+					if (frozenRule.endRowIndex !== undefined &&
+						frozenRule.endColIndex !== undefined) {
+						return;
+					}
+					startRowIndex = frozenRule.startRowIndex;
+					startColIndex = frozenRule.startColIndex;
+
+					endRowIndex = frozenRule.endRowIndex ||
+						this.$store.getters.getRowIndexByPosi(offsetTop + clientHeight + config.prestrainHeight);
+					endColIndex = frozenRule.endColIndex ||
+						this.$store.getters.getColIndexByPosi(offsetLeft + clientWidth + config.prestrainWidth);
+				} else {
+					endRowIndex = this.$store.getters.getRowIndexByPosi(clientHeight + config.prestrainHeight);
+					endColIndex = this.$store.getters.getColIndexByPosi(clientWidth + config.prestrainWidth);
+				}
+
+				let colRecord = cache.colRecord,
+					rowRecord = cache.rowRecord,
+					startCol = colList[startColIndex],
+					endCol = colList[endColIndex],
+					startRow = rowList[startRowIndex],
+					endRow = rowList[endRowIndex];
+
+				for (let i = 0, len = colRecord.length - 1; i < len; i++) {
+					let col = getters.getColByAlias(colRecord[i]),
+						nextCol = getters.getColByAlias(colRecord[i + 1]);
+
+					if (col.left <= startCol.left && nextCol.left > startCol.left) {
+						this.colOccupy.push(colRecord[i]);
+					}
+					if (col.left > startCol.left && col.left < endCol.left) {
+						this.colOccupy.push(colRecord[i]);
+					}
+					if (col.left < endCol.left && nextCol.left >= endCol.left) {
+						this.colOccupy.push(colRecord[i + 1]);
+					}
+				}
+
+				for (let i = 0, len = rowRecord.length - 1; i < len; i++) {
+					let row = getters.getRowByAlias(rowRecord[i]),
+						nextRow = getters.getRowByAlias(rowRecord[i + 1]);
+
+					if (row.top <= startRow.top && nextRow.top > startRow.top) {
+						this.rowOccupy.push(rowRecord[i]);
+					}
+					if (row.top > startRow.top && row.top < endRow.top) {
+						this.rowOccupy.push(rowRecord[i]);
+					}
+					if (row.top < endRow.top && nextRow.top >= endRow.top) {
+						this.rowOccupy.push(rowRecord[i + 1]);
+					}
+				}
 			}
 		},
 		watch: {
@@ -741,8 +810,8 @@
 						clearTimeout(self.timeoutId);
 						self.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
 					}
+					self.getOccupy();
 				});
-
 			},
 			scrollLeft(val) {
 				this.$el.scrollLeft = val;

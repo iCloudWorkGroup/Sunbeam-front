@@ -21,6 +21,24 @@ export default {
 			currentSheet: rootState.currentSheet
 		});
 	},
+    [actionTypes.ROWS_INSERTROWS]({state, rootState, commit}, rows) {
+        let map = state[rootState.currentSheet].map,
+            temp =[];
+
+        if (!Array.isArray(rows)) {
+            rows = [rows];
+        }
+
+        for (let i = 0, len = rows.length; i < len; i++) {
+            if(!map.get(rows[i].alias)){
+                temp.push(extend({}, template, rows[i]));
+            }
+        }
+        commit(mutaionTypes.INSERT_ROW, {
+            rows: temp,
+            currentSheet: rootState.currentSheet
+        });
+    },
 	[actionTypes.ROWS_GENERAT]({state, rootState, commit}, num){
 		let currentSheet = rootState.currentSheet,
             rowList = state[currentSheet],

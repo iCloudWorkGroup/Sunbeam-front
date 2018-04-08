@@ -74,17 +74,16 @@
 						</edit>
 					</td>
 				</tr>
-
 			</tbody>
 		</table>
 	</div>
 </template>
 <script type="text/javascript">
-import config from '../config';
-import getScrollbarWidth from '../util/scrollbarWidth';
-import ColHead from './col-head.vue';
-import RowHead from './row-head.vue';
-import Edit from './edit.vue';
+	import config from '../config';
+	import getScrollbarWidth from '../util/scrollbarWidth';
+	import ColHead from './col-head.vue';
+	import RowHead from './row-head.vue';
+	import Edit from './edit.vue';
 
 	export default {
 		props: [

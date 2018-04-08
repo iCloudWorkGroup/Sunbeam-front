@@ -4,13 +4,13 @@ export default {
 	[types.INSERT_SHEET](state, sheet) {
 		state.list.push(sheet);
 	},
-	[types.UPDATE_FROZENSTATE](state, payload){
+	[types.UPDATE_FROZENSTATE](state, payload) {
 		let list = state.list,
 			currentSheet = payload.currentSheet,
 			frozenState;
 
-		list.forEach(function(item){
-			if(item.alias === currentSheet){
+		list.forEach(function(item) {
+			if (item.alias === currentSheet) {
 				frozenState = item.frozenState;
 			}
 		});

@@ -1,7 +1,11 @@
 import * as actionTypes from '../../action-types';
 import * as mutaionTypes from '../../mutation-types';
-import {indexAttrBinary } from '../../../util/binary';
-import {cellAliasGenerator} from '../../../tools/generator';
+import {
+	indexAttrBinary
+} from '../../../util/binary';
+import {
+	cellAliasGenerator
+} from '../../../tools/generator';
 import extend from '../../../util/extend';
 import template from './template';
 
@@ -41,33 +45,33 @@ export default {
 			cell = cells[i];
 			aliasColList = cell.occupy.x;
 			aliasRowList = cell.occupy.y;
-			
+
 			aliasCol = aliasColList[0];
 			aliasRow = aliasRowList[0];
 
-            cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex');
+			cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex');
 
-            startRowIndex = indexAttrBinary(cell.occupy.row, rowList, 'sort');
-            endRowIndex = startRowIndex + aliasRowList.length - 1;
-            delete cell.occupy.row;
+			startRowIndex = indexAttrBinary(cell.occupy.row, rowList, 'sort');
+			endRowIndex = startRowIndex + aliasRowList.length - 1;
+			delete cell.occupy.row;
 
-            if (endRowIndex > limitRowIndex) {
-                endRowIndex = limitRowIndex;
-            }
-            if (startRowIndex === -1) {
-                continue;
-            }
+			if (endRowIndex > limitRowIndex) {
+				endRowIndex = limitRowIndex;
+			}
+			if (startRowIndex === -1) {
+				continue;
+			}
 
-            startColIndex = indexAttrBinary(cell.occupy.col, colList, 'sort');
-            endColIndex = startColIndex + aliasColList.length - 1;
-            delete cell.occupy.col;
+			startColIndex = indexAttrBinary(cell.occupy.col, colList, 'sort');
+			endColIndex = startColIndex + aliasColList.length - 1;
+			delete cell.occupy.col;
 
-            if (endColIndex > limitColIndex) {
-                endColIndex = limitColIndex;
-            }
-            if (endColIndex === -1) {
-                continue;
-            }
+			if (endColIndex > limitColIndex) {
+				endColIndex = limitColIndex;
+			}
+			if (endColIndex === -1) {
+				continue;
+			}
 			for (let j = startColIndex; j < endColIndex + 1; j++) {
 				let col = colList[j];
 				if (!col.hidden) {
@@ -131,8 +135,17 @@ export default {
 			}
 		}
 	},
-	[actionTypes.CELLS_UPDATECELL]({commit, state, rootState, getters},
-		{colAlias, rowAlias, propName, propValue}) {
+	[actionTypes.CELLS_UPDATECELL]({
+		commit,
+		state,
+		rootState,
+		getters
+	}, {
+		colAlias,
+		rowAlias,
+		propName,
+		propValue
+	}) {
 		let getPointInfo = getters.getPointInfo,
 			currentSheet = rootState.currentSheet,
 			cellIndex;
@@ -154,7 +167,7 @@ export default {
 				rowIndex = getters.getColIndexByAlias(rowAlias),
 				col = getters.colList[colIndex],
 				row = getters.rowList[rowIndex];
-				
+
 			cell.occupy.col.push(colAlias);
 			cell.occupy.row.push(rowAlias);
 			cell.physicsBox = {
@@ -181,7 +194,7 @@ export default {
 					colAlias,
 					rowAlias,
 					type: 'cellIndex',
-					value: getters.cellList.length -1
+					value: getters.cellList.length - 1
 				}
 			});
 		}

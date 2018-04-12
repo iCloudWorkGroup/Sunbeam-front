@@ -1,5 +1,7 @@
 <template>
-	<div class="edit scroll-box" @scroll="onScroll" :style="{width: width + 'px', height: height + 'px'}">
+	<div class="edit scroll-box" 
+		@scroll="onScroll" 
+		:style="{width: width + 'px', height: height + 'px'}">
 		<edit-panel></edit-panel>
 	</div>
 </template>
@@ -10,7 +12,10 @@
 	import send from '../util/send';
 	import * as actionTypes from '../store/action-types';
 	import * as mutationTypes from '../store/mutation-types';
-	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
+	import {
+		getColDisplayName, 
+		getRowDisplayName
+	} from '../util/displayname';
 
 	export default {
 		props: ['editWidth', 'editHeight'],

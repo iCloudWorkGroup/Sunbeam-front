@@ -5,12 +5,15 @@ import send from '../util/send';
 import rowTemplate from '../store/modules/rows/template';
 import colTemplate from '../store/modules/cols/template';
 import generator from './generator';
-import {getColDisplayName, getRowDisplayName} from '../util/displayname';
+import {
+	getColDisplayName,
+	getRowDisplayName
+} from '../util/displayname';
 
 export function initSpreadsheet(fn, data) {
-	let build = 'false';
+	let build = false;
 
-	if (build === 'true') {
+	if (build === true) {
 		buildNewSpreadsheet(fn);
 		return;
 	}
@@ -86,23 +89,28 @@ function restoreSpreadsheet(fn, data) {
 					row.displayName = getRowDisplayName(row.sort);
 					row.alias = row.aliasY;
 				});
-				cols.forEach(function(col){
+				cols.forEach(function(col) {
 					col.sort = col.index;
 					col.displayName = getColDisplayName(col.sort);
 					col.alias = col.aliasX;
 				});
-				cells.forEach(function(cell){
+				cells.forEach(function(cell) {
 					cell.alias = generator.cellAliasGenerator();
 				});
-				cache.colRecord.push(cols[0].alias, cols[cols.length -1].alias);
-				cache.rowRecord.push(rows[0].alias, rows[rows.length -1].alias);
+				cache.colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
+				cache.rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
 
-				cache.regionRecord.set(cache.colRecord[0] + '_' + 
-						cache.colRecord[1] + '_' + 
-						cache.rowRecord[0] + '_'+ 
-						cache.rowRecord[1], true);
-				
-				fn({sheet, rows, cols, cells});
+				cache.regionRecord.set(cache.colRecord[0] + '_' +
+					cache.colRecord[1] + '_' +
+					cache.rowRecord[0] + '_' +
+					cache.rowRecord[1], true);
+
+				fn({
+					sheet,
+					rows,
+					cols,
+					cells
+				});
 			}
 		}
 	});

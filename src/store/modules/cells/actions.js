@@ -1,5 +1,5 @@
 import * as actionTypes from '../../action-types';
-import * as mutaionTypes from '../../mutation-types';
+import * as mutationTypes from '../../mutation-types';
 import {
 	indexAttrBinary
 } from '../../../util/binary';
@@ -99,7 +99,7 @@ export default {
 					for (let k = 0; k < aliasRowList.length; k++) {
 						colAlias = aliasColList[j];
 						rowAlias = aliasRowList[k];
-						commit(mutaionTypes.UPDATE_POINTINFO, {
+						commit(mutationTypes.UPDATE_POINTINFO, {
 							currentSheet: sheet,
 							info: {
 								colAlias,
@@ -119,17 +119,17 @@ export default {
 				delete cell.occupy.x;
 				delete cell.occupy.y;
 				cell = extend({}, template, cell);
-				commit(mutaionTypes.INSERT_CELL, {
+				commit(mutationTypes.INSERT_CELL, {
 					currentSheet: sheet,
 					cells: [cell]
 				});
 			} else {
-				commit(mutaionTypes.UPDATE_CELL, {
+				commit(mutationTypes.UPDATE_CELL, {
 					currentSheet: sheet,
 					cellInfo: {
 						propName: 'physicsBox',
 						value: physicsBox,
-						cellIndex
+						cell: cells[cellIndex]
 					}
 				});
 			}
@@ -153,10 +153,11 @@ export default {
 		cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex');
 
 		if (typeof cellIndex === 'number') {
-			commit(mutaionTypes.UPDATE_CELL, {
+			let cells = getters.cellList;
+			commit(mutationTypes.UPDATE_CELL, {
 				currentSheet: rootState.currentSheet,
 				cellInfo: {
-					cellIndex,
+					cell: cells[cellIndex],
 					propName: propName,
 					value: propValue
 				}
@@ -182,13 +183,13 @@ export default {
 			} else {
 				cell[propName[0]] = propValue;
 			}
-			commit(mutaionTypes.INSERT_CELL, {
+			commit(mutationTypes.INSERT_CELL, {
 				currentSheet,
 				cells: [cell]
 			});
 
 
-			commit(mutaionTypes.UPDATE_POINTINFO, {
+			commit(mutationTypes.UPDATE_POINTINFO, {
 				currentSheet,
 				info: {
 					colAlias,

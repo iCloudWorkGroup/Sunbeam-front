@@ -6,6 +6,9 @@ export default {
 		state.currentSheet = alias;
 	},
 	[types.UPDATE_USERVIEW](state, payload){
-		extend(this.state.userView, payload);
-	}
+		extend(state.userView, payload);
+	},
+	[types.UPDATE_MOUSESTATE](state, payload){
+		state.mouseState = payload.state;
+	},
 };

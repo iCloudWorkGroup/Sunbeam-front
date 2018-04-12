@@ -45,7 +45,7 @@ export default {
                     startRowIndex: startRowIndex,
                     startColIndex: 0,
                     endRowIndex: endRowIndex,
-                    endColIndex: cols.length - 1
+                    endColIndex: 'MAX'
                 };
             }
             if (startRowIndex === 'MAX' || endRowIndex === 'MAX') {
@@ -53,7 +53,7 @@ export default {
                     startRowIndex: 0,
                     startColIndex: startColIndex,
                     endColIndex: endColIndex,
-                    endRowIndex: rows.length - 1
+                    endRowIndex: 'MAX'
                 };
             }
 
@@ -124,6 +124,9 @@ export default {
                 rowAlias,
                 colAlias;
 
+            endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex;
+            endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex;
+            
             for (let i = startColIndex, len1 = endColIndex + 1; i < len1; i++) {
                 colAlias = cols[i].alias;
                 if (typeof pointInfo[colAlias] !== 'undefined') {

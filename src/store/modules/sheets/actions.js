@@ -2,6 +2,7 @@ import extend from '../../../util/extend';
 import * as actionTypes from '../../action-types';
 import * as mutationTypes from '../../mutation-types';
 import template from './template';
+import {SELECT} from '../../../tools/basic';
 
 export default {
 	/**
@@ -31,7 +32,7 @@ export default {
 		dispatch
 	}) {
 		let currentSheet = rootState.currentSheet,
-			selects = rootState.selects[currentSheet],
+			selects = rootState.selects[currentSheet].list,
 			stateList = state.list,
 			frozenState;
 			
@@ -53,7 +54,7 @@ export default {
 			frozenRowIndex;
 
 		selects.forEach(function(item) {
-			if (item.type === 'selected') {
+			if (item.type === SELECT) {
 				select = item;
 			}
 		});

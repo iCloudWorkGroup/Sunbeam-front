@@ -1,6 +1,6 @@
 <template>
     <div class="select-group">
-        <select-item v-for="item in selectList" :key="item.alias" :item="item" :frozenRule="frozenRule">
+        <select-item v-for="item in selectList" :key="item.alias" :select="item" :frozenRule="frozenRule">
         </select-item>
     </div>
 </template>

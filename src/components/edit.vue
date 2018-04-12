@@ -712,7 +712,7 @@
 										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
-									this.$store.dispatch(actionTypes.ROWS_INSERTROWS, rows);	
+									this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rows);	
 									fn(endRowAlias);
 								}
 								let cells = sheetData.cells;
@@ -729,12 +729,12 @@
 					offsetTop = this.offsetTop,
 					clientWidth = this.$el.clientWidth,
 					clientHeight = this.$el.clientHeight,
+					getters = this.$store.getters,
 					endColIndex,
 					endRowIndex,
 					startRowIndex = 0,
 					startColIndex = 0,
-					frozenRule = this.frozenRule,
-					getters = this.$store.getters;
+					frozenRule = this.frozenRule;
 
 				if (frozenRule) {
 					if (frozenRule.endRowIndex !== undefined &&
@@ -745,12 +745,14 @@
 					startColIndex = frozenRule.startColIndex;
 
 					endRowIndex = frozenRule.endRowIndex ||
-						this.$store.getters.getRowIndexByPosi(offsetTop + clientHeight + config.prestrainHeight);
+						getters.getRowIndexByPosi(offsetTop + clientHeight + 
+							config.prestrainHeight);
 					endColIndex = frozenRule.endColIndex ||
-						this.$store.getters.getColIndexByPosi(offsetLeft + clientWidth + config.prestrainWidth);
+						getters.getColIndexByPosi(offsetLeft + clientWidth + 
+							config.prestrainWidth);
 				} else {
-					endRowIndex = this.$store.getters.getRowIndexByPosi(clientHeight + config.prestrainHeight);
-					endColIndex = this.$store.getters.getColIndexByPosi(clientWidth + config.prestrainWidth);
+					endRowIndex = getters.getRowIndexByPosi(clientHeight + config.prestrainHeight);
+					endColIndex = getters.getColIndexByPosi(clientWidth + config.prestrainWidth);
 				}
 
 				let colRecord = cache.colRecord,

@@ -19,7 +19,7 @@ export default {
             return this.col.displayName;
         },
         active() {
-            return this.col.activeState;
+            return this.col.active;
         }
     },
     methods: {

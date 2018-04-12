@@ -9,20 +9,38 @@ import template from './template';
 
 export default {
     [actionTypes.COLS_ADDCOLS]({state, rootState, commit}, cols) {
-        let tmp = [];
+        let temp = [];
         if (!Array.isArray(cols)) {
             cols = [cols];
         }
         for (let i = 0, len = cols.length; i < len; i++) {
-            tmp.push(extend({}, template, cols[i]));
+            temp.push(extend({}, template, cols[i]));
         }
         commit(mutaionTypes.ADD_COL, {
-            cols: tmp,
+            cols: temp,
+            currentSheet: rootState.currentSheet
+        });
+    },
+    [actionTypes.COLS_INSERTCOLS]({state, rootState, commit}, cols) {
+        let map = state[rootState.currentSheet].map,
+            temp = [];
+
+        if (!Array.isArray(cols)) {
+            cols = [cols];
+        }
+
+        for (let i = 0, len = cols.length; i < len; i++) {
+            if(!map.get(cols[i].alias)){
+                temp.push(extend({}, template, cols[i]));
+            }
+        }
+        commit(mutaionTypes.INSERT_COL, {
+            cols: temp,
             currentSheet: rootState.currentSheet
         });
     },
     [actionTypes.COLS_GENERAT]({state, rootState, commit}, num){
-       let currentSheet = rootState.currentSheet,
+        let currentSheet = rootState.currentSheet,
             colList = state[currentSheet],
             lastCol = colList[colList.length - 1],
             currentLeft = lastCol.left + lastCol.width + 1,

@@ -11,8 +11,8 @@ export default {
 	 */
 	[actionTypes.SELECTS_INITSELECT]({state, getters, commit, rootState}) {
 		let currentSheet = rootState.currentSheet,
-			rows = rootState.rows[currentSheet],
-			cols = rootState.cols[currentSheet],
+			rows = rootState.rows[currentSheet].list,
+			cols = rootState.cols[currentSheet].list,
 			select = extend(template),
 			region,
 			width,
@@ -55,8 +55,8 @@ export default {
 	[actionTypes.SELECTS_UPDATESELECT]({state, getters, commit, rootState}, 
 		{startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex, type}) {
 		let currentSheet = rootState.currentSheet,
-			rows = rootState.rows[currentSheet],
-			cols = rootState.cols[currentSheet],
+			rows = rootState.rows[currentSheet].list,
+			cols = rootState.cols[currentSheet].list,
 			select = extend(template),
 			region,
 			width,

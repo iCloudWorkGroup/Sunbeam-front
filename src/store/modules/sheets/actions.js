@@ -31,8 +31,16 @@ export default {
 		dispatch
 	}) {
 		let currentSheet = rootState.currentSheet,
-			frozenState = state[currentSheet].frozenState,
-			selects = rootState.selects[currentSheet];
+			selects = rootState.selects[currentSheet],
+			stateList = state.list,
+			frozenState;
+			
+		for (let i = 0, len = stateList.length; i < len; i++) {
+			if (stateList[i].alias === currentSheet) {
+				frozenState = stateList[i];
+				break;
+			}
+		}
 
 		if (frozenState.isFrozen) {
 			return;
@@ -51,16 +59,16 @@ export default {
 		});
 
 		frozenRowAlias = select.wholePosi.startRowAlias;
-		frozenColAlias = select.wholePosi.startRowAlias;
+		frozenColAlias = select.wholePosi.startColAlias;
 		frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias);
 		frozenColIndex = getters.getColIndexByAlias(frozenColAlias);
 
-
 		let userView = rootState.userView,
-			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
-		userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
-		userViewRightIndex = getters.getColIndexByAlias(userView.right);
-		userViewLeftIndex = getters.getColIndexByAlias(userView.left);
+
+		userViewTopIndex = getters.getRowIndexByPosi(userView.top),
+		userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom),
+		userViewRightIndex = getters.getColIndexByPosi(userView.right),
+		userViewLeftIndex = getters.getColIndexByPosi(userView.left);
 		//非可视范围，不能进行冻结
 		if (frozenRowIndex - userViewTopIndex < 0 ||
 			userViewBottomIndex - frozenRowIndex < 0 ||
@@ -89,38 +97,45 @@ export default {
 			userViewCol = colList[userViewLeftIndex],
 			userViewRow = rowList[userViewTopIndex],
 			frozenCol = colList[frozenColIndex],
-			frozenRow = colList[frozenRowIndex];
+			frozenRow = rowList[frozenRowIndex];
 
-		temp.push({
+		let rules = [];
+
+		rules.push({
 			type: 'cornerRule',
-			startRowAlias: userViewRow.alias,
-			endRowAlias: rowList[frozenRowIndex - 1].alias,
-			startColAlias: userViewCol.alias,
-			endColAlias: colList[frozenColIndex - 1].alias,
+			startRowIndex: userViewTopIndex,
+			endRowIndex: frozenRowIndex - 1,
+			startColIndex: userViewLeftIndex,
+			endColIndex: frozenColIndex - 1,
 			offsetTop: userViewRow.top,
 			offsetLeft: userViewCol.left,
-			width: frozenCol.left - userViewCol.left,
-			height: frozenRow.top - userViewRow.top
-		}, {
+			width: frozenCol.left - userViewCol.left - 1, //减1为边框的宽度
+			height: frozenRow.top - userViewRow.top - 1
+		}, 
+		{
 			type: 'topRule',
-			startRowAlias: userViewRow.alias,
-			endRowAlias: rowList[frozenRowIndex - 1].alias,
-			startColAlias: frozenCol.alias,
-			offsetTop: 0,
+			startRowIndex: userViewTopIndex,
+			endRowIndex: frozenRowIndex - 1,
+			startColIndex: frozenColIndex,
+			userViewLeft : userViewCol.left,
+			offsetTop: userViewRow.top,
 			offsetLeft: frozenCol.left,
-			height: frozenRow.top - userViewRow.top
+			height: frozenRow.top - userViewRow.top - 1
 		}, {
 			type: 'leftRule',
-			startRowAlias: frozenRow.alias,
-			startColAlias: userViewCol.alias,
-			endColAlias: colList[frozenColIndex - 1].alias,
-			offsetLeft: 0,
+			startRowIndex: frozenRowIndex,
+			startColIndex: userViewLeftIndex,
+			endColIndex: frozenColIndex - 1,
+			userViewTop : userViewRow.top,
+			offsetLeft: userViewCol.left,
 			offsetTop: frozenRow.top,
-			width: frozenCol.left - userViewCol.left
+			width: frozenCol.left - userViewCol.left - 1
 		}, {
 			type: 'mainRule',
-			startRowAlias: frozenRow.alias,
-			startColAlias: frozenCol.alias,
+			startRowIndex: frozenRowIndex,
+			startColIndex: frozenColIndex,
+			userViewTop : userViewRow.top,
+			userViewLeft : userViewCol.left,
 			offsetLeft: frozenCol.left,
 			offsetTop: frozenRow.top
 		});
@@ -129,35 +144,75 @@ export default {
 			isFrozen: true,
 			rowFrozen: true,
 			colFrozen: true,
-			rules: temp,
+			rules,
 			currentSheet
 		});
-	},
-	[actionTypes.SHEET_FIRSTCOLFROZEN]({
-		commit,
-		state,
-		getters,
-		rootState
-	}, index) {
+	}, 
+	[actionTypes.SHEET_FIRSTCOLFROZEN]({commit, state, getters, rootState}, index) {
+		let currentSheet = rootState.currentSheet,
+			stateList = state.list,
+			frozenState;
+		
+		for (let i = 0, len = stateList.length; i < len; i++) {
+			if (stateList[i].alias === currentSheet) {
+				frozenState = stateList[i];
+				break;
+			}
+		}
+		if(frozenState.isFrozen){
+			return;
+		}
+
+		let frozenColIndex;
+
+		let userView = rootState.userView,
+			userViewLeftIndex = getters.getColIndexByPosi(userView.left);
+
+		if(index === undefined){
+			index = userViewLeftIndex + 1;
+		}
+		frozenColIndex = index;
+		
+		let rowList = getters.rowList,
+			colList = getters.colList,
+			userViewCol = colList[userViewLeftIndex],
+			frozenCol = colList[frozenColIndex];
+
+		let rules = [];
+		rules.push({
+			type: 'leftRule',
+			startRowIndex: 0,
+			startColIndex: userViewLeftIndex,
+			endColIndex: frozenColIndex - 1,
+			offsetLeft: userViewCol.left,
+			offsetTop: 0,
+			width: frozenCol.left - userViewCol.left - 1
+		}, {
+			type: 'mainRule',
+			startRowIndex: 0,
+			startColIndex: frozenColIndex,
+			offsetLeft: frozenCol.left,
+			offsetTop: 0
+		});
+		commit(mutationTypes.UPDATE_FROZENSTATE,{
+			isFrozen: true,
+			rowFrozen: false,
+			colFrozen: true,
+			rules,
+			currentSheet
+		});
+	}, 
+	[actionTypes.SHEET_FIRSTROWFROZEN]({commit, state, getters, rootState}, index) {
 
 
-	},
-	[actionTypes.SHEET_FIRSTROWFROZEN]({
-		commit,
-		state,
-		getters,
-		rootState
-	}, index) {
-
-
-	},
-	[actionTypes.SHEET_UNFROZEN]({
-		commit,
-		state,
-		getters,
-		rootState
-	}, sheet) {
-
-
+	}, 
+	[actionTypes.SHEET_UNFROZEN]({commit, state, getters, rootState}, sheet) {
+			commit(mutationTypes.UPDATE_FROZENSTATE,{
+			isFrozen: false,
+			rowFrozen: false,
+			colFrozen: false,
+			rules: [],
+			currentSheet: rootState.currentSheet
+		});
 	}
 };

@@ -1,17 +1,50 @@
 <template>
     <div class="cell-group">
-        <cell-item :class="item.alias" v-for="item in userViewCellList" :key="item.alias" :item="item"></cell-item>
+        <cell-item v-for="item in cellList" :key="item.alias" :item="item" :frozenRule="frozenRule">
+        </cell-item>
     </div>
 </template>
 <script type="text/javascript">
 import CellItem from './cell-item.vue';
 export default {
+    props: [
+        'frozenRule'
+    ],
+    data() {
+        let startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex;
+
+        if (this.frozenRule) {
+            startColIndex = this.frozenRule.startColIndex;
+            endColIndex = this.frozenRule.endColIndex;
+            startRowIndex = this.frozenRule.startRowIndex;
+            endRowIndex = this.frozenRule.endRowIndex;
+        }
+        return {
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        }
+    },
     computed: {
         cellList() {
-            return this.$store.getters.cellList;
-        },
-        userViewCellList(){
-            return this.$store.getters.userViewCellList;
+            if (this.endRowIndex !== undefined && this.endColIndex !== undefined ){
+                return this.$store.getters.getCellsByVertical({
+                    startColIndex: this.startColIndex,
+                    endColIndex: this.endColIndex,
+                    startRowIndex: this.startRowIndex,
+                    endRowIndex: this.endRowIndex
+                });
+            }else if (this.endRowIndex !== undefined) {
+                return this.$store.getters.topRegionCellList;
+            } else if (this.endColIndex !== undefined) {
+                return this.$store.getters.leftRegionCellList;
+            } else{
+                return this.$store.getters.userViewCellList;
+            }
         }
     },
     components: {

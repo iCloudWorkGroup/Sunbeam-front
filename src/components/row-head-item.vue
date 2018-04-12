@@ -7,10 +7,10 @@
 </template>
 <script type="text/javascript">
 export default {
-    props: ['row'],
+    props: ['row', 'offsetTop'],
     computed: {
         top() {
-            return this.row.top;
+            return this.row.top - this.offsetTop;
         },
         height() {
             return this.row.height;

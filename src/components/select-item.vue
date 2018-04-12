@@ -10,13 +10,16 @@
     import * as types from '../store/action-types';
 
     export default {
-        props: ['item'],
+        props: ['item', 'frozenRule'],
         computed: {
             styleObject() {
                 let left = this.item.physicsBox.left,
                     top = this.item.physicsBox.top,
                     width = this.item.physicsBox.width,
-                    height = this.item.physicsBox.height;
+                    height = this.item.physicsBox.height,
+                    offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
+                    offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+
                 if (left === 0) {
                     left = left - 1;
                     width = width - 1;
@@ -30,8 +33,8 @@
                     height = height - 2;
                 }
                 return {
-                    left: left + 'px',
-                    top: top + 'px',
+                    left: left - offsetLeft + 'px',
+                    top: top - offsetTop + 'px',
                     width: width + 'px',
                     height: height + 'px',
                 };

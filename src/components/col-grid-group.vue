@@ -1,19 +1,48 @@
 <template>
     <div class="col-group">
-        <div class="col" v-for="item in userViewColList" :key="item.alias"  :style="{
-		left: item.left + 'px', 
+        <div class="col" v-for="item in colList" :key="item.alias"  :style="{
+		left: item.left - offsetLeft + 'px', 
 		width: item.width + 'px'}">
         </div>
     </div>
 </template>
 <script type="text/javascript">
     export default {
+        props: ['frozenRule'],
+        data() {
+            let startIndex,
+                endIndex;
+            if(this.frozenRule){
+                startIndex = this.frozenRule.startColIndex;
+                endIndex = this.frozenRule.endColIndex;
+            }
+            return {
+                startIndex,
+                endIndex
+            }
+        },
         computed: {
-            colList() {
-                return this.$store.getters.colList;
+            offsetLeft() {
+                if(this.frozenRule){
+                    return this.frozenRule.offsetLeft; 
+                }else{
+                    return 0;
+                }
             },
-            userViewColList(){
-                return this.$store.getters.userViewColList;
+            colList() {
+                let colList = this.$store.getters.colList,
+                    startIndex,
+                    endIndex,
+                    lastCol;
+
+                startIndex = this.startIndex || 0;
+                endIndex = this.endIndex || colList.length - 1;
+                
+                if(this.endIndex !== undefined){
+                    return colList.slice(startIndex, endIndex + 1);
+                }else{
+                    return this.$store.getters.userViewColList;
+                }
             }
         }
     };

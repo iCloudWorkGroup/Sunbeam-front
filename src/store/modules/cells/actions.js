@@ -10,42 +10,37 @@ import extend from '../../../util/extend';
 import template from './template';
 
 export default {
-	/**
-	 * 还原单元格
-	 */
-	[actionTypes.CELLS_RESTORECELL]({
-		commit,
-		dispatch,
-		state,
-		rootState,
-		getters
-	}, cells) {
-		if (!Array.isArray(cells)) {
-			cells = [cells];
-		}
+    /**
+     * 还原单元格
+     */
+    [actionTypes.CELLS_RESTORECELL]({ commit, dispatch, state, rootState,
+        getters }, cells) {
+        if (!Array.isArray(cells)) {
+            cells = [cells];
+        }
 
-		let sheet = rootState.currentSheet,
-			colList = rootState.cols[sheet],
-			rowList = rootState.rows[sheet],
-			cellList = rootState.cells[sheet],
-			limitRowIndex = rowList.length - 1,
-			limitColIndex = colList.length - 1,
-			getPointInfo = getters.getPointInfo;
+        let sheet = rootState.currentSheet,
+            colList = rootState.cols[sheet].list,
+            rowList = rootState.rows[sheet].list,
+            cellList = rootState.cells[sheet],
+            limitRowIndex = rowList.length - 1,
+            limitColIndex = colList.length - 1,
+            getPointInfo = getters.getPointInfo;
 
 
-		for (let i = 0, len = cells.length; i < len; i++) {
-			let cell,
-				startRowIndex,
-				startColIndex,
-				endRowIndex,
-				endColIndex,
-				aliasColList,
-				aliasRowList,
-				aliasCol, aliasRow,
-				cellIndex,
-				width = 0,
-				height = 0,
-				physicsBox;
+        for (let i = 0, len = cells.length; i < len; i++) {
+            let cell,
+                startRowIndex,
+                startColIndex,
+                endRowIndex,
+                endColIndex,
+                aliasColList,
+                aliasRowList,
+                aliasCol, aliasRow,
+                cellIndex,
+                width = 0,
+                height = 0,
+                physicsBox;
 
 			cell = cells[i];
 			aliasColList = cell.occupy.x;

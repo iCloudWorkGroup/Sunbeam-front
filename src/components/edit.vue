@@ -1,8 +1,11 @@
 <template>
-	<div class="edit scroll-box" 
-		@scroll="onScroll" 
-		:style="{width: width + 'px', height: height + 'px'}">
-		<edit-panel></edit-panel>
+	<div class="edit" @scroll="onScroll" 
+	:style="{ 
+		width: width + 'px', 
+		height: height + 'px'
+		}">
+		<edit-panel 
+		:frozenRule="frozenRule"></edit-panel>
 	</div>
 </template>
 <script type="text/javascript">
@@ -10,6 +13,7 @@
 	import config from '../config';
 	import cache from '../tools/cache';
 	import send from '../util/send';
+	import Vue from 'vue';
 	import * as actionTypes from '../store/action-types';
 	import * as mutationTypes from '../store/mutation-types';
 	import {
@@ -18,8 +22,16 @@
 	} from '../util/displayname';
 
 	export default {
-		props: ['editWidth', 'editHeight'],
+		props: ['editWidth',
+			'editHeight', 
+			'frozenRule',
+			'scrollTop',
+			'scrollLeft'
+		],
 		data() {
+			let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
+				offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+
 			return {
 				colOccupy: [],
 				rowOccupy: [],
@@ -27,25 +39,22 @@
 				recordScrollLeft: 0,
 				timeoutId: '',
 				lastScrollHandleTime: 0,
-				currentPromise: null
+				currentPromise: null,
+				offsetLeft, 
+				offsetTop
 			}
-		},
-		created() {
-			let colList = this.$store.getters.colList,
-				rowList = this.$store.getters.rowList,
-				lastCol = colList[colList.length - 1],
-				lastRow = rowList[rowList.length - 1];
-			//未处理冻结情况，添加冻结操作，需要通过计算，获取初始化值
-			this.colOccupy.push(colList[0].alias, lastCol.alias);
-			this.rowOccupy.push(rowList[0].alias, lastRow.alias);
 		},	
 		mounted() {
-			this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-				left: 0,
-				top: 0,
-				right: this.$el.offsetWidth,
-				bottom: this.$el.offsetHeight
-			});
+			let frozenRule = this.frozenRule;
+			this.getOccupy();
+			if(!frozenRule || frozenRule.type==='mainRule'){
+				this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+					left: this.offsetLeft,
+					top: this.offsetTop,
+					right: this.offsetLeft + this.$el.clientWidth + config.prestrainWidth,
+					bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
+				});
+			}
 		},
 		computed: {
 			width() {
@@ -60,33 +69,41 @@
 		},
 		methods: {
 			onScroll() {
-				const self = this;
+				let frozenRule = this.frozenRule,
+					self = this;
+
 				let currentScrollLeft = this.$el.scrollLeft,
 					currentScrollTop = this.$el.scrollTop;
 
-				this.$emit('changeScrollLeft', currentScrollLeft);
-				this.$emit('changeScrollTop', currentScrollTop);
+				if (!frozenRule || frozenRule.type === 'mainRule') {
+					this.$emit('changeScrollLeft', currentScrollLeft);
+					this.$emit('changeScrollTop', currentScrollTop);
 
-				
-				if(this.timeoutId === ''){
-					this.timeoutId = setTimeout(function(){
-						self.handleScroll(currentScrollLeft, currentScrollTop);
-					},50);
-				}else{
-					clearTimeout(this.timeoutId);
-					this.timeoutId = setTimeout(function(){
-						self.handleScroll(currentScrollLeft, currentScrollTop);
-					},50);
 				}
+				if (this.timeoutId !== '') {
+					clearTimeout(this.timeoutId);
+				}
+
+				this.timeoutId = setTimeout(function() {
+					self.handleScroll(currentScrollLeft, currentScrollTop);
+				}, 50);
 			},
+
 			handleScroll(currentScrollLeft, currentScrollTop){
 				let currentPromise = this.currentPromise,
+					frozenRule = this.frozenRule,
+					endColIndex,
+					endRowIndex,
 					self = this;
+
+				if(frozenRule){
+					endColIndex = frozenRule.endColIndex;
+					endRowIndex = frozenRule.endRowIndex;
+				}
 
 				currentPromise = currentPromise || new Promise(function(resolve){
 					resolve();
 				});
-
 				this.currentPromise = currentPromise.then(function(){
 					let transverse = currentScrollLeft - self.recordScrollLeft,
 						vertical = currentScrollTop - self.recordScrollTop,
@@ -99,10 +116,13 @@
 					self.recordScrollTop = currentScrollTop;
 					self.recordScrollLeft = currentScrollLeft;
 
-					if (vertical !== 0) {
+					if (vertical !== 0 && endRowIndex === undefined) {
 						limitTop = self.recordScrollTop - config.prestrainHeight;
 						limitTop = limitTop > 0 ? limitTop : 0;
-						limitBottom = limitTop + self.$el.offsetHeight + config.prestrainHeight;
+						limitTop += self.offsetTop;
+						limitBottom = limitTop + self.$el.clientHeight 
+							+ config.prestrainHeight 
+							+ self.offsetTop;
 
 						if (vertical > 0) {
 							p1 = new Promise(function(resolve) {
@@ -115,16 +135,19 @@
 						}
 						p1.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								top: self.recordScrollTop,
+								top: self.recordScrollTop + self.offsetTop,
 								bottom: limitBottom
 							});
 						});
 					}
 
-					if (transverse !== 0) {
+					if (transverse !== 0 && endColIndex === undefined) {
 						limitLeft = self.recordScrollLeft - config.prestrainWidth;
 					    limitLeft = limitLeft > 0 ? limitLeft : 0;
-						limitRight = limitLeft + self.$el.offsetWidth + config.prestrainWidth;
+					    limitLeft += self.offsetLeft;
+						limitRight = limitLeft + self.$el.clientWidth 
+							+ config.prestrainWidth
+							+ self.offsetLeft;
 
 						if (transverse > 0) {
 							p2 = new Promise(function(resolve){
@@ -137,7 +160,7 @@
 						}
 						p2.then(function() {
 							self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-								left: self.recordScrollLeft,
+								left: self.recordScrollLeft + self.offsetLeft,
 								right: limitRight
 							});
 						});
@@ -167,6 +190,7 @@
 					occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
 					occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
 					occupyBottom = occupyEndRow.top + occupyEndRow.height,
+					frozenRule = this.frozenRule,
 					addRowNum = 0,
 					self = this,
 					promise;
@@ -175,7 +199,7 @@
 				 * 当前视图边界值超过了后台对象的最大值
 				 * 需要自动增加列
 				 */
-				if (limitBottom > maxBottom) {
+				if (limitBottom > maxBottom && (!frozenRule || frozenRule.type === 'mainRule')) {
 					addRowNum = Math.ceil((limitBottom - maxBottom + bufferHeight) / config.rowHeight);
 					limitBottom = maxBottom;
 				}
@@ -191,7 +215,6 @@
 					removeOccupyRow();
 					resolve();
 				});
-
 				/**
 				 * 当前视图边界值超过了已加载对象最大值
 				 * 起始值为当前所占块下边界
@@ -214,11 +237,11 @@
 									occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias),
 									temp = []; //记录请求区间跨域加载块
 
-								for (let i = occupyBottomIndex, len = rowRecord.length; i < len; i++) {
+								temp.push(rowRecord[occupyBottomIndex]);
+								for (let i = occupyBottomIndex + 1, len = rowRecord.length; i < len; i++) {
 									temp.push(rowRecord[i]);
 									rowOccupy.push(rowRecord[i]);
 								}
-
 								temp.push(alias);
 
 								for (let i = 0, len1 = colOccupy.length - 1; i < len1; i++) {
@@ -231,8 +254,11 @@
 									}
 								}
 								rowOccupy.push(alias);
-								rowRecord.push(alias);
-
+								if(rowRecord.indexOf(alias)=== -1){
+									rowRecord.push(alias);
+								}
+								let lastRow = rowList[rowList.length - 1];
+								occupyBottom = lastRow.top + lastRow.height;
 							});
 					} else {
 						resolve();
@@ -396,6 +422,7 @@
 					occupyEndColAlias = colOccupy[colOccupy.length - 1],
 					occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias),
 					occupyRight = occupyEndCol.left + occupyEndCol.width,
+					frozenRule = this.frozenRule,
 					addColNum = 0,
 					self = this,
 					promise;
@@ -404,7 +431,7 @@
 				 * 当前视图边界值超过了后台对象的最大值
 				 * 需要自动增加列
 				 */
-				if (limitRight > maxRight) {
+				if (limitRight > maxRight && (!frozenRule || frozenRule.type === 'mainRule')) {
 					addColNum = Math.ceil((limitRight - maxRight + bufferWidth) / config.colWidth);
 					limitRight = maxRight;
 				}
@@ -457,10 +484,11 @@
 										regionRecord.set(sign, true);
 									}
 								}
-
 							}
 							colOccupy.push(alias);
-							colRecord.push(alias);
+							if (colRecord.indexOf(alias) === -1) {
+								colRecord.push(alias);
+							}
 						});
 					}else{
 						resolve();
@@ -593,7 +621,7 @@
 							}
 						}
 						if (flag) {
-							this.transverseRequest(limitLeft, currentLeft - 1);
+							self.transverseRequest(limitLeft, currentLeft - 1);
 						} else {
 							resolve();
 						}
@@ -650,7 +678,7 @@
 										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
-									this.$store.dispatch(actionTypes.COLS_ADDCOLS, cols);	
+									this.$store.dispatch(actionTypes.COLS_INSERTCOLS, cols);	
 									fn(endColAlias);
 								}
 								let cells = sheetData.cells;	
@@ -692,7 +720,7 @@
 										row.alias = row.aliasY;
 										row.displayName = getRowDisplayName(row.sort);
 									});
-									this.$store.dispatch(actionTypes.ROWS_ADDROWS, rows);	
+									this.$store.dispatch(actionTypes.ROWS_INSERTROWS, rows);	
 									fn(endRowAlias);
 								}
 								let cells = sheetData.cells;
@@ -701,12 +729,112 @@
 							resolve();
 						}
 					});
+			},
+			getOccupy(){
+				let colList = this.$store.getters.colList,
+					rowList = this.$store.getters.rowList,
+					offsetLeft = this.offsetLeft,
+					offsetTop = this.offsetTop,
+					clientWidth = this.$el.clientWidth,
+					clientHeight = this.$el.clientHeight,
+					endColIndex,
+					endRowIndex,
+					startRowIndex = 0,
+					startColIndex = 0,
+					frozenRule = this.frozenRule,
+					getters = this.$store.getters;
+
+				if (frozenRule) {
+					if (frozenRule.endRowIndex !== undefined &&
+						frozenRule.endColIndex !== undefined) {
+						return;
+					}
+					startRowIndex = frozenRule.startRowIndex;
+					startColIndex = frozenRule.startColIndex;
+
+					endRowIndex = frozenRule.endRowIndex ||
+						this.$store.getters.getRowIndexByPosi(offsetTop + clientHeight + config.prestrainHeight);
+					endColIndex = frozenRule.endColIndex ||
+						this.$store.getters.getColIndexByPosi(offsetLeft + clientWidth + config.prestrainWidth);
+				} else {
+					endRowIndex = this.$store.getters.getRowIndexByPosi(clientHeight + config.prestrainHeight);
+					endColIndex = this.$store.getters.getColIndexByPosi(clientWidth + config.prestrainWidth);
+				}
+
+				let colRecord = cache.colRecord,
+					rowRecord = cache.rowRecord,
+					startCol = colList[startColIndex],
+					endCol = colList[endColIndex],
+					startRow = rowList[startRowIndex],
+					endRow = rowList[endRowIndex];
+
+				for (let i = 0, len = colRecord.length - 1; i < len; i++) {
+					let col = getters.getColByAlias(colRecord[i]),
+						nextCol = getters.getColByAlias(colRecord[i + 1]);
+
+					if (col.left <= startCol.left && nextCol.left > startCol.left) {
+						this.colOccupy.push(colRecord[i]);
+					}
+					if (col.left > startCol.left && col.left < endCol.left) {
+						this.colOccupy.push(colRecord[i]);
+					}
+					if (col.left < endCol.left && nextCol.left >= endCol.left) {
+						this.colOccupy.push(colRecord[i + 1]);
+					}
+				}
+
+				for (let i = 0, len = rowRecord.length - 1; i < len; i++) {
+					let row = getters.getRowByAlias(rowRecord[i]),
+						nextRow = getters.getRowByAlias(rowRecord[i + 1]);
+
+					if (row.top <= startRow.top && nextRow.top > startRow.top) {
+						this.rowOccupy.push(rowRecord[i]);
+					}
+					if (row.top > startRow.top && row.top < endRow.top) {
+						this.rowOccupy.push(rowRecord[i]);
+					}
+					if (row.top < endRow.top && nextRow.top >= endRow.top) {
+						this.rowOccupy.push(rowRecord[i + 1]);
+					}
+				}
 			}
-		}
+		},
+		watch: {
+			frozenRule(newVal, oldVal){
+				let self = this;
+				Vue.nextTick(function(){
+					if(newVal){
+						self.$el.scrollTop = 0;
+						self.$el.scrollLeft = 0;
+						self.offsetLeft = self.frozenRule ? self.frozenRule.offsetLeft : 0,
+						self.offsetTop = self.frozenRule ? self.frozenRule.offsetTop : 0;
+						clearTimeout(self.timeoutId);
+						self.handleScroll(0, 0);
+					}else{
+						self.offsetLeft = 0;
+						self.offsetTop = 0;
+						self.$el.scrollTop = oldVal.userViewTop;
+						self.$el.scrollLeft = oldVal.userViewLeft;
+						clearTimeout(self.timeoutId);
+						self.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
+					}
+					self.getOccupy();
+				});
+			},
+			scrollLeft(val) {
+				this.$el.scrollLeft = val;
+			},
+			scrollTop(val) {
+				this.$el.scrollTop = val;
+			}
+		},
 	};
 </script>
 <style type="text/css">
-.scroll-box {
-    overflow: auto;
-}
+	.edit {
+		overflow: hidden;
+	}
+	.edit.scroll-box {
+	    overflow: auto;
+	}
 </style>

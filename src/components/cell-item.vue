@@ -8,13 +8,16 @@
 <script type="text/javascript">
 import {unit} from '../filters/unit'
 export default {
-    props: ['item'],
+    props: ['item', 'frozenRule'],
     computed: {
     	cellPosi(){
     		const physicsBox = this.item.physicsBox;
-    		return  {
-    			top: unit(physicsBox.top - 1),
-				left: unit(physicsBox.left - 1), 
+            let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
+                offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+
+            return{
+    			top: unit(physicsBox.top - offsetTop - 1),
+				left: unit(physicsBox.left - offsetLeft - 1), 
 				width: unit(physicsBox.width), 
 				height: unit(physicsBox.height)
     		}

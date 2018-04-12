@@ -39,3 +39,12 @@ store.dispatch(RESTORE, {
 });
 
 
+let element1 = document.getElementById('frozen');
+let element2 = document.getElementById('unfrozen');
+
+element1.addEventListener('click',function(e){
+	store.dispatch('SHEET_FROZEN');
+},false);
+element2.addEventListener('click',function(e){
+	store.dispatch('SHEET_UNFROZEN');
+},false);

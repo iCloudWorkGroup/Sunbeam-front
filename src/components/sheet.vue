@@ -8,13 +8,15 @@
 					</td>
 					<td v-if="colFrozen">
 						<col-head 
-							:rule="leftRule" 
-							:head-width="leftRule.width">	
+							:frozen-rule="leftRule" 
+							:col-head-width="leftRule.width"
+							:scroll-left="0"
+							class="frozen-right-border">	
 						</col-head>
 					</td>
 					<td>
 						<col-head
-							:rule="mainRule" 
+							:frozen-rule="topRule" 
 							:scroll-left="scrollLeft" 
 							:col-head-width="colHeadWidth">	
 						</col-head>
@@ -23,20 +25,24 @@
 				<tr v-if="rowFrozen">
 					<td>
 						<row-head
-							:rule="topRule"
-							:head-height="topRule.height"
+							:frozen-rule="cornerRule"
+							:row-head-height="cornerRule.height"
+							class="frozen-bottom-border"
 						></row-head>
 					</td>
 					<td v-if="colFrozen">
-						<edit :rule="cornerRule"
+						<edit :frozen-rule="cornerRule"
 							:edit-width="cornerRule.width" 
 							:edit-height="cornerRule.height"
+							class="frozen-right-border frozen-bottom-border"
 						></edit>
 					</td>
 					<td>
-						<edit :rule="topRule"
+						<edit :frozen-rule="topRule"
 							:edit-height="topRule.height"
 							:edit-width="colHeadWidth"
+							:scroll-left="scrollLeft"
+							class="frozen-bottom-border"
 							>
 						</edit>
 					</td>
@@ -44,23 +50,27 @@
 				<tr>
 					<td>
 						<row-head 
-							:rule="mainRule"
+							:frozen-rule="leftRule"
 							:scroll-top="scrollTop" 
 							:row-head-height="rowHeadHeight">
 						</row-head>
 					</td>
-					<td v-if="rowFrozen">
+					<td v-if="colFrozen">
 						<edit
+							:frozen-rule="leftRule"
 							:edit-height="rowHeadHeight"
-							:edit-width="rowFrozen.width"
+							:edit-width="leftRule.width"
+							:scroll-top="scrollTop" 
+							class="frozen-right-border"
 						></edit>
 					</td>
 					<td>
-						<edit :rule="mainRule"
+						<edit :frozen-rule="mainRule"
 							:edit-width="editWidth" 
 							:edit-height="editHeight"
 							@changeScrollTop="changeScrollTop" 
-							@changeScrollLeft="changeScrollLeft">	
+							@changeScrollLeft="changeScrollLeft"
+							class="scroll-box">	
 						</edit>
 					</td>
 				</tr>
@@ -88,53 +98,54 @@
 			};
 		},
 		computed: {
-			rowFrozen(){
-				let frozenState = this.$store.getters.getFrozenState;
+			rowFrozen() {
+				let frozenState = this.$store.getters.frozenState;
 				return frozenState.rowFrozen;
 			},
-			colFrozen(){
-				let frozenState = this.$store.getters.getFrozenState;
+			colFrozen() {
+				let frozenState = this.$store.getters.frozenState;
 				return frozenState.colFrozen;
 			},
 			cornerRule() {
-				let rules = this.$store.getters.getFrozenState.rules,
+				let rules = this.$store.getters.frozenState.rules,
 					rule;
 				rules.forEach(function(item) {
 					if (item.type === 'cornerRule') {
 						rule = item;
 					}
 				});
-				return item;
+
+				return rule;
 			},
 			leftRule() {
-				let rules = this.$store.getters.getFrozenState.rules,
+				let rules = this.$store.getters.frozenState.rules,
 					rule;
 				rules.forEach(function(item) {
 					if (item.type === 'leftRule') {
 						rule = item;
 					}
 				});
-				return item;
+				return rule;
 			},
 			topRule() {
-				let rules = this.$store.getters.getFrozenState.rules,
+				let rules = this.$store.getters.frozenState.rules,
 					rule;
 				rules.forEach(function(item) {
 					if (item.type === 'topRule') {
 						rule = item;
 					}
 				});
-				return item;
+				return rule;
 			},
 			mainRule() {
-				let rules = this.$store.getters.getFrozenState.rules,
+				let rules = this.$store.getters.frozenState.rules,
 					rule;
 				rules.forEach(function(item) {
 					if (item.type === 'mainRule') {
 						rule = item;
 					}
 				});
-				return item;
+				return rule;
 			},
 			width() {
 				return this.sheetWidth;
@@ -143,21 +154,69 @@
 				return this.sheetHeight;
 			},
 			colHeadWidth() {
-				let frozenState = this.$store.getters.getFrozenState;
-					// frozenState.rowFrozen;
-				return this.sheetWidth - config.cornerWidth - this.scrollbarWidth;
-			},
-			rowHeadHeight() {
+				let frozenState = this.$store.getters.frozenState,
+					offsetLeft = 0,
+					userViewLeft = 0;
 
-				return this.sheetHeight - config.cornerHeight - this.scrollbarWidth;
+				if (frozenState.colFrozen) {
+					frozenState.rules.forEach(function(item) {
+						if (item.type === 'topRule') {
+							offsetLeft = item.offsetLeft;
+							userViewLeft = item.userViewLeft;
+						}
+					});
+				}
+
+				return this.sheetWidth - config.cornerWidth 
+					- this.scrollbarWidth - offsetLeft
+					+ userViewLeft;
+			}, 
+			rowHeadHeight() {
+				let frozenState = this.$store.getters.frozenState,
+					offsetTop = 0,
+					userViewTop = 0;
+
+				if (frozenState.rowFrozen) {
+					frozenState.rules.forEach(function(item) {
+						if (item.type === 'leftRule') {
+							offsetTop = item.offsetTop;
+							userViewTop = item.userViewTop;
+						}
+					});
+				}
+				return this.sheetHeight - config.cornerHeight 
+				- this.scrollbarWidth - offsetTop
+				+ userViewTop;
 			},
 			editWidth() {
+				let frozenState = this.$store.getters.frozenState,
+					offsetLeft = 0,
+					userViewLeft = 0;
 
-				return this.sheetWidth - config.cornerWidth;
+				if (frozenState.colFrozen) {
+					frozenState.rules.forEach(function(item) {
+						if (item.type === 'mainRule') {
+							offsetLeft = item.offsetLeft;
+							userViewLeft = item.userViewLeft;
+						}
+					});
+				}
+				return this.sheetWidth - config.cornerWidth - offsetLeft + userViewLeft;
 			},
 			editHeight() {
+				let frozenState = this.$store.getters.frozenState,
+					offsetTop = 0,
+					userViewTop = 0;
 
-				return this.sheetHeight - config.cornerHeight;
+				if (frozenState.rowFrozen) {
+					frozenState.rules.forEach(function(item) {
+						if (item.type === 'mainRule') {
+							offsetTop = item.offsetTop;
+							userViewTop = item.userViewTop;
+						}
+					});
+				}
+				return this.sheetHeight - config.cornerHeight - offsetTop + userViewTop;
 			}
 		},
 		components: {

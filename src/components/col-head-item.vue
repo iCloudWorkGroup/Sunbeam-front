@@ -7,10 +7,10 @@
 </template>
 <script type="text/javascript">
 export default {
-    props: ['col'],
+    props: ['col', 'offsetLeft'],
     computed: {
         left() {
-            return this.col.left;
+            return this.col.left - this.offsetLeft;
         },
         width() {
             return this.col.width;

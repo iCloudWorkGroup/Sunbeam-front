@@ -1,18 +1,47 @@
 <template>
     <div class="row-group">
-        <div v-for="item in userViewRowList" class="row" :key="item.alias" :style="{
-        top: item.top + 'px', 
+        <div v-for="item in rowList" class="row" :key="item.alias" :style="{
+        top: item.top - offsetTop + 'px', 
         height: item.height + 'px'}"></div>
     </div>
 </template>
 <script type="text/javascript">
 export default {
+    props: ['frozenRule'],
+    data() {
+        let startIndex,
+            endIndex;
+        if (this.frozenRule) {
+            startIndex = this.frozenRule.startRowIndex;
+            endIndex = this.frozenRule.endRowIndex;
+        }
+        return {
+            startIndex,
+            endIndex
+        }
+    },
     computed: {
-        rowList() {
-            return this.$store.getters.rowList;
+        offsetTop() {
+            if (this.frozenRule) {
+                return this.frozenRule.offsetTop;
+            } else {
+                return 0;
+            }
         },
-        userViewRowList() {
-            return this.$store.getters.userViewRowList;
+        rowList() {
+            let rowList = this.$store.getters.rowList,
+                startIndex,
+                endIndex,
+                lastCol;
+
+            startIndex = this.startIndex || 0;
+            endIndex = this.endIndex || rowList.length - 1;
+            
+            if(this.endIndex !== undefined){
+                return rowList.slice(startIndex, endIndex + 1);
+            }else{
+                return this.$store.getters.userViewRowList;
+            }
         }
     }
 };

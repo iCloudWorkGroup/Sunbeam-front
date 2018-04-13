@@ -1,3 +1,4 @@
+
 export default function extend(...values) {
 	let target,
 		options, clone, name,

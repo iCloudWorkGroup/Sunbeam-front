@@ -1,6 +1,11 @@
 <template>
-	<div class="edit" @scroll="onScroll" :style="{width: width + 'px', height: height + 'px'}">
-		<edit-panel :frozenRule="frozenRule"></edit-panel>
+	<div class="edit" @scroll="onScroll" 
+	:style="{ 
+		width: width + 'px', 
+		height: height + 'px'
+		}">
+		<edit-panel 
+		:frozenRule="frozenRule"></edit-panel>
 	</div>
 </template>
 <script type="text/javascript">
@@ -11,7 +16,10 @@
 	import Vue from 'vue';
 	import * as actionTypes from '../store/action-types';
 	import * as mutationTypes from '../store/mutation-types';
-	import {getColDisplayName, getRowDisplayName} from '../util/displayname';
+	import {
+		getColDisplayName, 
+		getRowDisplayName
+	} from '../util/displayname';
 
 	export default {
 		props: ['editWidth',

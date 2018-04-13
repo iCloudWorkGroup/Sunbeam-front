@@ -18,7 +18,7 @@ store.dispatch(RESTORE, {
 	left: 0,
 	top: 0,
 	right,
-	bottom
+	bottom 
 }).then(() => {
 	new Vue({
 		el: '#app',
@@ -28,7 +28,7 @@ store.dispatch(RESTORE, {
 			bookHeight: 0
 		},
 		components: {
-			'book': Book
+			Book
 		},
 		created() {
 			this.bookWidth = wrapper.offsetWidth;
@@ -44,6 +44,7 @@ store.dispatch(RESTORE, {
 		}
 	});
 });
+
 
 let element1 = document.getElementById('frozen');
 let element2 = document.getElementById('unfrozen');

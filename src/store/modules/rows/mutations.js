@@ -1,8 +1,10 @@
 import Vue from 'vue';
 import * as types from '../../mutation-types';
-import {indexAttrBinary} from '../../../util/binary';
+import {
+	indexAttrBinary
+} from '../../../util/binary';
 
-export default {	
+export default {
 	[types.INSERT_SHEET](state, sheet) {
 		Vue.set(state, sheet.alias, {
 			list: [],
@@ -13,7 +15,7 @@ export default {
 		let rows = payload.rows,
 			rowsState = state[payload.currentSheet],
 			list = rowsState.list,
-			map = rowsState.map;			
+			map = rowsState.map;
 		for (let i = 0, len = rows.length; i < len; i++) {
 			let row = rows[i];
 			list.push(row);

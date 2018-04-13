@@ -36,14 +36,14 @@ export default {
 		let colInfo = state[currentSheet].col,
 			rowInfo = state[currentSheet].row;
 		
-		cells.forEach(function(cell){
+		cells.forEach(function(cell) {
 			let occupyCol = cell.occupy.col,
 				occupyRow = cell.occupy.row;
 
 			for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
 				for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-					colInfo[occupyCol][occupyRow] = null;
-					rowInfo[occupyRow][occupyCol] = null;
+					colInfo[occupyCol][occupyRow].cellIndex = null;
+					rowInfo[occupyRow][occupyCol].cellIndex = null;
 				}
 			}
 		});

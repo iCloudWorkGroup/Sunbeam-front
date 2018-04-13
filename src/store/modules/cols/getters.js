@@ -25,6 +25,10 @@ export default {
 		return function(alias) {
 			let col = getters.getColByAlias(alias),
 				list = state[rootState.currentSheet].list;
+
+			if(alias === 'MAX'){
+				return 'MAX';
+			}
 			if (col) {
 				return rangeBinary(col.left, list, 'left', 'width');
 			}

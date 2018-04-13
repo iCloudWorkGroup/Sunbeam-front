@@ -55,5 +55,10 @@ export default {
 				row[propName[0]] = value;
 			}
 		});
+	},
+	[types.DELETE_ROW](state, {currentSheet, index}){
+		let list = state[currentSheet].list;
+		list.splice(index, 1);
 	}
+
 };

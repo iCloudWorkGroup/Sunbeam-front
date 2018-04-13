@@ -50,6 +50,8 @@ let element2 = document.getElementById('unfrozen');
 let element3 = document.getElementById('insertrow');
 let element4 = document.getElementById('insertcol');
 let element5 = document.getElementById('deletecol');
+let element6 = document.getElementById('deleterow');
+
 
 element1.addEventListener('click',function(e){
 	store.dispatch('SHEET_FROZEN');
@@ -65,4 +67,8 @@ element4.addEventListener('click',function(e){
 },false);
 element5.addEventListener('click',function(e){
 	store.dispatch('COLS_DELETECOLS');
+},false);
+
+element6.addEventListener('click',function(e){
+	store.dispatch('ROWS_DELETEROWS');
 },false);

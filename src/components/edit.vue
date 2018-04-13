@@ -25,8 +25,6 @@
 				offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
 
 			return {
-				colOccupy: [],
-				rowOccupy: [],
 				recordScrollTop: 0,
 				recordScrollLeft: 0,
 				timeoutId: '',
@@ -48,12 +46,30 @@
 				});
 			}
 		},
+		beforeDestroy() {
+			this.updateOccupy([], []);
+		},
 		computed: {
 			width() {
 				return this.editWidth;
 			},
 			height() {
 				return this.editHeight;
+			},
+			colOccupy() {
+				let type = this.frozenRule && this.frozenRule.type;
+				return this.$store.getters.getEditViewOccupy(type).col;
+			},
+			rowOccupy() {
+				let type = this.frozenRule && this.frozenRule.type;
+				let temp = this.$store.getters.getEditViewOccupy(type).row;
+				return this.$store.getters.getEditViewOccupy(type).row;
+			},
+			colListLen(){
+				return this.$store.getters.colList.length;
+			},
+			rowListLen(){
+				return this.$store.getters.rowList.length;
 			}
 		},
 		components: {
@@ -81,7 +97,7 @@
 				}, 50);
 			},
 
-			handleScroll(currentScrollLeft, currentScrollTop){
+			handleScroll(currentScrollLeft, currentScrollTop, adjustCol = false, adjustRow = false){
 				let currentPromise = this.currentPromise,
 					frozenRule = this.frozenRule,
 					endColIndex,
@@ -108,7 +124,7 @@
 					self.recordScrollTop = currentScrollTop;
 					self.recordScrollLeft = currentScrollLeft;
 
-					if (vertical !== 0 && endRowIndex === undefined) {
+					if ((vertical !== 0 && endRowIndex === undefined) || adjustRow) {
 						limitTop = self.recordScrollTop - config.prestrainHeight;
 						limitTop = limitTop > 0 ? limitTop : 0;
 						limitTop += self.offsetTop;
@@ -116,7 +132,7 @@
 							+ config.prestrainHeight 
 							+ self.offsetTop;
 
-						if (vertical > 0) {
+						if (vertical > 0 || adjustRow) {
 							p1 = new Promise(function(resolve) {
 								self.scrollToBottom(limitTop, limitBottom, resolve);
 							});
@@ -133,7 +149,7 @@
 						});
 					}
 
-					if (transverse !== 0 && endColIndex === undefined) {
+					if ((transverse !== 0 && endColIndex === undefined) || adjustCol) {
 						limitLeft = self.recordScrollLeft - config.prestrainWidth;
 					    limitLeft = limitLeft > 0 ? limitLeft : 0;
 					    limitLeft += self.offsetLeft;
@@ -141,7 +157,7 @@
 							+ config.prestrainWidth
 							+ self.offsetLeft;
 
-						if (transverse > 0) {
+						if (transverse > 0 || adjustCol) {
 							p2 = new Promise(function(resolve){
 								self.scrollToRight(limitLeft, limitRight, resolve);
 							});
@@ -176,8 +192,8 @@
 					maxBottom = cache.localRowPosi,
 					bufferHeight = config.scrollBufferWidth,
 					rowRecord = cache.rowRecord,
-					rowOccupy = this.rowOccupy,
-					colOccupy = this.colOccupy,
+					rowOccupy = this.rowOccupy.slice(0),
+					colOccupy = this.colOccupy.slice(0),
 					regionRecord = cache.regionRecord,
 					occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
 					occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
@@ -205,6 +221,7 @@
 				}).then(function(){
 					addRow();
 					removeOccupyRow();
+					self.updateOccupy(colOccupy, rowOccupy);
 					resolve();
 				});
 				/**
@@ -223,9 +240,7 @@
 
 						self.verticalRequest(currentMaxBottom + 1, limitBottom, resolve,
 							function(alias) {
-								let rowOccupy = self.rowOccupy,
-									colOccupy = self.colOccupy,
-									occupyBottomAlias = rowOccupy[rowOccupy.length - 1],
+								let occupyBottomAlias = rowOccupy[rowOccupy.length - 1],
 									occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias),
 									temp = []; //记录请求区间跨域加载块
 
@@ -297,8 +312,7 @@
 						addRowNum : config.maxRowNum - rowList.length;
 
 					if (addRowNum > 0) {
-						let colOccupy = this.colOccupy,
-							tempAlias = rowList[rowList.length - 1].alias,
+						let tempAlias = rowList[rowList.length - 1].alias,
 							currentAlias;
 
 						this.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum);
@@ -331,8 +345,8 @@
 				}
 			},
 			scrollToTop(limitTop, limitBottom, resolve){
-				let rowOccupy = this.rowOccupy,
-					colOccupy = this.colOccupy,
+				let rowOccupy = this.rowOccupy.slice(0),
+					colOccupy = this.colOccupy.slice(0),
 					rowRecord = cache.rowRecord,
 					occupyStartRowAlias = rowOccupy[0],
 					occupyStartRow = this.$store.getters.getRowByAlias(occupyStartRowAlias),
@@ -343,6 +357,7 @@
 					getTop(currentResolve);
 				}).then(function(){
 					adjustOccupy();
+					self.updateOccupy(colOccupy, rowOccupy);
 					resolve();
 				});
 
@@ -407,7 +422,8 @@
 					maxRight = cache.localColPosi,
 					bufferWidth = config.scrollBufferWidth,
 					colRecord = cache.colRecord,
-					colOccupy = this.colOccupy,
+					colOccupy = this.colOccupy.slice(0),
+					rowOccupy = this.rowOccupy.slice(0),
 					regionRecord = cache.regionRecord,
 					lastCol = colList[colList.length - 1],
 					currentMaxRight = lastCol.left + lastCol.width,
@@ -437,6 +453,7 @@
 				}).then(function(){
 					addCol();
 					removeOccupyCol();
+					self.updateOccupy(colOccupy, rowOccupy);
 					resolve();
 				});
 
@@ -456,9 +473,7 @@
 					 */
 					self.transverseRequest(currentMaxRight + 1, limitRight, resolve,
 						function(alias) {
-							let rowOccupy = self.rowOccupy,
-								colOccupy = self.colOccupy,
-								occupyRightAlias = colOccupy[colOccupy.length - 1],
+							let occupyRightAlias = colOccupy[colOccupy.length - 1],
 								occupyRightIndex = colRecord.indexOf(occupyRightAlias),
 								temp = []; //记录请求区间跨域加载块
 
@@ -489,8 +504,7 @@
 
 				function getRight(resolve) {
 					if (occupyRight < limitRight) {
-						let rowOccupy = self.rowOccupy,
-							temp = [occupyEndColAlias],
+						let temp = [occupyEndColAlias],
 							i = colRecord.indexOf(occupyEndColAlias) + 1;
 
 						for (let len = colRecord.length; i < len; i++) {
@@ -528,8 +542,7 @@
 						addColNum : config.maxColNum - colList.length;
 
 					if (addColNum > 0) {
-						let rowOccupy = self.rowOccupy,
-							tempAlias = colList[colList.length - 1].alias,
+						let tempAlias = colList[colList.length - 1].alias,
 							currentAlias;
 
 						self.$store.dispatch(actionTypes.COLS_GENERAT, addColNum);
@@ -564,8 +577,8 @@
 				}
 			},
 			scrollToLeft(limitLeft, limitRight, resolve){
-				let colOccupy = this.colOccupy,
-					rowOccupy = this.rowOccupy,
+				let colOccupy = this.colOccupy.slice(0),
+					rowOccupy = this.rowOccupy.slice(0),
 					occupyStartColAlias = colOccupy[0],
 					occupyStartCol = this.$store.getters.getColByAlias(occupyStartColAlias),
 					currentLeft = occupyStartCol.left,
@@ -576,6 +589,7 @@
 					getLeft(currentResolve);
 				}).then(function(){
 					adjustOccupy();
+					self.updateOccupy(colOccupy, rowOccupy);
 					resolve();
 				});
 
@@ -670,7 +684,7 @@
 										col.alias = col.aliasX;
 										col.displayName = getColDisplayName(col.sort);
 									});
-									this.$store.dispatch(actionTypes.COLS_INSERTCOLS, cols);	
+									this.$store.dispatch(actionTypes.COLS_RESTORECOLS, cols);	
 									fn(endColAlias);
 								}
 								let cells = sheetData.cells;	
@@ -722,11 +736,18 @@
 						}
 					});
 			},
+			updateOccupy(colOccupy, rowOccupy) {
+				this.$store.dispatch(actionTypes.OCCUPY_RESET, {
+					type: this.frozenRule && this.frozenRule.type,
+					col: colOccupy,
+					row: rowOccupy
+				});
+			},
 			getOccupy(){
 				let colList = this.$store.getters.colList,
 					rowList = this.$store.getters.rowList,
-					offsetLeft = this.offsetLeft,
-					offsetTop = this.offsetTop,
+					offsetLeft = this.$el.scrollLeft,
+					offsetTop = this.$el.scrollTop,
 					clientWidth = this.$el.clientWidth,
 					clientHeight = this.$el.clientHeight,
 					getters = this.$store.getters,
@@ -734,7 +755,9 @@
 					endRowIndex,
 					startRowIndex = 0,
 					startColIndex = 0,
-					frozenRule = this.frozenRule;
+					frozenRule = this.frozenRule,
+					colOccupy = [],
+					rowOccupy = [];
 
 				if (frozenRule) {
 					if (frozenRule.endRowIndex !== undefined &&
@@ -743,18 +766,19 @@
 					}
 					startRowIndex = frozenRule.startRowIndex;
 					startColIndex = frozenRule.startColIndex;
-
-					endRowIndex = frozenRule.endRowIndex ||
-						getters.getRowIndexByPosi(offsetTop + clientHeight + 
-							config.prestrainHeight);
-					endColIndex = frozenRule.endColIndex ||
-						getters.getColIndexByPosi(offsetLeft + clientWidth + 
-							config.prestrainWidth);
-				} else {
-					endRowIndex = getters.getRowIndexByPosi(clientHeight + config.prestrainHeight);
-					endColIndex = getters.getColIndexByPosi(clientWidth + config.prestrainWidth);
+					endRowIndex = frozenRule.endRowIndex;
+					endColIndex = frozenRule.endColIndex;
+					offsetTop += frozenRule.offsetTop;
+					offsetLeft += frozenRule.offsetLeft;
 				}
 
+				endRowIndex = endRowIndex ||
+					getters.getRowIndexByPosi(offsetTop + clientHeight + 
+						config.prestrainHeight);
+				endColIndex = endColIndex ||
+					getters.getColIndexByPosi(offsetLeft + clientWidth + 
+						config.prestrainWidth);
+				
 				let colRecord = cache.colRecord,
 					rowRecord = cache.rowRecord,
 					startCol = colList[startColIndex],
@@ -767,13 +791,13 @@
 						nextCol = getters.getColByAlias(colRecord[i + 1]);
 
 					if (col.left <= startCol.left && nextCol.left > startCol.left) {
-						this.colOccupy.push(colRecord[i]);
+						colOccupy.push(colRecord[i]);
 					}
 					if (col.left > startCol.left && col.left < endCol.left) {
-						this.colOccupy.push(colRecord[i]);
+						colOccupy.push(colRecord[i]);
 					}
 					if (col.left < endCol.left && nextCol.left >= endCol.left) {
-						this.colOccupy.push(colRecord[i + 1]);
+						colOccupy.push(colRecord[i + 1]);
 					}
 				}
 
@@ -782,15 +806,16 @@
 						nextRow = getters.getRowByAlias(rowRecord[i + 1]);
 
 					if (row.top <= startRow.top && nextRow.top > startRow.top) {
-						this.rowOccupy.push(rowRecord[i]);
+						rowOccupy.push(rowRecord[i]);
 					}
 					if (row.top > startRow.top && row.top < endRow.top) {
-						this.rowOccupy.push(rowRecord[i]);
+						rowOccupy.push(rowRecord[i]);
 					}
 					if (row.top < endRow.top && nextRow.top >= endRow.top) {
-						this.rowOccupy.push(rowRecord[i + 1]);
+						rowOccupy.push(rowRecord[i + 1]);
 					}
 				}
+				this.updateOccupy(colOccupy, rowOccupy);
 			}
 		},
 		watch: {
@@ -820,6 +845,16 @@
 			},
 			scrollTop(val) {
 				this.$el.scrollTop = val;
+			},
+			colListLen(newVal, oldVal){
+				if(newVal < oldVal){
+					this.handleScroll(this.recordScrollLeft, this.recordScrollTop, true, false);
+				}
+			},
+			rowListLen(newVal, oldVal){
+				if(newVal < oldVal){
+					this.handleScroll(this.recordScrollLeft, this.recordScrollTop, false, true);
+				}
 			}
 		},
 	};

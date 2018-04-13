@@ -4,6 +4,14 @@ import * as mutationTypes from '../../mutation-types';
 import template from './template';
 import {SELECT} from '../../../tools/basic';
 
+
+let viewTypes = {
+	mainRule: 'mainView',
+	leftRule: 'leftView',
+	topRule: 'topView',
+	cornerRule: 'cornerView'
+};
+
 export default {
 	/**
 	 * 还原sheet
@@ -180,6 +188,7 @@ export default {
 			frozenCol = colList[frozenColIndex];
 
 		let rules = [];
+
 		rules.push({
 			type: 'leftRule',
 			startRowIndex: 0,
@@ -193,6 +202,7 @@ export default {
 			startRowIndex: 0,
 			startColIndex: frozenColIndex,
 			offsetLeft: frozenCol.left,
+			userViewLeft: userViewCol.left,
 			offsetTop: 0
 		});
 		commit(mutationTypes.UPDATE_FROZENSTATE,{
@@ -204,16 +214,82 @@ export default {
 		});
 	}, 
 	[actionTypes.SHEET_FIRSTROWFROZEN]({commit, state, getters, rootState}, index) {
+		let currentSheet = rootState.currentSheet,
+			stateList = state.list,
+			frozenState;
+		
+		for (let i = 0, len = stateList.length; i < len; i++) {
+			if (stateList[i].alias === currentSheet) {
+				frozenState = stateList[i];
+				break;
+			}
+		}
+		if(frozenState.isFrozen){
+			return;
+		}
 
+		let frozenRowIndex;
+
+		let userView = rootState.userView,
+			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
+
+		if(index === undefined){
+			index = userViewTopIndex + 1;
+		}
+		frozenRowIndex = index;
+		
+		let rowList = getters.rowList,
+			colList = getters.colList,
+			userViewRow = rowList[userViewTopIndex],
+			frozenRow = rowList[frozenRowIndex];
+
+		let rules = [];
+
+		rules.push({
+			type: 'topRule',
+			startColIndex: 0,
+			startRowIndex: userViewTopIndex,
+			endRowIndex: frozenRowIndex - 1,
+			offsetTop: userViewRow.top,
+			offsetLeft: 0,
+			width: frozenRow.top - userViewRow.top - 1
+		}, {
+			type: 'mainRule',
+			startRowIndex: frozenRowIndex,
+			startColIndex: 0,
+			offsetTop: frozenRow.top,
+			userViewTop : userViewRow.top,
+			offsetLeft: 0
+		});
+		commit(mutationTypes.UPDATE_FROZENSTATE,{
+			isFrozen: true,
+			rowFrozen: true,
+			colFrozen: false,
+			rules,
+			currentSheet
+		});
 
 	}, 
 	[actionTypes.SHEET_UNFROZEN]({commit, state, getters, rootState}, sheet) {
-			commit(mutationTypes.UPDATE_FROZENSTATE,{
+		commit(mutationTypes.UPDATE_FROZENSTATE, {
 			isFrozen: false,
 			rowFrozen: false,
 			colFrozen: false,
 			rules: [],
 			currentSheet: rootState.currentSheet
+		});
+	},
+	[actionTypes.OCCUPY_RESET]({commit, getters, rootState}, {
+		type,
+		col,
+		row
+	}){
+		type = type || 'mainRule';
+		commit(mutationTypes.RESET_OCCUPY, {
+			currentSheet: rootState.currentSheet,
+			type: viewTypes[type],
+			col,
+			row
 		});
 	}
 };

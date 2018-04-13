@@ -1,6 +1,5 @@
 <template>
-	<div class="select-item" @dblclick="edit" :style="styleObject" 
-            :class="{'whole-col': wholeCol, 'whole-row': wholeRow}">
+	<div class="select-item" @dblclick="edit" :style="styleObject">
 		<div class="box">
 			<div class="bg"></div>
 			<div class="expand"></div>
@@ -40,22 +39,12 @@
 
                 result = {
                     left: left - offsetLeft + 'px',
-                    top: top - offsetTop + 'px'
+                    top: top - offsetTop + 'px',
+                    width: width + 'px',
+                    height: height + 'px'
                 };
 
-                if (wholePosi.endColAlias !== 'MAX') {
-                    result.width = width + 'px';
-                }
-                if (wholePosi.endRowAlias !== 'MAX') {
-                    result.height = height + 'px';
-                }
                 return result;
-            },
-            wholeCol(){
-                return this.select.wholePosi.endRowAlias === 'MAX';
-            },
-            wholeRow(){
-                return this.select.wholePosi.endColAlias === 'MAX';
             },
             wholePosi(){
                 return this.select.wholePosi;
@@ -126,12 +115,5 @@
     -moz-transition: .2s;
     -webkit-transition: .2s;
     -o-transition: .2s;
-}
-
-.select-item.whole-col {
-    height: 100%;
-}
-.select-item.whole-row {
-    width: 100%;
 }
 </style>

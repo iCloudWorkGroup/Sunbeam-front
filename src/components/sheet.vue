@@ -16,7 +16,7 @@
 					</td>
 					<td>
 						<col-head
-							:frozen-rule="topRule" 
+							:frozen-rule="mainRule" 
 							:scroll-left="scrollLeft" 
 							:col-head-width="colHeadWidth">	
 						</col-head>
@@ -25,8 +25,8 @@
 				<tr v-if="rowFrozen">
 					<td>
 						<row-head
-							:frozen-rule="cornerRule"
-							:row-head-height="cornerRule.height"
+							:frozen-rule="topRule"
+							:row-head-height="topRule.height"
 							class="frozen-bottom-border"
 						></row-head>
 					</td>
@@ -50,7 +50,7 @@
 				<tr>
 					<td>
 						<row-head 
-							:frozen-rule="leftRule"
+							:frozen-rule="mainRule"
 							:scroll-top="scrollTop" 
 							:row-head-height="rowHeadHeight">
 						</row-head>
@@ -76,6 +76,7 @@
 				</tr>
 			</tbody>
 		</table>
+		<!-- <input-box :scroll-left="scrollLeft" :scroll-top="scrollTop" ></input-box> -->
 	</div>
 </template>
 <script type="text/javascript">
@@ -84,6 +85,7 @@
 	import ColHead from './col-head.vue';
 	import RowHead from './row-head.vue';
 	import Edit from './edit.vue';
+	import InputBox from './input-box.vue';
 
 	export default {
 		props: [
@@ -222,7 +224,8 @@
 		components: {
 			ColHead,
 			RowHead,
-			Edit
+			Edit,
+			InputBox
 		},
 		methods: {
 			changeScrollTop(val){

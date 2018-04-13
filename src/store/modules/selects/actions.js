@@ -123,23 +123,23 @@ export default {
 			left: cols[startColIndex].left
 		};
 
-		if(endColIndex !== 'MAX'){
-			let width = cols[endColIndex].width + cols[endColIndex].left - 
-					cols[startColIndex].left;
-			select.physicsBox.width = width;
-		}
-		if(endRowIndex !== 'MAX'){
-			let height = rows[endRowIndex].height + rows[endRowIndex].top - 
-					rows[startRowIndex].top;
-			select.physicsBox.height = height;
-		}
 		select.wholePosi = {
 			startColAlias: cols[startColIndex].alias,
 			startRowAlias: rows[startRowIndex].alias,
 			endColAlias: endColIndex !== 'MAX' ? cols[endColIndex].alias : 'MAX',
 			endRowAlias: endRowIndex !== 'MAX' ? rows[endRowIndex].alias : 'MAX'
 		};
+		endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex;
+		endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex;
 
+		let width = cols[endColIndex].width + cols[endColIndex].left - 
+				cols[startColIndex].left;
+		select.physicsBox.width = width;
+	
+		let height = rows[endRowIndex].height + rows[endRowIndex].top - 
+				rows[startRowIndex].top;
+		select.physicsBox.height = height;
+		
 		if(mouseState === LOCATE){
 			select.activePosi = {
 				colAlias: cols[startColIndex].alias,

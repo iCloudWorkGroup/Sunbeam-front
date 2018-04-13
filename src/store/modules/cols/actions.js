@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import * as actionTypes from '../../action-types';
 import * as mutationTypes from '../../mutation-types';
 import {getColDisplayName} from '../../../util/displayname';
@@ -23,11 +24,34 @@ export default {
             currentSheet: rootState.currentSheet
         });
     },
+    [actionTypes.COLS_RESTORECOLS]({
+        state,
+        rootState,
+        commit
+    }, cols) {
+        let map = state[rootState.currentSheet].map,
+            temp = [];
+
+        if (!Array.isArray(cols)) {
+            cols = [cols];
+        }
+
+        for (let i = 0, len = cols.length; i < len; i++) {
+            if (!map.get(cols[i].alias)) {
+                temp.push(extend({}, template, cols[i]));
+            }
+        }
+        commit(mutationTypes.INSERT_COL, {
+            cols: temp,
+            currentSheet: rootState.currentSheet
+        });
+    },
     [actionTypes.COLS_DELETECOLS]({
         state,
         rootState,
         commit,
-        getters
+        getters,
+        dispatch
     }, index) {
         let selects = getters.selectList,
             currentSheet = rootState.currentSheet;
@@ -40,7 +64,7 @@ export default {
                     break;
                 }
             }
-            index = getters.getRowIndexByAlias(select.wholePosi.startColAlias);
+            index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
 
         let cols = getters.colList,
@@ -173,13 +197,23 @@ export default {
                 value: getColDisplayName(col.sort - 1)
             });
         }
+
+        // let colRecord = cache.colRecord;
+        // if (colRecord.indexOf(colAlias) !== -1) {
+        //     dispatch(actionTypes.DELETE_COL_RECORD, colAlias);
+        // }
+        if(cache.localColPosi > 0){
+            cache.localColPosi -= colWidth;
+        }
         commit(mutationTypes.BATCH_UPDATE_COL, {
             currentSheet,
             info: updateColInfo
-        });     
-        commit(mutationTypes.DELETE_COL, {
-            currentSheet,
-            index
+        });
+        Vue.nextTick(function() {
+            commit(mutationTypes.DELETE_COL, {
+                currentSheet,
+                index
+            });
         });
     },
     [actionTypes.COLS_INSERTCOLS]({
@@ -199,7 +233,7 @@ export default {
                     break;
                 }
             }
-            index = getters.getRowIndexByAlias(select.wholePosi.startColAlias);
+            index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
 
         let col = extend(template),
@@ -341,7 +375,8 @@ export default {
 
         startIndex = getters.getColIndexByAlias(oldStartAlias);
         endIndex = getters.getColIndexByAlias(oldEndAlias);
-
+        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 : endIndex;
+       
         commit(mutationTypes.CANCEL_ACTIVE_COL,{
             currentSheet,
             startIndex,
@@ -350,7 +385,8 @@ export default {
 
         startIndex = getters.getColIndexByAlias(newStartAlias);
         endIndex = getters.getColIndexByAlias(newEndAlias);
-
+        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 : endIndex;
+        
         commit(mutationTypes.ACTIVE_COL, {
             currentSheet,
             startIndex,

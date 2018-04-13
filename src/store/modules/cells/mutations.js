@@ -20,7 +20,6 @@ export default {
 		}
 	}) {
 		let currentList = state[currentSheet];
-
 		propName = propName.split('.');
 		if (propName.length > 1) {
 			cell[propName[0]][propName[1]] = value;

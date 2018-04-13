@@ -126,10 +126,18 @@ export default {
 			} else {
 				commit(mutationTypes.UPDATE_CELL, {
 					currentSheet: sheet,
-					cellInfo: {
-						propName: 'physicsBox',
-						value: physicsBox,
-						cell: cells[cellIndex]
+					info: {
+						propName: 'physicsBox.width',
+						value: physicsBox.width,
+						cell: cellList[cellIndex]
+					}
+				});
+				commit(mutationTypes.UPDATE_CELL, {
+					currentSheet: sheet,
+					info: {
+						propName: 'physicsBox.height',
+						value: physicsBox.height,
+						cell: cellList[cellIndex]
 					}
 				});
 			}
@@ -156,7 +164,7 @@ export default {
 			let cells = getters.cellList;
 			commit(mutationTypes.UPDATE_CELL, {
 				currentSheet: rootState.currentSheet,
-				cellInfo: {
+				info: {
 					cell: cells[cellIndex],
 					propName: propName,
 					value: propValue

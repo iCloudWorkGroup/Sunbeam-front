@@ -13,7 +13,6 @@
 	import RowGridGroup from './row-grid-group.vue';
 	import CellGroup from './cell-group.vue';
 	import SelectGroup from './select-group.vue';
-	import InputBox from './input-box.vue';
 	import {LOCATE, DRAG} from '../tools/basic';
 	export default {
 		props: ['editPanelWidth', 'editPanelHeight', 'frozenRule'],
@@ -21,8 +20,7 @@
 			ColGridGroup,
 			RowGridGroup,
 			CellGroup,
-			SelectGroup,
-			InputBox
+			SelectGroup
 		},
 		computed: {
 			width() {
@@ -53,6 +51,12 @@
 			},
 			mouseState(){
 				return this.$store.state.mouseState;
+			},
+			colListLen(){
+				return this.$store.getters.colList.length;
+			},
+			rowListLen(){
+				return this.$store.getters.rowList.length;
 			}
 		},
 		methods: {

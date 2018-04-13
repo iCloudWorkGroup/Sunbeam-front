@@ -3,6 +3,7 @@
         <col-head-item v-for="col in colList"  :key="col.alias" :col="col" :offsetLeft="offsetLeft"></col-head-item>
     </div>
 </template>
+
 <script type="text/javascript">
 import colHeadItem from './col-head-item.vue';
 import {SELECTS_UPDATESELECT} from '../store/action-types';
@@ -35,24 +36,22 @@ export default {
             }
         },
         colList() {
-            let colList = this.$store.getters.colList,
+            let getters = this.$store.getters,
+                colList = getters.colList,
                 startIndex,
                 endIndex,
                 lastCol;
 
             startIndex = this.startIndex || 0;
             endIndex = this.endIndex || colList.length - 1;
-            
             if(this.endIndex !== undefined){
                 return colList.slice(startIndex, endIndex + 1);
             }else{
-                return this.$store.getters.userViewColList;
+                return getters.userViewColList;
             }
         },        
         mouseState() {
             return this.$store.state.mouseState;
-
-
         }
     },
     methods: {

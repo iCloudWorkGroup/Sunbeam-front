@@ -108,7 +108,7 @@ export default {
     getCellsByVertical(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
             cells = state[currentSheet];
-
+            
         return function({
             startColIndex,
             startRowIndex,
@@ -134,7 +134,7 @@ export default {
                         len2; j++) {
                         rowAlias = rows[j].alias;
                         temp = pointInfo[colAlias][rowAlias];
-                        if (typeof temp !== 'undefined' && temp.cellIndex !== null) {
+                        if (temp && temp.cellIndex !== null) {
                             index = temp.cellIndex;
                             if (!tempObj[index]) {
                                 result.push(cells[index]);

@@ -1,6 +1,9 @@
 <template>
     <div class="col-head-panel">
-        <col-head-item v-for="col in colList"  :key="col.alias" :col="col" :offsetLeft="offsetLeft"></col-head-item>
+        <col-head-item v-for="col in colList" 
+        :key="col.alias" 
+        :col="col" 
+        :offsetLeft="offsetLeft"></col-head-item>
     </div>
 </template>
 <script type="text/javascript">
@@ -11,7 +14,7 @@ export default {
     data() {
         let startIndex,
             endIndex;
-        if(this.frozenRule){
+        if (this.frozenRule) {
             startIndex = this.frozenRule.startColIndex;
             endIndex = this.frozenRule.endColIndex;
         }
@@ -25,9 +28,9 @@ export default {
     },
     computed: {
         offsetLeft() {
-            if(this.frozenRule){
-                return this.frozenRule.offsetLeft; 
-            }else{
+            if (this.frozenRule) {
+                return this.frozenRule.offsetLeft;
+            } else {
                 return 0;
             }
         },
@@ -39,10 +42,10 @@ export default {
 
             startIndex = this.startIndex || 0;
             endIndex = this.endIndex || colList.length - 1;
-            
-            if(this.endIndex !== undefined){
+
+            if (this.endIndex !== undefined) {
                 return colList.slice(startIndex, endIndex + 1);
-            }else{
+            } else {
                 return this.$store.getters.userViewColList;
             }
         }

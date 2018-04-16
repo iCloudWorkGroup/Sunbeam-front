@@ -9,7 +9,13 @@ export default {
 	/**
 	 * 初始化选中区域
 	 */
-	[actionTypes.SELECTS_INITSELECT]({state, getters, commit, rootState}) {
+	[actionTypes.SELECTS_INITSELECT]({
+		state,
+		getters,
+		commit,
+		rootState,
+		rootGetters
+	}) {
 		let currentSheet = rootState.currentSheet,
 			rows = rootState.rows[currentSheet].list,
 			cols = rootState.cols[currentSheet].list,
@@ -52,8 +58,18 @@ export default {
 	/**
 	 * 更新选中区域
 	 */
-	[actionTypes.SELECTS_UPDATESELECT]({state, getters, commit, rootState}, 
-		{startColIndex, startRowIndex, endColIndex = startColIndex, endRowIndex = startRowIndex, type}) {
+	[actionTypes.SELECTS_UPDATESELECT]({
+		state,
+		getters,
+		commit,
+		rootState
+	}, {
+		startColIndex,
+		startRowIndex,
+		endColIndex = startColIndex,
+		endRowIndex = startRowIndex,
+		type
+	}) {
 		let currentSheet = rootState.currentSheet,
 			rows = rootState.rows[currentSheet].list,
 			cols = rootState.cols[currentSheet].list,

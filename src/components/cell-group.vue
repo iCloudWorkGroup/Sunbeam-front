@@ -1,6 +1,9 @@
 <template>
     <div class="cell-group">
-        <cell-item v-for="item in cellList" :key="item.alias" :item="item" :frozenRule="frozenRule">
+        <cell-item v-for="item in cellList" 
+        :key="item.alias" 
+        :item="item" 
+        :frozenRule="frozenRule">
         </cell-item>
     </div>
 </template>

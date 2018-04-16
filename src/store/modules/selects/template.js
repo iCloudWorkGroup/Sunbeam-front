@@ -1,5 +1,5 @@
 import cfg from '../../../config';
-
+import {SELECT} from '../../../tools/basic';
 /**
  * 选中区对象默认值
  */
@@ -91,5 +91,6 @@ export default {
 		 */
 		endRowAlias: '0'
 	},
-	type: 'selected'
+	type: SELECT,
+	alias: ''
 };

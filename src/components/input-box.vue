@@ -3,7 +3,13 @@
 </template>
 <script type="text/javascript">
 	import {EDIT_HIDE, EDIT_SHOW} from '../store/action-types';
+	import config from '../config';
+	
 	export default {
+		props: [
+			'scrollLeft',
+			'scrollTop'
+		],
 		mounted() {
 			this.$watch('editState', function(val){
 				if(val){
@@ -12,13 +18,35 @@
 			});
 		},
 		computed: {
+			left(){
+				let getters = this.$store.getters,
+					frozenRules = getters.frozenState,
+					cols = getters.colList,
+					mainRule,
+					left;
+				for (let i = 0, len = frozenRules.length; i < len; i++) {
+					if (frozenRules[i] === 'mainRule') {
+						mainRule = frozenRules[i];
+						break;
+					}
+				}
+				if (!mainRule || cols[mainRule.startColIndex].left < left) {
+					left -= this.scrollLeft;
+				}
+				
+				left = getters.getInputState.left + config.cornerWidth;
+				return left;
+			},
+			height(){
+				cornerHeight
+			},
 			styleObject() {
 				let state = this.$store.getters.getInputState;
 				return {
 					top: state.top + 1 + 'px',
-					left: state.left + 1 + 'px',
+					left: this.left + 1 + 'px',
 					width: state.width + 'px',
-					height: state.height + 'px',
+					height: this.height + 'px',
 					maxWidth: state.maxWidth + 'px',
 					maxHeight: state.maxHeight + 'px',
 					fontFamily: state.family,

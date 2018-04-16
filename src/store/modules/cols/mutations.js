@@ -33,5 +33,33 @@ export default {
 			list.splice(index, 0, col);
 			map.set(col.alias, col);
 		}
+	},
+	[types.CANCEL_ACTIVE_COL](state, {startIndex, endIndex, currentSheet}){
+		let list = state[currentSheet].list;
+
+		for (let i = startIndex; i <= endIndex; i++) {
+			list[i].active = false;
+		}
+	},
+	[types.ACTIVE_COL](state, {startIndex, endIndex = startIndex, currentSheet}){
+		let list = state[currentSheet].list;
+
+		for (let i = startIndex; i <= endIndex; i++) {
+			list[i].active = true;
+		}
+	},
+	[types.BATCH_UPDATE_COL](state, {currentSheet, info}){
+		info.forEach(function({col, propName, value}){
+			propName = propName.split('.');
+			if (propName.length > 1) {
+				col[propName[0]][propName[1]] = value;
+			} else {
+				col[propName[0]] = value;
+			}
+		});
+	},
+	[types.DELETE_COL](state, {currentSheet, index}){
+		let list = state[currentSheet].list;
+		list.splice(index, 1);
 	}
 };

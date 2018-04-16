@@ -9,6 +9,7 @@ import selects from './modules/selects/index';
 import sheets from './modules/sheets/index';
 import pointsInfo from './modules/pointsinfo/index';
 import input from './modules/input/index';
+import {LOCATE} from '../tools/basic';
 
 Vue.use(Vuex);
 
@@ -23,7 +24,8 @@ const state = {
 		right: 0,
 		top: 0,
 		bottom: 0
-	}
+	},
+	mouseState: LOCATE,
 };
 
 export default new Vuex.Store({

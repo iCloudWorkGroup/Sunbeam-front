@@ -9,7 +9,7 @@ textarea { resize: none; overflow: hidden; }
 /**
  * selected effect
  */
-.col-head-line, .row-head-line, .selected-container, .clip-container, .datasource-container, .rulesource-container, .sequence { transition: .2s; -moz-transition: .2s; -webkit-transition: .2s; -o-transition: .2s; }
+.col-head-line, .row-head-line, .selected-container, .selected-container .bg, .clip-container, .datasource-container, .rulesource-container, .sequence { transition: .2s; -moz-transition: .2s; -webkit-transition: .2s; -o-transition: .2s; }
 
 /**
  * adjust row or col effect

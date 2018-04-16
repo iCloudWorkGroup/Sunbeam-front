@@ -8,17 +8,21 @@
 </template>
 <script type="text/javascript">
     import * as types from '../store/action-types';
+    import {SELECT} from '../tools/basic';
 
     export default {
-        props: ['item', 'frozenRule'],
+        props: ['select', 'frozenRule'],
         computed: {
             styleObject() {
-                let left = this.item.physicsBox.left,
-                    top = this.item.physicsBox.top,
-                    width = this.item.physicsBox.width,
-                    height = this.item.physicsBox.height,
+                let wholePosi = this.select.wholePosi,
+                    physicsBox = this.select.physicsBox,
+                    left = physicsBox.left,
+                    top = physicsBox.top,
+                    width = physicsBox.width,
+                    height = physicsBox.height,
                     offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
-                    offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+                    offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0,
+                    result;
 
                 if (left === 0) {
                     left = left - 1;
@@ -32,12 +36,18 @@
                 } else {
                     height = height - 2;
                 }
-                return {
+
+                result = {
                     left: left - offsetLeft + 'px',
                     top: top - offsetTop + 'px',
                     width: width + 'px',
-                    height: height + 'px',
+                    height: height + 'px'
                 };
+
+                return result;
+            },
+            wholePosi(){
+                return this.select.wholePosi;
             }
         },
         methods: {
@@ -46,6 +56,26 @@
                     type: 'click'
                 });
             }
+        },
+        mounted() {
+            let self = this;
+            this.$watch('select', function(newVal, oldVal) {
+                if (newVal.type !== SELECT) {
+                    return;
+                }
+                self.$store.dispatch(types.ROWS_UPDATEACTIVEROWS, {
+                    oldStartAlias: oldVal.startRowAlias,
+                    newStartAlias: newVal.startRowAlias,
+                    oldEndAlias: oldVal.endRowAlias,
+                    newEndAlias: newVal.endRowAlias
+                });
+                self.$store.dispatch(types.COLS_UPDATEACTIVECOLS, {
+                    oldStartAlias: oldVal.startColAlias,
+                    newStartAlias: newVal.startColAlias,
+                    oldEndAlias: oldVal.endColAlias,
+                    newEndAlias: newVal.endColAlias
+                });
+            });
         }
     };
 </script>

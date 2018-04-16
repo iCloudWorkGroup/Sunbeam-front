@@ -25,7 +25,7 @@ export default {
 	 * @type {Number}
 	 */
 	scrollBufferWidth: 500,
-	scrollBufferHeight: 500,
+	scrollBufferHeight: 200,
 	/**
 	 * 请求地址根路径
 	 * @type {String}

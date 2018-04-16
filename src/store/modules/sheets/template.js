@@ -27,5 +27,26 @@ export default {
 		colFrozen: false,
 		
 		rules: []
+	},
+	/**
+	 * 视图占位
+	 */
+	editViewOccupy: {
+		leftView: {
+			col: [],
+			row: []
+		},
+		topView: {
+			col: [],
+			row: []
+		},
+		mainView: {
+			col: [],
+			row: []
+		},
+		cornerView: {
+			col: [],
+			row: []
+		}
 	}
 };

@@ -9,7 +9,7 @@ export default {
 	top: 0,
 	height: cfg.rowHeight,
 	displayName: '',
-	activeState: false,
+	active: false,
 	/**
 	 * 上方为隐藏列（用于效果显示）
 	 * @type {Boolean}

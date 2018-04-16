@@ -32,7 +32,10 @@ export default {
 		return function(alias) {
 			let row = getters.getRowByAlias(alias),
 				list = state[rootState.currentSheet].list;
-
+			
+			if(alias === 'MAX'){
+				return 'MAX';
+			}
 			if (row) {
 				return rangeBinary(row.top, list, 'top', 'height');
 			}

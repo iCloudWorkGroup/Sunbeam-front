@@ -168,7 +168,7 @@ export default {
 
 		for (let i = 0, len = stateList.length; i < len; i++) {
 			if (stateList[i].alias === currentSheet) {
-				frozenState = stateList[i];
+				frozenState = stateList[i].frozenState;
 				break;
 			}
 		}
@@ -287,17 +287,66 @@ export default {
 			currentSheet: rootState.currentSheet
 		});
 	},
-	[actionTypes.OCCUPY_RESET]({commit, getters, rootState}, {
-		type,
+	[actionTypes.OCCUPY_UPDATE]({commit, getters, rootState}, {
+		type = 'mainRule',
 		col,
 		row
 	}){
-		type = type || 'mainRule';
-		commit(mutationTypes.RESET_OCCUPY, {
+		commit(mutationTypes.UPDATE_OCCUPY, {
 			currentSheet: rootState.currentSheet,
 			type: viewTypes[type],
 			col,
 			row
 		});
+	},
+	[actionTypes.OCCUPY_DELETECOL]({state, commit, getters, rootState}, alias){
+		let currentSheet = rootState.currentSheet,
+			stateList = state.list,
+			editViewOccupy;
+
+		for (let i = 0, len = stateList.length; i < len; i++) {
+			if (stateList[i].alias === currentSheet) {
+				editViewOccupy = stateList[i].editViewOccupy;
+				break;
+			}
+		}
+		
+		for (let key in editViewOccupy) {
+			let index,
+				occupyCol = editViewOccupy[key].col.slice(0);
+
+			if ((index = occupyCol.indexOf(alias)) !== -1) {
+				commit(mutationTypes.UPDATE_OCCUPY, {
+					currentSheet: rootState.currentSheet,
+					type: key,
+					col: occupyCol.splice(index, 1)
+				});
+			}
+		}
+	},
+	[actionTypes.OCCUPY_DELETEROW]({commit, getters, rootState}, alias){
+		let currentSheet = rootState.currentSheet,
+			stateList = state.list,
+			editViewOccupy;
+   
+		for (let i = 0, len = stateList.length; i < len; i++) {
+			if (stateList[i].alias === currentSheet) {
+				editViewOccupy = stateList[i].editViewOccupy;
+				break;
+			}
+		}
+		
+		for (let key in editViewOccupy) {
+			let index,
+				occupyRow = editViewOccupy[key].row.slice(0);
+
+			if ((index = occupyRow.indexOf(alias)) !== -1) {
+				commit(mutationTypes.UPDATE_OCCUPY, {
+					currentSheet: rootState.currentSheet,
+					type: key,
+					row: occupyRow.splice(index, 1)
+				});
+			}
+		}
 	}
 };

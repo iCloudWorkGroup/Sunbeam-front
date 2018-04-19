@@ -46,13 +46,12 @@ export default {
 			endColAlias: cols[endColIndex].alias,
 			endRowAlias: rows[endRowIndex].alias
 		};
-		select.alias = generator.selectAliasGenerator().value;
 		commit(mutationTypes.INSERT_SELECT, {
 			currentSheet,
 			selects: [select]
 		});
 		commit(mutationTypes.SWITCH_ACTIVESELECT, {
-			select: select
+			select: getters.selectList[0]
 		});
 		commit(mutationTypes.ACTIVE_COL, {
 			currentSheet,
@@ -139,7 +138,6 @@ export default {
 		let height = rows[endRowIndex].height + rows[endRowIndex].top - 
 				rows[startRowIndex].top;
 		select.physicsBox.height = height;
-		
 		if(mouseState === LOCATE){
 			select.activePosi = {
 				colAlias: cols[startColIndex].alias,
@@ -166,8 +164,8 @@ export default {
 			});
 		}
 		commit(mutationTypes.UPDATE_SELECT, {
-			currentSheet,
-			select
+			select: activeSelect,
+			props: select
 		});
 	}
 };

@@ -52,6 +52,8 @@ let element3 = document.getElementById('insertrow');
 let element4 = document.getElementById('insertcol');
 let element5 = document.getElementById('deletecol');
 let element6 = document.getElementById('deleterow');
+let element7 = document.getElementById('rowoper');
+let element8 = document.getElementById('coloper');
 
 
 element1.addEventListener('click',function(e){
@@ -72,4 +74,12 @@ element5.addEventListener('click',function(e){
 
 element6.addEventListener('click',function(e){
 	store.dispatch('ROWS_DELETEROWS');
+},false);
+
+element7.addEventListener('click',function(e){
+	store.dispatch('ROWS_OPERROWS',{props:{content: {background: 'rgb(0,0,0)'}}});
+},false);
+
+element8.addEventListener('click',function(e){
+	store.dispatch('COLS_OPERCOLS',{props:{content: {background: 'rgb(0,0,0)'}}});
 },false);

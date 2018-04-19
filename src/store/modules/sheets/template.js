@@ -25,7 +25,6 @@ export default {
 		isFrozen: false,
 		rowFrozen: false,
 		colFrozen: false,
-		
 		rules: []
 	},
 	/**

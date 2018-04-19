@@ -14,7 +14,6 @@ export default function(options) {
 		baseURL: cfg.rootPath,
 		contentType: 'application/json; charset=UTF-8',
 		dataType: 'json',
-		isPublic: true,
 		headers: {
 			'step': cache.sendQueueStep
 		}

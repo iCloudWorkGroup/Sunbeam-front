@@ -1,4 +1,5 @@
 import * as types from '../../mutation-types';
+import extend from '../../../util/extend';
 
 export default {
 	[types.INSERT_SHEET](state, sheet) {
@@ -20,7 +21,7 @@ export default {
 		frozenState.rowFrozen = payload.rowFrozen;
 		frozenState.colFrozen = payload.colFrozen;
 	},
-	[types.RESET_OCCUPY](state, payload) {
+	[types.UPDATE_OCCUPY](state, payload) {
 		let list = state.list,
 			currentSheet = payload.currentSheet,
 			editViewOccupy;
@@ -32,7 +33,12 @@ export default {
 		});
 		let col = editViewOccupy.col,
 			row = editViewOccupy.row;
-		col.splice(0, col.length, ...payload.col);
-		row.splice(0, row.length, ...payload.row);
+		
+		if(payload.col){
+			col.splice(0, col.length, ...payload.col);
+		}
+		if(payload.row){
+			row.splice(0, row.length, ...payload.row);
+		}
 	}
 };

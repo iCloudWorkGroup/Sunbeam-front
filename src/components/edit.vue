@@ -43,16 +43,8 @@
 			}
 		},	
 		mounted() {
-			let frozenRule = this.frozenRule;
-			this.getOccupy();
-			if(!frozenRule || frozenRule.type==='mainRule'){
-				this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-					left: this.offsetLeft,
-					top: this.offsetTop,
-					right: this.offsetLeft + this.$el.clientWidth + config.prestrainWidth,
-					bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
-				});
-			}
+			this.setOccupy();
+			this.updateUserView();
 		},
 		beforeDestroy() {
 			this.updateOccupy([], []);
@@ -65,12 +57,11 @@
 				return this.editHeight;
 			},
 			colOccupy() {
-				let type = this.frozenRule && this.frozenRule.type;
+				let type = this.frozenRule && this.frozenRule.type || 'mainRule';
 				return this.$store.getters.getEditViewOccupy(type).col;
 			},
 			rowOccupy() {
-				let type = this.frozenRule && this.frozenRule.type;
-				let temp = this.$store.getters.getEditViewOccupy(type).row;
+				let type = this.frozenRule && this.frozenRule.type || 'mainRule';
 				return this.$store.getters.getEditViewOccupy(type).row;
 			},
 			colListLen(){
@@ -180,7 +171,6 @@
 								right: limitRight
 							});
 						});
-
 					}
 					if(!p1){
 						p1 = new Promise((resolve) => {
@@ -305,6 +295,7 @@
 								}
 							}
 						}
+						self.updateOccupy(colOccupy, rowOccupy);
 						if (flag) {
 							self.verticalRequest(occupyBottom + 1, limitBottom, resolve);
 						}else{
@@ -323,7 +314,7 @@
 						let tempAlias = rowList[rowList.length - 1].alias,
 							currentAlias;
 
-						this.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum);
+						self.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum);
 
 						currentAlias = rowList[rowList.length - 1].alias;
 
@@ -373,11 +364,12 @@
 					if (limitTop < currentTop) {
 						let regionRecord = cache.regionRecord,
 							temp = [rowOccupy[0]],
-							i = rowRecord.indexOf(occupyStartRowAlias) - 1;
+							i = rowRecord.indexOf(occupyStartRowAlias);
 
 						if (i === -1) {
 							return;
 						}
+						i--;
 						for (; i > -1; i--) {
 							let row = self.$store.getters.getRowByAlias(rowRecord[i]);
 							temp.unshift(row.alias);
@@ -426,7 +418,8 @@
 				}
 			},
 			scrollToRight(limitLeft, limitRight, resolve) {
-				let colList = this.$store.getters.colList,
+				let getters = this.$store.getters,
+					colList = getters.colList,
 					maxRight = cache.localColPosi,
 					bufferWidth = config.scrollBufferWidth,
 					colRecord = cache.colRecord,
@@ -635,7 +628,7 @@
 							}
 						}
 						if (flag) {
-							self.transverseRequest(limitLeft, currentLeft - 1);
+							self.transverseRequest(limitLeft, currentLeft - 1, resolve);
 						} else {
 							resolve();
 						}
@@ -745,47 +738,47 @@
 					});
 			},
 			updateOccupy(colOccupy, rowOccupy) {
-				this.$store.dispatch(actionTypes.OCCUPY_RESET, {
+				this.$store.dispatch(actionTypes.OCCUPY_UPDATE, {
 					type: this.frozenRule && this.frozenRule.type,
 					col: colOccupy,
 					row: rowOccupy
 				});
 			},
-			getOccupy(){
-				let colList = this.$store.getters.colList,
-					rowList = this.$store.getters.rowList,
+			setOccupy(){
+				let getters = this.$store.getters,
+					colList = getters.colList,
+					rowList = getters.rowList,
 					offsetLeft = this.$el.scrollLeft,
 					offsetTop = this.$el.scrollTop,
 					clientWidth = this.$el.clientWidth,
 					clientHeight = this.$el.clientHeight,
-					getters = this.$store.getters,
-					endColIndex,
-					endRowIndex,
 					startRowIndex = 0,
 					startColIndex = 0,
+					endColIndex,
+					endRowIndex,
 					frozenRule = this.frozenRule,
 					colOccupy = [],
 					rowOccupy = [];
 
+
 				if (frozenRule) {
-					if (frozenRule.endRowIndex !== undefined &&
-						frozenRule.endColIndex !== undefined) {
-						return;
-					}
 					startRowIndex = frozenRule.startRowIndex;
 					startColIndex = frozenRule.startColIndex;
 					endRowIndex = frozenRule.endRowIndex;
 					endColIndex = frozenRule.endColIndex;
+
 					offsetTop += frozenRule.offsetTop;
 					offsetLeft += frozenRule.offsetLeft;
 				}
 
-				endRowIndex = endRowIndex ||
-					getters.getRowIndexByPosi(offsetTop + clientHeight + 
-						config.prestrainHeight);
-				endColIndex = endColIndex ||
+
+				endColIndex = endColIndex !== undefined ? endColIndex : 
 					getters.getColIndexByPosi(offsetLeft + clientWidth + 
 						config.prestrainWidth);
+
+				endRowIndex = endRowIndex !== undefined ? endRowIndex : 
+					getters.getRowIndexByPosi(offsetTop + clientHeight + 
+						config.prestrainHeight);
 				
 				let colRecord = cache.colRecord,
 					rowRecord = cache.rowRecord,
@@ -824,6 +817,17 @@
 					}
 				}
 				this.updateOccupy(colOccupy, rowOccupy);
+			},
+			updateUserView(){
+				let frozenRule = this.frozenRule;
+				if (!frozenRule || frozenRule.type === 'mainRule') {
+					this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+						left: this.offsetLeft,
+						top: this.offsetTop,
+						right: this.offsetLeft + this.$el.clientWidth + config.prestrainWidth,
+						bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
+					});
+				}
 			}
 		},
 		watch: {
@@ -845,7 +849,8 @@
 						clearTimeout(self.timeoutId);
 						self.handleScroll(oldVal.userViewLeft, oldVal.userViewTop);
 					}
-					self.getOccupy();
+					self.setOccupy();
+					self.updateUserView();
 				});
 			},
 			scrollLeft(val) {
@@ -855,16 +860,18 @@
 				this.$el.scrollTop = val;
 			},
 			colListLen(newVal, oldVal){
-				if(newVal < oldVal){
+				let frozenRule = this.frozenRule;
+				if(newVal < oldVal && (!frozenRule || frozenRule.endColIndex === undefined)){
 					this.handleScroll(this.recordScrollLeft, this.recordScrollTop, true, false);
 				}
 			},
 			rowListLen(newVal, oldVal){
-				if(newVal < oldVal){
+				let frozenRule = this.frozenRule;
+				if(newVal < oldVal && (!frozenRule || frozenRule.endRowIndex === undefined)){
 					this.handleScroll(this.recordScrollLeft, this.recordScrollTop, false, true);
 				}
 			}
-		},
+		}
 	};
 </script>
 <style type="text/css">

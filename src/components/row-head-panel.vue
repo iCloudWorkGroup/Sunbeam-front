@@ -98,8 +98,7 @@
 
 			let rowPosi = e.clientY - box.top + offsetTop,
 				rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi);
-
-			console.log(rowIndex);
+				
 			this.$store.dispatch(SELECTS_UPDATESELECT, {
 				colIndex: 'MAX',
 				rowIndex

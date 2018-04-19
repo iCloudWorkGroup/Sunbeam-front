@@ -11,7 +11,7 @@ import {
 } from '../util/displayname';
 
 export function initSpreadsheet(fn, data) {
-	let build = false;
+	let build = true;
 	if (build === true) {
 		buildNewSpreadsheet(fn);
 		return;
@@ -24,26 +24,49 @@ function buildNewSpreadsheet(fn) {
 	let rows = [],
 		cols = [],
 		cells = [],
+		colRecord = cache.colRecord,
+		rowRecord = cache.rowRecord,
 		sheet;
 
+	sheet = {
+		alias: 'sheet1',
+		name: 'sheet1'
+	};
+
+	let rowHeight = cfg.rowHeight;
 	for (let i = 0, len = cfg.initRowNum; i < len; i++) {
 		rows.push(extend({}, rowTemplate, {
 			alias: generator.rowAliasGenerator(),
-			displayName: getRowDisplayName(i)
+			displayName: getRowDisplayName(i),
+			top: i * (rowHeight + 1),
+			sort: i
 		}));
 	}
+	let colWidth = cfg.colWidth;
 	for (let i = 0, len = cfg.initColNum; i < len; i++) {
 		cols.push(extend({}, colTemplate, {
 			alias: generator.colAliasGenerator(),
-			displayName: getColDisplayName(i)
+			displayName: getColDisplayName(i),
+			left: i * (colWidth + 1),
+			sort: i
 		}));
 	}
+	colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
+	rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
+
+	cache.regionRecord.set(
+		colRecord[0] + '_' +
+		colRecord[1] + '_' +
+		rowRecord[0] + '_' +
+		rowRecord[1], true);
 
 	fn({
 		rows,
 		cols,
 		cells,
-		sheet
+		sheet,
+		colRecord,
+		rowRecord
 	});
 }
 
@@ -51,6 +74,8 @@ function restoreSpreadsheet(fn, data) {
 	var cols = [],
 		rows = [],
 		cells = [],
+		colRecord = cache.colRecord,
+		rowRecord = cache.rowRecord,
 		sheet;
 	send({
 		url: 'reload',
@@ -67,13 +92,12 @@ function restoreSpreadsheet(fn, data) {
 
 			generator.rowAliasGenerator(parseInt(data.aliasRowCounter));
 			generator.colAliasGenerator(parseInt(data.aliasColCounter));
-			generator.cellAliasGenerator('0');
-			generator.selectAliasGenerator('0');
 
 			data = data.returndata;
 
 			if (data.spreadSheet && data.spreadSheet[0] &&
 				(sheetData = data.spreadSheet[0].sheet)) {
+
 				sheet = {
 					alias: sheetData.alias || 'sheet1',
 					name: sheetData.name
@@ -92,17 +116,14 @@ function restoreSpreadsheet(fn, data) {
 					col.displayName = getColDisplayName(col.sort);
 					col.alias = col.aliasX;
 				});
-				cells.forEach(function(cell) {
-					cell.alias = generator.cellAliasGenerator();
-				});
-				cache.colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
-				cache.rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
+				colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
+				rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
 
 				cache.regionRecord.set(
-					cache.colRecord[0] + '_' +
-					cache.colRecord[1] + '_' +
-					cache.rowRecord[0] + '_' +
-					cache.rowRecord[1], true);
+					colRecord[0] + '_' +
+					colRecord[1] + '_' +
+					rowRecord[0] + '_' +
+					rowRecord[1], true);
 
 				fn({
 					sheet,

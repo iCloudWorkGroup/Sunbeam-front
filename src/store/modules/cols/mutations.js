@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as types from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
+import extend from '../../../util/extend';
 
 export default {
 	[types.INSERT_SHEET](state, sheet) {
@@ -48,14 +49,9 @@ export default {
 			list[i].active = true;
 		}
 	},
-	[types.BATCH_UPDATE_COL](state, {currentSheet, info}){
-		info.forEach(function({col, propName, value}){
-			propName = propName.split('.');
-			if (propName.length > 1) {
-				col[propName[0]][propName[1]] = value;
-			} else {
-				col[propName[0]] = value;
-			}
+	[types.UPDATE_COL](state, info){
+		info.forEach(function({col, props}){
+			extend(col, props);
 		});
 	},
 	[types.DELETE_COL](state, {currentSheet, index}){

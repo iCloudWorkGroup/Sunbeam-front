@@ -27,6 +27,7 @@ export default function extend(...values) {
 			if (isObject(copy)) {
 				if (Array.isArray(copy)) {
 					clone = src && Array.isArray(src) ? src : [];
+					clone.splice(0, clone.length, ...copy);;
 				} else {
 					clone = src && isObject(src) ? src : {};
 				}

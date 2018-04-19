@@ -9,7 +9,12 @@ export default {
 	getRowIndexByPosi(state, getters, rootState) {
 		return function(posi) {
 			let currentSheet = rootState.currentSheet,
-				list = state[currentSheet].list;
+				list = state[currentSheet].list,
+				lastRow = list[list.length - 1];
+
+			if (posi > lastRow.top + lastRow.height) {
+				return list.length - 1;
+			}
 			return rangeBinary(posi, list, 'top', 'height');
 		};
 	},

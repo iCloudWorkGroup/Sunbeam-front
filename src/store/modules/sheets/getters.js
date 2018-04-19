@@ -11,7 +11,7 @@ export default {
 			list = state.list,
 			sheet;
 		for (let i = 0, len = list.length; i < len; i++) {
-			if(list[i].alias === alias){
+			if (list[i].alias === alias) {
 				sheet = list[i];
 				break;
 			}

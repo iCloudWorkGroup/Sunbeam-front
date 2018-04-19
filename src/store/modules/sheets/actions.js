@@ -2,7 +2,9 @@ import extend from '../../../util/extend';
 import * as actionTypes from '../../action-types';
 import * as mutationTypes from '../../mutation-types';
 import template from './template';
-import {SELECT} from '../../../tools/basic';
+import {
+	SELECT
+} from '../../../tools/basic';
 
 
 let viewTypes = {
@@ -73,7 +75,6 @@ export default {
 		frozenColIndex = getters.getColIndexByAlias(frozenColAlias);
 
 		let userView = rootState.userView,
-
 			userViewTopIndex = getters.getRowIndexByPosi(userView.top),
 			userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom),
 			userViewRightIndex = getters.getColIndexByPosi(userView.right),
@@ -216,19 +217,24 @@ export default {
 			rules,
 			currentSheet
 		});
-	}, 
-	[actionTypes.SHEET_FIRSTROWFROZEN]({commit, state, getters, rootState}, index) {
+	},
+	[actionTypes.SHEET_FIRSTROWFROZEN]({
+		commit,
+		state,
+		getters,
+		rootState
+	}, index) {
 		let currentSheet = rootState.currentSheet,
 			stateList = state.list,
 			frozenState;
-		
+
 		for (let i = 0, len = stateList.length; i < len; i++) {
 			if (stateList[i].alias === currentSheet) {
 				frozenState = stateList[i];
 				break;
 			}
 		}
-		if(frozenState.isFrozen){
+		if (frozenState.isFrozen) {
 			return;
 		}
 
@@ -237,11 +243,11 @@ export default {
 		let userView = rootState.userView,
 			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
 
-		if(index === undefined){
+		if (index === undefined) {
 			index = userViewTopIndex + 1;
 		}
 		frozenRowIndex = index;
-		
+
 		let rowList = getters.rowList,
 			colList = getters.colList,
 			userViewRow = rowList[userViewTopIndex],
@@ -262,10 +268,10 @@ export default {
 			startRowIndex: frozenRowIndex,
 			startColIndex: 0,
 			offsetTop: frozenRow.top,
-			userViewTop : userViewRow.top,
+			userViewTop: userViewRow.top,
 			offsetLeft: 0
 		});
-		commit(mutationTypes.UPDATE_FROZENSTATE,{
+		commit(mutationTypes.UPDATE_FROZENSTATE, {
 			isFrozen: true,
 			rowFrozen: true,
 			colFrozen: false,
@@ -287,11 +293,15 @@ export default {
 			currentSheet: rootState.currentSheet
 		});
 	},
-	[actionTypes.OCCUPY_RESET]({commit, getters, rootState}, {
+	[actionTypes.OCCUPY_RESET]({
+		commit,
+		getters,
+		rootState
+	}, {
 		type,
 		col,
 		row
-	}){
+	}) {
 		type = type || 'mainRule';
 		commit(mutationTypes.RESET_OCCUPY, {
 			currentSheet: rootState.currentSheet,

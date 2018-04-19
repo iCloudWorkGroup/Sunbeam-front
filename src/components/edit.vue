@@ -20,7 +20,8 @@ import {
 } from '../util/displayname';
 
 export default {
-    props: ['editWidth',
+    props: [
+        'editWidth',
         'editHeight',
         'frozenRule',
         'scrollTop',
@@ -89,7 +90,7 @@ export default {
 
             let currentScrollLeft = this.$el.scrollLeft,
                 currentScrollTop = this.$el.scrollTop;
-
+            // 不冻结也会触发 bug
             if (!frozenRule || frozenRule.type === 'mainRule') {
                 this.$emit('changeScrollLeft', currentScrollLeft);
                 this.$emit('changeScrollTop', currentScrollTop);
@@ -103,7 +104,6 @@ export default {
                 self.handleScroll(currentScrollLeft, currentScrollTop);
             }, 50);
         },
-
         handleScroll(currentScrollLeft, currentScrollTop, adjustCol = false,
             adjustRow = false) {
             let currentPromise = this.currentPromise,
@@ -123,6 +123,7 @@ export default {
             this.currentPromise = currentPromise.then(function() {
                 let transverse = currentScrollLeft - self.recordScrollLeft,
                     vertical = currentScrollTop - self.recordScrollTop,
+                    // 需要加载的区域范围
                     limitTop,
                     limitBottom,
                     limitLeft,
@@ -131,16 +132,18 @@ export default {
 
                 self.recordScrollTop = currentScrollTop;
                 self.recordScrollLeft = currentScrollLeft;
-
+                // 垂直方向上有变化 或者 有调整行高
                 if ((vertical !== 0 && endRowIndex === undefined) ||
                     adjustRow) {
                     limitTop = self.recordScrollTop - config.prestrainHeight;
                     limitTop = limitTop > 0 ? limitTop : 0;
                     limitTop += self.offsetTop;
+                    // 如果预加载距离有两个，或者有一个预加载距离，
+                    // 这个方法就是错误的，bug
                     limitBottom = limitTop + self.$el.clientHeight +
                         config.prestrainHeight +
                         self.offsetTop;
-
+                        // vertical》0,就是向下滚动
                     if (vertical > 0 || adjustRow) {
                         p1 = new Promise(function(resolve) {
                             self.scrollToBottom(limitTop,
@@ -212,8 +215,7 @@ export default {
                 colOccupy = this.colOccupy.slice(0),
                 regionRecord = cache.regionRecord,
                 occupyEndRowAlias = rowOccupy[rowOccupy.length - 1],
-                occupyEndRow = this.$store.getters.getRowByAlias(
-                    occupyEndRowAlias),
+                occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias),
                 occupyBottom = occupyEndRow.top + occupyEndRow.height,
                 frozenRule = this.frozenRule,
                 addRowNum = 0,
@@ -224,8 +226,8 @@ export default {
              * 当前视图边界值超过了后台对象的最大值
              * 需要自动增加列
              */
-            if (limitBottom > maxBottom && (!frozenRule || frozenRule.type ===
-                    'mainRule')) {
+            if (limitBottom > maxBottom && 
+            	(!frozenRule || frozenRule.type === 'mainRule')) {
                 addRowNum = Math.ceil((limitBottom - maxBottom + bufferHeight) /
                     config.rowHeight);
                 limitBottom = maxBottom;
@@ -764,19 +766,16 @@ export default {
                 success: (data) => {
                     let sheetData;
                     data = data.returndata;
-
                     if (data.spreadSheet && data.spreadSheet[0] &&
                         (sheetData = data.spreadSheet[0].sheet)) {
                         if (fn) {
                             let rows = sheetData.glY,
-                                endRowAlias = rows[rows.length - 1]
-                                .aliasY;
+                                endRowAlias = rows[rows.length - 1].aliasY;
 
                             rows.forEach(function(row) {
                                 row.sort = row.index;
                                 row.alias = row.aliasY;
-                                row.displayName =
-                                    getRowDisplayName(row.sort);
+                                row.displayName = getRowDisplayName(row.sort);
                             });
                             this.$store.dispatch(actionTypes.ROWS_RESTOREROWS,
                                 rows);
@@ -922,7 +921,7 @@ export default {
     overflow: hidden;
 }
 
-.edit.scroll-box {
+.scroll-box {
     overflow: auto;
 }
 </style>

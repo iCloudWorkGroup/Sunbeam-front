@@ -116,7 +116,6 @@
 						rule = item;
 					}
 				});
-
 				return rule;
 			},
 			leftRule() {

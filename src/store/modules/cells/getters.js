@@ -15,8 +15,7 @@ export default {
         return function({
             startColIndex,
             startRowIndex,
-            endColIndex =
-            startColIndex,
+            endColIndex = startColIndex,
             endRowIndex = startRowIndex
         }) {
             let currentSheet = rootState.currentSheet,

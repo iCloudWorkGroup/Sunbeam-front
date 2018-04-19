@@ -1,21 +1,20 @@
 <template>
     <div class="col-head-panel" ref="panel" @mousedown="mouseDownHandle" @mousemove="mouseMoveHandle">
-        <col-head-item v-for="col in colList"  :key="col.alias" :col="col" :offsetLeft="offsetLeft"></col-head-item>
+        <col-head-item v-for="col in colList" :key="col.alias" :col="col" :offsetLeft="offsetLeft"></col-head-item>
     </div>
 </template>
-
 <script type="text/javascript">
 import colHeadItem from './col-head-item.vue';
-import {SELECTS_UPDATESELECT} from '../store/action-types';
-import {UPDATE_MOUSESTATE} from '../store/mutation-types';
-import {LOCATE, DRAG} from '../tools/basic';
+import { SELECTS_UPDATESELECT } from '../store/action-types';
+import { UPDATE_MOUSESTATE } from '../store/mutation-types';
+import { LOCATE, DRAG } from '../tools/basic';
 
 export default {
     props: ['frozenRule'],
     data() {
         let startIndex,
             endIndex;
-        if(this.frozenRule){
+        if (this.frozenRule) {
             startIndex = this.frozenRule.startColIndex;
             endIndex = this.frozenRule.endColIndex;
         }
@@ -29,9 +28,9 @@ export default {
     },
     computed: {
         offsetLeft() {
-            if(this.frozenRule){
-                return this.frozenRule.offsetLeft; 
-            }else{
+            if (this.frozenRule) {
+                return this.frozenRule.offsetLeft;
+            } else {
                 return 0;
             }
         },
@@ -44,18 +43,18 @@ export default {
 
             startIndex = this.startIndex || 0;
             endIndex = this.endIndex || colList.length - 1;
-            if(this.endIndex !== undefined){
+            if (this.endIndex !== undefined) {
                 return colList.slice(startIndex, endIndex + 1);
-            }else{
+            } else {
                 return getters.userViewColList;
             }
-        },        
+        },
         mouseState() {
             return this.$store.state.mouseState;
         }
     },
     methods: {
-        mouseDownHandle(e){
+        mouseDownHandle(e) {
             let elem = this.$refs.panel,
                 frozenRule = this.frozenRule,
                 offsetLeft = this.offsetLeft,
@@ -99,17 +98,17 @@ export default {
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
                 colIndex,
-                rowIndex: 'MAX' 
+                rowIndex: 'MAX'
             });
         }
     },
-    mounted(){
+    mounted() {
         this.currentMouseMoveState = this.routineMoveState;
-        this.$watch('mouseState', function(val){
-            if(val === DRAG){
+        this.$watch('mouseState', function(val) {
+            if (val === DRAG) {
                 this.currentMouseMoveState = this.dragState;
             }
-            if(val === LOCATE){
+            if (val === LOCATE) {
                 this.currentMouseMoveState = this.routineMoveState;
             }
         });

@@ -31,7 +31,8 @@ export default {
 		mouseRowSort: 0
 	},
 	/**
-	 * 盒子模型
+	 * 盒子模型，在渲染时直接使用该值，
+	 * 省去再次计算过程
 	 * @property {object} physicBox
 	 */
 	physicsBox: {
@@ -57,7 +58,7 @@ export default {
 		left: 0,
 	},
 	/**
-	 * 选中区域激活位置
+	 * 选中区域起点位置，也就是操作起点位置
 	 * @type {Object}
 	 */
 	activePosi: {
@@ -65,7 +66,7 @@ export default {
 		colAlias: '0',
 	},
 	/**
-	 * 选中区位置信息
+	 * 选中区位置信息，整个选中区域的信息
 	 * @property {object} wholePosi
 	 */
 	wholePosi: {

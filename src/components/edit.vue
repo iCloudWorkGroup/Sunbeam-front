@@ -877,7 +877,7 @@ export default {
     overflow: hidden;
 }
 
-.edit.scroll-box {
+.scroll-box {
     overflow: auto;
 }
 </style>

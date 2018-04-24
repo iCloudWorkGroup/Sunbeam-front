@@ -1,6 +1,5 @@
-import {
-    rangeBinary
-} from '../../../util/binary';
+import { rangeBinary } from '../../../util/binary';
+
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,

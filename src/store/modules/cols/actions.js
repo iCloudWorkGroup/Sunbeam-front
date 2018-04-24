@@ -8,7 +8,6 @@ import config from '../../../config';
 import cache from '../../../tools/cache';
 import template from './template';
 import {SELECT} from '../../../tools/basic';
-import generator from '../../../tools/generator';
 
 export default {
     [actionTypes.COLS_ADDCOLS]({state, rootState, commit}, cols) {
@@ -86,9 +85,13 @@ export default {
                 temp;
 
             if ((temp = occupy.indexOf(colAlias)) !== -1) {
-                if(occupy.length ===1 ){
+                if(occupy.length === 1 ){
                     deleteCells.push(cell);
                 }else{
+                    deleteCells.push({
+                        col: [colAlias],
+                        row: cell.occupy.row
+                    });
                     updateCellInfo.push({
                         cell,
                         props: {
@@ -99,8 +102,9 @@ export default {
                     });
                 }
             } else {
-                let newOccupy = occupy.slice(0).splice(temp, 1);
-                
+                let newOccupy = occupy.slice(0);
+                    newOccupy.splice(temp, 1);
+
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -119,10 +123,7 @@ export default {
             currentSheet,
             cells: deleteCells
         });
-        commit(mutationTypes.UPDATE_CELL, {
-            currentSheet,
-            info: updateCellInfo
-        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
 
         let updateSelectInfo = [],
@@ -285,15 +286,17 @@ export default {
 
         let col = extend(template),
             cols = getters.colList,
+            getPointInfo = getters.getPointInfo,
             cellList,
             updateCellInfo = [],
+            originalColAlias = cols[index],
             colWidth = col.width,
             colAlias = generator.colAliasGenerator(),
             colLeft = cols[index].left;
 
         col.sort = index;
         col.alias = colAlias;
-        col.displayName =  getColDisplayName(index);
+        col.displayName = getColDisplayName(index);
         col.left = colLeft;
 
         cellList = getters.getCellsByVertical({
@@ -304,10 +307,9 @@ export default {
         });
 
         cellList.forEach(function(cell) {
-            let occupy = cell.occupy.col,
-                temp;
+            let occupy = cell.occupy.col;
 
-            if ((temp = occupy.indexOf(colAlias)) === 0 || temp === -1) {
+            if (cell.physicsBox.left >= colLeft) {
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -317,7 +319,14 @@ export default {
                     }
                 });
             } else {
-                let newOccupy = occupy.slice(0).splice(temp, 0, colAlias);
+                let index = occupy.indexOf(originalColAlias),
+                    newOccupy = occupy.slice(0),
+                    occupyRow = cell.occupy.row,
+                    cellIndex;
+                
+                newOccupy.splice(index, 0, colAlias);
+                cellIndex = getPointInfo(occupy[0], occupyRow[0], 'cellIndex');
+
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -329,13 +338,21 @@ export default {
                         }
                     }
                 });
+                occupyRow.forEach(function(rowAlias) {
+                    commit(mutationTypes.UPDATE_POINTINFO, {
+                        currentSheet,
+                        info: {
+                            colAlias,
+                            rowAlias,
+                            type: 'cellIndex',
+                            value: cellIndex
+                        }
+                    });
+                });
             }
         });
 
-        commit(mutationTypes.UPDATE_CELL, {
-            currentSheet,
-            info: updateCellInfo
-        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
 
         let updateSelectInfo = [];
@@ -378,7 +395,7 @@ export default {
                 props: {
                     left: col.left + colWidth + 1,
                     sort: col.sort + 1,
-                    displayName: col.sort + 1
+                    displayName: getColDisplayName(col.sort + 1)
                 }
             });
         }
@@ -440,7 +457,7 @@ export default {
             endIndex
         });
     },
-    [actionTypes.COLS_OPERCOLS]({getters, state, rootState, commit}, 
+    [actionTypes.COLS_OPERCOLS]({getters, commit}, 
         {startIndex, endIndex, props}){
 
         if(startIndex === undefined){

@@ -14,10 +14,8 @@
 				"sheet": {
 					"cells": [{
 						"occupy": {
-							"col": 0,
-							"row": 0,
 							"x": ["1", "2"],
-							"y": ["1"]
+							"y": ["1", "2"]
 						},
 						"content": {
 							"texts": "单元格1",
@@ -25,10 +23,8 @@
 						}
 					}, {
 						"occupy": {
-							"col": 0,
-							"row": 1,
-							"x": ["1"],
-							"y": ["2"]
+							"x": ["3"],
+							"y": ["3"]
 						},
 						"content": {
 							"texts": "单元格1",
@@ -36,10 +32,8 @@
 						}
 					}, {
 						"occupy": {
-							"col": 1,
-							"row": 1,
-							"x": ["2"],
-							"y": ["2"]
+							"x": ["3"],
+							"y": ["3"]
 						},
 						"content": {
 							"texts": "单元格1",
@@ -101,8 +95,7 @@
 						"index": 8,
 						"left": 576,
 						"displayName": "I"
-					}, 
-					{
+					}, {
 						"alias": "10",
 						"sort": 9,
 						"index": 9,
@@ -215,8 +208,7 @@
 						"index": 14,
 						"displayName": "15",
 						"top": 280
-					}, 
-					{
+					}, {
 						"alias": "16",
 						"sort": 15,
 						"height": 19,
@@ -234,5 +226,220 @@
 				}
 			}]
 		}
-	}
+	},
+	"sheet": {
+		"name": "new Sheet",
+		"alias": "sheet1"
+	},
+	"cells": [{
+		"occupy": {
+			"row": ["1", "2"],
+			"col": ["1", "2"]
+		},
+		"content": {
+			"texts": "单元格1",
+			"displayTexts": "单元格1"
+		}
+	}, {
+		"occupy": {
+			"col": ["3"],
+			"row": ["3"]
+		},
+		"content": {
+			"texts": "单元格1",
+			"displayTexts": "单元格1"
+		}
+	}, {
+		"occupy": {
+			"col": ["0"],
+			"row": ["3"]
+		},
+		"content": {
+			"texts": "单元格1",
+			"displayTexts": "单元格1"
+		}
+	}],
+	"rows": [{
+		"alias": "1",
+		"sort": 0,
+		"height": 19,
+		"index": 0,
+		"top": 0,
+		"displayName": "1",
+		"activeState": true
+	}, {
+		"alias": "2",
+		"sort": 1,
+		"height": 19,
+		"index": 1,
+		"displayName": "2",
+		"top": 20
+	}, {
+		"alias": "3",
+		"sort": 2,
+		"height": 19,
+		"index": 2,
+		"displayName": "3",
+		"top": 40
+	}, {
+		"alias": "4",
+		"sort": 3,
+		"height": 19,
+		"index": 3,
+		"displayName": "4",
+		"top": 60
+	}, {
+		"alias": "5",
+		"sort": 4,
+		"height": 19,
+		"index": 4,
+		"displayName": "5",
+		"top": 80
+	}, {
+		"alias": "6",
+		"sort": 5,
+		"height": 19,
+		"index": 5,
+		"displayName": "6",
+		"top": 100
+	}, {
+		"alias": "7",
+		"sort": 6,
+		"height": 19,
+		"index": 6,
+		"displayName": "7",
+		"top": 120
+	}, {
+		"alias": "8",
+		"sort": 7,
+		"height": 19,
+		"index": 7,
+		"displayName": "8",
+		"top": 140
+	}, {
+		"alias": "9",
+		"sort": 8,
+		"height": 19,
+		"index": 8,
+		"displayName": "9",
+		"top": 160
+	}, {
+		"alias": "10",
+		"sort": 9,
+		"height": 19,
+		"index": 9,
+		"displayName": "10",
+		"top": 180
+	}, {
+		"alias": "11",
+		"sort": 10,
+		"height": 19,
+		"index": 10,
+		"displayName": "11",
+		"top": 200
+	}, {
+		"alias": "12",
+		"sort": 11,
+		"height": 19,
+		"index": 11,
+		"displayName": "12",
+		"top": 220
+	}, {
+		"alias": "13",
+		"sort": 12,
+		"height": 19,
+		"index": 12,
+		"displayName": "13",
+		"top": 240
+	}, {
+		"alias": "14",
+		"sort": 13,
+		"height": 19,
+		"index": 13,
+		"displayName": "14",
+		"top": 260
+	}, {
+		"alias": "15",
+		"sort": 14,
+		"height": 19,
+		"index": 14,
+		"displayName": "15",
+		"top": 280
+	}, {
+		"alias": "16",
+		"sort": 15,
+		"height": 19,
+		"index": 15,
+		"displayName": "16",
+		"top": 300
+	}, {
+		"alias": "17",
+		"sort": 16,
+		"height": 19,
+		"index": 16,
+		"displayName": "17",
+		"top": 320
+	}],
+	"cols": [{
+		"alias": "1",
+		"sort": 0,
+		"index": 0,
+		"left": 0,
+		"displayName": "A",
+		"activeState": true
+	}, {
+		"alias": "2",
+		"sort": 1,
+		"index": 1,
+		"left": 72,
+		"displayName": "B"
+	}, {
+		"alias": "3",
+		"sort": 2,
+		"index": 2,
+		"left": 144,
+		"displayName": "C"
+	}, {
+		"alias": "4",
+		"sort": 3,
+		"index": 3,
+		"left": 216,
+		"displayName": "D"
+	}, {
+		"alias": "5",
+		"sort": 4,
+		"index": 4,
+		"left": 288,
+		"displayName": "E"
+	}, {
+		"alias": "6",
+		"sort": 5,
+		"index": 5,
+		"left": 360,
+		"displayName": "F"
+	}, {
+		"alias": "7",
+		"sort": 6,
+		"index": 6,
+		"left": 432,
+		"displayName": "G"
+	}, {
+		"alias": "8",
+		"sort": 7,
+		"index": 7,
+		"left": 504,
+		"displayName": "H"
+	}, {
+		"alias": "9",
+		"sort": 8,
+		"index": 8,
+		"left": 576,
+		"displayName": "I"
+	}, {
+		"alias": "10",
+		"sort": 9,
+		"index": 9,
+		"left": 648,
+		"displayName": "J"
+	}]
 }

@@ -9,7 +9,6 @@ import getters from './getters';
  * @type {Object}
  */
 const state = {
-	
 };
 
 export default {

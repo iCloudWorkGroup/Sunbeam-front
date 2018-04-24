@@ -10,17 +10,19 @@ import {
 	getRowDisplayName
 } from '../util/displayname';
 
-export function initSpreadsheet(fn, data) {
-	let build = true;
-	if (build === true) {
-		buildNewSpreadsheet(fn);
-		return;
-	}
-	restoreSpreadsheet(fn, data);
+export function initSpreadsheet(data, fn) {
+	return new Promise(function(resolve){
+		let build = true;
+		if (build === true) {
+			buildNewSpreadsheet(fn, resolve);
+			return;
+		}
+		restoreSpreadsheet(data, fn, resolve);
+	});
 }
 
 
-function buildNewSpreadsheet(fn) {
+function buildNewSpreadsheet(fn, resolve) {
 	let rows = [],
 		cols = [],
 		cells = [],
@@ -64,19 +66,19 @@ function buildNewSpreadsheet(fn) {
 		rows,
 		cols,
 		cells,
-		sheet,
-		colRecord,
-		rowRecord
+		sheet
 	});
+	resolve();
 }
 
-function restoreSpreadsheet(fn, data) {
+function restoreSpreadsheet(data, fn, resolve) {
 	var cols = [],
 		rows = [],
 		cells = [],
 		colRecord = cache.colRecord,
 		rowRecord = cache.rowRecord,
 		sheet;
+		
 	send({
 		url: 'reload',
 		data: JSON.stringify(data),
@@ -116,6 +118,10 @@ function restoreSpreadsheet(fn, data) {
 					col.displayName = getColDisplayName(col.sort);
 					col.alias = col.aliasX;
 				});
+				cells.forEach(function(cell){
+					cell.occupy.col = cell.occupy.x;
+					cell.occupy.row = cell.occupy.y;
+				});
 				colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
 				rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
 
@@ -131,6 +137,7 @@ function restoreSpreadsheet(fn, data) {
 					cols,
 					cells
 				});
+				resolve();
 			}
 		}
 	});

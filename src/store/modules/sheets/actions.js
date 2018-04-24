@@ -322,10 +322,11 @@ export default {
 				occupyCol = editViewOccupy[key].col.slice(0);
 
 			if ((index = occupyCol.indexOf(alias)) !== -1) {
+				occupyCol.splice(index, 1);
 				commit(mutationTypes.UPDATE_OCCUPY, {
 					currentSheet: rootState.currentSheet,
 					type: key,
-					col: occupyCol.splice(index, 1)
+					col: occupyCol
 				});
 			}
 		}
@@ -347,10 +348,12 @@ export default {
 				occupyRow = editViewOccupy[key].row.slice(0);
 
 			if ((index = occupyRow.indexOf(alias)) !== -1) {
+				occupyRow.splice(index, 1);
+				
 				commit(mutationTypes.UPDATE_OCCUPY, {
 					currentSheet: rootState.currentSheet,
 					type: key,
-					row: occupyRow.splice(index, 1)
+					row: occupyRow
 				});
 			}
 		}

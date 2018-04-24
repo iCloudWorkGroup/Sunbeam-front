@@ -144,6 +144,7 @@ export default {
 		let height = rows[endRowIndex].height + rows[endRowIndex].top - 
 				rows[startRowIndex].top;
 		select.physicsBox.height = height;
+		
 		if(mouseState === LOCATE){
 			select.activePosi = {
 				colAlias: cols[startColIndex].alias,

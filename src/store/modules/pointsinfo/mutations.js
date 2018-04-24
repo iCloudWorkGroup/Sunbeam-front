@@ -14,7 +14,7 @@ export default {
 		let colInfo = state[currentSheet].col,
 			rowInfo = state[currentSheet].row,
 			tmp;
-
+			
 		if (colInfo[colAlias] && (tmp = colInfo[colAlias][rowAlias])) {
 			tmp[type] = value;
 			tmp = rowInfo[rowAlias][colAlias];

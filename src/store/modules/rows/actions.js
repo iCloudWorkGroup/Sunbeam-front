@@ -10,7 +10,6 @@ import extend from '../../../util/extend';
 import generator from '../../../tools/generator';
 import template from './template';
 import {SELECT} from '../../../tools/basic';
-import generator from '../../../tools/generator';
 
 export default {
     [actionTypes.ROWS_ADDROWS]({
@@ -74,9 +73,12 @@ export default {
 
         let row = extend(template),
             rows = getters.rowList,
+            getPointInfo = getters.getPointInfo,
             cellList,
             updateCellInfo = [],
+            updatePointInfo = [],
             rowHeight = row.height,
+            originalRowAlias = rows[index].alias,
             rowAlias = generator.rowAliasGenerator(),
             rowTop = rows[index].top;
 
@@ -94,10 +96,8 @@ export default {
         });
 
         cellList.forEach(function(cell) {
-            let occupy = cell.occupy.row,
-                temp;
-
-            if ((temp = occupy.indexOf(rowAlias)) === 0 || temp === -1) {
+            let occupy = cell.occupy.row;
+            if (cell.physicsBox.top >= rowTop) {
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -107,8 +107,14 @@ export default {
                     }
                 });
             } else {
-                let newOccupy = occupy.slice(0).splice(temp, 0, rowAlias);
-                
+                let index = occupy.indexOf(originalRowAlias),
+                    newOccupy = occupy.slice(0),
+                    occupyCol = cell.occupy.col,
+                    cellIndex;
+
+                    newOccupy.splice(index, 0, rowAlias);
+                    cellIndex = getPointInfo(occupyCol[0], occupy[0], 'cellIndex');
+    
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -120,13 +126,22 @@ export default {
                         }
                     }
                 });
+
+                occupyCol.forEach(function(colAlias) {
+                    commit(mutationTypes.UPDATE_POINTINFO, {
+                        currentSheet,
+                        info: {
+                            colAlias,
+                            rowAlias,
+                            type: 'cellIndex',
+                            value: cellIndex
+                        }
+                    });
+                });
             }
         });
 
-        commit(mutationTypes.UPDATE_CELL, {
-            currentSheet,
-            info: updateCellInfo
-        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
 
         let updateSelectInfo = [];
@@ -221,6 +236,10 @@ export default {
                 if(occupy.length ===1 ){
                     deleteCells.push(cell);
                 }else{
+                    deleteCells.push({
+                        col: cell.occupy.col,
+                        row: [rowAlias]
+                    });
                     updateCellInfo.push({
                         cell,
                         props: {
@@ -250,10 +269,7 @@ export default {
             currentSheet,
             cells: deleteCells
         });
-        commit(mutationTypes.UPDATE_CELL, {
-            currentSheet,
-            info: updateCellInfo
-        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
 
         let updateSelectInfo = [],

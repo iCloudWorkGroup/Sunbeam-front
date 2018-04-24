@@ -22,7 +22,9 @@ export default {
             cellList = rootState.cells[sheet],
             limitRowIndex = rowList.length - 1,
             limitColIndex = colList.length - 1,
-            getPointInfo = getters.getPointInfo;
+            getPointInfo = getters.getPointInfo,
+            getColIndexByAlias = getters.getColIndexByAlias,
+            getRowIndexByAlias = getters.getRowIndexByAlias;
 
         for (let i = 0, len = cells.length; i < len; i++) {
             let cell,
@@ -39,17 +41,16 @@ export default {
                 physicsBox;
 
 			cell = cells[i];
-			aliasColList = cell.occupy.x;
-			aliasRowList = cell.occupy.y;
+			aliasColList = cell.occupy.col;
+			aliasRowList = cell.occupy.row;
 
 			aliasCol = aliasColList[0];
 			aliasRow = aliasRowList[0];
 
 			cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex');
 
-			startRowIndex = indexAttrBinary(cell.occupy.row, rowList, 'sort');
+			startRowIndex = getRowIndexByAlias(aliasRow);
 			endRowIndex = startRowIndex + aliasRowList.length - 1;
-			delete cell.occupy.row;
 
 			if (endRowIndex > limitRowIndex) {
 				endRowIndex = limitRowIndex;
@@ -58,9 +59,8 @@ export default {
 				continue;
 			}
 
-			startColIndex = indexAttrBinary(cell.occupy.col, colList, 'sort');
+			startColIndex = getColIndexByAlias(aliasCol);
 			endColIndex = startColIndex + aliasColList.length - 1;
-			delete cell.occupy.col;
 
 			if (endColIndex > limitColIndex) {
 				endColIndex = limitColIndex;
@@ -107,35 +107,21 @@ export default {
 					}
 				}
 				cell.physicsBox = physicsBox;
-				/**
-				 * 该代码为保持与后台数据结构相同，后期删除
-				 */
-				cell.occupy.col = cell.occupy.x;
-				cell.occupy.row = cell.occupy.y;
-				delete cell.occupy.x;
-				delete cell.occupy.y;
 				cell = extend({}, template, cell);
 				commit(mutationTypes.INSERT_CELL, {
 					currentSheet: sheet,
 					cells: [cell]
 				});
 			} else {
-				commit(mutationTypes.UPDATE_CELL, {
-					currentSheet: sheet,
-					info: {
-						propName: 'physicsBox.width',
-						value: physicsBox.width,
-						cell: cellList[cellIndex]
+				commit(mutationTypes.UPDATE_CELL, [{
+					cell: cellList[cellIndex],
+					props: {
+						physicsBox: {
+							height: physicsBox.height,
+							width: physicsBox.width
+						}
 					}
-				});
-				commit(mutationTypes.UPDATE_CELL, {
-					currentSheet: sheet,
-					info: {
-						propName: 'physicsBox.height',
-						value: physicsBox.height,
-						cell: cellList[cellIndex]
-					}
-				});
+				}]);
 			}
 		}
 	},
@@ -319,13 +305,13 @@ export default {
 				for (let j = startIndex; j < endIndex + 1; j++) {
 					let colAlias = cols[j].alias,
 						rowAlias = rows[i].alias,
-						cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex'),
-						cell = extend({}, props);
+						cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex');
+					if (typeof cellIndex !== 'number') {
+						let cell = extend({}, props);
 						cell.occupy = {
 							col: [colAlias],
 							row: [rowAlias]
 						};
-					if(typeof cellIndex !== 'number'){
 						insertCellInfo.push(cell);
 					}
 				}

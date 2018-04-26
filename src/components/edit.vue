@@ -34,7 +34,6 @@ export default {
 			recordScrollTop: 0,
 			recordScrollLeft: 0,
 			timeoutId: '',
-			lastScrollHandleTime: 0,
 			currentPromise: null,
 			offsetLeft, 
 			offsetTop

@@ -61,11 +61,11 @@ export default {
 			let type = this.frozenRule && this.frozenRule.type || 'mainRule';
 			return this.$store.getters.getEditViewOccupy(type).row;
 		},
-		colListLen(){
-			return this.$store.getters.colList.length;
+		colMaxPosi(){
+			return this.$store.getters.getColMaxPosi;
 		},
-		rowListLen(){
-			return this.$store.getters.rowList.length;
+		rowMaxPosi(){
+			return this.$store.getters.getRowMaxPosi;
 		}
 	},
 	components: {
@@ -856,13 +856,13 @@ export default {
 		scrollTop(val) {
 			this.$el.scrollTop = val;
 		},
-		colListLen(newVal, oldVal){
+		colMaxPosi(newVal, oldVal){
 			let frozenRule = this.frozenRule;
 			if(newVal < oldVal && (!frozenRule || frozenRule.endColIndex === undefined)){
 				this.handleScroll(this.recordScrollLeft, this.recordScrollTop, true, false);
 			}
 		},
-		rowListLen(newVal, oldVal){
+		rowMaxPosi(newVal, oldVal){
 			let frozenRule = this.frozenRule;
 			if(newVal < oldVal && (!frozenRule || frozenRule.endRowIndex === undefined)){
 				this.handleScroll(this.recordScrollLeft, this.recordScrollTop, false, true);

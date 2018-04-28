@@ -1,10 +1,10 @@
 export default {
 	colWidth: 71,
 	rowHeight: 19,
-	initRowNum: 100,
+	initRowNum: 40,
 	initColNum: 26,
-	maxRowNum: 3000,
-	maxColNum: 150,
+	maxRowNum: 50,
+	maxColNum: 30,
 	/**
 	 * 页面左侧距离
 	 * @property {int} outerLeft

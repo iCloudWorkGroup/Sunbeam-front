@@ -1,7 +1,7 @@
 <template>
     <div class="col-head-container" :style="{width: width + 'px'}">
         <div class="col-head-bg col-head-height" :style="{
-        width: totalWidth + 'px'}">
+        width: totalWidth}">
             <col-head-panel :frozenRule="frozenRule"></col-head-panel>
             <div class="col-head-line" v-for="item in selectList" :style="{
             left: item.physicsBox.left - offsetLeft + 'px', 
@@ -35,15 +35,27 @@ export default {
             return this.colHeadWidth;
         },
         totalWidth() {
-            let colList = this.$store.getters.colList,
-                startIndex,
-                endIndex,
-                lastCol;
+            let cols = this.$store.getters.colList,
+                visibleCols = this.$store.getters.visibleColList,
+                frozenRule = this.frozenRule,
+                startColIndex,
+                endColIndex,
+                lastCol,
+                startCol;
 
-            startIndex = this.startIndex || 0;
-            endIndex = this.endIndex || colList.length - 1;
-            lastCol = colList[endIndex];
-            return lastCol.left + lastCol.width - colList[startIndex].left;
+            if (frozenRule) {
+                startColIndex = frozenRule.startColIndex;
+                if (frozenRule.endColIndex !== undefined) {
+                    endColIndex = frozenRule.endColIndex;
+                }
+                startCol = cols[startColIndex];
+                lastCol = cols[endColIndex];
+            } else {
+                endColIndex = visibleCols.length - 1;
+                startCol = visibleCols[0];
+                lastCol = visibleCols[endColIndex];
+            }
+            return lastCol.left + lastCol.width - startCol.left + 'px';
         },
         offsetLeft() {
             if (this.frozenRule) {

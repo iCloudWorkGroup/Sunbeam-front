@@ -57,6 +57,10 @@ let element5 = document.getElementById('deletecol');
 let element6 = document.getElementById('deleterow');
 let element7 = document.getElementById('rowoper');
 let element8 = document.getElementById('coloper');
+let element9 = document.getElementById('colhide');
+let element10 = document.getElementById('colcancelhide');
+let element11 = document.getElementById('rowhide');
+let element12 = document.getElementById('rowcancelhide');
 
 
 element1.addEventListener('click',function(e){
@@ -85,4 +89,17 @@ element7.addEventListener('click',function(e){
 
 element8.addEventListener('click',function(e){
 	store.dispatch('COLS_OPERCOLS',{props:{content: {background: 'rgb(0,0,0)'}}});
+},false);
+
+element9.addEventListener('click',function(e){
+	store.dispatch('COLS_HIDE');
+},false);
+element10.addEventListener('click',function(e){
+	store.dispatch('COLS_CANCELHIDE');
+},false);
+element11.addEventListener('click',function(e){
+	store.dispatch('ROWS_HIDE');
+},false);
+element12.addEventListener('click',function(e){
+	store.dispatch('ROWS_CANCELHIDE');
 },false);

@@ -19,65 +19,75 @@
 </template>
 
 <script type="text/javascript">
-	import RowHeadItem from './row-head-item.vue';
-	import {SELECTS_UPDATESELECT, ROWS_ADJUSTHEIGHT} from '../store/action-types';
-	import {UPDATE_MOUSESTATE} from '../store/mutation-types';
-	import {LOCATE, DRAG} from '../tools/basic';
+import RowHeadItem from './row-head-item.vue';
+import {SELECTS_UPDATESELECT, ROWS_ADJUSTHEIGHT} from '../store/action-types';
+import {UPDATE_MOUSESTATE} from '../store/mutation-types';
+import {LOCATE, DRAG} from '../tools/basic';
 
-	export default {
-		props: ['frozenRule'],
-		data() {
-			let startIndex,
-				endIndex;
+export default {
+	props: ['frozenRule'],
+	data() {
+		let startIndex,
+			endIndex;
+		if (this.frozenRule) {
+			startIndex = this.frozenRule.startRowIndex;
+			endIndex = this.frozenRule.endRowIndex;
+		}
+
+		return {
+			startIndex,
+			endIndex,
+			adjustState: false,
+			adjustRow: null,
+			adjustRowIndex: null
+		}
+	},
+	components: {
+		RowHeadItem
+	},
+	computed: {
+		offsetTop() {
 			if (this.frozenRule) {
-				startIndex = this.frozenRule.startRowIndex;
-				endIndex = this.frozenRule.endRowIndex;
+				return this.frozenRule.offsetTop;
+			} else {
+				return 0;
 			}
+		},
+		rowList() {
+            let getters = this.$store.getters,
+                rows = getters.rowList,
+                visibleRows = getters.visibleRowList,
+                frozenRule = this.frozenRule,
+                startRowIndex,
+                endRowIndex,
+                lastRow,
+                startRow;
 
-			return {
-				startIndex,
-				endIndex,
-				adjustState: false,
-				adjustRow: null,
-				adjustRowIndex: null
-			}
+            if (frozenRule) {
+                startRowIndex = frozenRule.startRowIndex;
+                if (frozenRule.endRowIndex !== undefined) {
+                    endRowIndex = frozenRule.endRowIndex;
+                }
+                startRow = rows[startRowIndex];
+                lastRow = rows[endRowIndex];
+                startRowIndex = getters.getVisibleRowIndexBySort(startRow.sort);
+                endRowIndex = getters.getVisibleRowIndexBySort(startRow.sort);
+                return visibleCols.slice(startRowIndex, endRowIndex + 1);
+            } else {
+            	console.log(getters.userViewRowList.length);
+                return getters.userViewRowList;
+            }
 		},
-		components: {
-			RowHeadItem
+		adjustRowList() {
+			let rowList = this.$store.getters.rowList;
+			return rowList.slice(this.adjustRowIndex + 1);
 		},
-		computed: {
-			offsetTop() {
-				if (this.frozenRule) {
-					return this.frozenRule.offsetTop;
-				} else {
-					return 0;
-				}
-			},
-			rowList() {
-				let rowList = this.$store.getters.rowList,
-	                startIndex,
-	                endIndex,
-	                lastCol;
-
-	            startIndex = this.startIndex || 0;
-	            endIndex = this.endIndex || rowList.length - 1;
-	            
-	            if(this.endIndex !== undefined){
-	                return rowList.slice(startIndex, endIndex + 1);
-	            }else{
-	                return this.$store.getters.userViewRowList;
-	            }
-			},
-			adjustRowList() {
-				let rowList = this.$store.getters.rowList;
-				return rowList.slice(this.adjustRowIndex + 1);
-			},
-			mouseState() {
-				return this.$store.state.mouseState;
-			}
-		},
+		mouseState() {
+			return this.$store.state.mouseState;
+		}
+	},
 	methods: {
-		getRelativePosi(posi){
+		getRelativePosi(posi) {
 			let elem = this.$refs.panel,
 				box = elem.getBoundingClientRect(),
 				offsetTop = this.offsetTop;
@@ -95,7 +105,7 @@
 		currentMouseDownState(e) {
 
 		},
-		locateState(e){
+		locateState(e) {
 			let rowPosi = this.getRelativePosi(e.clientY),
 				rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi);
 
@@ -119,7 +129,7 @@
 			this.adjustState = true;
 
 			if (!(adjustHandle = this.adjustHandle)) {
-				
+
 				adjustHandle = this.adjustHandle = function(e) {
 					self.adjustHandleState.call(self, e);
 				}
@@ -128,7 +138,7 @@
 			document.addEventListener('mousemove', adjustHandle, false);
 			this.currentMouseMoveState = function() {};
 
-			function stopAdjustHandle(e){
+			function stopAdjustHandle(e) {
 				document.removeEventListener('mousemove', adjustHandle);
 				document.removeEventListener('mouseup', stopAdjustHandle);
 				self.changeRowHeight(e);
@@ -137,7 +147,7 @@
 		},
 
 		routineMoveState(e) {
-			if(this.adjustState){
+			if (this.adjustState) {
 				return;
 			}
 
@@ -156,29 +166,30 @@
 		dragState(e) {
 			let rowPosi = this.getRelativePosi(e.clientY),
 				rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi);
-				
+
 			this.$store.dispatch(SELECTS_UPDATESELECT, {
 				colIndex: 'MAX',
 				rowIndex
 			});
 		},
-		adjustHandleState(e){
+		adjustHandleState(e) {
 			let rowView = this.$refs.adjustRowView.$el,
 				panelView = this.$refs.adjustPanelView,
 				posi = this.getRelativePosi(e.clientY),
 				row = this.adjustRow,
 				temp;
 
-			if ((temp = posi- row.top) > 5) {
+			if ((temp = posi - row.top) > 5) {
 				rowView.style.height = temp + 'px';
 				panelView.style.top = temp - row.height + 'px';
 			}
 		},
-		changeRowHeight(){
+		changeRowHeight() {
 			this.adjustState = false;
 			this.currentMouseMoveState = this.routineMoveState;
 			let height = this.$refs.adjustRowView.$el.style.height;
-			height = parseInt(height.substring(0, height.length -2));0
+			height = parseInt(height.substring(0, height.length - 2));
+			
 			this.$store.dispatch(ROWS_ADJUSTHEIGHT, {
 				height,
 				index: this.adjustRowIndex
@@ -196,7 +207,7 @@
 			}
 		});
 	}
-	};
+};
 </script>
 <style type="text/css">
 	.adjust-row-head-item{

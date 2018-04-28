@@ -1,5 +1,5 @@
 import { rangeBinary } from '../../../util/binary';
-
+import {indexAttrBinary} from '../../../util/binary';
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
@@ -18,8 +18,8 @@ export default {
             endRowIndex = startRowIndex
         }) {
             let currentSheet = rootState.currentSheet,
-                rows = rootState.rows[currentSheet].list,
-                cols = rootState.cols[currentSheet].list,
+                rows = getters.rowList,
+                cols = getters.colList,
                 cellStartColIndex,
                 cellStartRowIndex,
                 cellEndColIndex,
@@ -28,16 +28,6 @@ export default {
                 temp,
                 flag = true;
 
-            if (startRowIndex > endRowIndex) {
-                temp = startRowIndex;
-                startRowIndex = endRowIndex;
-                endRowIndex = temp;
-            }
-            if (startColIndex > endColIndex) {
-                temp = startColIndex;
-                startColIndex = endColIndex;
-                endColIndex = temp;
-            }
             if (startColIndex === 'MAX' || endColIndex === 'MAX') {
                 return {
                     startRowIndex: startRowIndex,
@@ -54,6 +44,14 @@ export default {
                     endRowIndex: 'MAX'
                 };
             }
+            if ((temp = startRowIndex) > endRowIndex) {
+                startRowIndex = endRowIndex;
+                endRowIndex = temp;
+            }
+            if ((temp = startColIndex) > endColIndex) {
+                startColIndex = endColIndex;
+                endColIndex = temp;
+            }
 
             while (flag) {
                 flag = false;
@@ -68,12 +66,11 @@ export default {
                     temp = cellList[i].physicsBox;
                     cellStartRowIndex = rangeBinary(temp.top, rows, 'top',
                         'height');
-                    cellStartColIndex = rangeBinary(temp.left, cols, 'left',
-                        'width');
                     cellEndRowIndex = rangeBinary(temp.top + temp.height,
                         rows, 'top', 'height');
-                    cellEndColIndex = rangeBinary(temp.left + temp.width,
-                        cols, 'left', 'width');
+                    cellStartColIndex = getters.getColIndexByPosi(temp.left);
+                    cellEndColIndex = getters.getColIndexByPosi(temp.left + temp.width);
+
                     if (cellStartColIndex < startColIndex) {
                         startColIndex = cellStartColIndex;
                         flag = true;
@@ -111,17 +108,19 @@ export default {
             startColIndex,
             startRowIndex,
             endColIndex = startColIndex,
-            endRowIndex = startRowIndex
+            endRowIndex = startRowIndex,
+            cols,
+            rows
         }) {
             let result = [],
                 pointInfo = rootState.pointsInfo[currentSheet].col,
-                rows = rootState.rows[currentSheet].list,
-                cols = rootState.cols[currentSheet].list,
                 index, temp,
                 tempObj = {},
                 rowAlias,
                 colAlias;
 
+            rows = rows || getters.rowList;
+            cols = cols || getters.colList;
             endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex;
             endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex;
             
@@ -206,18 +205,28 @@ export default {
     },
     userViewCellList(state, getters, rootState){
         let currentSheet = rootState.currentSheet,
-            list = state[currentSheet],
             userView = rootState.userView,
+            cols = getters.colList,
+            rows = getters.rowList,
+            visibleColList = getters.visibleColList,
+            visibleRowList = getters.visibleRowList,
             startRowIndex = getters.getRowIndexByPosi(userView.top),
             endRowIndex = getters.getRowIndexByPosi(userView.bottom),
-            startColIndex = getters.getColIndexByPosi (userView.left),
-            endColIndex = getters.getColIndexByPosi (userView.right);
+            startColIndex = getters.getColIndexByPosi(userView.left),
+            endColIndex = getters.getColIndexByPosi(userView.right);
+
+        startRowIndex = indexAttrBinary(rows[startRowIndex].sort, visibleRowList, 'sort');
+        endRowIndex = indexAttrBinary(rows[endRowIndex].sort, visibleRowList, 'sort');
+        startColIndex = indexAttrBinary(cols[startColIndex].sort, visibleColList, 'sort');
+        endColIndex = indexAttrBinary(cols[endColIndex].sort, visibleColList, 'sort');
 
         return getters.getCellsByVertical({
             startRowIndex,
             endRowIndex,
             startColIndex,
-            endColIndex
+            endColIndex,
+            cols: visibleColList,
+            rows: visibleRowList
         });
     }
 };

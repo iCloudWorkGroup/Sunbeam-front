@@ -1,9 +1,8 @@
 <template>
     <div class="col-group">
         <div class="col" v-for="item in colList" :key="item.alias" :style="{
-        left: item.left - offsetLeft + 'px', 
-        width: item.width + 'px'
-    }">
+            left: item.left - offsetLeft + 'px', 
+            width: item.width + 'px'}">
         </div>
     </div>
 </template>
@@ -31,18 +30,27 @@ export default {
             }
         },
         colList() {
-            let colList = this.$store.getters.colList,
-                startIndex,
-                endIndex,
-                lastCol;
+            let getters = this.$store.getters,
+                cols = getters.colList,
+                visibleCols = getters.visibleColList,
+                frozenRule = this.frozenRule,
+                startColIndex,
+                endColIndex,
+                lastCol,
+                startCol;
 
-            startIndex = this.startIndex || 0;
-            endIndex = this.endIndex || colList.length - 1;
-
-            if (this.endIndex !== undefined) {
-                return colList.slice(startIndex, endIndex + 1);
+            if (frozenRule) {
+                startColIndex = frozenRule.startColIndex;
+                if (frozenRule.endColIndex !== undefined) {
+                    endColIndex = frozenRule.endColIndex;
+                }
+                startCol = cols[startColIndex];
+                lastCol = cols[endColIndex];
+                startColIndex = getters.getVisibleColIndexBySort(startCol.sort);
+                endColIndex = getters.getVisibleColIndexBySort(lastCol.sort);
+                return visibleCols.slice(startColIndex, endColIndex + 1);
             } else {
-                return this.$store.getters.userViewColList;
+                return getters.userViewColList;
             }
         }
     }

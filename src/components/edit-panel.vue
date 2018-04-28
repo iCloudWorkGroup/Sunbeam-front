@@ -1,3 +1,4 @@
+
 <template>
     <div class="edit-panel" ref="panel" @mousedown="locate" @mousemove="mouseMoveHandle"
         :style="{width: width, height: height}">
@@ -25,47 +26,59 @@ export default {
     },
     computed: {
         width() {
-            let colList = this.$store.getters.colList,
+            let cols = this.$store.getters.colList,
+                visibleCols = this.$store.getters.visibleColList,
                 frozenRule = this.frozenRule,
-                startColIndex = frozenRule ? frozenRule.startColIndex : 0,
+                startColIndex,
                 endColIndex,
-                lastCol;
+                lastCol,
+                startCol;
 
-            endColIndex = frozenRule && frozenRule.endColIndex !== undefined ?
-                frozenRule.endColIndex : colList.length - 1;
-            lastCol = colList[endColIndex];
-
-
-            return lastCol.left + lastCol.width - colList[startColIndex].left +
-                'px';
+            if (frozenRule) {
+                startColIndex = frozenRule.startColIndex;
+                if (frozenRule.endColIndex !== undefined) {
+                    endColIndex = frozenRule.endColIndex;
+                }
+                startCol = cols[startColIndex];
+                lastCol = cols[endColIndex];
+            } else {
+                endColIndex = visibleCols.length - 1;
+                startCol = visibleCols[0];
+                lastCol = visibleCols[endColIndex];
+            }
+            return lastCol.left + lastCol.width - startCol.left + 'px';
         },
         height() {
-            let rowList = this.$store.getters.rowList,
+            let rows = this.$store.getters.rowList,
+                visibleRows = this.$store.getters.visibleRowList,
                 frozenRule = this.frozenRule,
-                startRowIndex = frozenRule ? frozenRule.startRowIndex : 0,
+                startRowIndex,
                 endRowIndex,
-                lastRow;
+                lastRow,
+                startRow;
 
-            endRowIndex = frozenRule && frozenRule.endRowIndex !== undefined ?
-                frozenRule.endRowIndex : rowList.length - 1;
-            lastRow = rowList[endRowIndex];
-
-            return lastRow.top + lastRow.height - rowList[startRowIndex].top +
-                'px';
+            if (frozenRule) {
+                startRowIndex = frozenRule.startRowIndex;
+                if (frozenRule.endRowIndex !== undefined) {
+                    endRowIndex = frozenRule.endRowIndex;
+                }
+                startRow = cols[startRowIndex];
+                lastRow = cols[endRowIndex];
+            } else {
+                endRowIndex = visibleRows.length - 1;
+                startRow = visibleRows[0];
+                lastRow = visibleRows[endRowIndex];
+            }
+            return lastRow.top + lastRow.height - startRow.top + 'px';
         },
         mouseState() {
             return this.$store.state.mouseState;
-        },
-        colListLen() {
-            return this.$store.getters.colList.length;
-        },
-        rowListLen() {
-            return this.$store.getters.rowList.length;
         }
     },
     methods: {
-        locate(e) {
-            let elem = this.$refs.panel,
+        locate(e){
+            let getters = this.$store.getters,
+                elem = this.$refs.panel,
                 frozenRule = this.frozenRule,
                 offsetLeft = 0,
                 offsetTop = 0,
@@ -79,8 +92,8 @@ export default {
 
             let colPosi = e.clientX - box.left + offsetLeft,
                 rowPosi = e.clientY - box.top + offsetTop,
-                colIndex = this.$store.getters.getColIndexByPosi(colPosi),
-                rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi);
+                colIndex = getters.getColIndexByPosi(colPosi),
+                rowIndex = getters.getRowIndexByPosi(rowPosi);
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
                 colIndex,

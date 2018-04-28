@@ -13,11 +13,6 @@ export default {
 	 * @type {Boolean}
 	 */
 	rightAjacentHide: false,
-	/**
-	 * 左为隐藏列（用于效果显示）
-	 * @type {Boolean}
-	 */
-	leftAjacentHide: false,
 	active: false,
 	hidden: false,
 	/**

@@ -22,6 +22,9 @@ export function indexAttrBinary(value, array, attr, startIndex = 0,
 	endIndex = array.length - 1) {
 	let middleIndex;
 
+	if(array.length === 0){
+		return -1;
+	}
 	if (array[startIndex][attr] > value) {
 		return startIndex;
 	}

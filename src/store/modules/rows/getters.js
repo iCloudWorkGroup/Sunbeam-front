@@ -6,16 +6,40 @@ export default {
 			result = state[currentSheet].list;
 		return result;
 	},
+	visibleRowList(state, getters){
+		let list = getters.rowList,
+			result = [];
+
+		list.forEach(function(row) {
+			if (!row.hidden) {
+				result.push(row);
+			}
+		});
+		return result;
+	},
+	getRowMaxPosi(state, getters) {
+		let list = getters.visibleRowList,
+			lastRow = list[list.length -1];
+		return lastRow.top + lastRow.height;
+	},
 	getRowIndexByPosi(state, getters, rootState) {
 		return function(posi) {
-			let currentSheet = rootState.currentSheet,
-				list = state[currentSheet].list,
-				lastRow = list[list.length - 1];
+			let row = getters.getRowByPosi(posi);
+			return getters.getRowIndexBySort(row.sort);
+		};
+	},
+	getRowByPosi(state, getters) {
+		let visibleList = getters.visibleRowList,
+			list = getters.rowList;
 
-			if (posi > lastRow.top + lastRow.height) {
-				return list.length - 1;
-			}
-			return rangeBinary(posi, list, 'top', 'height');
+		return function(posi) {
+			let lastRow = visibleList[visibleList.length - 1];
+			if (lastRow.top + lastRow.height < posi) {
+				return lastRow;
+			};
+			let index = rangeBinary(posi, visibleList, 'top', 'height'),
+				row = visibleList[index];
+			return row;
 		};
 	},
 	getTempList(state, getters, rootState){
@@ -24,22 +48,9 @@ export default {
 			return list.length;
 		}
 	},
-	getRowByPosi(state, getters, rootState){
-		return function(posi){
-			let currentSheet = rootState.currentSheet,
-				list = state[currentSheet].list,
-				lastRow = list[list.length - 1];
-
-			if (posi > lastRow.top + lastRow.height) {
-				return list.length - 1;
-			}
-			return list[rangeBinary(posi, list, 'top', 'height')];
-		}
-	},
 	getRowIndexBySort(state, getters, rootState){
+		let list = getters.rowList;
 		return function(sort) {
-			let currentSheet = rootState.currentSheet,
-				list = state[currentSheet].list;
 			return indexAttrBinary(sort, list, 'sort');
 		};
 	},
@@ -52,26 +63,28 @@ export default {
 		};
 	},
 	getRowIndexByAlias(state, getters, rootState) {
+		let list = getters.rowList;
 		return function(alias) {
-			let row = getters.getRowByAlias(alias),
-				list = state[rootState.currentSheet].list;
-			
 			if(alias === 'MAX'){
 				return 'MAX';
 			}
+			let row = getters.getRowByAlias(alias);
 			if (row) {
-				return rangeBinary(row.top, list, 'top', 'height');
+				return getters.getRowIndexBySort(row.sort);
 			}
 			return -1;
 		};
 	},
 	userViewRowList(state, getters, rootState){
-		let currentSheet = rootState.currentSheet,
-			list = state[currentSheet].list,
+		let list = getters.rowList,
+			visibleList = getters.visibleRowList,
 			userView = rootState.userView,
 			start = getters.getRowIndexByPosi(userView.top),
 			end = getters.getRowIndexByPosi(userView.bottom);
 
-		return list.slice(start, end);
+			start = indexAttrBinary(list[start].sort, visibleList, 'sort');
+			end = indexAttrBinary(list[end].sort, visibleList, 'sort');
+			
+		return visibleList.slice(start, end + 1);
 	}
 };

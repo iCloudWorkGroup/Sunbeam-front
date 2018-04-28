@@ -40,9 +40,8 @@ export default {
 			list[i].active = false;
 		}
 	},
-	[types.ACTIVE_ROW](state, {startIndex, endIndex, currentSheet}){
+	[types.ACTIVE_ROW](state, {startIndex, endIndex= startIndex, currentSheet}){
 		let list = state[currentSheet].list;
-
 		for (let i = startIndex; i <= endIndex; i++) {
 			list[i].active = true;
 		}

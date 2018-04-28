@@ -54,6 +54,330 @@ export default {
             currentSheet: rootState.currentSheet
         });
     },
+    [actionTypes.ROWS_HIDE]({
+        state,
+        rootState,
+        commit,
+        getters,
+        dispatch
+    }, index) {
+        let selects = getters.selectList,
+            currentSheet = rootState.currentSheet;
+
+        if(getters.visibleRowList.length < 2){
+            return;
+        }
+
+        if (index === undefined) {
+            let select;
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i];
+                    break;
+                }
+            }
+            index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
+        }
+        let rows = getters.rowList,
+            visibleRows = getters.visibleRowList,
+            row = rows[index],
+            deleteCells = [],
+            updateCellInfo = [],
+            rowHeight = row.height,
+            rowAlias = row.alias;
+
+
+       let cellList = getters.getCellsByVertical({
+            startColIndex: 0,
+            startRowIndex: index,
+            endColIndex: 'MAX',
+            endRowIndex: 'MAX',
+        });
+
+        cellList.forEach(function(cell) {
+            let occupy = cell.occupy.row,
+                temp;
+
+            if ((temp = occupy.indexOf(rowAlias)) !== -1) {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            height: cell.physicsBox.height - rowHeight - 1
+                        }
+                    }
+                });
+            } else {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            top: cell.physicsBox.top - rowHeight - 1
+                        }
+                    }
+                });
+            }
+        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+
+
+        let updateSelectInfo = [],
+            rowTop = row.top;
+
+        selects.forEach(function(select) {
+            let wholePosi = select.wholePosi,
+                startSort,
+                endSort,
+                rowSort = row.sort,
+                endVisibleSort = visibleRows[visibleRows.length - 1].sort;
+
+            startSort = getters.getRowByAlias(wholePosi.startRowAlias).sort;
+            endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort;
+
+            if (startSort >= rowSort) {
+                if(startSort === endVisibleSort){
+                    updateSelectInfo.push({
+                        select,
+                        props: {
+                            physicsBox: {
+                                top: rows[index -1].top,
+                                height: rows[index - 1].height
+                            },
+                            wholePosi: {
+                                startRowAlias: rows[index - 1].alias,
+                                endRowAlias: rows[index - 1].alias
+                            }
+                        }   
+                    });
+                    commit(mutationTypes.ACTIVE_ROW, {
+                        currentSheet,
+                        startIndex: index - 1
+                    });
+                }else if (startSort === endSort) {
+                    updateSelectInfo.push({
+                        select,
+                        props: {
+                            physicsBox: {
+                                height: rows[index + 1].height
+                            },
+                            wholePosi: {
+                                startRowAlias: rows[index + 1].alias,
+                                endRowAlias: rows[index + 1].alias
+                            }
+                        }   
+                    });
+                    commit(mutationTypes.ACTIVE_ROW, {
+                        currentSheet,
+                        startIndex: index + 1
+                    });
+                }else{
+                    updateSelectInfo.push({
+                        select,
+                        props: {
+                            physicsBox: {
+                                height: select.physicsBox.height - rowHeight -1
+                            }
+                        }
+                    });
+                }
+
+            } else if (endSort > rowTop) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            top: select.physicsBox.top - rowHeight -1
+                        }
+                    }
+                });
+            }
+        });
+
+        commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
+
+        let updateRowInfo = [{
+            row: rows[index],
+            props: {
+                hidden: true,
+                active: false
+            }
+        }];
+
+        if (index > 0) {
+            updateRowInfo.push({
+                row: rows[index - 1],
+                props: {
+                    bottomAjacentHide: true
+                }
+            });
+        }
+        for (let i = index + 1, len = rows.length; i < len; i++) {
+            let row = rows[i];
+            updateRowInfo.push({
+                row,
+                props: {
+                    top: row.top - rowHeight - 1
+                }
+            });
+        }
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo);  
+    },
+    [actionTypes.ROWS_CANCELHIDE]({
+        state,
+        rootState,
+        commit,
+        getters,
+        dispatch
+    }, index) {
+        let selects = getters.selectList,
+            currentSheet = rootState.currentSheet,
+            rows = getters.rowList,
+            visibleRows = getters.visibleRowList;
+
+        if (index === undefined) {
+            let select,
+                startIndex,
+                endIndex,
+                visibleStartRow = visibleRows[0],
+                visibleEndRow = visibleRows[visibleRows.length - 1];
+
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i];
+                    break;
+                }
+            }
+            let startRowAlias = select.wholePosi.startRowAlias,
+                endRowAlias = select.wholePosi.endRowAlias;
+            if (visibleStartRow.alias === startRowAlias &&
+                visibleStartRow !== rows[0]) {
+                index = 0;
+            } else if (visibleEndRow.alias === endRowAlias &&
+                visibleEndRow !== rows[rows.length - 1]) {
+                index = rows.length - 1;
+            } else {
+                startIndex = getters.getColIndexByAlias(startRowAlias);
+                endIndex = getters.getColIndexByAlias(endRowAlias);
+
+                for (let i = startIndex; i < endIndex + 1; i++) {
+                    if (rows[i].hidden) {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+
+        }
+        if (index === undefined || !rows[index].hidden) {
+            return;
+        }
+
+        let row = rows[index],
+            deleteCells = [],
+            updateCellInfo = [],
+            rowHeight = row.height,
+            rowAlias = row.alias;
+
+       let cellList = getters.getCellsByVertical({
+            startColIndex: 0,
+            startRowIndex: index,
+            endColIndex: 'MAX',
+            endRowIndex: 'MAX',
+        });
+
+        cellList.forEach(function(cell) {
+            let occupy = cell.occupy.row,
+                temp;
+
+            if ((temp = occupy.indexOf(rowAlias)) !== -1) {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            height: cell.physicsBox.height + rowHeight + 1
+                        }
+                    }
+                });
+            } else {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            top: cell.physicsBox.top + rowHeight + 1
+                        }
+                    }
+                });
+            }
+        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+
+
+        let updateSelectInfo = [],
+            rowTop = row.top;
+
+        selects.forEach(function(select) {
+            let wholePosi = select.wholePosi,
+                startIndex,
+                endIndex;
+
+            startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+            endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+
+            if (startIndex > index) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            top: select.physicsBox.top + rowHeight + 1
+                        }
+                    }
+                });
+            } else if (endIndex > index) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height + rowHeight + 1
+                        }
+                    }
+                });
+                commit(mutationTypes.UPDATE_ROW, [{
+                    row: rows[index],
+                    props: {
+                        active: true
+                    }
+                }]);
+            }
+        });
+
+        commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
+
+        let updateRowInfo = [{
+            row: rows[index],
+            props: {
+                hidden: false
+            }
+        }];
+
+        if (index > 0) {
+            updateRowInfo.push({
+                row: rows[index - 1],
+                props: {
+                    bottomAjacentHide: false
+                }
+            });
+        }
+        for (let i = index + 1, len = rows.length; i < len; i++) {
+            let row = rows[i];
+            updateRowInfo.push({
+                row,
+                props: {
+                    top: row.top + rowHeight + 1
+                }
+            });
+        }
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo);  
+    },
     [actionTypes.ROWS_INSERTROWS]({
         state,
         rootState,

@@ -11,11 +11,6 @@ export default {
 	displayName: '',
 	active: false,
 	/**
-	 * 上方为隐藏列（用于效果显示）
-	 * @type {Boolean}
-	 */
-	topAjacentHide: false,
-	/**
 	 * 下方为隐藏列（用于效果显示）
 	 * @type {Boolean}
 	 */

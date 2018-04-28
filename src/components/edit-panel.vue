@@ -91,12 +91,14 @@ export default {
             });
         },
         mouseMoveHandle(e) {
+            
+
             this.currentMouseMoveState(e);
         },
         currentMouseMoveState() {
 
         },
-        routineMoveState() {
+        routineMoveState(e) {
 
         },
         dragState(e) {
@@ -125,7 +127,6 @@ export default {
     },
     mounted() {
         this.currentMouseMoveState = this.routineMoveState;
-
         this.$watch('mouseState', function(val) {
             if (val === DRAG) {
                 this.currentMouseMoveState = this.dragState;

@@ -18,6 +18,24 @@ export default {
 			return rangeBinary(posi, list, 'top', 'height');
 		};
 	},
+	getTempList(state, getters, rootState){
+		let list = getters.rowList;
+		return function(){
+			return list.length;
+		}
+	},
+	getRowByPosi(state, getters, rootState){
+		return function(posi){
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet].list,
+				lastRow = list[list.length - 1];
+
+			if (posi > lastRow.top + lastRow.height) {
+				return list.length - 1;
+			}
+			return list[rangeBinary(posi, list, 'top', 'height')];
+		}
+	},
 	getRowIndexBySort(state, getters, rootState){
 		return function(sort) {
 			let currentSheet = rootState.currentSheet,

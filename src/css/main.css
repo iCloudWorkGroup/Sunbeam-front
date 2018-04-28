@@ -32,7 +32,7 @@ textarea { resize: none; overflow: hidden; }
 .col-head-height { height: 19px; }
 .row-head-width { width: 36px; }
 .col-head-panel, .row-head-panel { position: relative; height: inherit; width: inherit; z-index: 9; }
-.col-head-item, .row-head-item { position: absolute; cursor: pointer; overflow: hidden; background-color: white }
+.col-head-item, .row-head-item { position: absolute; cursor: inherit; overflow: hidden; background-color: white }
 .row-head-item { border-bottom: 1px solid #bfbfbf; width: inherit; }
 .col-head-item { border-right: 1px solid #bfbfbf; height: inherit; }
 .col-head-item:hover, .row-head-item:hover { background: #9fd5b7 !important; }

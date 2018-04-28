@@ -15,8 +15,20 @@ export default {
 			if (lastCol.left + lastCol.height) {
 				return list.length - 1;
 			};
-
 			return rangeBinary(posi, list, 'left', 'width');
+		};
+	},
+	getColByPosi(state, getters, rootState) {
+		return function(posi) {
+			let currentSheet = rootState.currentSheet,
+				list = state[currentSheet].list,
+				lastCol = list[list.length - 1];
+
+			if (lastCol.left + lastCol.height) {
+				return list.length - 1;
+			};
+
+			return list[rangeBinary(posi, list, 'left', 'width')];
 		};
 	},
 	getColIndexBySort(state, getters, rootState) {

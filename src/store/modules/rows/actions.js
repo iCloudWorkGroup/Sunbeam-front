@@ -224,6 +224,118 @@ export default {
             rows: [row]
         });
     },
+    [actionTypes.ROWS_ADJUSTHEIGHT]({state, rootState, commit, getters}, {index, height}){
+         let currentSheet = rootState.currentSheet,
+            rows = getters.rowList,
+            row = rows[index],
+            adjustHeight = height - row.height,
+            updateCellInfo = [];
+
+       let cellList = getters.getCellsByVertical({
+            startColIndex: 0,
+            startRowIndex: index,
+            endColIndex: 'MAX',
+            endRowIndex: 'MAX',
+        });
+
+        cellList.forEach(function(cell) {
+            let occupy = cell.occupy.row,
+                temp;
+
+            if ((temp = occupy.indexOf(rowAlias)) !== -1){
+                    updateCellInfo.push({
+                        cell,
+                        props: {
+                            physicsBox: {
+                                height: cell.physicsBox.height + adjustHeight
+                            }
+                        }
+                    });
+                
+            } else {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            top: cell.physicsBox.top + adjustHeight
+                        }                   
+                    }
+                });
+            }
+        });
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+
+        let updateSelectInfo = [],
+            rowTop = row.top,
+            rowHeight = row.height,
+            selects = getters.selectList;
+
+        selects.forEach(function(select) {
+            let wholePosi = select.wholePosi,
+                startPosi,
+                endPosi;
+
+            startPosi = getters.getRowByAlias(wholePosi.startRowAlias).top;
+            endPosi = getters.getRowByAlias(wholePosi.endRowAlias).top;
+            if (startPosi === rowTop) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height + adjustHeight
+                        }
+                    }
+                });
+            } else if (startPosi > rowTop) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            top: select.physicsBox.top + adjustHeight
+                        }
+                    }
+                });
+
+            } else if (endPosi > rowTop) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height + adjustHeight
+                        }
+                    }
+                });
+            }
+        });
+
+        commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
+
+        let updateRowInfo = [];
+        for (let i = index, len = rows.length; i < len; i++) {
+            let row = rows[i];
+            if(i === index){
+                updateRowInfo.push({
+                    row,
+                    props: {
+                        height: height,
+                    }
+                });
+            }else{
+                updateRowInfo.push({
+                    row,
+                    props: {
+                        top:  row.top + adjustHeight,
+                    }
+                });
+            }
+
+        }
+ 
+        if(cache.localRowPosi > 0){
+            cache.localRowPosi += adjustHeight;
+        }
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo);
+    },
     [actionTypes.ROWS_DELETEROWS]({
         state,
         rootState,

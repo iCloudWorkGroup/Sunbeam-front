@@ -9,7 +9,9 @@ import {
 import extend from '../../../util/extend';
 import generator from '../../../tools/generator';
 import template from './template';
-import {SELECT} from '../../../tools/basic';
+import {
+    SELECT
+} from '../../../tools/basic';
 import generator from '../../../tools/generator';
 
 export default {
@@ -60,7 +62,6 @@ export default {
     }, index) {
         let selects = getters.selectList,
             currentSheet = rootState.currentSheet;
-
         if (index === undefined) {
             let select;
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -83,7 +84,7 @@ export default {
 
         row.sort = index;
         row.alias = rowAlias;
-        row.displayName =  getRowDisplayName(index);
+        row.displayName = getRowDisplayName(index);
         row.top = rowTop;
 
         cellList = getters.getCellsByVertical({
@@ -109,7 +110,8 @@ export default {
                     propName: 'physicsBox.height',
                     value: cell.physicsBox.height + rowHeight + 1
                 });
-                let newOccupy = occupy.slice(0).splice(temp, 0, rowAlias);
+                let newOccupy = occupy.slice(0).splice(temp, 0,
+                    rowAlias);
                 updateCellInfo.push({
                     cell,
                     propName: 'occupy.row',
@@ -164,7 +166,7 @@ export default {
                 row,
                 propName: 'sort',
                 value: row.sort + 1
-            },{
+            }, {
                 row,
                 propName: 'displayName',
                 value: getRowDisplayName(row.sort + 1)
@@ -173,7 +175,7 @@ export default {
         commit(mutationTypes.BATCH_UPDATE_ROW, {
             currentSheet,
             info: updateRowInfo
-        });        
+        });
         commit(mutationTypes.INSERT_ROW, {
             currentSheet,
             rows: [row]
@@ -206,7 +208,7 @@ export default {
             rowHeight = row.height,
             rowAlias = row.alias;
 
-       let cellList = getters.getCellsByVertical({
+        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -218,13 +220,14 @@ export default {
                 temp;
 
             if ((temp = occupy.indexOf(rowAlias)) !== -1) {
-                if(occupy.length ===1 ){
+                if (occupy.length === 1) {
                     deleteCells.push(cell);
-                }else{
+                } else {
                     updateCellInfo.push({
                         cell,
                         propName: 'physicsBox.height',
-                        value: cell.physicsBox.height - rowHeight - 1
+                        value: cell.physicsBox.height -
+                            rowHeight - 1
                     });
                 }
             } else {
@@ -286,11 +289,12 @@ export default {
                         currentSheet,
                         startIndex: index + 1
                     });
-                }else{
+                } else {
                     updateSelectInfo.push({
                         select,
                         propName: 'physicsBox.height',
-                        value: select.physicsBox.height - rowHeight -1
+                        value: select.physicsBox.height -
+                            rowHeight - 1
                     });
                     updateSelectInfo.push({
                         select,
@@ -303,7 +307,8 @@ export default {
                 updateSelectInfo.push({
                     select,
                     propName: 'physicsBox.top',
-                    value: select.physicsBox.top + rowHeight + 1
+                    value: select.physicsBox.top + rowHeight +
+                        1
                 });
             }
         });
@@ -324,14 +329,14 @@ export default {
                 row,
                 propName: 'sort',
                 value: row.sort - 1
-            },{
+            }, {
                 row,
                 propName: 'displayName',
                 value: getRowDisplayName(row.sort - 1)
             });
         }
- 
-        if(cache.localRowPosi > 0){
+
+        if (cache.localRowPosi > 0) {
             cache.localRowPosi -= rowHeight;
         }
         commit(mutationTypes.BATCH_UPDATE_ROW, {
@@ -399,7 +404,7 @@ export default {
         startIndex = getters.getRowIndexByAlias(newStartAlias);
         endIndex = getters.getRowIndexByAlias(newEndAlias);
         endIndex = endIndex === 'MAX' ? getters.rowList.length - 1 : endIndex;
-        
+
         commit(mutationTypes.ACTIVE_ROW, {
             currentSheet,
             startIndex,

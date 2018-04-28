@@ -9,7 +9,12 @@ export default {
 	getColIndexByPosi(state, getters, rootState) {
 		return function(posi) {
 			let currentSheet = rootState.currentSheet,
-				list = state[currentSheet].list;
+				list = state[currentSheet].list,
+				lastCol = list[list.length - 1];
+
+			if (lastCol.left + lastCol.height) {
+				return list.length - 1;
+			};
 
 			return rangeBinary(posi, list, 'left', 'width');
 		};
@@ -18,6 +23,7 @@ export default {
 		return function(sort) {
 			let currentSheet = rootState.currentSheet,
 				list = state[currentSheet].list;
+
 			return indexAttrBinary(sort, list, 'sort');
 		};
 	},

@@ -62,5 +62,6 @@ export default {
 	state: {
 		isDestroy: false,
 		hidden: false
-	}
+	},
+	alias: ''
 };

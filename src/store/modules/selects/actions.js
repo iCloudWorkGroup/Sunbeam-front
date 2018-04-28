@@ -3,9 +3,9 @@ import * as mutationTypes from '../../mutation-types';
 import * as actionTypes from '../../action-types';
 import generator from '../../../tools/generator';
 import template from './template';
-import { LOCATE, DRAG } from '../../../tools/basic';
-import { indexAttrBinary } from '../../../util/binary';
-import { SELECT } from '../../../tools/basic';
+import {LOCATE, DRAG} from '../../../tools/basic';
+import {indexAttrBinary} from '../../../util/binary';
+import {SELECT} from '../../../tools/basic';
 
 
 export default {
@@ -37,10 +37,8 @@ export default {
             endColIndex = region.endColIndex,
             endRowIndex = region.endRowIndex;
 
-        width = cols[endColIndex].width + cols[endColIndex].left - cols[
-            startColIndex].left;
-        height = rows[endRowIndex].height + rows[endRowIndex].top - rows[
-            startRowIndex].top;
+        width = cols[endColIndex].width + cols[endColIndex].left - cols[startColIndex].left;
+        height = rows[endRowIndex].height + rows[endRowIndex].top - rows[startRowIndex].top;
 
         select.physicsBox = {
             top: rows[startRowIndex].top,
@@ -54,13 +52,12 @@ export default {
             endColAlias: cols[endColIndex].alias,
             endRowAlias: rows[endRowIndex].alias
         };
-        select.alias = generator.selectAliasGenerator().value;
         commit(mutationTypes.INSERT_SELECT, {
             currentSheet,
             selects: [select]
         });
         commit(mutationTypes.SWITCH_ACTIVESELECT, {
-            select: select
+            select: getters.selectList[0]
         });
         commit(mutationTypes.ACTIVE_COL, {
             currentSheet,
@@ -95,7 +92,7 @@ export default {
             mouseState = rootState.mouseState,
             region;
 
-        if (mouseState === LOCATE) {
+        if(mouseState === LOCATE){
             region = getters.getFullOprRegion({
                 startColIndex: colIndex,
                 startRowIndex: rowIndex
@@ -106,28 +103,25 @@ export default {
             let tempPosi = activeSelect.tempPosi,
                 wholePosi = activeSelect.wholePosi;
 
-            if (wholePosi.endColAlias === 'MAX') {
+            if(wholePosi.endColAlias === 'MAX'){
                 colIndex = 'MAX';
                 rowIndex = rowIndex === 'MAX' ? 0 : rowIndex;
             }
-
-            if (wholePosi.endRowAlias === 'MAX') {
+            
+            if(wholePosi.endRowAlias === 'MAX'){
                 rowIndex = 'MAX';
                 colIndex = colIndex === 'MAX' ? 0 : colIndex;
             }
 
             region = getters.getFullOprRegion({
-                startColIndex: indexAttrBinary(tempPosi.initColSort,
-                    cols, 'sort'),
-                startRowIndex: indexAttrBinary(tempPosi.initRowSort,
-                    rows, 'sort'),
+                startColIndex: indexAttrBinary(tempPosi.initColSort, cols, 'sort'),
+                startRowIndex: indexAttrBinary(tempPosi.initRowSort, rows, 'sort'),
                 endColIndex: colIndex,
                 endRowIndex: rowIndex
             });
         }
 
-        let { startColIndex, startRowIndex, endColIndex, endRowIndex } = region
-        ;
+        let {startColIndex, startRowIndex, endColIndex, endRowIndex} = region;
 
         select.physicsBox = {
             top: rows[startRowIndex].top,
@@ -143,15 +137,15 @@ export default {
         endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex;
         endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex;
 
-        let width = cols[endColIndex].width + cols[endColIndex].left -
-            cols[startColIndex].left;
+        let width = cols[endColIndex].width + cols[endColIndex].left - 
+                cols[startColIndex].left;
         select.physicsBox.width = width;
-
-        let height = rows[endRowIndex].height + rows[endRowIndex].top -
-            rows[startRowIndex].top;
+    
+        let height = rows[endRowIndex].height + rows[endRowIndex].top - 
+                rows[startRowIndex].top;
         select.physicsBox.height = height;
-
-        if (mouseState === LOCATE) {
+        
+        if(mouseState === LOCATE){
             select.activePosi = {
                 colAlias: cols[startColIndex].alias,
                 rowAlias: rows[startRowIndex].alias
@@ -161,7 +155,7 @@ export default {
                 initRowSort: rows[startRowIndex].sort
             };
         }
-
+        
         if (activeSelect.type === SELECT) {
             dispatch(actionTypes.ROWS_UPDATEACTIVEROWS, {
                 oldStartAlias: activeSelect.wholePosi.startRowAlias,
@@ -177,8 +171,8 @@ export default {
             });
         }
         commit(mutationTypes.UPDATE_SELECT, {
-            currentSheet,
-            select
+            select: activeSelect,
+            props: select
         });
     }
 };

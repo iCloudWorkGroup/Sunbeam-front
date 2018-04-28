@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import * as types from '../../mutation-types';
-import {
-	indexAttrBinary
-} from '../../../util/binary';
+import {indexAttrBinary} from '../../../util/binary';
+import extend from '../../../util/extend';
 
 export default {
 	[types.INSERT_SHEET](state, sheet) {
@@ -48,14 +47,9 @@ export default {
 			list[i].active = true;
 		}
 	},
-	[types.BATCH_UPDATE_ROW](state,{currentSheet, info}){
-		info.forEach(function({row, propName, value}){
-			propName = propName.split('.');
-			if (propName.length > 1) {
-				row[propName[0]][propName[1]] = value;
-			} else {
-				row[propName[0]] = value;
-			}
+	[types.UPDATE_ROW](state, info){
+		info.forEach(function({row, props}){
+			extend(row, props);
 		});
 	},
 	[types.DELETE_ROW](state, {currentSheet, index}){

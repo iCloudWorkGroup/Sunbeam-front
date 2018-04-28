@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
 import actions from './actions';
 import mutations from './mutations';
 import cols from './modules/cols/index';
@@ -9,9 +7,7 @@ import selects from './modules/selects/index';
 import sheets from './modules/sheets/index';
 import pointsInfo from './modules/pointsinfo/index';
 import input from './modules/input/index';
-import {LOCATE} from '../tools/basic';
-
-Vue.use(Vuex);
+import { LOCATE } from '../tools/basic';
 
 const state = {
 	/**
@@ -28,7 +24,7 @@ const state = {
 	mouseState: LOCATE,
 };
 
-export default new Vuex.Store({
+export default {
 	state,
 	actions,
 	mutations,
@@ -41,4 +37,4 @@ export default new Vuex.Store({
 		pointsInfo,
 		input
 	}
-});
+};

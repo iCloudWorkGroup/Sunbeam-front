@@ -30,8 +30,11 @@ export default {
 					break;
 				}
 			}
-			type = type || 'mainRule';
-			return sheet.editViewOccupy[viewTypes[type]];
+			if(type === undefined){
+				return sheet.editViewOccupy;
+			}else{
+				return sheet.editViewOccupy[viewTypes[type]];
+			}
 		}
 	}
 };

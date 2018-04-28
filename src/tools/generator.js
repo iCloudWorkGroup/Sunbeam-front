@@ -14,15 +14,19 @@ function createGenerator(counter) {
 }
 export default {
 	rowAliasGenerator(counter = 0) {
-		this.rowAliasGenerator = createGenerator(counter)
+		this.rowAliasGenerator = createGenerator(counter);
+		return counter + '';
 	},
 	colAliasGenerator(counter = 0) {
 		this.colAliasGenerator = createGenerator(counter);
+		return counter + '';
 	},
 	cellAliasGenerator(counter = 0) {
 		this.cellAliasGenerator = createGenerator(counter);
+		return counter + '';
 	},
 	selectAliasGenerator(counter = 0) {
 		this.selectAliasGenerator = createGenerator(counter);
+		return counter + '';
 	}
 };

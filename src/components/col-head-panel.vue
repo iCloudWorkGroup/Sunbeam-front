@@ -53,15 +53,24 @@ export default {
         },
         colList() {
             let getters = this.$store.getters,
-                colList = getters.colList,
-                startIndex,
-                endIndex,
-                lastCol;
+                cols = getters.colList,
+                visibleCols = getters.visibleColList,
+                frozenRule = this.frozenRule,
+                startColIndex,
+                endColIndex,
+                lastCol,
+                startCol;
 
-            startIndex = this.startIndex || 0;
-            endIndex = this.endIndex || colList.length - 1;
-            if (this.endIndex !== undefined) {
-                return colList.slice(startIndex, endIndex + 1);
+            if (frozenRule) {
+                startColIndex = frozenRule.startColIndex;
+                if (frozenRule.endColIndex !== undefined) {
+                    endColIndex = frozenRule.endColIndex;
+                }
+                startCol = cols[startColIndex];
+                lastCol = cols[endColIndex];
+                startColIndex = getVisibleColIndexBySort(startCol.sort);
+                endColIndex = getVisibleColIndexBySort(lastCol.sort);
+                return getters.visibleCols.slice(startIndex, endIndex + 1);
             } else {
                 return getters.userViewColList;
             }
@@ -174,7 +183,7 @@ export default {
 
             let width = this.$refs.adjustColView.$el.style.width;
             
-            width = parseInt(width.substring(0, width.length -2));
+            width = parseInt(width.substring(0, width.length - 2));
             this.$store.dispatch(COLS_ADJUSTWIDTH, {
                 width,
                 index: this.adjustColIndex

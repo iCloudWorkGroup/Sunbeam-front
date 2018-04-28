@@ -1,7 +1,7 @@
 <template>
     <div class="row-head-container" :style="{ height: height + 'px'}">
         <div class="row-head-bg row-head-width" :style="{
-        height: totalHeight + 'px'}">
+        height: totalHeight}">
             <row-head-panel :frozenRule = "frozenRule"></row-head-panel>
             <div class="row-head-line" v-for="item in selectList"
 				:style="{
@@ -37,15 +37,27 @@
 				return this.rowHeadHeight;
 			},
 			totalHeight() {
-				let rowList = this.$store.getters.rowList,
-					startIndex,
-					endIndex,
-					lastRow;
+	            let rows = this.$store.getters.rowList,
+	                visibleRows = this.$store.getters.visibleRowList,
+	                frozenRule = this.frozenRule,
+	                startRowIndex,
+	                endRowIndex,
+	                lastRow,
+	                startRow;
 
-				startIndex = this.startIndex || 0;
-				endIndex = this.endIndex || rowList.length - 1;
-				lastRow = rowList[endIndex];
-				return lastRow.top + lastRow.height - rowList[startIndex].top;
+	            if (frozenRule) {
+	                startRowIndex = frozenRule.startRowIndex;
+	                if (frozenRule.endRowIndex !== undefined) {
+	                    endRowIndex = frozenRule.endRowIndex;
+	                }
+	                startRow = rows[startRowIndex];
+	                lastRow = rows[endRowIndex];
+	            } else {
+	                endRowIndex = visibleRows.length - 1;
+	                startRow = visibleRows[0];
+	                lastRow = visibleRows[endRowIndex];
+	            }
+	            return lastRow.top + lastRow.height - startRow.top + 'px';
 			},
 			selectList() {
 				return this.$store.getters.selectList;

@@ -1,6 +1,7 @@
 <template>
     <div class="col-head-item" :style="{
     left: left + 'px', 
+    borderRight: borderRight,
     width: width + 'px'}" :class="{active: active}">
         <div class="item">{{displayName}}</div>
     </div>
@@ -13,6 +14,9 @@ export default {
             return this.col.left - this.offsetLeft;
         },
         width() {
+            if(this.col.rightAjacentHide){
+                return this.col.width - 2;
+            }
             return this.col.width;
         },
         displayName() {
@@ -20,6 +24,12 @@ export default {
         },
         active() {
             return this.col.active;
+        },
+        borderRight(){
+            if(this.col.rightAjacentHide){
+                return 'double #bfbfbf';
+            }
+            return;
         }
     },
     methods: {

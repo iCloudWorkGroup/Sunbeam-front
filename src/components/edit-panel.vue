@@ -15,7 +15,7 @@ import ColGridGroup from './col-grid-group.vue';
 import RowGridGroup from './row-grid-group.vue';
 import CellGroup from './cell-group.vue';
 import SelectGroup from './select-group.vue';
-import { LOCATE, DRAG } from '../tools/basic';
+import { LOCATE, DRAG } from '../tools/constant';
 export default {
     props: ['editPanelWidth', 'editPanelHeight', 'frozenRule'],
     components: {

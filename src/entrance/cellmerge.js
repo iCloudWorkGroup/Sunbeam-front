@@ -1,0 +1,3 @@
+function(store, sbm){
+	extend();
+}

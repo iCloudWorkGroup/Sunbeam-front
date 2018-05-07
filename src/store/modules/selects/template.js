@@ -1,5 +1,5 @@
 import cfg from '../../../config';
-import {SELECT} from '../../../tools/basic';
+import {SELECT} from '../../../tools/constant';
 /**
  * 选中区对象默认值
  */

@@ -8,7 +8,7 @@
 </template>
 <script type="text/javascript">
     import * as types from '../store/action-types';
-    import {SELECT} from '../tools/basic';
+    import {SELECT} from '../tools/constant';
 
     export default {
         props: ['select', 'frozenRule'],

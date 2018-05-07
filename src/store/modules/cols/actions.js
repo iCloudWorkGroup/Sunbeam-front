@@ -9,9 +9,7 @@ import extend from '../../../util/extend';
 import config from '../../../config';
 import cache from '../../../tools/cache';
 import template from './template';
-import {
-    SELECT
-} from '../../../tools/basic';
+import { SELECT } from '../../../tools/constant';
 
 export default {
     [actionTypes.COLS_ADDCOLS]({

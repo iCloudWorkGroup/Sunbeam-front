@@ -5,24 +5,25 @@ import send from '../util/send';
 import rowTemplate from '../store/modules/rows/template';
 import colTemplate from '../store/modules/cols/template';
 import generator from './generator';
-import {
-	getColDisplayName,
-	getRowDisplayName
-} from '../util/displayname';
+import {getColDisplayName, getRowDisplayName} from '../util/displayname';
 
-export function initSpreadsheet(data, fn) {
-	return new Promise(function(resolve){
-		let build = true;
-		if (build === true) {
-			buildNewSpreadsheet(fn, resolve);
-			return;
-		}
-		restoreSpreadsheet(data, fn, resolve);
-	});
+/**
+ * 初始化/请求表格数据
+ * @param  {Object}   viewBox 视图盒模型大小
+ * @param  {Function} fn      数据处理函数
+ * @return {[type]}           [description]
+ */
+export default function(viewBox, fn) {
+	let build = true;
+	if (build === true) {
+		buildSBM(fn);
+		return;
+	}
+	restoreSBM(viewBox, fn);
 }
 
 
-function buildNewSpreadsheet(fn, resolve) {
+function buildSBM(fn, resolve) {
 	let rows = [],
 		cols = [],
 		cells = [],
@@ -56,22 +57,15 @@ function buildNewSpreadsheet(fn, resolve) {
 	colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
 	rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
 
-	cache.regionRecord.set(
-		colRecord[0] + '_' +
-		colRecord[1] + '_' +
-		rowRecord[0] + '_' +
-		rowRecord[1], true);
-
 	fn({
 		rows,
 		cols,
 		cells,
 		sheet
 	});
-	resolve();
 }
 
-function restoreSpreadsheet(data, fn, resolve) {
+function restoreSBM(data, fn, resolve) {
 	var cols = [],
 		rows = [],
 		cells = [],
@@ -81,6 +75,7 @@ function restoreSpreadsheet(data, fn, resolve) {
 		
 	send({
 		url: 'reload',
+		async: false,
 		data: JSON.stringify(data),
 		success(data) {
 			if (!data || !data.returndata) {
@@ -137,7 +132,6 @@ function restoreSpreadsheet(data, fn, resolve) {
 					cols,
 					cells
 				});
-				resolve();
 			}
 		}
 	});

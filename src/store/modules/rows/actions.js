@@ -11,7 +11,7 @@ import {
 } from '../../../util/displayname';
 import {
     SELECT
-} from '../../../tools/basic';
+} from '../../../tools/constant';
 
 
 export default {
@@ -452,27 +452,6 @@ export default {
                         }
                     }
                 });
-<<<<<<< HEAD
-                let newOccupy = occupy.slice(0).splice(temp, 0,
-                    rowAlias);
-                updateCellInfo.push({
-                    cell,
-                    propName: 'occupy.row',
-                    value: newOccupy
-=======
-
-                occupyCol.forEach(function(colAlias) {
-                    commit(mutationTypes.UPDATE_POINTINFO, {
-                        currentSheet,
-                        info: {
-                            colAlias,
-                            rowAlias,
-                            type: 'cellIndex',
-                            value: cellIndex
-                        }
-                    });
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
-                });
             }
         });
 
@@ -516,24 +495,6 @@ export default {
             let row = rows[i];
             updateRowInfo.push({
                 row,
-<<<<<<< HEAD
-                propName: 'top',
-                value: row.top + rowHeight + 1
-            }, {
-                row,
-                propName: 'sort',
-                value: row.sort + 1
-            }, {
-                row,
-                propName: 'displayName',
-                value: getRowDisplayName(row.sort + 1)
-            });
-        }
-        commit(mutationTypes.BATCH_UPDATE_ROW, {
-            currentSheet,
-            info: updateRowInfo
-        });
-=======
                 props: {
                     top: row.top + rowHeight + 1,
                     sort: row.sort + 1,
@@ -541,8 +502,7 @@ export default {
                 }
             });
         }
-        commit(mutationTypes.UPDATE_ROW, updateRowInfo);        
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo);  
         commit(mutationTypes.INSERT_ROW, {
             currentSheet,
             rows: [row]
@@ -701,14 +661,6 @@ export default {
             if ((temp = occupy.indexOf(rowAlias)) !== -1) {
                 if (occupy.length === 1) {
                     deleteCells.push(cell);
-<<<<<<< HEAD
-                } else {
-                    updateCellInfo.push({
-                        cell,
-                        propName: 'physicsBox.height',
-                        value: cell.physicsBox.height -
-                            rowHeight - 1
-=======
                 }else{
                     deleteCells.push({
                         col: cell.occupy.col,
@@ -721,7 +673,6 @@ export default {
                                 height: cell.physicsBox.height - rowHeight - 1
                             }
                         }
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
                     });
                 }
             } else {
@@ -779,16 +730,6 @@ export default {
                 } else {
                     updateSelectInfo.push({
                         select,
-<<<<<<< HEAD
-                        propName: 'physicsBox.height',
-                        value: select.physicsBox.height -
-                            rowHeight - 1
-                    });
-                    updateSelectInfo.push({
-                        select,
-                        propName: 'wholePosi.startRowAlias',
-                        value: rows[index + 1].alias
-=======
                         props: {
                             physicsBox: {
                                 height: select.physicsBox.height - rowHeight - 1
@@ -797,24 +738,17 @@ export default {
                                 startRowAlias: rows[index + 1].alias
                             }
                         }
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
                     });
                 }
 
             } else if (endPosi > rowTop) {
                 updateSelectInfo.push({
                     select,
-<<<<<<< HEAD
-                    propName: 'physicsBox.top',
-                    value: select.physicsBox.top + rowHeight +
-                        1
-=======
                     props: {
                         physicsBox: {
                             top: select.physicsBox.top + rowHeight + 1
                         }
                     }
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
                 });
             }
         });
@@ -826,24 +760,11 @@ export default {
             let row = rows[i];
             updateRowInfo.push({
                 row,
-<<<<<<< HEAD
-                propName: 'top',
-                value: row.top - rowHeight - 1
-            }, {
-                row,
-                propName: 'sort',
-                value: row.sort - 1
-            }, {
-                row,
-                propName: 'displayName',
-                value: getRowDisplayName(row.sort - 1)
-=======
                 props: {
                     top:  row.top - rowHeight - 1,
                     sort: row.sort - 1,
                     displayName: getRowDisplayName(row.sort - 1)
                 }
->>>>>>> 7e175004bf511db363d61bc33f8c284a7246c638
             });
         }
 

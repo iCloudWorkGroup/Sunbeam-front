@@ -21,7 +21,7 @@
 import ColHeadItem from './col-head-item.vue';
 import { SELECTS_UPDATESELECT, COLS_ADJUSTWIDTH } from '../store/action-types';
 import { UPDATE_MOUSESTATE } from '../store/mutation-types';
-import { LOCATE, DRAG } from '../tools/basic';
+import { LOCATE, DRAG } from '../tools/constant';
 
 export default {
     props: ['frozenRule'],

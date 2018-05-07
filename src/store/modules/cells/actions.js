@@ -3,46 +3,42 @@ import * as mutationTypes from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
 import extend from '../../../util/extend';
 import template from './template';
-import {SELECT} from '../../../tools/basic';
+import {SELECT} from '../../../tools/constant';
 import generator from '../../../tools/generator';
 
 export default {
     /**
-     * 还原单元格
+     * 还原单元格, 由occupy生成盒模型信息
      */
     [actionTypes.CELLS_RESTORECELL]({ commit, dispatch, state, rootState,
-        getters }, cells) {
-        if (!Array.isArray(cells)) {
-            cells = [cells];
+        getters }, cellList) {
+        if (!Array.isArray(cellList)) {
+            cellList = [cellList];
         }
 
         let sheet = rootState.currentSheet,
-            colList = rootState.cols[sheet].list,
-            rowList = rootState.rows[sheet].list,
-            cellList = rootState.cells[sheet],
-            limitRowIndex = rowList.length - 1,
-            limitColIndex = colList.length - 1,
+            cols = getters.colList,
+            rows = getters.rowList,
+            cells = getters.cellList,
+            limitRowIndex = rows.length - 1,
+            limitColIndex = cols.length - 1,
             getPointInfo = getters.getPointInfo,
             getColIndexByAlias = getters.getColIndexByAlias,
             getRowIndexByAlias = getters.getRowIndexByAlias;
 
-        for (let i = 0, len = cells.length; i < len; i++) {
-            let cell,
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                aliasColList,
-                aliasRowList,
-                aliasCol, aliasRow,
-                cellIndex,
-                width = 0,
-                height = 0,
-                physicsBox;
-
-			cell = cells[i];
-			aliasColList = cell.occupy.col;
-			aliasRowList = cell.occupy.row;
+        for (let i = 0, len = cellList.length; i < len; i++) {
+			let cell = cellList[i],
+				aliasColList = cell.occupy.col,
+				aliasRowList = cell.occupy.row,
+				startRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex,
+				aliasCol, aliasRow,
+				cellIndex,
+				width = 0,
+				height = 0,
+				physicsBox;
 
 			aliasCol = aliasColList[0];
 			aliasRow = aliasRowList[0];
@@ -68,21 +64,22 @@ export default {
 			if (endColIndex === -1) {
 				continue;
 			}
+
 			for (let j = startColIndex; j < endColIndex + 1; j++) {
-				let col = colList[j];
+				let col = cols[j];
 				if (!col.hidden) {
 					width += col.width + 1;
 				}
 			}
 			for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-				let row = rowList[j];
+				let row = rows[j];
 				if (!row.hidden) {
 					height += row.height + 1;
 				}
 			}
 			physicsBox = {
-				top: rowList[startRowIndex].top,
-				left: colList[startColIndex].left,
+				top: rows[startRowIndex].top,
+				left: cols[startColIndex].left,
 				width: width - 1,
 				height: height - 1
 			};
@@ -101,7 +98,7 @@ export default {
 								colAlias,
 								rowAlias,
 								type: 'cellIndex',
-								value: cellList.length
+								value: cells.length
 							}
 						});
 					}
@@ -110,11 +107,11 @@ export default {
 				cell = extend({}, template, cell);
 				commit(mutationTypes.INSERT_CELL, {
 					currentSheet: sheet,
-					cells: [cell]
+					cell
 				});
 			} else {
 				commit(mutationTypes.UPDATE_CELL, [{
-					cell: cellList[cellIndex],
+					cell: cells[cellIndex],
 					props: {
 						physicsBox: {
 							height: physicsBox.height,
@@ -125,75 +122,59 @@ export default {
 			}
 		}
 	},
-	// [actionTypes.CELLS_UPDATECELL]({commit, state, rootState, getters}, {
-	// 	colAlias,
-	// 	rowAlias,
-	// 	propName,
-	// 	propValue
-	// }) {
-	// 	let getPointInfo = getters.getPointInfo,
-	// 		currentSheet = rootState.currentSheet,
-	// 		cellIndex;
 
-	// 	cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex');
+	[actionTypes.CELLS_UPDATE]({commit, dispatch, getters}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex,
+		props
+	}) {
+		let getPointInfo = getters.getPointInfo,
+			tempSign = {},
+			cols = getters.colList,
+			rows = getters.rowList,
+			cells = getters.cellList,
+			updateCellInfo = [],
+			insertCellList = [],
+			colAlias,
+			rowAlias,
+			cellIndex;
 
-	// 	if (typeof cellIndex === 'number') {
-	// 		let cells = getters.cellList;
-	// 		{cell, props}
-	// 		commit(mutationTypes.UPDATE_CELL,
-	// 			{
-	// 				cell: cells[cellIndex],
-	// 				propName: propName,
-	// 				value: propValue
-	// 			}
-	// 		});
-	// 	} else {
-	// 		let cell = extend(template),
-	// 			colIndex = getters.getColIndexByAlias(colAlias),
-	// 			rowIndex = getters.getColIndexByAlias(rowAlias),
-	// 			col = getters.colList[colIndex],
-	// 			row = getters.rowList[rowIndex];
-
-	// 		cell.occupy.col.push(colAlias);
-	// 		cell.occupy.row.push(rowAlias);
-
-	// 		cell.physicsBox = {
-	// 			top: row.top,
-	// 			left: col.left,
-	// 			width: col.width,
-	// 			height: row.height
-	// 		};
-
-	// 		cell.alias = generator.cellAliasGenerator();
-	// 		propName = propName.split('.');
-	// 		if (propName.length > 1) {
-	// 			cell[propName[0]][propName[1]] = propValue;
-	// 		} else {
-	// 			cell[propName[0]] = propValue;
-	// 		}
-	// 		commit(mutationTypes.INSERT_CELL, {
-	// 			currentSheet,
-	// 			cells: [cell]
-	// 		});
-
-
-	// 		commit(mutationTypes.UPDATE_POINTINFO, {
-	// 			currentSheet,
-	// 			info: {
-	// 				colAlias,
-	// 				rowAlias,
-	// 				type: 'cellIndex',
-	// 				value: getters.cellList.length - 1
-	// 			}
-	// 		});
-	// 	}
-	// },
+		for (let i = startColIndex; i <= endColIndex; i++) {
+			for (let j = startRowIndex; j <= endRowIndex; j++) {
+				cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex');
+				if (typeof cellIndex === 'number') {
+					let cell;
+					if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
+						updateCellInfo.push({
+			       			cell,
+			       			props
+			       		});
+					}
+				} else {
+					insertCellList.push(extend({
+						occupy: {
+							col: [cols[i].alias],
+							row: [rows[j].alias]
+						}
+					}, props));
+				}
+			}
+		}
+		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
+		commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+	},
+	/**
+	 * 插入单元格
+	 */
 	[actionTypes.CELLS_INSERTCELL]({commit, state, rootState, getters}, cellList){
 		let insertCellInfo = [],
 			cols = getters.colList,
 			rows = getters.rowList,
-			currentSheet = rootState.currentSheet,
+			sheet = rootState.currentSheet,
 			indexCounter = getters.cellList.length;
+			
 		cellList.forEach(function(cell) {
 			let aliasColList = cell.occupy.col,
 				aliasRowList = cell.occupy.row,
@@ -203,26 +184,11 @@ export default {
 				endRowIndex;
 
 			cell = extend({}, template, cell);
-			for (let i = 0, len = aliasColList.length; i < len; i++) {
-				if ((startColIndex = getters.getColIndexByAlias(aliasColList[i])) !== -1) {
-					break;
-				}
-			}
-			for (let i = aliasColList.length - 1; i > -1; i++) {
-				if ((endColIndex = getters.getColIndexByAlias(aliasColList[i])) !== -1) {
-					break;
-				}
-			}
-			for (let i = 0, len = aliasRowList.length; i < len; i++) {
-				if ((startRowIndex = getters.getRowIndexByAlias(aliasRowList[i])) !== -1) {
-					break;
-				}
-			}
-			for (let i = aliasRowList.length - 1; i > -1; i++) {
-				if ((endRowIndex = getters.getRowIndexByAlias(aliasRowList[i])) !== -1) {
-					break;
-				}
-			}
+
+			startColIndex = getters.getColIndexByAlias(aliasColList[0]);			
+			endColIndex = getters.getColIndexByAlias(aliasColList[aliasColList.length -1]);
+			startRowIndex = getters.getRowIndexByAlias(aliasRowList[0]);
+			endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length -1]);
 
 
 			cell.physicsBox = {
@@ -234,8 +200,8 @@ export default {
 
 			cell.alias = generator.cellAliasGenerator();
 			commit(mutationTypes.INSERT_CELL, {
-				currentSheet,
-				cells: [cell]
+				currentSheet: rootState.currentSheet,
+				cell
 			});
 			for (let j = 0; j < aliasColList.length; j++) {
 				for (let k = 0; k < aliasRowList.length; k++) {
@@ -442,5 +408,5 @@ export default {
 			}
 			return true;
 		}
-	},
+	}
 };

@@ -3,9 +3,9 @@ import * as mutationTypes from '../../mutation-types';
 import * as actionTypes from '../../action-types';
 import generator from '../../../tools/generator';
 import template from './template';
-import {LOCATE, DRAG} from '../../../tools/basic';
+import {LOCATE, DRAG} from '../../../tools/constant';
 import {indexAttrBinary} from '../../../util/binary';
-import {SELECT} from '../../../tools/basic';
+import {SELECT} from '../../../tools/constant';
 
 
 export default {

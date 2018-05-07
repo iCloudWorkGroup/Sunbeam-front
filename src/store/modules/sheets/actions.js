@@ -4,7 +4,7 @@ import * as mutationTypes from '../../mutation-types';
 import template from './template';
 import {
 	SELECT
-} from '../../../tools/basic';
+} from '../../../tools/constant';
 
 
 let viewTypes = {

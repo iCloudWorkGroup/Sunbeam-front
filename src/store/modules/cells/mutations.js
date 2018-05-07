@@ -6,11 +6,9 @@ export default {
 	[types.INSERT_SHEET](state, sheet) {
 		Vue.set(state, sheet.alias, []);
 	},
-	[types.INSERT_CELL](state, {currentSheet, cells}) {
+	[types.INSERT_CELL](state, {currentSheet, cell}) {
 		let currentList = state[currentSheet];
-		for (let i = 0, len = cells.length; i < len; i++) {
-			currentList.push(cells[i]);
-		}
+			currentList.push(cell);
 	},
 	[types.UPDATE_CELL](state, info) {
 		if(!Array.isArray(info)){

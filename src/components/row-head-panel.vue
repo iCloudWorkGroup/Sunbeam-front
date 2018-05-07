@@ -22,7 +22,7 @@
 import RowHeadItem from './row-head-item.vue';
 import {SELECTS_UPDATESELECT, ROWS_ADJUSTHEIGHT} from '../store/action-types';
 import {UPDATE_MOUSESTATE} from '../store/mutation-types';
-import {LOCATE, DRAG} from '../tools/basic';
+import {LOCATE, DRAG} from '../tools/constant';
 
 export default {
 	props: ['frozenRule'],

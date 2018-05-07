@@ -64,7 +64,7 @@ export default {
 			colAlias = currentState.colAlias,
 			rowAlias = currentState.rowAlias;
 
-		dispatch(actionTypes.CELLS_UPDATECELL, {
+		dispatch(actionTypes.CELLS_UPDATE, {
 			colAlias,
 			rowAlias,
 			propName: 'content.texts',

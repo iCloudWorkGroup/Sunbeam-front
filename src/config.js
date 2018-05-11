@@ -27,6 +27,11 @@ export default {
 	scrollBufferWidth: 500,
 	scrollBufferHeight: 200,
 	/**
+	 * 工具栏宽度
+	 * @type {Number}
+	 */
+	toolbarHeight: 130,
+	/**
 	 * 请求地址根路径
 	 * @type {String}
 	 */

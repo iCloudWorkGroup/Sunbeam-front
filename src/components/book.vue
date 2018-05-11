@@ -1,10 +1,8 @@
 <template>
     <div class="book" 
-    :width="width + 'px'" 
-    :style="{ 
-	   width: width + 'px', 
-	   height: height + 'px'
-    }">
+        :width="width + 'px'" 
+        :style="{ width: width + 'px', 
+            height: height + 'px'}">
         <sheet :sheet-width="width" :sheet-height="sheetHeight"></sheet>
         <!-- <tab></tab> -->
     </div>

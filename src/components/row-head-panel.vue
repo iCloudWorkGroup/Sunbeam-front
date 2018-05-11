@@ -74,7 +74,6 @@ export default {
                 endRowIndex = getters.getVisibleRowIndexBySort(startRow.sort);
                 return visibleCols.slice(startRowIndex, endRowIndex + 1);
             } else {
-            	console.log(getters.userViewRowList.length);
                 return getters.userViewRowList;
             }
 		},

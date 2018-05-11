@@ -1,0 +1,39 @@
+.widget-panel {
+	overflow-y: auto;
+	overflow-x: hidden;
+	border: 1px solid #9fd5b7;
+}
+
+.widget-panel .widget-menu {
+}
+
+.widget-menu li {
+	padding: 3px 8px;
+	overflow: hidden
+}
+
+.widget-ico {
+	padding: 0;
+	margin: 3px;
+	float: left;
+	display: inline-block;
+}
+
+.widget-content {
+	margin: 3px;
+}
+
+.widget-pad {
+	padding: 3px
+}
+
+.widget-weight {
+	font-weight: 700
+}
+
+.widget-desc {
+	width: 160px;
+}
+.hide{
+	display: none;
+}

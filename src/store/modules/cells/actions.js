@@ -128,8 +128,56 @@ export default {
 		endColIndex,
 		startRowIndex,
 		endRowIndex,
-		props
+		propNames,
+		value
 	}) {
+		if(typeof startColIndex === 'undefined'){
+			let select = getters.activeSelect,
+				wholePosi = select.wholePosi;
+			
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+		}
+
+		propNames = propNames.split('.');
+
+		if(value === undefined){
+			let cellList = getters.getCellsByVertical({
+				startColIndex,
+				endColIndex,
+				startRowIndex,
+				endRowIndex
+			});
+			if(cellList.length === 0){
+				value = true;
+			}else{
+				let temp;
+				for (let i = 0; i < propNames.length; i++) {
+					if(i === 0){
+						temp = cellList[0][propNames[i]];
+					}else{
+						temp = temp[propNames[i]];
+					}
+				}
+				value = !temp;
+			}
+		}
+
+		let	props = {},
+			temp;
+
+		for (let i = 0, len = propNames.length; i < len; i++) {
+			if (i === 0) {
+				temp = props[propNames[0]] = {};
+			}else if (i < len - 1) {	
+				temp[propNames[i]] = temp = {};
+			}else {
+				temp[propNames[i]] = value;
+			} 
+		}
+
 		let getPointInfo = getters.getPointInfo,
 			tempSign = {},
 			cols = getters.colList,
@@ -143,6 +191,8 @@ export default {
 
 		for (let i = startColIndex; i <= endColIndex; i++) {
 			for (let j = startRowIndex; j <= endRowIndex; j++) {
+				colAlias = cols[i].alias;
+				rowAlias = rows[j].alias;
 				cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex');
 				if (typeof cellIndex === 'number') {
 					let cell;
@@ -155,8 +205,8 @@ export default {
 				} else {
 					insertCellList.push(extend({
 						occupy: {
-							col: [cols[i].alias],
-							row: [rows[j].alias]
+							col: [colAlias],
+							row: [rowAlias]
 						}
 					}, props));
 				}
@@ -164,6 +214,166 @@ export default {
 		}
 		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
 		commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+	},
+	[actionTypes.CELLS_UPDATE_BORDER]({commit, dispatch, getters}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex,
+		value
+	}) {
+		if(typeof startColIndex === 'undefined'){
+			let select = getters.activeSelect,
+				wholePosi = select.wholePosi;
+			
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+		}
+
+		switch (value) {
+			case 'bottom':
+				setBottom();
+				break;
+			case 'top':
+				setTop();
+				break;
+			case 'left':
+				setLeft();
+				break;
+			case 'right':
+				setRight();
+				break;
+			case 'none':
+				setNone();
+				break;
+			case 'all':
+				setAll();
+				break;
+			case 'outer':
+				setOuter();
+				break;
+		}
+
+		function setBottom() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex: endRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border.bottom',
+				value: true
+			});
+		}
+
+		function setTop() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex: startRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border.top',
+				value: true
+			});
+		}
+
+		function setLeft() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex: startColIndex,
+				propNames: 'physicsBox.border.left',
+				value: true
+			});
+		}
+
+		function setRight() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex: endColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border.right',
+				value: true
+			});
+		}
+
+		function setNone() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					top: false,
+					left: false,
+					right: false,
+					bottom: false
+				}
+			});
+		}
+
+		function setAll() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					top: true,
+					left: true,
+					right: true,
+					bottom: true
+				}
+			});
+		}
+
+		function setOuter() {
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex: startRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					top: true,
+				}
+			});
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex: startColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					left: true,
+				}
+			});
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex: endRowIndex,
+				startColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					bottom: true
+				}
+			});
+			dispatch(actionTypes.CELLS_UPDATE, {
+				startRowIndex,
+				startColIndex: endColIndex,
+				endRowIndex,
+				endColIndex,
+				propNames: 'physicsBox.border',
+				value: {
+					right: true
+				}
+			});
+		}
 	},
 	/**
 	 * 插入单元格
@@ -191,12 +401,14 @@ export default {
 			endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length -1]);
 
 
-			cell.physicsBox = {
+			let physicsBox = {
 				top: rows[startRowIndex].top,
 				left: cols[startColIndex].left,
 				width: cols[endColIndex].left + cols[endColIndex].width - cols[startColIndex].left,
 				height: rows[endRowIndex].top + rows[endRowIndex].height - rows[startRowIndex].top
 			};
+
+			extend(cell, {physicsBox});
 
 			cell.alias = generator.cellAliasGenerator();
 			commit(mutationTypes.INSERT_CELL, {

@@ -28,6 +28,7 @@
     "cross-spawn": "^5.0.1",
     "css-loader": "^0.28.7",
     "express": "^4.15.4",
+    "file-loader": "^1.1.11",
     "generator-karma": "^2.0.1",
     "html-webpack-plugin": "^2.30.1",
     "inject-loader": "^3.0.1",

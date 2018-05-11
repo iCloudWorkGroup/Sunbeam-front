@@ -1,10 +1,32 @@
 import { rangeBinary } from '../../../util/binary';
 import {indexAttrBinary} from '../../../util/binary';
+import extend from '../../../util/extend';
+import template from './template';
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
             result = state[currentSheet];
         return result;
+    },
+    getSelectCell(state, getters, rootState){
+        let select = getters.activeSelect,
+            wholePosi = select.wholePosi,
+            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias),
+            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias),
+            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias),
+            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias),
+            cellList;
+
+        cellList = getters.getCellsBytransverse({startColIndex,
+            startRowIndex,
+            endRowIndex,
+            endColIndex});
+
+        if(cellList.length === 0){
+            return extend({}, template);
+        }else{
+            return extend({}, cellList[0]);
+        }
     },
     /**
      * 返回合法的操作区域
@@ -136,6 +158,50 @@ export default {
                             if (!tempObj[index]) {
                                 result.push(cells[index]);
                                 tempObj[index] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        };
+    },
+    getCellsBytransverse(state, getters, rootState) {
+        let currentSheet = rootState.currentSheet,
+            cells = state[currentSheet];
+            
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex = startColIndex,
+            endRowIndex = startRowIndex,
+            cols,
+            rows
+        }) {
+            let result = [],
+                pointInfo = rootState.pointsInfo[currentSheet].row,
+                index, temp,
+                tempObj = {},
+                rowAlias,
+                colAlias;
+
+            rows = rows || getters.rowList;
+            cols = cols || getters.colList;
+            endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex;
+            endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex;
+            
+            for (let i = startRowIndex, len1 = endRowIndex + 1; i < len1; i++) {
+                rowAlias = rows[i].alias;
+                if (typeof pointInfo[rowAlias] !== 'undefined') {
+                    for (let j = startColIndex, len2 = endColIndex + 1; j <
+                        len2; j++) {
+                        colAlias = rows[j].alias;
+                        temp = pointInfo[rowAlias][colAlias];
+                        if (temp && temp.cellIndex !== null) {
+                            index = temp.cellIndex;
+                            if (!tempObj[index]) {
+                                result.push(cells[index]);
+                                tempObj[index] = true;
                             }
                         }
                     }

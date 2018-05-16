@@ -52,9 +52,7 @@
         },
         methods: {
             edit() {
-                this.$store.dispatch(types.EDIT_SHOW, {
-                    type: 'click'
-                });
+                this.$store.dispatch(types.EDIT_SHOW);
             }
         },
         mounted() {

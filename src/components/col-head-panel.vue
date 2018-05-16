@@ -65,12 +65,14 @@ export default {
                 startColIndex = frozenRule.startColIndex;
                 if (frozenRule.endColIndex !== undefined) {
                     endColIndex = frozenRule.endColIndex;
+                }else {
+                    endColIndex = visibleCols.length -1;
                 }
                 startCol = cols[startColIndex];
                 lastCol = cols[endColIndex];
-                startColIndex = getVisibleColIndexBySort(startCol.sort);
-                endColIndex = getVisibleColIndexBySort(lastCol.sort);
-                return getters.visibleCols.slice(startIndex, endIndex + 1);
+                startColIndex = getters.getVisibleColIndexBySort(startCol.sort);
+                endColIndex = getters.getVisibleColIndexBySort(lastCol.sort);
+                return getters.visibleColList.slice(startColIndex, endColIndex + 1);
             } else {
                 return getters.userViewColList;
             }

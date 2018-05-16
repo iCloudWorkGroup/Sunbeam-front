@@ -67,12 +67,14 @@ export default {
                 startRowIndex = frozenRule.startRowIndex;
                 if (frozenRule.endRowIndex !== undefined) {
                     endRowIndex = frozenRule.endRowIndex;
+                }else{
+                	endRowIndex = visibleRows.length - 1;
                 }
                 startRow = rows[startRowIndex];
                 lastRow = rows[endRowIndex];
                 startRowIndex = getters.getVisibleRowIndexBySort(startRow.sort);
-                endRowIndex = getters.getVisibleRowIndexBySort(startRow.sort);
-                return visibleCols.slice(startRowIndex, endRowIndex + 1);
+                endRowIndex = getters.getVisibleRowIndexBySort(lastRow.sort);
+                return visibleRows.slice(startRowIndex, endRowIndex + 1);
             } else {
                 return getters.userViewRowList;
             }

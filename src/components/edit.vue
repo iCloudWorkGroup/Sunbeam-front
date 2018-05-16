@@ -874,6 +874,7 @@ export default {
 <style type="text/css">
 .edit {
     overflow: hidden;
+    background: white;
 }
 
 .scroll-box {

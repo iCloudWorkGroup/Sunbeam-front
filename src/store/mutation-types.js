@@ -25,6 +25,7 @@ export const ACTIVE_COL = 'ACTIVE_COL';
 export const UPDATE_ROW = 'UPDATE_ROW';
 export const UPDATE_COL = 'UPDATE_COL';
 
+export const UPDATE_FOCUSSTATE = 'UPDATE_FOCUSSTATE';
 
 export const UPDATE_FROZENSTATE = 'UPDATE_FROZENSTATE';
 

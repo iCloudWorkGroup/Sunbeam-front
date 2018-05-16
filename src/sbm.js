@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import options from './store/index';
 import {RESTORE} from './store/action-types';
-import {UPDATE_MOUSESTATE} from './store/mutation-types';
+import {UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE} from './store/mutation-types';
 import Book from './components/book.vue';
 import Toolbar from './components/toolbar/toolbar.vue'
 import { LOCATE } from './tools/constant';
@@ -30,9 +30,11 @@ function SBM(wrapperId) {
 		store.dispatch(RESTORE, data);
 	});
 
-	let template = `<div style="position:absolute;left:0;right:0;top:0;bottom:0;">
+	let template = `<div style="position:absolute;left:0;right:0;top:0;bottom:0;"
+						@mouseup="getFocus">
 						<toolbar></toolbar>
-						<book :book-width="bookWidth" :book-height="bookHeight">
+						<book :book-width="bookWidth" 
+							:book-height="bookHeight">
 						</book>
 					</div>`;
 
@@ -59,6 +61,11 @@ function SBM(wrapperId) {
 					state: LOCATE
 				});
 			}, false);
+		},
+		methods: {
+			getFocus(){
+				this.$store.commit(UPDATE_FOCUSSTATE, false);
+			}
 		}
 	});
 	font(this, store);

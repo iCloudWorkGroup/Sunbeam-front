@@ -43,6 +43,8 @@ export default {
                 startColIndex = frozenRule.startColIndex;
                 if (frozenRule.endColIndex !== undefined) {
                     endColIndex = frozenRule.endColIndex;
+                }else{
+                    endColIndex = cols.length -1;
                 }
                 startCol = cols[startColIndex];
                 lastCol = cols[endColIndex];

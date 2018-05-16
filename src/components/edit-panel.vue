@@ -38,6 +38,8 @@ export default {
                 startColIndex = frozenRule.startColIndex;
                 if (frozenRule.endColIndex !== undefined) {
                     endColIndex = frozenRule.endColIndex;
+                }else{
+                    endColIndex = cols.length -1;
                 }
                 startCol = cols[startColIndex];
                 lastCol = cols[endColIndex];
@@ -61,9 +63,11 @@ export default {
                 startRowIndex = frozenRule.startRowIndex;
                 if (frozenRule.endRowIndex !== undefined) {
                     endRowIndex = frozenRule.endRowIndex;
+                }else {
+                    endRowIndex = rows.length - 1;
                 }
-                startRow = cols[startRowIndex];
-                lastRow = cols[endRowIndex];
+                startRow = rows[startRowIndex];
+                lastRow = rows[endRowIndex];
             } else {
                 endRowIndex = visibleRows.length - 1;
                 startRow = visibleRows[0];
@@ -104,8 +108,6 @@ export default {
             });
         },
         mouseMoveHandle(e) {
-            
-
             this.currentMouseMoveState(e);
         },
         currentMouseMoveState() {

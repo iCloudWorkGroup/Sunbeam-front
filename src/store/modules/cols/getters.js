@@ -43,7 +43,7 @@ export default {
 		};
 	},
 	getVisibleColIndexBySort(state, getters, rootState) {
-		let list = getters.visibleList;
+		let list = getters.visibleColList;
 		return function(sort) {
 			return indexAttrBinary(sort, list, 'sort');
 		};

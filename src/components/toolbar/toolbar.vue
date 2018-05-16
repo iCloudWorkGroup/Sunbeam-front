@@ -25,8 +25,17 @@
 						 @updateActiveWidgetId = "updateActiveWidgetId">	
 					</font>
 				</tool-panel>
+				<tool-panel  title="对齐方式">
+					<align></align>
+				</tool-panel>
 			</ul>
 			<ul id="reviewTool" v-show="activeTabId === 'reviewTool'">
+				<tool-panel  title="视图">
+					<frozen 
+						:active-widget-id="activeWidgetId"
+						 @updateActiveWidgetId = "updateActiveWidgetId">	
+					</frozen>
+				</tool-panel>
 			</ul>
 		</div>
 	</div>
@@ -34,6 +43,8 @@
 <script type="text/javascript">
 	import ToolPanel from './toolpanel.vue';
 	import Font from './font.vue';
+	import Frozen from './frozen.vue';
+	import Align from './align.vue';
 	import '../../css/toolbar.css';
 	import '../../css/widget.css';
 
@@ -46,7 +57,9 @@
 		},
 		components: {
 			ToolPanel,
-			Font
+			Font,
+			Frozen,
+			Align
 		},
 		computed: {
 
@@ -70,5 +83,11 @@
 	}
 </script>
 <style type="text/css">
-	
+	.toolBar{
+		position: relative;
+		z-index:999;
+	}
+	.menu-container{
+		padding-top: 1px;
+	}
 </style>

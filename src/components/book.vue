@@ -13,7 +13,8 @@ import Sheet from './sheet.vue';
 export default {
     props: [
         'bookWidth',
-        'bookHeight'
+        'bookHeight',
+        'focusState'
     ],
     computed: {
         width() {
@@ -38,5 +39,6 @@ export default {
 .book {
     position: relative;
     overflow: hidden;
+    z-index: 0;
 }
 </style>

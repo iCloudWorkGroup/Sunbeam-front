@@ -70,7 +70,10 @@
                 </tr>
             </tbody>
         </table>
-        <!-- <input-box :scroll-left="scrollLeft" :scroll-top="scrollTop" ></input-box> -->
+        <input-box 
+            :scroll-left="scrollLeft" 
+            :scroll-top="scrollTop">         
+        </input-box>
     </div>
 </template>
 <script type="text/javascript">
@@ -246,5 +249,7 @@ export default {
     border-style: solid;
     height: 19px;
     width: 36px;
+    z-index: 100;
+    background: white;
 }
 </style>

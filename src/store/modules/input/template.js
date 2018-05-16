@@ -16,5 +16,7 @@ export default {
 	italic: false,
 	underline: false,
 	background: 'rgb(255, 255, 255)',
-	editState: false
+	editState: false,
+	transverseScroll: false,
+	verticalScroll: false
 }

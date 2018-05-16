@@ -42,6 +42,12 @@ export default {
 			return row;
 		};
 	},
+	getVisibleRowIndexBySort(state, getters, rootState) {
+		let list = getters.visibleRowList;
+		return function(sort) {
+			return indexAttrBinary(sort, list, 'sort');
+		};
+	},
 	getTempList(state, getters, rootState){
 		let list = getters.rowList;
 		return function(){

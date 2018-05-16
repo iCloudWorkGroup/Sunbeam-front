@@ -1,62 +1,64 @@
 <template>
-	<div class="fui-layout">
-		<div class="fui-transverse">
-			<span class="section" data-widget="fontfamily" @click="activeWidget">
-				<span class="fui-transverse-model fui-cf-fontfamily">{{currentState.content.family}}</span>
-				<span class="fui-transverse-model fui-cf-fontfamily-extend active">
-					<span class="caret"></span>
+	<div class="fui-body">
+		<div class="fui-layout">
+			<div class="fui-transverse">
+				<span class="section" data-widget="fontfamily" @click="activeWidget">
+					<span class="fui-transverse-model fui-cf-fontfamily">{{currentState.content.family}}</span>
+					<span class="fui-transverse-model fui-cf-fontfamily-extend active">
+						<span class="caret"></span>
+					</span>
 				</span>
-			</span>
-			<span class="section"  data-widget="fontsize" @click="activeWidget">
-				<span class="fui-transverse-model fui-cf-fontsize">{{currentState.content.size}}</span>
-				<span class="fui-transverse-model fui-cf-fontsize-extend active">
-					<span class="caret"></span>
+				<span class="section"  data-widget="fontsize" @click="activeWidget">
+					<span class="fui-transverse-model fui-cf-fontsize">{{currentState.content.size}}</span>
+					<span class="fui-transverse-model fui-cf-fontsize-extend active">
+						<span class="caret"></span>
+					</span>
 				</span>
-			</span>
-		</div>
-		<div class="fui-transverse">
-			<span class="ico-section" 
-				data-type="content.weight" 
-				title="加粗" 
-				:class="{active: currentState.content.weight}"
-				@click="reverseAction">
-				<span class="fui-cf-ico ico-weight"></span>
-			</span>
-			<span class="ico-section" 
-				data-type="content.italic" 
-				title="斜体" 
-				:class="{active: currentState.content.italic}"
-				@click="reverseAction">
-				<span class="fui-cf-ico ico-italic"></span>
-			</span>
-			<span class="ico-section" 
-				data-type="content.underline" 
-				title="下划线" 
-				:class="{active: currentState.content.underline}"
-				@click="reverseAction">
-				<span class="fui-cf-ico ico-underline"></span>
-			</span>
-			<span class="ico-section" 
-				data-widget="border" 
-				title="边框" 
-				@click="activeWidget">
-				<span class="fui-cf-ico ico-borderbottom ico-section-ico"></span>
-				<span class="ico-section-rightarrow">
-					<span class="caret"></span>
+			</div>
+			<div class="fui-transverse">
+				<span class="ico-section" 
+					data-type="content.weight" 
+					title="加粗" 
+					:class="{active: currentState.content.weight}"
+					@click="reverseAction">
+					<span class="fui-cf-ico ico-weight"></span>
 				</span>
-			</span>
-			<span class="ico-section" data-widget="background" title="背景色" @click="activeWidget">
-				<span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
-				<span class="ico-section-rightarrow">
-					<span class="caret"></span>
+				<span class="ico-section" 
+					data-type="content.italic" 
+					title="斜体" 
+					:class="{active: currentState.content.italic}"
+					@click="reverseAction">
+					<span class="fui-cf-ico ico-italic"></span>
 				</span>
-			</span>
-			<span class="ico-section" data-widget="color" title="字体颜色" @click="activeWidget">
-				<span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
-				<span class="ico-section-rightarrow">
-					<span class="caret"></span>
+				<span class="ico-section" 
+					data-type="content.underline" 
+					title="下划线" 
+					:class="{active: currentState.content.underline}"
+					@click="reverseAction">
+					<span class="fui-cf-ico ico-underline"></span>
 				</span>
-			</span>
+				<span class="ico-section" 
+					data-widget="border" 
+					title="边框" 
+					@click="activeWidget">
+					<span class="fui-cf-ico ico-borderbottom ico-section-ico"></span>
+					<span class="ico-section-rightarrow">
+						<span class="caret"></span>
+					</span>
+				</span>
+				<span class="ico-section" data-widget="background" title="背景色" @click="activeWidget">
+					<span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
+					<span class="ico-section-rightarrow">
+						<span class="caret"></span>
+					</span>
+				</span>
+				<span class="ico-section" data-widget="color" title="字体颜色" @click="activeWidget">
+					<span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
+					<span class="ico-section-rightarrow">
+						<span class="caret"></span>
+					</span>
+				</span>
+			</div>	
 		</div>
 		<div class="widget" ref="fontsize" 
 			v-show="activeWidgetId === 'fontsize'"
@@ -1148,7 +1150,7 @@
 						</li>
 					</ul>
 				</div>
-		</div>		
+		</div>	
 	</div>
 </template>
 <script type="text/javascript">

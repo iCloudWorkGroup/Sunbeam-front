@@ -10,30 +10,38 @@ export default {
 		getters,
 		commit
 	}) {
-		let select = getters.selectList[0],
-			colAlias = select.activePosi.colAlias,
-			rowAlias = select.activePosi.rowAlias,
-			colList = getters.colList,
-			rowList = getters.rowList,
-			colIndex, rowIndex,
-			cellList, cell, temp = {};
+		let wholePosi = getters.activeSelect.wholePosi,
+			colAlias = wholePosi.startColAlias,
+			rowAlias = wholePosi.startRowAlias,
+			colIndex, rowIndex;
 
 		colIndex = getters.getColIndexByAlias(colAlias);
 		rowIndex = getters.getRowIndexByAlias(rowAlias);
 
+		let cellList;
 		cellList = getters.getCellsByVertical({
 			startColIndex: colIndex,
 			startRowIndex: rowIndex
 		});
+		let cell = cellList[0],
+			colList = getters.colList,
+			rowList = getters.rowList,
+			props;
 
-		if (cell = cellList[0]) {
-			temp = extend(temp, cell.content, cell.physicsBox);
-			temp.colAlias = cell.occupy.col[0];
-			temp.rowAlias = cell.occupy.row[0];
+		props = {
+			editState: true,
+			transverseScroll: true,
+			verticalScroll: true
+		};
+		if (cell) {
+			props = extend(props, cell.content, cell.physicsBox);
+			props.colAlias = cell.occupy.col[0];
+			props.rowAlias = cell.occupy.row[0];
 		} else {
-			let row = getters.rowList[rowIndex],
-				col = getters.colList[colIndex];
-			temp = extend(temp, {
+			let row = rowList[rowIndex],
+				col = colList[colIndex];
+
+			props = extend(props, {
 				colAlias,
 				rowAlias,
 				left: col.left,
@@ -42,14 +50,29 @@ export default {
 				height: row.height
 			});
 		}
-		temp.maxWidth = colList[colList.length - 1].left +
-			colList[colList.length - 1].width - temp.left;
-		temp.maxHeight = rowList[rowList.length - 1].top +
-			rowList[rowList.length - 1].height - temp.top;
-		temp.editState = true;
+
+		let frozenState = getters.frozenState;
+		if(frozenState.isFrozen){
+			let rules = frozenState.rules,
+				rule;
+			for (let i = 0, len = rule.length; i < len; i++) {
+				rule = rules[i];
+				if(rule.type === 'mainRule'){
+					break;
+				}
+			}
+			let frozenRowIndex = rule.startRowIndex,
+			frozenColIndex = rule.startColIndex;
+			if(colIndex < frozenColIndex){
+				props.transverseScroll = false;
+			}
+			if(rowIndex < frozenRowIndex){
+				props.verticalScroll = false;
+			}
+		}
 		commit(mutationTypes.UPDATE_EDIT, {
 			currentSheet: rootState.currentSheet,
-			inputInfo: temp
+			inputInfo: props
 		});
 	},
 	[actionTypes.EDIT_HIDE]({
@@ -59,19 +82,18 @@ export default {
 		commit,
 		dispatch
 	}, texts) {
-		let currentSheet = rootState.currentSheet,
-			currentState = state[currentSheet],
-			colAlias = currentState.colAlias,
-			rowAlias = currentState.rowAlias;
+		let inputState = getters.getInputState,
+			startColIndex = getters.getColIndexByAlias(inputState.colAlias),
+			startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias);
 
 		dispatch(actionTypes.CELLS_UPDATE, {
-			colAlias,
-			rowAlias,
-			propName: 'content.texts',
-			propValue: texts
+			startColIndex,
+			startRowIndex,
+			propNames: 'content.texts',
+			value: texts
 		});
 		commit(mutationTypes.UPDATE_EDIT, {
-			currentSheet,
+			currentSheet: rootState.currentSheet,
 			inputInfo: {
 				editState: false,
 				width: 0,

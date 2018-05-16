@@ -49,6 +49,8 @@
 	                startRowIndex = frozenRule.startRowIndex;
 	                if (frozenRule.endRowIndex !== undefined) {
 	                    endRowIndex = frozenRule.endRowIndex;
+	                }else {
+	                	endRowIndex = visibleRows.length -1;
 	                }
 	                startRow = rows[startRowIndex];
 	                lastRow = rows[endRowIndex];
@@ -79,4 +81,8 @@
 	};
 </script>
 <style>
+	.row-head-container{
+		z-index: 100;
+		background: white;
+	}
 </style>

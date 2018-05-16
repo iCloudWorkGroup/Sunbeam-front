@@ -1,9 +1,7 @@
 <template>
 	<li class="fui-group">	
 		<span class="fui-container">
-			<div class="fui-body">
-				<slot></slot>
-			</div>
+			<slot></slot>
 			<div class="fui-title">{{title}}</div>
 		</span>
 		<span class="fui-separator"></span>

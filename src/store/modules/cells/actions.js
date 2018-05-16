@@ -140,6 +140,8 @@ export default {
 			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
 			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
 		}
+		endColIndex = endColIndex || startColIndex;
+		endRowIndex = endRowIndex || startRowIndex;
 
 		propNames = propNames.split('.');
 

@@ -1,8 +1,9 @@
 <template>
-	<textarea class="edit-frame" :value="texts" v-focus @blur="hide" :style="styleObject"></textarea>
+	<textarea class="edit-frame" :value="texts" @blur="completeEdit" :style="styleObject"></textarea>
 </template>
 <script type="text/javascript">
 	import {EDIT_HIDE, EDIT_SHOW} from '../store/action-types';
+	import {UPDATE_FOCUSSTATE} from '../store/mutation-types';
 	import config from '../config';
 	
 	export default {
@@ -11,44 +12,38 @@
 			'scrollTop'
 		],
 		mounted() {
-			this.$watch('editState', function(val){
-				if(val){
-					this.$el.focus();
-				}
-			});
+			this.getFocus();
 		},
 		computed: {
 			left(){
 				let getters = this.$store.getters,
-					frozenRules = getters.frozenState,
-					cols = getters.colList,
-					mainRule,
-					left;
-				for (let i = 0, len = frozenRules.length; i < len; i++) {
-					if (frozenRules[i] === 'mainRule') {
-						mainRule = frozenRules[i];
-						break;
-					}
+					getInputState = getters.getInputState,
+					left = getters.getInputState.left;
+
+				if(getInputState.transverseScroll){
+					left += this.scrollLeft;
 				}
-				if (!mainRule || cols[mainRule.startColIndex].left < left) {
-					left -= this.scrollLeft;
-				}
-				
-				left = getters.getInputState.left + config.cornerWidth;
+				left += config.cornerWidth;
 				return left;
 			},
-			height(){
-				cornerHeight
+			top(){
+				let getters = this.$store.getters,
+					getInputState = getters.getInputState,
+					top = getters.getInputState.top;
+
+				if(getInputState.verticalScroll){
+					top += this.scrollTop;
+				}
+				top += config.cornerHeight;
+				return top;
 			},
 			styleObject() {
 				let state = this.$store.getters.getInputState;
 				return {
-					top: state.top + 1 + 'px',
+					top: this.top + 1 + 'px',
 					left: this.left + 1 + 'px',
 					width: state.width + 'px',
-					height: this.height + 'px',
-					maxWidth: state.maxWidth + 'px',
-					maxHeight: state.maxHeight + 'px',
+					height: state.height + 'px',
 					fontFamily: state.family,
 					fontSize: state.size + 'px',
 					fontStyle: state.italic,
@@ -62,19 +57,28 @@
 			},
 			editState() {
 				return this.$store.getters.getEidtState;
+			},
+			focusState() {
+				return this.$store.state.focusState;
 			}
 		},
 		methods: {
-			hide() {
+			completeEdit() {
 				if(this.editState){
 					this.$store.dispatch(EDIT_HIDE, this.$el.value);
 				}
+			},
+			getFocus() {
+				if(!this.$store.state.focusState){
+					this.$el.focus();
+					this.$store.commit(UPDATE_FOCUSSTATE, true);
+				}
 			}
 		},
-		directives: {
-			focus: {
-				inserted(el) {
-					el.focus();
+		watch: {
+			focusState(val) {
+				if(!val){
+					this.getFocus();
 				}
 			}
 		}

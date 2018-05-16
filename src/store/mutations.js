@@ -11,4 +11,7 @@ export default {
 	[types.UPDATE_MOUSESTATE](state, payload){
 		state.mouseState = payload.state;
 	},
+	[types.UPDATE_FOCUSSTATE](state, val){
+		state.focusState = val;
+	}
 };

@@ -22,6 +22,7 @@ const state = {
 		bottom: 0
 	},
 	mouseState: LOCATE,
+	focusState: false
 };
 
 export default {

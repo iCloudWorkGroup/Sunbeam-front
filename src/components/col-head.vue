@@ -47,9 +47,11 @@ export default {
                 startColIndex = frozenRule.startColIndex;
                 if (frozenRule.endColIndex !== undefined) {
                     endColIndex = frozenRule.endColIndex;
+                }else{
+                    endColIndex = visibleCols.length - 1;
                 }
-                startCol = cols[startColIndex];
-                lastCol = cols[endColIndex];
+                startCol = visibleCols[startColIndex];
+                lastCol = visibleCols[endColIndex];
             } else {
                 endColIndex = visibleCols.length - 1;
                 startCol = visibleCols[0];
@@ -77,4 +79,8 @@ export default {
 };
 </script>
 <style>
+    .col-head-container {
+        z-index: 100;
+        background: white;
+    }
 </style>

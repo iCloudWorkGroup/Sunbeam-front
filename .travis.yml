@@ -12,7 +12,7 @@ before_script:
 - cat /home/travis/.ssh/config
 script:
 - git remote add deploy root@sunbeam:/usr/local/codelib/sunbeam-front.git
-- git push deploy $TRAVIS_BRANCH
+- git push deploy $TRAVIS_BRANCH --force
 cache:
   directories:
   - node_modules

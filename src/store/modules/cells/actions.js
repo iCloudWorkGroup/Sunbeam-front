@@ -227,7 +227,6 @@ export default {
 		if(typeof startColIndex === 'undefined'){
 			let select = getters.activeSelect,
 				wholePosi = select.wholePosi;
-			
 			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
 			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
 			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);

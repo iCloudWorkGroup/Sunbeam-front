@@ -17,7 +17,7 @@ export default {
             endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias),
             cellList;
 
-        cellList = getters.getCellsBytransverse({startColIndex,
+        cellList = getters.getCellsByTransverse({startColIndex,
             startRowIndex,
             endRowIndex,
             endColIndex});
@@ -166,7 +166,7 @@ export default {
             return result;
         };
     },
-    getCellsBytransverse(state, getters, rootState) {
+    getCellsByTransverse(state, getters, rootState) {
         let currentSheet = rootState.currentSheet,
             cells = state[currentSheet];
             
@@ -294,5 +294,39 @@ export default {
             cols: visibleColList,
             rows: visibleRowList
         });
+    },
+    getMergeState(state, getters, rootState){
+        return function(){
+            let wholePosi = getters.activeSelect.wholePosi,
+                startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias),
+                startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias),
+                endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias),
+                endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+
+            if (startColIndex === endColIndex && startRowIndex === endRowIndex) {
+                return false;
+            }
+            let cellList = getters.getCellsByVertical({
+                startColIndex,
+                startRowIndex,
+                endColIndex,
+                endRowIndex
+            });
+
+            if(cellList.length !== 1){
+                return false;
+            }
+            let cell = cellList[0],
+                occupyCol = cell.occupy.col,
+                occupyRow = cell.occupy.row;
+
+            if(occupyCol[0] !== wholePosi.startColAlias ||
+                occupyRow[0] !== wholePosi.startRowAlias ||
+                occupyCol[occupyCol.length -1] !== wholePosi.endColAlias ||
+                occupyRow[occupyRow.length -1] !== wholePosi.endRowAlias){
+                return false;
+            }
+            return true;
+        }
     }
 };

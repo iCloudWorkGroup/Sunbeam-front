@@ -41,7 +41,7 @@ textarea { resize: none; overflow: hidden; }
 .row-head-line, .col-head-line { z-index: 10; border: 2px solid #217346; position: absolute; }
 .row-head-line { border-right-width: 0; right: 0; width: 0; margin-top: -1px }
 .col-head-line { border-bottom-width: 0; bottom: 0; height: 0; margin-left: -1px; }
-.scroll-container { overflow: auto; }f
+.scroll-container { overflow: auto; }
 .cells-container { position: relative; }
 .line-container { width: inherit; height: inherit; position: absolute; left: 0; top: 0; }
 .row-container, .col-container { width: inherit; height: inherit; position: absolute; }

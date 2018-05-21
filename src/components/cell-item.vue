@@ -14,17 +14,37 @@ export default {
             const physicsBox = this.item.physicsBox,
                   border = physicsBox.border;
             let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
-                offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0;
+                offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0,
+                top = physicsBox.top - offsetTop,
+                left = physicsBox.left - offsetLeft,
+                width = physicsBox.width,
+                height = physicsBox.height;
+
+            top -= border.top && 1;
+            left -= border.left && 1;
+
+            if(border.left === 2){
+                width--;
+            }
+            if(border.right === 2){
+                width--;
+            }
+            if(border.top === 2){
+                height--;
+            }
+            if(border.bottom === 2){
+                height--;
+            }
 
             return {
-                top: unit(physicsBox.top - offsetTop - 1),
-                left: unit(physicsBox.left - offsetLeft - 1),
-                width: unit(physicsBox.width),
-                height: unit(physicsBox.height),
-                borderTopColor: border.top ? '#000' : 'transparent',
-                borderLeftColor: border.left ? '#000' : 'transparent',
-                borderRightColor: border.right ? '#000' : 'transparent',
-                borderBottomColor: border.bottom ? '#000' : 'transparent'
+                top: unit(top),
+                left: unit(left),
+                width: unit(width),
+                height: unit(height),
+                borderTopWidth: unit(border.top),
+                borderLeftWidth: unit(border.left),
+                borderRightWidth: unit(border.right),
+                borderBottomWidth: unit(border.bottom)
             }
         },
         cellProps() {
@@ -59,7 +79,7 @@ export default {
     position: absolute;
     overflow: hidden;
     cursor: default;
-    border: 1px solid transparent;
+    border: 0 solid black;
 }
 
 .cell-content {

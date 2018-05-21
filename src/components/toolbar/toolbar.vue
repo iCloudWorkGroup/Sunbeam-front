@@ -28,6 +28,9 @@
 				<tool-panel  title="对齐方式">
 					<align></align>
 				</tool-panel>
+				<tool-panel  title="合并拆分">
+					<merge></merge>
+				</tool-panel>
 			</ul>
 			<ul id="reviewTool" v-show="activeTabId === 'reviewTool'">
 				<tool-panel  title="视图">
@@ -45,6 +48,7 @@
 	import Font from './font.vue';
 	import Frozen from './frozen.vue';
 	import Align from './align.vue';
+	import Merge from './merge.vue';
 	import '../../css/toolbar.css';
 	import '../../css/widget.css';
 
@@ -59,7 +63,8 @@
 			ToolPanel,
 			Font,
 			Frozen,
-			Align
+			Align,
+			Merge
 		},
 		computed: {
 

@@ -1148,6 +1148,30 @@
 								<div>外侧边框</div>
 							</span>
 						</li>
+						<li data-value="bottom-thick">
+							<span class="fui-cf-ico ico-borderbottom ico-section-ico widget-ico"></span>
+							<span class="widget-content">
+								<div>粗下边框</div>
+							</span>
+						</li>
+						<li data-value="top-thick">
+							<span class="fui-cf-ico ico-bordertop ico-section-ico widget-ico"></span>
+							<span class="widget-content">
+								<div>粗上边框</div>
+							</span>
+						</li>
+						<li data-value="left-thick">
+							<span class="fui-cf-ico ico-borderleft ico-section-ico widget-ico"></span>
+							<span class="widget-content">
+								<div>粗左边框</div>
+							</span>
+						</li>
+						<li data-value="right-thick">
+							<span class="fui-cf-ico ico-borderright ico-section-ico widget-ico"></span>
+							<span class="widget-content">
+								<div>粗右边框</div>
+							</span>
+						</li>
 					</ul>
 				</div>
 		</div>	

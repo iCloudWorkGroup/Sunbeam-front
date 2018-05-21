@@ -1,25 +1,31 @@
 <template>
 	<div class="fui-body">
 		<div class="fui-layout">
-			<div class="fui-transverse"  @click="setAlign" data-type="content.alignRow">
-				<span class="ico-section" data-value="top">
+			<div class="fui-transverse"  @click="setAlign" data-type="content.alignCol">
+				<span class="ico-section" data-value="top" 
+					:class="{active: alignCol === 'top'}">
 					<span class="fui-cf-ico ico-aligntop"></span>
 				</span>
-				<span class="ico-section" data-value="middle">
+				<span class="ico-section" data-value="middle" 
+					:class="{active: alignCol === 'middle'}">
 					<span class="fui-cf-ico ico-alignmiddle"></span>
 				</span>
-				<span class="ico-section" data-value="bottom">
+				<span class="ico-section" data-value="bottom" 
+					:class="{active: alignCol === 'bottom'}">
 					<span class="fui-cf-ico ico-alignbottom"></span>
 				</span>
 			</div>
-			<div class="fui-transverse"  @click="setAlign" data-type="content.alignCol">
-				<span class="ico-section" data-value="left">
+			<div class="fui-transverse"  @click="setAlign" data-type="content.alignRow">
+				<span class="ico-section" data-value="left" 
+					:class="{active: alignRow === 'left'}">
 					<span class="fui-cf-ico ico-alignleft"></span>
 				</span>
-				<span class="ico-section" data-value="center">
+				<span class="ico-section" data-value="center" 
+					:class="{active: alignRow === 'center'}">
 					<span class="fui-cf-ico ico-aligncenter"></span>
 				</span>
-				<span class="ico-section" data-value="right">
+				<span class="ico-section" data-value="right" 
+					:class="{active: alignRow === 'right'}">
 					<span class="fui-cf-ico ico-alignright"></span>
 				</span>
 			</div>
@@ -48,6 +54,14 @@
 
 				let frozenState = sheet.frozenState;
 				return frozenState;
+			},			
+			alignRow(){
+				let cellProps = this.$store.getters.getSelectCell;
+				return cellProps.content.alignRow;
+			},
+			alignCol(){
+				let cellProps = this.$store.getters.getSelectCell;
+				return cellProps.content.alignCol;
 			}
 		},
 		methods: {

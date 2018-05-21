@@ -233,6 +233,11 @@ export default {
 			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
 			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
 		}
+		let thick = false;
+		if (value.indexOf('-thick') !== -1) {
+			thick = true;
+			value = value.split('-')[0];
+		}
 
 		switch (value) {
 			case 'bottom':
@@ -265,7 +270,7 @@ export default {
 				endRowIndex,
 				endColIndex,
 				propNames: 'physicsBox.border.bottom',
-				value: true
+				value: thick ? 2 : 1
 			});
 		}
 
@@ -276,7 +281,7 @@ export default {
 				endRowIndex: startRowIndex,
 				endColIndex,
 				propNames: 'physicsBox.border.top',
-				value: true
+				value: thick ? 2 : 1
 			});
 		}
 
@@ -287,7 +292,7 @@ export default {
 				endRowIndex,
 				endColIndex: startColIndex,
 				propNames: 'physicsBox.border.left',
-				value: true
+				value: thick ? 2 : 1
 			});
 		}
 
@@ -298,7 +303,7 @@ export default {
 				endRowIndex,
 				endColIndex,
 				propNames: 'physicsBox.border.right',
-				value: true
+				value: thick ? 2 : 1
 			});
 		}
 
@@ -310,10 +315,10 @@ export default {
 				endColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					top: false,
-					left: false,
-					right: false,
-					bottom: false
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0
 				}
 			});
 		}
@@ -326,10 +331,10 @@ export default {
 				endColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					top: true,
-					left: true,
-					right: true,
-					bottom: true
+					top: 1,
+					left: 1,
+					right: 1,
+					bottom: 1
 				}
 			});
 		}
@@ -342,7 +347,7 @@ export default {
 				endColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					top: true,
+					top: 1
 				}
 			});
 			dispatch(actionTypes.CELLS_UPDATE, {
@@ -352,7 +357,7 @@ export default {
 				endColIndex: startColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					left: true,
+					left: 1
 				}
 			});
 			dispatch(actionTypes.CELLS_UPDATE, {
@@ -362,7 +367,7 @@ export default {
 				endColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					bottom: true
+					bottom: 1
 				}
 			});
 			dispatch(actionTypes.CELLS_UPDATE, {
@@ -372,7 +377,7 @@ export default {
 				endColIndex,
 				propNames: 'physicsBox.border',
 				value: {
-					right: true
+					right: 1
 				}
 			});
 		}
@@ -622,5 +627,103 @@ export default {
 			}
 			return true;
 		}
+	},
+	[actionTypes.CELLS_MERGE]({commit, dispatch, getters, rootState}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex,
+		value
+	} = {}) {
+		if(typeof startColIndex === 'undefined'){
+			let select = getters.activeSelect,
+				wholePosi = select.wholePosi;
+			
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+		}
+		endColIndex = endColIndex || startColIndex;
+		endRowIndex = endRowIndex || startRowIndex;
+
+		if (value === undefined) {
+			value = !getters.getMergeState();
+		}
+		let cellList = getters.getCellsByTransverse({
+			startColIndex,
+			endColIndex,
+			startRowIndex,
+			endRowIndex
+		});
+
+		if (value) {
+			let cell;
+			for (let i = 0, len = cellList.length; i < len; i++) {
+				if(cellList[i].content.texts){
+					cell = cellList[i];
+					break;
+				}
+			}
+			if(!cell){
+				cell = getters.getCellsByTransverse({
+					startColIndex,
+					endColIndex
+				})[0];
+			}
+			cell = extend({}, cell || {});
+
+			let cols = getters.colList,
+				rows = getters.rowList,
+				rowAliasList = [],
+				colAliasList = [];
+
+			for (let i = startColIndex; i < endColIndex + 1; i++) {
+				colAliasList.push(cols[i].alias);
+			}
+			for (let i = startRowIndex; i < endRowIndex + 1; i++) {
+				rowAliasList.push(rows[i].alias);
+			}
+			cell.occupy = {
+				row: rowAliasList,
+				col: colAliasList
+			}
+			dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+		}else{
+			let currentSheet = rootState.currentSheet,
+				cols = getters.colList,
+				rows = getters.rowList;
+			for (let i = startColIndex; i < endColIndex + 1; i++) {
+				for (let j = startRowIndex; j < endRowIndex + 1; j++) {
+					commit(mutationTypes.UPDATE_POINTINFO, {
+						currentSheet,
+						info: {
+							colAlias: cols[i].alias,
+							rowAlias: rows[j].alias,
+							type: 'cellIndex',
+							value: null
+						}
+					});
+				}
+			}
+			let insertCellList = [];
+			cellList.forEach(function(cell) {
+				let rowAliasList = cell.occupy.row,
+					colAliasList = cell.occupy.col;
+				for (let i = 0, len1 = colAliasList.length; i < len1; i++) {
+					for (let j = 0, len2 = rowAliasList.length; j < len2; j++) {
+						let insertCell = extend({}, cell);
+						insertCell.occupy.col = [colAliasList[i]];
+						insertCell.occupy.row = [rowAliasList[j]];
+						if (i !== 0 || j !== 0) {
+							insertCell.content.texts = '';
+						}
+						insertCellList.push(insertCell);
+					}
+				}
+			});
+			dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
+		}
+
 	}
 };

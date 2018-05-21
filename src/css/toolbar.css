@@ -80,7 +80,7 @@ span { display: inline-block; }
 .fui-alone { margin: 6px 0 0 0; }
 .fui-transverse { margin: 6px 0 2px 0; }
 .fui-transverse-model { padding: 2px; }
-.fui-section.active { border-color: #9fd5b7; background: #9fd5b7; }
+.fui-section.active,.fui-transverse-model.active { border-color: #9fd5b7; background: #9fd5b7; }
 .section { border: 1px solid #e1e1e1; }
 .section:hover, .section.active { border-color: #9fd5b7; }
 .ico-section { padding: 3px 5px; height: 16px; overflow: hidden; }

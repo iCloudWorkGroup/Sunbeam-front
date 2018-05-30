@@ -32,18 +32,18 @@ export default {
 			tmp[type] = value;
 		}
 	},
-	[types.DELETE_CELL_POINTINFO](state, {currentSheet, cells}) {
+	[types.DELETE_CELL_POINTINFO](state, {currentSheet, occupys}) {
 		let colInfo = state[currentSheet].col,
 			rowInfo = state[currentSheet].row;
 		
-		cells.forEach(function(cell) {
-			let occupyCol = cell.occupy.col,
-				occupyRow = cell.occupy.row;
+		occupys.forEach(function(occupy) {
+			let occupyCol = occupy.col,
+				occupyRow = occupy.row;
 
 			for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
 				for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-					colInfo[occupyCol][occupyRow].cellIndex = null;
-					rowInfo[occupyRow][occupyCol].cellIndex = null;
+					colInfo[occupyCol[i]][occupyRow[j]].cellIndex = null;
+					rowInfo[occupyRow[j]][occupyCol[i]].cellIndex = null;
 				}
 			}
 		});

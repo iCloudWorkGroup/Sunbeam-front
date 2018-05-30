@@ -4,11 +4,12 @@
         :style="{ width: width + 'px', 
             height: height + 'px'}">
         <sheet :sheet-width="width" :sheet-height="sheetHeight"></sheet>
-        <!-- <tab></tab> -->
+        <sheet-edit></sheet-edit>
     </div>
 </template>
 <script type="text/javascript">
 import Sheet from './sheet.vue';
+import SheetEdit from './sheet-edit.vue';
 
 export default {
     props: [
@@ -31,7 +32,8 @@ export default {
         }
     },
     components: {
-        Sheet
+        Sheet,
+        SheetEdit
     }
 };
 </script>

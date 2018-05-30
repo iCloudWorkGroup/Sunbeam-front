@@ -3,8 +3,8 @@ li { list-style: none; }
 .glyphicon-plus:before { content: "\2b"; }
 .glyphicon-th-list:before { content: "\e012"; }
 .glyphicons { font-family: 'Glyphicons Halflings'; color: #555; font-size: 12px; }
-.topBar { background: #e1e1e1; overflow: hidden;}
-.toolBar { font-size: 9pt; font-family: 'Microsoft Yahei', 'SimSun', 'sans-serif'; background: #fafafa; border-bottom: 1px solid #e1e1e1; height: 130px;}
+.topBar { background: #e1e1e1; height: 30px; overflow: hidden;}
+.toolBar { font-size: 9pt; font-family: 'Microsoft Yahei', 'SimSun', 'sans-serif'; background: #fafafa; border-bottom: 1px solid #e1e1e1; height: 130px; min-width: 960px; }
 .file-control, .fui-control-tabs, .download{ float: left; }
 .file-control span { background: #217346; color: #fff; padding: 7px 20px; height: 16px; display: block; cursor: default; }
 .fui-control-tabs { height: 30px; }

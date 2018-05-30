@@ -105,9 +105,8 @@ export default {
 				endRowIndex = frozenRule.endRowIndex;
 			}
 
-			currentPromise = currentPromise || new Promise(function(resolve){
-				resolve();
-			});
+			currentPromise = currentPromise || Promise.resolve();
+			
 			this.currentPromise = currentPromise.then(function(){
 				let transverse = currentScrollLeft - self.recordScrollLeft,
 					vertical = currentScrollTop - self.recordScrollTop,

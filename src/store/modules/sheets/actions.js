@@ -2,9 +2,9 @@ import extend from '../../../util/extend';
 import * as actionTypes from '../../action-types';
 import * as mutationTypes from '../../mutation-types';
 import template from './template';
-import {
-	SELECT
-} from '../../../tools/constant';
+import {SELECT} from '../../../tools/constant';
+import send from '../../../util/send';
+import config from '../../../config';
 
 
 let viewTypes = {
@@ -40,7 +40,7 @@ export default {
 		getters,
 		rootState,
 		dispatch
-	}) {
+	}, frozen) {
 		let currentSheet = rootState.currentSheet,
 			selects = rootState.selects[currentSheet].list,
 			stateList = state.list,
@@ -57,39 +57,46 @@ export default {
 			return;
 		}
 
-		let select,
-			frozenColAlias,
+		let frozenColAlias,
 			frozenRowAlias,
 			frozenColIndex,
-			frozenRowIndex;
+			frozenRowIndex,
+			userViewTopIndex,
+			userViewLeftIndex;
 
-		selects.forEach(function(item) {
-			if (item.type === SELECT) {
-				select = item;
-			}
-		});
+		if(frozen){
+			frozenRowAlias = frozen.rowAlias;
+			frozenColAlias = frozen.colAlias;
+			userViewLeftIndex = getters.getColIndexByAlias(frozen.viewColAlias);
+			userViewTopIndex = getters.getRowIndexByAlias(frozen.viewRowAlias);
+		}else{
+			let select = getters.activeSelect;
+			frozenRowAlias = select.wholePosi.startRowAlias;
+			frozenColAlias = select.wholePosi.startColAlias;
 
-		frozenRowAlias = select.wholePosi.startRowAlias;
-		frozenColAlias = select.wholePosi.startColAlias;
+			let userView = rootState.userView;
+			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
+			userViewLeftIndex = getters.getColIndexByPosi(userView.left);
+		}
 		frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias);
 		frozenColIndex = getters.getColIndexByAlias(frozenColAlias);
 
-		let userView = rootState.userView,
-			userViewTopIndex = getters.getRowIndexByPosi(userView.top),
-			userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom),
-			userViewRightIndex = getters.getColIndexByPosi(userView.right),
-			userViewLeftIndex = getters.getColIndexByPosi(userView.left);
-		//非可视范围，不能进行冻结
-		if (frozenRowIndex - userViewTopIndex < 0 ||
-			userViewBottomIndex - frozenRowIndex < 0 ||
-			frozenColIndex - userViewLeftIndex < 0 ||
-			userViewRightIndex - frozenColIndex < 0) {
-			return;
-		}
-		//左上角位置不能进行冻结
-		if (frozenRowIndex === userViewTopIndex &&
-			frozenColIndex === userViewLeftIndex) {
-			return;
+		if (!frozen || frozen.type !== 'restore') {
+			let userView = rootState.userView;
+			let userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
+			let userViewRightIndex = getters.getColIndexByPosi(userView.right);
+			//非可视范围，不能进行冻结
+			if (frozenRowIndex - userViewTopIndex < 0 ||
+				userViewBottomIndex - frozenRowIndex < 0 ||
+				frozenColIndex - userViewLeftIndex < 0 ||
+				userViewRightIndex - frozenColIndex < 0) {
+				return;
+			}
+			//左上角位置不能进行冻结
+			if (frozenRowIndex === userViewTopIndex &&
+				frozenColIndex === userViewLeftIndex) {
+				return;
+			}
 		}
 
 		if (frozenColIndex === userViewLeftIndex) {
@@ -101,13 +108,24 @@ export default {
 			return;
 		}
 
-
 		let rowList = getters.rowList,
 			colList = getters.colList,
 			userViewCol = colList[userViewLeftIndex],
 			userViewRow = rowList[userViewTopIndex],
 			frozenCol = colList[frozenColIndex],
 			frozenRow = rowList[frozenRowIndex];
+
+		if (!frozen || frozen.type !== 'restore') {
+			send({
+				url: config.operUrl['frozen'],
+				data: JSON.stringify({
+					viewRow: userViewRow.alias,
+					viewCol: userViewCol.alias,
+					oprCol: frozenCol.alias,
+					oprRow: frozenRow.alias
+				}),
+			});
+		}
 
 		let rules = [];
 
@@ -192,6 +210,16 @@ export default {
 			userViewCol = colList[userViewLeftIndex],
 			frozenCol = colList[frozenColIndex];
 
+		send({
+			url: config.operUrl['frozen'],
+			data: JSON.stringify({
+				viewRow: rowList[0].alias,
+				viewCol: userViewCol.alias,
+				oprCol: frozenCol.alias,
+				oprRow: rowList[0].alias
+			}),
+		});
+
 		let rules = [];
 
 		rules.push({
@@ -253,6 +281,15 @@ export default {
 			userViewRow = rowList[userViewTopIndex],
 			frozenRow = rowList[frozenRowIndex];
 
+		send({
+			url: config.operUrl['frozen'],
+			data: JSON.stringify({
+				viewCol: colList[0].alias,
+				viewRow: userViewRow.alias,
+				oprRow: frozenRow.alias,
+				oprCol: colList[0].alias
+			}),
+		});
 		let rules = [];
 
 		rules.push({
@@ -285,6 +322,9 @@ export default {
 		getters,
 		rootState
 	}, sheet) {
+		send({
+			url: config.operUrl['unfrozen']
+		});
 		commit(mutationTypes.UPDATE_FROZENSTATE, {
 			isFrozen: false,
 			rowFrozen: false,

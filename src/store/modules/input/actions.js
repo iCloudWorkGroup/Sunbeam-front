@@ -2,6 +2,8 @@ import extend from '../../../util/extend';
 import cellTemplate from '../cells/template';
 import * as mutationTypes from '../../mutation-types';
 import * as actionTypes from '../../action-types';
+import send from '../../../util/send';
+import config from '../../../config';
 
 export default {
 	[actionTypes.EDIT_SHOW]({
@@ -55,7 +57,7 @@ export default {
 		if(frozenState.isFrozen){
 			let rules = frozenState.rules,
 				rule;
-			for (let i = 0, len = rule.length; i < len; i++) {
+			for (let i = 0, len = rules.length; i < len; i++) {
 				rule = rules[i];
 				if(rule.type === 'mainRule'){
 					break;
@@ -84,13 +86,32 @@ export default {
 	}, texts) {
 		let inputState = getters.getInputState,
 			startColIndex = getters.getColIndexByAlias(inputState.colAlias),
-			startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias);
+			startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias),
+			cols = getters.colList,
+			rows = getters.rowList;
 
-		dispatch(actionTypes.CELLS_UPDATE, {
+		send({
+			url: config.operUrl['texts'],
+			data: JSON.stringify({
+				coordinate: {
+					startCol: cols[startColIndex].sort,
+					startRow: rows[startRowIndex].sort,
+					endCol: cols[startColIndex].sort,
+					endRow: rows[startRowIndex].sort
+				},
+				content: texts
+			}),
+		});
+		dispatch(actionTypes.CELLS_UPDATE_PROP, {
 			startColIndex,
 			startRowIndex,
-			propNames: 'content.texts',
-			value: texts
+			endColIndex: startColIndex,
+			endRowIndex: startRowIndex,
+			props: {
+				content: {
+					texts: texts
+				}
+			}
 		});
 		commit(mutationTypes.UPDATE_EDIT, {
 			currentSheet: rootState.currentSheet,

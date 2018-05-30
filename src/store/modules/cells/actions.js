@@ -5,6 +5,8 @@ import extend from '../../../util/extend';
 import template from './template';
 import {SELECT} from '../../../tools/constant';
 import generator from '../../../tools/generator';
+import config from '../../../config';
+import send from '../../../util/send';
 
 export default {
     /**
@@ -103,6 +105,8 @@ export default {
 						});
 					}
 				}
+				physicsBox.border = cell.border;
+				delete cell.border;
 				cell.physicsBox = physicsBox;
 				cell = extend({}, template, cell);
 				commit(mutationTypes.INSERT_CELL, {
@@ -122,7 +126,6 @@ export default {
 			}
 		}
 	},
-
 	[actionTypes.CELLS_UPDATE]({commit, dispatch, getters}, {
 		startColIndex,
 		endColIndex,
@@ -130,7 +133,7 @@ export default {
 		endRowIndex,
 		propNames,
 		value
-	}) {
+	}){
 		if(typeof startColIndex === 'undefined'){
 			let select = getters.activeSelect,
 				wholePosi = select.wholePosi;
@@ -145,25 +148,43 @@ export default {
 
 		propNames = propNames.split('.');
 
-		if(value === undefined){
+		let propValue;
+		for (let i = 0; i < propNames.length; i++) {
+			if(i === 0){
+				propValue = template[propNames[i]];
+			}else{
+				propValue = propValue[propNames[i]];
+			}
+		}
+
+		if (value === undefined && (typeof propValue === 'boolean' ||
+				propValue === 0 || propValue === 1)) {
 			let cellList = getters.getCellsByVertical({
 				startColIndex,
 				endColIndex,
 				startRowIndex,
 				endRowIndex
 			});
-			if(cellList.length === 0){
-				value = true;
-			}else{
+			if (cellList.length === 0) {
+				if(typeof propValue === 'boolean'){
+					value = true;
+				}else{
+					value = 1;
+				}
+			} else {
 				let temp;
 				for (let i = 0; i < propNames.length; i++) {
-					if(i === 0){
+					if (i === 0) {
 						temp = cellList[0][propNames[i]];
-					}else{
+					} else {
 						temp = temp[propNames[i]];
 					}
 				}
-				value = !temp;
+				if(typeof propValue === 'boolean'){
+					value = !temp; 
+				}else{
+					value = 1^temp;
+				}
 			}
 		}
 
@@ -180,6 +201,58 @@ export default {
 			} 
 		}
 
+		let cols = getters.colList,
+			rows = getters.rowList,
+			oper = propNames[propNames.length - 1],
+			url = config.operUrl[oper],
+			data = {};
+
+		data.coordinate = [{
+			startCol: cols[startColIndex].sort,
+			startRow: rows[startRowIndex].sort,
+			endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
+			endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+		}];
+		if(value !== undefined){
+			let sendPropName = config.operSendPropName[oper] || oper;
+			data[sendPropName] = value; 
+		}
+		send({
+			url,
+			data: JSON.stringify(data),
+		});
+		success();
+		function success() {
+			if (endRowIndex === 'MAX') {
+				dispatch(actionTypes.COLS_OPERCOLS, {
+					startIndex: startColIndex,
+					endIndex: endColIndex,
+					props
+				});
+			} else if (endColIndex === 'MAX') {
+				dispatch(actionTypes.ROWS_OPERROWS, {
+					startIndex: startRowIndex,
+					endIndex: endRowIndex,
+					props
+				});
+			} else {
+				dispatch(actionTypes.CELLS_UPDATE_PROP, {
+					startColIndex,
+					endColIndex,
+					startRowIndex,
+					endRowIndex,
+					props
+				});
+			}
+		}
+	},
+	[actionTypes.CELLS_UPDATE_PROP]({commit, dispatch, getters}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex,
+		props
+	}) {
 		let getPointInfo = getters.getPointInfo,
 			tempSign = {},
 			cols = getters.colList,
@@ -238,6 +311,8 @@ export default {
 			value = value.split('-')[0];
 		}
 
+		let operates = []; 
+
 		switch (value) {
 			case 'bottom':
 				setBottom();
@@ -262,127 +337,224 @@ export default {
 				break;
 		}
 
+
 		function setBottom() {
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex: endRowIndex,
-				startColIndex,
-				endRowIndex,
-				endColIndex,
-				propNames: 'physicsBox.border.bottom',
-				value: thick ? 2 : 1
-			});
+			if (endRowIndex !== 'MAX') {
+				operates.push({
+					startRowIndex: endRowIndex,
+					startColIndex,
+					endRowIndex,
+					endColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								bottom: thick ? 2 : 1
+							}
+						}
+					}
+				});
+			}
 		}
 
 		function setTop() {
-			dispatch(actionTypes.CELLS_UPDATE, {
+			operates.push({
 				startRowIndex,
 				startColIndex,
 				endRowIndex: startRowIndex,
 				endColIndex,
-				propNames: 'physicsBox.border.top',
-				value: thick ? 2 : 1
+				props: {
+					physicsBox: {
+						border: {
+							top: thick ? 2 : 1
+						}
+					}
+				}
 			});
 		}
 
 		function setLeft() {
-			dispatch(actionTypes.CELLS_UPDATE, {
+			operates.push( {
 				startRowIndex,
 				startColIndex,
 				endRowIndex,
 				endColIndex: startColIndex,
-				propNames: 'physicsBox.border.left',
-				value: thick ? 2 : 1
+				props: {
+					physicsBox: {
+						border: {
+							left: thick ? 2 : 1
+						}
+					}
+				}
 			});
 		}
 
 		function setRight() {
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex,
-				startColIndex: endColIndex,
-				endRowIndex,
-				endColIndex,
-				propNames: 'physicsBox.border.right',
-				value: thick ? 2 : 1
-			});
+			if (endColIndex !== 'MAX') {
+				operates.push({
+					startRowIndex,
+					startColIndex: endColIndex,
+					endRowIndex,
+					endColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								right: thick ? 2 : 1
+							}
+						}
+					}
+				});
+			}
 		}
 
 		function setNone() {
-			dispatch(actionTypes.CELLS_UPDATE, {
+			operates.push({
 				startRowIndex,
 				startColIndex,
 				endRowIndex,
 				endColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0
+				props: {
+					physicsBox: {
+						border: {
+							right: 0,
+							left: 0,
+							top: 0,
+							bottom: 0
+						}
+					}
 				}
 			});
 		}
 
 		function setAll() {
-			dispatch(actionTypes.CELLS_UPDATE, {
+			operates.push({
 				startRowIndex,
 				startColIndex,
 				endRowIndex,
 				endColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					top: 1,
-					left: 1,
-					right: 1,
-					bottom: 1
+				props: {
+					physicsBox: {
+						border: {
+							right: 1,
+							left: 1,
+							top: 1,
+							bottom: 1
+						}
+					}
 				}
 			});
 		}
 
 		function setOuter() {
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex,
-				startColIndex,
-				endRowIndex: startRowIndex,
-				endColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					top: 1
-				}
-			});
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex,
-				startColIndex,
-				endRowIndex,
-				endColIndex: startColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					left: 1
-				}
-			});
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex: endRowIndex,
-				startColIndex,
-				endRowIndex,
-				endColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					bottom: 1
-				}
-			});
-			dispatch(actionTypes.CELLS_UPDATE, {
-				startRowIndex,
-				startColIndex: endColIndex,
-				endRowIndex,
-				endColIndex,
-				propNames: 'physicsBox.border',
-				value: {
-					right: 1
-				}
-			});
+			if (endRowIndex !== 'MAX') {
+				operates.push({
+					startRowIndex: endRowIndex,
+					startColIndex,
+					endRowIndex,
+					endColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								bottom: thick ? 2 : 1
+							}
+						}
+					}
+				});
+				operates.push({
+					startRowIndex,
+					startColIndex,
+					endRowIndex: startRowIndex,
+					endColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								top: thick ? 2 : 1
+							}
+						}
+					}
+				});
+			}
+
+			if (endColIndex !== 'MAX') {
+				operates.push({
+					startRowIndex,
+					startColIndex: endColIndex,
+					endRowIndex,
+					endColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								right: thick ? 2 : 1
+							}
+						}
+					}
+				});
+				operates.push({
+					startRowIndex,
+					startColIndex,
+					endRowIndex,
+					endColIndex: startColIndex,
+					props: {
+						physicsBox: {
+							border: {
+								left: thick ? 2 : 1
+							}
+						}
+					}
+				});
+			}
 		}
+		let url = config.operUrl.border,
+			cols = getters.colList,
+			rows = getters.rowList,
+			data;
+
+		data = {
+			coordinate: [{
+				startCol: cols[startColIndex].sort,
+				startRow: rows[startRowIndex].sort,
+				endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
+				endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+			}],
+			direction: value
+
+		};
+		if (value !== 'none') {
+			data.line = thick ? 2 : 1
+		}
+		send({
+			url,
+			data: JSON.stringify(data),
+		});
+		success();
+		function success() {
+			if (endRowIndex === 'MAX') {
+				operates.forEach((item) => {
+					dispatch(actionTypes.COLS_OPERCOLS, {
+						startIndex: item.startColIndex,
+						endIndex: item.endColIndex,
+						props: item.props
+					});
+				});
+			} else if (endColIndex === 'MAX') {
+				operates.forEach((item) => {
+					dispatch(actionTypes.ROWS_OPERROWS, {
+						startIndex: item.startRowIndex,
+						endIndex: item.endRowIndex,
+						props: item.props
+					});
+				});
+			} else {
+				operates.forEach((item) => {
+					dispatch(actionTypes.CELLS_UPDATE_PROP, item);
+				});
+			}
+		}
+		
 	},
 	/**
 	 * 插入单元格
+	 * 传入单元初始化属性和占位
+	 * 计算出单元格的盒模型，同时维护pointsinfo
 	 */
 	[actionTypes.CELLS_INSERTCELL]({commit, state, rootState, getters}, cellList){
 		let insertCellInfo = [],
@@ -425,6 +597,7 @@ export default {
 				for (let k = 0; k < aliasRowList.length; k++) {
 					let colAlias = aliasColList[j],
 						rowAlias = aliasRowList[k];
+
 					commit(mutationTypes.UPDATE_POINTINFO, {
 						currentSheet: rootState.currentSheet,
 						info: {
@@ -436,24 +609,11 @@ export default {
 					});
 				}
 			}
-			indexCounter ++;
+			indexCounter++;
 		});
 	},
 	[actionTypes.COLS_OPERCOLS]({getters, state, rootState, commit, dispatch}, 
         {startIndex, endIndex, props}){
-		if(startIndex === undefined){
-            let selects = getters.selectList,
-                select;
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i];
-                    break;
-                }
-            }
-            startIndex =  getters.getColIndexByAlias(select.wholePosi.startColAlias);
-            endIndex =  getters.getColIndexByAlias(select.wholePosi.endColAlias);
-        }
-        endIndex = endIndex === undefined ? startIndex : endIndex;
 
         let updateCellInfo = [];
        	let cellList = getters.getCellsByVertical({
@@ -505,23 +665,7 @@ export default {
 	},
 	[actionTypes.ROWS_OPERROWS]({getters, state, rootState, commit, dispatch}, 
         {startIndex, endIndex, props}){
-		if (startIndex === undefined) {
-			let selects = getters.selectList,
-				select;
-			for (let i = 0, len = selects.length; i < len; i++) {
-				if (selects[i].type === SELECT) {
-					select = selects[i];
-					break;
-				}
-			}
-			startIndex = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
-			endIndex = getters.getRowIndexByAlias(select.wholePosi.endRowAlias);
-		}
-		endIndex = endIndex === undefined ? startIndex : endIndex;
 
-		if (endIndex === 'MAX') {
-			return;
-		}
 		let updateCellInfo = [];
 
 		let cellList = getters.getCellsByVertical({
@@ -559,6 +703,7 @@ export default {
 						rowAlias = rows[j].alias,
 						cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex'),
 						cell = extend({}, props);
+
 					cell.occupy = {
 						col: [colAlias],
 						row: [rowAlias]
@@ -572,7 +717,9 @@ export default {
 		dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo);
 	},
 	[actionTypes.OCCUPY_UPDATE]({commit, getters, rootState, dispatch}, {col, row}){
-
+		if (col.length === 0 || row.length === 0) {
+			return;
+		}
 		let startRowIndex = getters.getRowIndexByAlias(row[0]),
 			startColIndex = getters.getColIndexByAlias(col[0]),
 			endRowIndex = getters.getRowIndexByAlias(row[row.length - 1]),
@@ -583,7 +730,7 @@ export default {
 			temp;
 
 		for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-			if (!isEmpty((temp = rows[i].oprProp))) {
+			if (!isEmpty((temp = rows[i].props))) {
 				for (let j = startColIndex; j < endColIndex + 1; j++) {
 					let rowAlias = rows[i].alias,
 						colAlias = cols[j].alias,
@@ -600,44 +747,63 @@ export default {
 				}
 			}
 		}
-		
+
 
 		for (let i = startColIndex; i < endColIndex + 1; i++) {
-			if (!isEmpty((temp =cols[i].oprProp))) {
+			if (!isEmpty((temp = cols[i].props))) {
 				for (let j = startRowIndex; j < endRowIndex + 1; j++) {
 					let rowAlias = rows[j].alias,
 						colAlias = cols[i].alias,
 						index = getPointInfo(colAlias, rowAlias, 'cellIndex'),
 						cell = extend({}, temp);
-						
+
 					cell.occupy = {
 						col: [colAlias],
 						row: [rowAlias]
 					};
-					if(typeof index !== 'number'){
+					if (typeof index !== 'number') {
 						dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
 					}
 				}
 			}
 		}
-		function isEmpty(obj){
-			for(let key in obj){
+
+		function isEmpty(obj) {
+			let flag = true;
+			for (let key in obj) {
+				flag = false;
+			}
+			if(flag){
+				return true;
+			}
+			for (let key in obj.content) {
+				return false;
+			}
+			for (let key in obj.border) {
+				return false;
+			}
+			for (let key in obj.customProp) {
 				return false;
 			}
 			return true;
 		}
 	},
-	[actionTypes.CELLS_MERGE]({commit, dispatch, getters, rootState}, {
+	[actionTypes.CELLS_MERGE]({
+		commit,
+		dispatch,
+		getters,
+		rootState
+	}, {
 		startColIndex,
 		endColIndex,
 		startRowIndex,
 		endRowIndex,
 		value
 	} = {}) {
-		if(typeof startColIndex === 'undefined'){
+		if (typeof startColIndex === 'undefined') {
 			let select = getters.activeSelect,
 				wholePosi = select.wholePosi;
-			
+
 			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
 			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
 			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
@@ -645,6 +811,9 @@ export default {
 		}
 		endColIndex = endColIndex || startColIndex;
 		endRowIndex = endRowIndex || startRowIndex;
+		if(endRowIndex === 'MAX' || endColIndex === 'MAX'){
+			return;
+		}
 
 		if (value === undefined) {
 			value = !getters.getMergeState();
@@ -655,20 +824,40 @@ export default {
 			startRowIndex,
 			endRowIndex
 		});
+		let action = value ? 'merge' : 'split',
+			url = config.operUrl[action],
+			cols = getters.colList,
+			rows = getters.rowList,
+			data;
 
+		data = {
+			coordinate: [{
+				startCol: cols[startColIndex].sort,
+				startRow: rows[startRowIndex].sort,
+				endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
+				endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+			}]
+		};
+		send({
+			url,
+			data: JSON.stringify(data)
+		});
 		if (value) {
+			merge();
+		} else {
+			split();
+		}
+
+		function merge() {
 			let cell;
 			for (let i = 0, len = cellList.length; i < len; i++) {
-				if(cellList[i].content.texts){
+				if (cellList[i].content.texts) {
 					cell = cellList[i];
 					break;
 				}
 			}
-			if(!cell){
-				cell = getters.getCellsByTransverse({
-					startColIndex,
-					endColIndex
-				})[0];
+			if (!cell) {
+				cell = cellList[0];
 			}
 			cell = extend({}, cell || {});
 
@@ -688,7 +877,9 @@ export default {
 				col: colAliasList
 			}
 			dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
-		}else{
+		}
+
+		function split() {
 			let currentSheet = rootState.currentSheet,
 				cols = getters.colList,
 				rows = getters.rowList;
@@ -723,6 +914,5 @@ export default {
 			});
 			dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
 		}
-
 	}
 };

@@ -6,12 +6,9 @@ import cache from '../../../tools/cache';
 import extend from '../../../util/extend';
 import generator from '../../../tools/generator';
 import template from './template';
-import {
-    getRowDisplayName
-} from '../../../util/displayname';
-import {
-    SELECT
-} from '../../../tools/constant';
+import {getRowDisplayName} from '../../../util/displayname';
+import {SELECT} from '../../../tools/constant';
+import send from '../../../util/send';
 
 
 export default {
@@ -81,11 +78,16 @@ export default {
         let rows = getters.rowList,
             visibleRows = getters.visibleRowList,
             row = rows[index],
-            deleteCells = [],
             updateCellInfo = [],
             rowHeight = row.height,
             rowAlias = row.alias;
-
+        
+        send({
+            url: config.operUrl['hiderow'],
+            data: JSON.stringify({
+                row: row.sort
+            }),
+        });
 
        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
@@ -273,11 +275,16 @@ export default {
         }
 
         let row = rows[index],
-            deleteCells = [],
             updateCellInfo = [],
             rowHeight = row.height,
             rowAlias = row.alias;
 
+        send({
+            url: config.operUrl['showrow'],
+            data: JSON.stringify({
+                row: row.sort
+            }),
+        });
        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
@@ -407,7 +414,13 @@ export default {
             originalRowAlias = rows[index].alias,
             rowAlias = generator.rowAliasGenerator(),
             rowTop = rows[index].top;
-
+        
+        send({
+            url: config.operUrl['insertrow'],
+            data: JSON.stringify({
+                row: rows[index].sort,
+            }),
+        });
 
         row.sort = index;
         row.alias = rowAlias;
@@ -512,10 +525,19 @@ export default {
          let currentSheet = rootState.currentSheet,
             rows = getters.rowList,
             row = rows[index],
+            rowAlias = row.alias,
             adjustHeight = height - row.height,
             updateCellInfo = [];
 
-       let cellList = getters.getCellsByVertical({
+
+        send({
+            url: config.operUrl['adjustrow'],
+            data: JSON.stringify({
+                row: row.sort,
+                offset: height
+            }),
+        });
+        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -642,11 +664,17 @@ export default {
 
         let rows = getters.rowList,
             row = rows[index],
-            deleteCells = [],
+            deleteOccupys = [],
             updateCellInfo = [],
             rowHeight = row.height,
             rowAlias = row.alias;
 
+        send({
+            url: config.operUrl['deleterow'],
+            data: JSON.stringify({
+                row: row.sort,
+            }),
+        });
         let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
@@ -660,9 +688,9 @@ export default {
 
             if ((temp = occupy.indexOf(rowAlias)) !== -1) {
                 if (occupy.length === 1) {
-                    deleteCells.push(cell);
+                    deleteOccupys.push(cell.occupy);
                 }else{
-                    deleteCells.push({
+                    deleteOccupys.push({
                         col: cell.occupy.col,
                         row: [rowAlias]
                     });
@@ -693,7 +721,7 @@ export default {
 
         commit(mutationTypes.DELETE_CELL_POINTINFO, {
             currentSheet,
-            cells: deleteCells
+            occupys: deleteOccupys
         });
         commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 

@@ -22,14 +22,14 @@ export default {
 		format: '',
 		size: '11',
 		family: 'SimSun',
-		color: 'rgb(0, 0, 0)',
+		color: 'rgb(0, 0, 0, 1)',
 		weight: false,
 		italic: false,
 		alignRow: 'left',
 		alignCol: 'middle',
 		wordWrap: false,
-		underline: false,
-		background: 'rgb(255, 255, 255)',
+		underline: 0,
+		background: 'rgba(255, 255, 255, 1)',
 	},
 	/**
 	 * 与容器相关属性

@@ -45,7 +45,7 @@
 					width: state.width + 'px',
 					height: state.height + 'px',
 					fontFamily: state.family,
-					fontSize: state.size + 'px',
+					fontSize: state.size + 'pt',
 					fontStyle: state.italic,
 					color: state.color,
 					textDecoration: state.underline,

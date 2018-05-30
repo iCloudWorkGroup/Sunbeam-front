@@ -31,6 +31,10 @@
 				<tool-panel  title="合并拆分">
 					<merge></merge>
 				</tool-panel>
+				<tool-panel  title="行列">
+					<rowcol :active-widget-id="activeWidgetId"
+						@updateActiveWidgetId = "updateActiveWidgetId"></rowcol>
+				</tool-panel>
 			</ul>
 			<ul id="reviewTool" v-show="activeTabId === 'reviewTool'">
 				<tool-panel  title="视图">
@@ -38,6 +42,12 @@
 						:active-widget-id="activeWidgetId"
 						 @updateActiveWidgetId = "updateActiveWidgetId">	
 					</frozen>
+				</tool-panel>
+				<tool-panel  title="隐藏">
+					<hide 
+						:active-widget-id="activeWidgetId"
+						 @updateActiveWidgetId = "updateActiveWidgetId">	
+					</hide>
 				</tool-panel>
 			</ul>
 		</div>
@@ -49,6 +59,8 @@
 	import Frozen from './frozen.vue';
 	import Align from './align.vue';
 	import Merge from './merge.vue';
+	import Rowcol from './rowcol.vue';
+	import Hide from './hide.vue';
 	import '../../css/toolbar.css';
 	import '../../css/widget.css';
 
@@ -64,7 +76,9 @@
 			Font,
 			Frozen,
 			Align,
-			Merge
+			Merge,
+			Rowcol,
+			Hide
 		},
 		computed: {
 

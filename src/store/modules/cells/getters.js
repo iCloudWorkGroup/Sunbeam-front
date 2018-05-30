@@ -195,7 +195,7 @@ export default {
                 if (typeof pointInfo[rowAlias] !== 'undefined') {
                     for (let j = startColIndex, len2 = endColIndex + 1; j <
                         len2; j++) {
-                        colAlias = rows[j].alias;
+                        colAlias = cols[j].alias;
                         temp = pointInfo[rowAlias][colAlias];
                         if (temp && temp.cellIndex !== null) {
                             index = temp.cellIndex;

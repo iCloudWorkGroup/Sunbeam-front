@@ -52,7 +52,7 @@ export default {
                 italic = cellContent.italic ? 'italic ' : '',
                 weight = cellContent.weight ? 'bold' : 'normal',
                 underline = cellContent.underline ? 'underline': '',
-                font = unit(cellContent.size) + ' ' + cellContent.family;
+                font = cellContent.size + 'pt ' + cellContent.family;
 
             return {
                 background: cellContent.background,

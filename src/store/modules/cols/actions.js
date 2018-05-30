@@ -10,6 +10,7 @@ import config from '../../../config';
 import cache from '../../../tools/cache';
 import template from './template';
 import { SELECT } from '../../../tools/constant';
+import send from '../../../util/send';
 
 export default {
     [actionTypes.COLS_ADDCOLS]({
@@ -63,9 +64,17 @@ export default {
         let currentSheet = rootState.currentSheet,
             cols = getters.colList,
             col = cols[index],
+            colAlias = col.alias,
             adjustWidth = width - col.width,
             updateCellInfo = [];
 
+        send({
+            url: config.operUrl['adjustcol'],
+            data: JSON.stringify({
+                col: col.sort,
+                offset: width
+            }),
+        });
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -74,10 +83,10 @@ export default {
         });
 
         cellList.forEach(function(cell) {
-            let occupy = cell.occupy.row,
+            let occupy = cell.occupy.col,
                 temp;
 
-            if ((temp = occupy.indexOf(rowAlias)) !== -1) {
+            if ((temp = occupy.indexOf(colAlias)) !== -1) {
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -191,14 +200,20 @@ export default {
             }
             index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
-
         let cols = getters.colList,
             col = cols[index],
-            deleteCells = [],
+            deleteOccupys = [],
             updateCellInfo = [],
             colWidth = col.width,
             colAlias = col.alias;
 
+
+        send({
+            url: config.operUrl['deletecol'],
+            data: JSON.stringify({
+                col: col.sort,
+            }),
+        });
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -212,9 +227,9 @@ export default {
 
             if ((temp = occupy.indexOf(colAlias)) !== -1) {
                 if (occupy.length === 1) {
-                    deleteCells.push(cell);
+                    deleteOccupys.push(cell.occupy);
                 } else {
-                    deleteCells.push({
+                    deleteOccupys.push({
                         col: [colAlias],
                         row: cell.occupy.row
                     });
@@ -247,7 +262,7 @@ export default {
 
         commit(mutationTypes.DELETE_CELL_POINTINFO, {
             currentSheet,
-            cells: deleteCells
+            occupys: deleteOccupys
         });
         commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
@@ -324,6 +339,7 @@ export default {
             cache.localColPosi -= colWidth;
         }
         commit(mutationTypes.UPDATE_COL, updateColInfo);
+        
         let self = this;
         Vue.nextTick(function() {
             let colRecord = cache.colRecord,
@@ -416,11 +432,16 @@ export default {
         let cols = getters.colList,
             visibleCols = getters.visibleColList,
             col = cols[index],
-            deleteCells = [],
             updateCellInfo = [],
             colWidth = col.width,
             colAlias = col.alias;
 
+        send({
+            url: config.operUrl['hidecol'],
+            data: JSON.stringify({
+                col: col.sort
+            }),
+        });
 
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
@@ -608,11 +629,16 @@ export default {
         }
 
         let col = cols[index],
-            deleteCells = [],
             updateCellInfo = [],
             colWidth = col.width,
             colAlias = col.alias;
 
+        send({
+            url: config.operUrl['showcol'],
+            data: JSON.stringify({
+                col: col.sort
+            }),
+        });
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -742,6 +768,12 @@ export default {
             colAlias = generator.colAliasGenerator(),
             colLeft = cols[index].left;
 
+        send({
+            url: config.operUrl['insertcol'],
+            data: JSON.stringify({
+                col: cols[index].sort,
+            }),
+        });
         col.sort = index;
         col.alias = colAlias;
         col.displayName = getColDisplayName(index);

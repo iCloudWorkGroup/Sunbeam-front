@@ -14,7 +14,7 @@ import {getColDisplayName, getRowDisplayName} from '../util/displayname';
  * @return {[type]}           [description]
  */
 export default function(viewBox, fn) {
-	let build = true;
+	let build = false;
 	if (build === true) {
 		buildSBM(fn);
 		return;
@@ -76,63 +76,60 @@ function restoreSBM(data, fn, resolve) {
 	send({
 		url: 'reload',
 		async: false,
+		isPublic: false,
 		data: JSON.stringify(data),
 		success(data) {
-			if (!data || !data.returndata) {
+			let sheet;
+			if (!data || !Array.isArray(data.sheets) || !(sheet = data.sheets[0])) {
 				return;
 			}
 
-			let sheetData;
+			cache.localRowPosi = sheet.maxRowPixel;
+			cache.localColPosi = sheet.maxColPixel;
 
-			cache.localRowPosi = data.maxRowPixel;
-			cache.localColPosi = data.maxColPixel;
+			generator.rowAliasGenerator(parseInt(sheet.maxRowAlias));
+			generator.colAliasGenerator(parseInt(sheet.maxColAlias));
+			generator.cellAliasGenerator(0);
+			let sheetData = {
+				alias: sheet.alias || 'sheet1',
+				name: sheet.name
+			};
 
-			generator.rowAliasGenerator(parseInt(data.aliasRowCounter));
-			generator.colAliasGenerator(parseInt(data.aliasColCounter));
+			let rowData = sheet.gridLineRow;
+			let colData = sheet.gridLineCol;
+			let cellData = sheet.cells;
+			let frozenData = sheet.frozen;
 
-			data = data.returndata;
+			rowData.forEach(function(row) {
+				row.displayName = getRowDisplayName(row.sort);
+			});
+			colData.forEach(function(col) {
+				col.displayName = getColDisplayName(col.sort);
+			});
+			cellData.forEach(function(cell){
+				cell.alias = generator.cellAliasGenerator();
+			});
 
-			if (data.spreadSheet && data.spreadSheet[0] &&
-				(sheetData = data.spreadSheet[0].sheet)) {
+			frozenData.type = 'restore';
+			frozenData.viewColAlias = sheet.viewColAlias;
+			frozenData.viewRowAlias = sheet.viewRowAlias;
 
-				sheet = {
-					alias: sheetData.alias || 'sheet1',
-					name: sheetData.name
-				};
-				rows = sheetData.glY;
-				cols = sheetData.glX;
-				cells = sheetData.cells;
+			colRecord.push(colData[0].alias, colData[colData.length - 1].alias);
+			rowRecord.push(rowData[0].alias, rowData[rowData.length - 1].alias);
 
-				rows.forEach(function(row) {
-					row.sort = row.index;
-					row.displayName = getRowDisplayName(row.sort);
-					row.alias = row.aliasY;
-				});
-				cols.forEach(function(col) {
-					col.sort = col.index;
-					col.displayName = getColDisplayName(col.sort);
-					col.alias = col.aliasX;
-				});
-				cells.forEach(function(cell){
-					cell.occupy.col = cell.occupy.x;
-					cell.occupy.row = cell.occupy.y;
-				});
-				colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
-				rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
+			cache.regionRecord.set(
+				colRecord[0] + '_' +
+				colRecord[1] + '_' +
+				rowRecord[0] + '_' +
+				rowRecord[1], true);
 
-				cache.regionRecord.set(
-					colRecord[0] + '_' +
-					colRecord[1] + '_' +
-					rowRecord[0] + '_' +
-					rowRecord[1], true);
-
-				fn({
-					sheet,
-					rows,
-					cols,
-					cells
-				});
-			}
+			fn({
+				sheet: sheetData,
+				rows: rowData,
+				cols: colData,
+				cells: cellData,
+				frozen: frozenData
+			});
 		}
 	});
 }

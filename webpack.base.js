@@ -3,7 +3,7 @@ const webpack = require('webpack')
 module.exports = {
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		publicPath: '/dist/'
+		publicPath: './'
 	},
 	module: {
 		rules: [{

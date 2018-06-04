@@ -578,12 +578,36 @@ export default {
 			startRowIndex = getters.getRowIndexByAlias(aliasRowList[0]);
 			endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length -1]);
 
+			let top = rows[startRowIndex].top,
+				left = cols[startColIndex].left,
+				width,
+				height;
+
+			for (let i = endColIndex; i > startColIndex - 1; i--) {
+				if (cols[i].hidden) {
+					continue;
+				} else {
+					width = cols[i].left + cols[i].width - cols[startColIndex].left;
+					break;
+				}
+			}
+			width = width || -1;
+
+			for (let i = endRowIndex; i > startRowIndex - 1; i--) {
+				if (rows[i].hidden) {
+					continue;
+				} else {
+					height = rows[i].top + rows[i].height - rows[startRowIndex].top;
+					break;
+				}
+			}
+			height = height || -1;
 
 			let physicsBox = {
-				top: rows[startRowIndex].top,
-				left: cols[startColIndex].left,
-				width: cols[endColIndex].left + cols[endColIndex].width - cols[startColIndex].left,
-				height: rows[endRowIndex].top + rows[endRowIndex].height - rows[startRowIndex].top
+				top,
+				left,
+				width,
+				height
 			};
 
 			extend(cell, {physicsBox});

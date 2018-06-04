@@ -21,7 +21,7 @@
 					left = getters.getInputState.left;
 
 				if(getInputState.transverseScroll){
-					left += this.scrollLeft;
+					left -= this.scrollLeft;
 				}
 				left += config.cornerWidth;
 				return left;
@@ -32,7 +32,7 @@
 					top = getters.getInputState.top;
 
 				if(getInputState.verticalScroll){
-					top += this.scrollTop;
+					top -= this.scrollTop;
 				}
 				top += config.cornerHeight;
 				return top;

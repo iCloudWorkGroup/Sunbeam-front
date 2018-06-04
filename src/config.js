@@ -3,7 +3,7 @@ export default {
 	rowHeight: 19,
 	initRowNum: 40,
 	initColNum: 26,
-	maxRowNum: 500,
+	maxRowNum: 2000,
 	maxColNum: 52,
 	/**
 	 * 页面左侧距离
@@ -18,8 +18,8 @@ export default {
 	/**
 	 * 请求预加载区域宽度,单位px
 	 */
-	prestrainWidth: 100,
-	prestrainHeight: 50,
+	prestrainWidth: 600,
+	prestrainHeight: 300,
 	/**
 	 * 请求区域缓存宽度
 	 * @type {Number}
@@ -58,7 +58,8 @@ export default {
 		'hiderow': 'row/hide',
 		'hidecol': 'col/hide',
 		'showrow': 'row/show',
-		'showcol': 'col/show'
+		'showcol': 'col/show',
+		
 	},
 	operSendPropName: {
 		'alignRow': 'align',
@@ -71,5 +72,5 @@ export default {
 	 * @type {String}
 	 */
 	// rootPath: 'http://192.168.1.173:8080/sunbeam/'
-	rootPath: 'http://localhost:8080/'
+	rootPath: 'http://192.168.3.96:8080/spreadsheet/'
 };

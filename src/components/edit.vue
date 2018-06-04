@@ -14,6 +14,7 @@ import send from '../util/send';
 import Vue from 'vue';
 import * as actionTypes from '../store/action-types';
 import * as mutationTypes from '../store/mutation-types';
+import generator from '../tools/generator';
 import {
 	getColDisplayName, 
 	getRowDisplayName
@@ -183,7 +184,7 @@ export default {
 		},
 		scrollToBottom(limitTop, limitBottom, resolve) {
 			let rowList = this.$store.getters.rowList,
-				maxBottom = cache.localRowPosi,
+				localMaxBottom = cache.localRowPosi,
 				bufferHeight = config.scrollBufferWidth,
 				rowRecord = cache.rowRecord,
 				rowOccupy = this.rowOccupy.slice(0),
@@ -197,13 +198,24 @@ export default {
 				self = this,
 				promise;
 			
+			limitBottom = parseInt(limitBottom);
 			/**
 			 * 当前视图边界值超过了后台对象的最大值
 			 * 需要自动增加列
 			 */
+			let lastRow = rowList[rowList.length - 1],
+				maxBottom = lastRow.top + lastRow.height;
+				maxBottom = maxBottom > localMaxBottom ? maxBottom : localMaxBottom;	
+
 			if (limitBottom > maxBottom && (!frozenRule || frozenRule.type === 'mainRule')) {
 				addRowNum = Math.ceil((limitBottom - maxBottom + bufferHeight) / config.rowHeight);
 				limitBottom = maxBottom;
+			}
+
+			if(cache.localRowPosi === 0){
+				addRow();
+				resolve();
+				return;
 			}
 
 			promise = new Promise(function(currentResolve){
@@ -228,9 +240,8 @@ export default {
 					currentMaxBottom = lastRow.top + lastRow.height;
 
 				if (currentMaxBottom < limitBottom) {
-
 					limitBottom = limitBottom + bufferHeight;
-					limitBottom = limitBottom < maxBottom ? limitBottom : maxBottom;
+					limitBottom = limitBottom < localMaxBottom ? limitBottom : localMaxBottom;
 
 					self.verticalRequest(currentMaxBottom + 1, limitBottom, resolve,
 						function(alias) {
@@ -273,6 +284,7 @@ export default {
 
 					for (let len = rowRecord.length; i < len; i++) {
 						let row = self.$store.getters.getRowByAlias(rowRecord[i]);
+
 						temp.push(row.alias);
 						rowOccupy.push(row.alias);
 						if (row.top + row.height > limitBottom) {
@@ -348,6 +360,10 @@ export default {
 				currentTop = occupyStartRow.top,
 				self = this;
 
+			if(cache.localRowPosi === 0){
+				resolve();
+				return;
+			}
 			new Promise(function(currentResolve){
 				getTop(currentResolve);
 			}).then(function(){
@@ -416,14 +432,12 @@ export default {
 		scrollToRight(limitLeft, limitRight, resolve) {
 			let getters = this.$store.getters,
 				colList = getters.colList,
-				maxRight = cache.localColPosi,
+				localMaxRight = cache.localColPosi,
 				bufferWidth = config.scrollBufferWidth,
 				colRecord = cache.colRecord,
 				colOccupy = this.colOccupy.slice(0),
 				rowOccupy = this.rowOccupy.slice(0),
 				regionRecord = cache.regionRecord,
-				lastCol = colList[colList.length - 1],
-				currentMaxRight = lastCol.left + lastCol.width,
 				occupyEndColAlias = colOccupy[colOccupy.length - 1],
 				occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias),
 				occupyRight = occupyEndCol.left + occupyEndCol.width,
@@ -432,15 +446,24 @@ export default {
 				self = this,
 				promise;
 
+			limitRight = parseInt(limitRight);
 			/**
 			 * 当前视图边界值超过了后台对象的最大值
 			 * 需要自动增加列
 			 */
+			let lastCol = colList[colList.length - 1],
+				maxRight = lastCol.left + lastCol.width;
+				maxRight = maxRight > localMaxRight ? maxRight : localMaxRight;	
 			if (limitRight > maxRight && (!frozenRule || frozenRule.type === 'mainRule')) {
 				addColNum = Math.ceil((limitRight - maxRight + bufferWidth) / config.colWidth);
 				limitRight = maxRight;
 			}
 
+			if(cache.localRowPosi === 0){
+				addCol();
+				resolve();
+				return;
+			}
 			promise = new Promise(function(currentResolve){
 				getNextCol(currentResolve);
 			}).then(function(){
@@ -460,6 +483,8 @@ export default {
 			 * 终止值为视图边界+缓存高度
 			 */
 			function getNextCol(resolve) {
+				let lastCol = colList[colList.length - 1],
+					currentMaxRight = lastCol.left + lastCol.width;
 				if (currentMaxRight < limitRight) {
 					limitRight = limitRight + config.scrollBufferWidth;
 					limitRight = limitRight < maxRight ? limitRight : maxRight;
@@ -541,7 +566,10 @@ export default {
 				if (addColNum > 0) {
 					let tempAlias = colList[colList.length - 1].alias,
 						currentAlias;
-
+					
+					// send({
+					// 	url: config.operUrl
+					// });						
 					self.$store.dispatch(actionTypes.COLS_GENERAT, addColNum);
 
 					currentAlias = colList[colList.length - 1].alias;
@@ -582,6 +610,10 @@ export default {
 				colRecord = cache.colRecord,
 				self = this;
 
+			if(cache.localRowPosi === 0){
+				resolve();
+				return;
+			}
 			new Promise(function(currentResolve){
 				getLeft(currentResolve);
 			}).then(function(){
@@ -666,27 +698,39 @@ export default {
 						right,
 						bottom
 					}),
-					success: (data) => {
-						let sheetData;
-						data = data.returndata;
+					success: (data) => {							
+						if (fn) {
+							let colData = data.gridLineCol,
+								endColAlias = colData[colData.length - 1].alias,
+								firstCol = colData[0];
 
-						if (data.spreadSheet && data.spreadSheet[0] &&
-							(sheetData = data.spreadSheet[0].sheet)) {
-							if(fn){
-								let cols = sheetData.glX,
-									endColAlias = cols[cols.length - 1].aliasX;
-
-								cols.forEach(function(col) {
-									col.sort = col.index;
-									col.alias = col.aliasX;
-									col.displayName = getColDisplayName(col.sort);
-								});
-								this.$store.dispatch(actionTypes.COLS_RESTORECOLS, cols);	
-								fn(endColAlias);
+							if (firstCol.hidden) {
+								let index = this.$store.getters.getColIndexByAlias(firstCol.alias);
+								if (index > 0) {
+									let cols = this.$store.getters.colList;
+									this.$store.commit(mutationTypes.UPDATE_COL, {
+										col: cols[index - 1],
+										props: {
+											rightAjacentHide: true
+										}
+									});
+								}
 							}
-							let cells = sheetData.cells;	
-							this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
+							for (let i = 0, len = colData.length; i < len; i++) {
+								let col = colData[i];
+								if (col.hidden && i > 0) {
+									colData[i - 1].rightAjacentHide = true;
+								}
+								col.displayName = getColDisplayName(col.sort);
+							}
+							this.$store.dispatch(actionTypes.COLS_RESTORECOLS, colData);
+							fn(endColAlias);
 						}
+						let cells = data.cells;
+						cells.forEach(function(cell){
+							cell.alias = generator.cellAliasGenerator();
+						});
+						this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 						resolve();
 					}
 				});
@@ -709,26 +753,39 @@ export default {
 						bottom
 					}),
 					success: (data) => {
-						let sheetData;
-						data = data.returndata;
+						if (fn) {
+							let rowData = data.gridLineRow,
+								endRowAlias = rowData[rowData.length - 1].alias,
+								firstRow = rowData[0];
 
-						if (data.spreadSheet && data.spreadSheet[0] &&
-							(sheetData = data.spreadSheet[0].sheet)) {
-							if(fn){
-								let rows = sheetData.glY,
-									endRowAlias = rows[rows.length - 1].aliasY;
-
-								rows.forEach(function(row) {
-									row.sort = row.index;
-									row.alias = row.aliasY;
-									row.displayName = getRowDisplayName(row.sort);
-								});
-								this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rows);	
-								fn(endRowAlias);
+							if (firstRow.hidden) {
+								let index = this.$store.getters.getRowIndexByAlias(firstRow.alias);
+								if (index > 0) {
+									let rows = this.$store.getters.rowList;
+									this.$store.commit(mutationTypes.UPDATE_ROW, {
+										row: rows[index - 1],
+										props: {
+											bottomAjacentHide: true
+										}
+									});
+								}
 							}
-							let cells = sheetData.cells;
-							this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
+							for (let i = 0, len = rowData.length; i < len; i++) {
+								let row = rowData[i];
+								if (row.hidden && i > 0) {
+									rowData[i - 1].bottomAjacentHide = true;
+								}
+								row.displayName = getRowDisplayName(row.sort);
+							}
+
+							this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rowData);
+							fn(endRowAlias);
 						}
+						let cells = data.cells;
+						cells.forEach(function(cell){
+							cell.alias = generator.cellAliasGenerator();
+						});
+						this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells);
 						resolve();
 					}
 				});

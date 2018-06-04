@@ -40,24 +40,19 @@
 	            let rows = this.$store.getters.rowList,
 	                visibleRows = this.$store.getters.visibleRowList,
 	                frozenRule = this.frozenRule,
-	                startRowIndex,
-	                endRowIndex,
 	                lastRow,
 	                startRow;
 
 	            if (frozenRule) {
-	                startRowIndex = frozenRule.startRowIndex;
+	            	startRow = rows[frozenRule.startRowIndex];
 	                if (frozenRule.endRowIndex !== undefined) {
-	                    endRowIndex = frozenRule.endRowIndex;
+						lastRow = rows[frozenRule.endRowIndex];
 	                }else {
-	                	endRowIndex = visibleRows.length -1;
+	                	lastRow = visibleRows[visibleRows.length -1];
 	                }
-	                startRow = rows[startRowIndex];
-	                lastRow = rows[endRowIndex];
 	            } else {
-	                endRowIndex = visibleRows.length - 1;
 	                startRow = visibleRows[0];
-	                lastRow = visibleRows[endRowIndex];
+	                lastRow = visibleRows[visibleRows.length - 1];
 	            }
 	            return lastRow.top + lastRow.height - startRow.top + 'px';
 			},

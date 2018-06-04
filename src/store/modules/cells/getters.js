@@ -47,7 +47,6 @@ export default {
                 cellEndColIndex,
                 cellEndRowIndex,
                 cellList,
-                temp,
                 flag = true;
 
             if (startColIndex === 'MAX' || endColIndex === 'MAX') {
@@ -66,15 +65,14 @@ export default {
                     endRowIndex: 'MAX'
                 };
             }
-            if ((temp = startRowIndex) > endRowIndex) {
-                startRowIndex = endRowIndex;
-                endRowIndex = temp;
+            if (startRowIndex > endRowIndex) {
+                [startRowIndex, endRowIndex] = [endRowIndex, startRowIndex];
             }
-            if ((temp = startColIndex) > endColIndex) {
-                startColIndex = endColIndex;
-                endColIndex = temp;
+            if (startColIndex > endColIndex) {
+                [startColIndex, endColIndex] = [endColIndex, startColIndex];
             }
 
+            let temp = new Map();
             while (flag) {
                 flag = false;
                 cellList = getters.getCellsByVertical({
@@ -85,13 +83,19 @@ export default {
                 });
 
                 for (let i = 0, len = cellList.length; i < len; i++) {
-                    temp = cellList[i].physicsBox;
-                    cellStartRowIndex = rangeBinary(temp.top, rows, 'top',
-                        'height');
-                    cellEndRowIndex = rangeBinary(temp.top + temp.height,
-                        rows, 'top', 'height');
-                    cellStartColIndex = getters.getColIndexByPosi(temp.left);
-                    cellEndColIndex = getters.getColIndexByPosi(temp.left + temp.width);
+                    let cell = cellList[i];
+                    if(temp.get(cell.alias)){
+                        break;
+                    }
+                    temp.set(cell.alias, true);
+
+                    let occupyCol = cell.occupy.col,
+                        occupyRow = cell.occupy.row;
+                    cellStartRowIndex = getters.getRowIndexByAlias(occupyRow[0]);
+                    cellEndRowIndex = getters.getRowIndexByAlias(occupyRow[occupyRow.length - 1]);
+
+                    cellStartColIndex = getters.getColIndexByAlias(occupyCol[0]);
+                    cellEndColIndex = getters.getColIndexByAlias(occupyCol[occupyCol.length - 1]);
 
                     if (cellStartColIndex < startColIndex) {
                         startColIndex = cellStartColIndex;

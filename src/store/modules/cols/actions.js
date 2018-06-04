@@ -198,6 +198,9 @@ export default {
                     break;
                 }
             }
+            if(select.wholePosi.endColAlias === 'MAX'){
+                return;
+            }
             index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
         let cols = getters.colList,
@@ -336,10 +339,10 @@ export default {
         }
 
         if (cache.localColPosi > 0) {
-            cache.localColPosi -= colWidth;
+            cache.localColPosi -= colWidth + 1;
         }
         commit(mutationTypes.UPDATE_COL, updateColInfo);
-        
+
         let self = this;
         Vue.nextTick(function() {
             let colRecord = cache.colRecord,
@@ -425,6 +428,9 @@ export default {
                     select = selects[i];
                     break;
                 }
+            }
+            if(select.wholePosi.endColAlias === 'MAX'){
+                return;
             }
             index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
@@ -577,6 +583,10 @@ export default {
             });
         }
         commit(mutationTypes.UPDATE_COL, updateColInfo);
+
+        if (cache.localColPosi > 0) {
+            cache.localColPosi -= colWidth + 1;
+        }
     },
     [actionTypes.COLS_CANCELHIDE]({
         state,
@@ -602,6 +612,9 @@ export default {
                     select = selects[i];
                     break;
                 }
+            }
+            if(select.wholePosi.endColAlias === 'MAX'){
+                return;
             }
             let startColAlias = select.wholePosi.startColAlias,
                 endColAlias = select.wholePosi.endColAlias;
@@ -737,6 +750,10 @@ export default {
             });
         }
         commit(mutationTypes.UPDATE_COL, updateColInfo);
+
+        if (cache.localColPosi > 0) {
+            cache.localColPosi += colWidth + 1;
+        }
     },
     [actionTypes.COLS_INSERTCOLS]({
         state,
@@ -754,6 +771,9 @@ export default {
                     select = selects[i];
                     break;
                 }
+            }
+            if(select.wholePosi.endColAlias === 'MAX'){
+                return;
             }
             index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
         }
@@ -884,6 +904,9 @@ export default {
             currentSheet,
             cols: [col]
         });
+        if (cache.localColPosi > 0) {
+            cache.localColPosi += colWidth + 1;
+        }
     },
     [actionTypes.COLS_GENERAT]({
         state,
@@ -907,9 +930,6 @@ export default {
             }));
         }
 
-        if (cache.localColPosi > 0) {
-            cache.localColPosi = temp[temp.length - 1].left + temp[temp.length - 1].width;
-        }
         commit(mutationTypes.ADD_COL, {
             cols: temp,
             currentSheet

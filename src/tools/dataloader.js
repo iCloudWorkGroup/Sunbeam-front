@@ -56,7 +56,12 @@ function buildSBM(fn, resolve) {
 	}
 	colRecord.push(cols[0].alias, cols[cols.length - 1].alias);
 	rowRecord.push(rows[0].alias, rows[rows.length - 1].alias);
-
+	cache.regionRecord.set(
+		colRecord[0] + '_' +
+		colRecord[1] + '_' +
+		rowRecord[0] + '_' +
+		rowRecord[1], true);
+	
 	fn({
 		rows,
 		cols,
@@ -100,20 +105,29 @@ function restoreSBM(data, fn, resolve) {
 			let cellData = sheet.cells;
 			let frozenData = sheet.frozen;
 
-			rowData.forEach(function(row) {
+			for (let i = 0, len = rowData.length; i < len; i++) {
+				let row = rowData[i];
+				if (row.hidden && i > 0) {
+					rowData[i - 1].bottomAjacentHide = true;
+				}
 				row.displayName = getRowDisplayName(row.sort);
-			});
-			colData.forEach(function(col) {
+			}
+			for (let i = 0, len = colData.length; i < len; i++) {
+				let col = colData[i];
+				if (col.hidden && i > 0) {
+					colData[i - 1].rightAjacentHide = true;
+				}
 				col.displayName = getColDisplayName(col.sort);
-			});
+			}
+
 			cellData.forEach(function(cell){
 				cell.alias = generator.cellAliasGenerator();
 			});
-
-			frozenData.type = 'restore';
-			frozenData.viewColAlias = sheet.viewColAlias;
-			frozenData.viewRowAlias = sheet.viewRowAlias;
-
+			if (frozenData) {
+				frozenData.type = 'restore';
+				frozenData.viewColAlias = sheet.viewColAlias;
+				frozenData.viewRowAlias = sheet.viewRowAlias;
+			}
 			colRecord.push(colData[0].alias, colData[colData.length - 1].alias);
 			rowRecord.push(rowData[0].alias, rowData[rowData.length - 1].alias);
 

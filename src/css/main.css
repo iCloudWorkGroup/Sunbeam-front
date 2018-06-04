@@ -100,8 +100,8 @@ textarea { resize: none; overflow: hidden; }
 /**
  * frozen module
  */
-.frozen-right-border { border-right: 1px solid black; }
-.frozen-bottom-border { border-bottom: 1px solid black; }
+.frozen-right-border { border-right: 1px dashed rgb(48,116,72); }
+.frozen-bottom-border { border-bottom: 1px dashed rgb(48,116,72); }
 .container { position: relative; overflow: hidden; }
 
 /**

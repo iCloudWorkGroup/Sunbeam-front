@@ -14,7 +14,7 @@ import config from './config'
 Vue.use(Vuex);
 
 //后期需要进行修改
-window.SPREADSHEET_AUTHENTIC_KEY = '0c8d6409-700f-4d18-875a-d948b4c8c07c';
+window.SPREADSHEET_AUTHENTIC_KEY = '9e417dc6-e85d-45cd-991f-577b642cfb81';
 
 function SBM(wrapperId) {
 	if(!(this instanceof SBM)){

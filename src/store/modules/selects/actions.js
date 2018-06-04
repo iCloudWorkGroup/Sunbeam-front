@@ -20,16 +20,21 @@ export default {
         rootGetters
     }) {
         let currentSheet = rootState.currentSheet,
-            rows = rootState.rows[currentSheet].list,
-            cols = rootState.cols[currentSheet].list,
+            rows = getters.rowList,
+            cols = getters.colList,
+            visibleRows = getters.visibleRowList,
+            visibleCols = getters.visibleColList,
             select = extend(template),
             region,
             width,
             height;
 
+        let col = visibleCols[0],
+            row = visibleRows[0];
+
         region = getters.getFullOprRegion({
-            startColIndex: 0,
-            startRowIndex: 0
+            startColIndex: getters.getColIndexByAlias(col.alias),
+            startRowIndex: getters.getRowIndexByAlias(row.alias)
         });
 
         let startColIndex = region.startColIndex,

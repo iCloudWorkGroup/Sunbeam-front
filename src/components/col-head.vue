@@ -38,24 +38,19 @@ export default {
             let cols = this.$store.getters.colList,
                 visibleCols = this.$store.getters.visibleColList,
                 frozenRule = this.frozenRule,
-                startColIndex,
-                endColIndex,
                 lastCol,
                 startCol;
 
             if (frozenRule) {
-                startColIndex = frozenRule.startColIndex;
+                startCol = cols[frozenRule.startColIndex];
                 if (frozenRule.endColIndex !== undefined) {
-                    endColIndex = frozenRule.endColIndex;
+                    lastCol = cols[frozenRule.endColIndex];
                 }else{
-                    endColIndex = visibleCols.length - 1;
+                    lastCol = visibleCols[visibleCols.length - 1];
                 }
-                startCol = visibleCols[startColIndex];
-                lastCol = visibleCols[endColIndex];
             } else {
-                endColIndex = visibleCols.length - 1;
                 startCol = visibleCols[0];
-                lastCol = visibleCols[endColIndex];
+                lastCol = visibleCols[visibleCols.length - 1];
             }
             return lastCol.left + lastCol.width - startCol.left + 'px';
         },

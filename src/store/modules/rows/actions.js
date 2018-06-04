@@ -73,6 +73,9 @@ export default {
                     break;
                 }
             }
+            if(select.wholePosi.endRowAlias === 'MAX'){
+                return;
+            }
             index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
         let rows = getters.rowList,
@@ -135,7 +138,7 @@ export default {
 
             startSort = getters.getRowByAlias(wholePosi.startRowAlias).sort;
             endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort;
-
+            
             if (startSort >= rowSort) {
                 if(startSort === endVisibleSort){
                     updateSelectInfo.push({
@@ -223,6 +226,9 @@ export default {
             });
         }
         commit(mutationTypes.UPDATE_ROW, updateRowInfo);  
+        if (cache.localRowPosi > 0) {
+            cache.localRowPosi -= rowHeight + 1;
+        }
     },
     [actionTypes.ROWS_CANCELHIDE]({
         state,
@@ -251,6 +257,10 @@ export default {
             }
             let startRowAlias = select.wholePosi.startRowAlias,
                 endRowAlias = select.wholePosi.endRowAlias;
+
+            if(endRowAlias === 'MAX'){
+                return;
+            }
             if (visibleStartRow.alias === startRowAlias &&
                 visibleStartRow !== rows[0]) {
                 index = 0;
@@ -355,6 +365,9 @@ export default {
                     }
                 }]);
             }
+            if (cache.localRowPosi > 0) {
+                cache.localRowPosi += rowHeight + 1;
+            }
         });
 
         commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
@@ -400,6 +413,9 @@ export default {
                     select = selects[i];
                     break;
                 }
+            }
+            if(select.wholePosi.endRowAlias === 'MAX'){
+                return;
             }
             index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
@@ -520,15 +536,19 @@ export default {
             currentSheet,
             rows: [row]
         });
+        if (cache.localRowPosi > 0) {
+            cache.localRowPosi -= rowHeight + 1;
+        }
     },
-    [actionTypes.ROWS_ADJUSTHEIGHT]({state, rootState, commit, getters}, {index, height}){
+    [actionTypes.ROWS_ADJUSTHEIGHT]({state, rootState, commit, getters}, 
+        {index, height}){
+
          let currentSheet = rootState.currentSheet,
             rows = getters.rowList,
             row = rows[index],
             rowAlias = row.alias,
             adjustHeight = height - row.height,
             updateCellInfo = [];
-
 
         send({
             url: config.operUrl['adjustrow'],
@@ -658,6 +678,9 @@ export default {
                     select = selects[i];
                     break;
                 }
+            }
+            if(select.wholePosi.endRowAlias === 'MAX'){
+                return;
             }
             index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
@@ -797,7 +820,7 @@ export default {
         }
 
         if (cache.localRowPosi > 0) {
-            cache.localRowPosi -= rowHeight;
+            cache.localRowPosi -= rowHeight + 1;
         }
         commit(mutationTypes.UPDATE_ROW, updateRowInfo);
         Vue.nextTick(function() {
@@ -882,9 +905,6 @@ export default {
                 sort: currentSort + i,
                 displayName: getRowDisplayName(currentSort + i)
             }));
-        }
-        if (cache.localRowPosi > 0) {
-            cache.localRowPosi = temp[temp.length - 1].top + temp[temp.length - 1].height;
         }
         commit(mutationTypes.ADD_ROW, {
             rows: temp,

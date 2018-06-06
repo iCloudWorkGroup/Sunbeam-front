@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "node dev-server.js",
     "weex": "webpack --config webpack.weex.js",
-    "built": "webpack --config webpack.prod.js",
+    "built": "webpack --config webpack.prod.js && node prod-server.js",
     "test:e2e": "node test/e2e/runner.js",
     "test": "karma start"
   },

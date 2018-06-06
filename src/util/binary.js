@@ -1,8 +1,9 @@
-export function rangeBinary(val, array, strandAttr, rangeAttr, 
+export function rangeBinary(val, array, strandAttr, rangeAttr,
 	start = 0, end = array.length - 1) {
 	let middle,
 		findVal = Math.floor(val),
-		startVal, endVal,
+		startVal, 
+		endVal,
 		middleIndex;
 
 	while (start < end) {
@@ -18,11 +19,20 @@ export function rangeBinary(val, array, strandAttr, rangeAttr,
 	}
 	return start;
 }
-export function indexAttrBinary(value, array, attr, startIndex = 0, 
+/**
+ * [indexAttrBinary description]
+ * @param  {[type]} value      [description]
+ * @param  {[type]} array      [description]
+ * @param  {[type]} attr       [description]
+ * @param  {Number} startIndex [description]
+ * @param  {[type]} endIndex   [description]
+ * @return {[type]}            [description]
+ */
+export function indexAttrBinary(value, array, attr, startIndex = 0,
 	endIndex = array.length - 1) {
 	let middleIndex;
 
-	if(array.length === 0){
+	if (array.length === 0) {
 		return -1;
 	}
 	if (array[startIndex][attr] > value) {

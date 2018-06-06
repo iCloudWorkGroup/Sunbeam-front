@@ -2,11 +2,18 @@ import './css/main.css';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import options from './store/index';
-import {RESTORE} from './store/action-types';
-import {UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE} from './store/mutation-types';
+import {
+	RESTORE
+} from './store/action-types';
+import {
+	UPDATE_MOUSESTATE,
+	UPDATE_FOCUSSTATE
+} from './store/mutation-types';
 import Book from './components/book.vue';
 import Toolbar from './components/toolbar/toolbar.vue'
-import { LOCATE } from './tools/constant';
+import {
+	LOCATE
+} from './tools/constant';
 import dataloader from './tools/dataloader';
 import font from './entrance/font';
 import config from './config'
@@ -17,7 +24,7 @@ Vue.use(Vuex);
 window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec';
 
 function SBM(wrapperId) {
-	if(!(this instanceof SBM)){
+	if (!(this instanceof SBM)) {
 		return new SBM(wrapperId);
 	}
 
@@ -26,7 +33,12 @@ function SBM(wrapperId) {
 		bottom = wrapper.offsetHeight,
 		store = new Vuex.Store(options);
 
-	dataloader({left: 0, top: 0, right, bottom}, function(data) {
+	dataloader({
+		left: 0,
+		top: 0,
+		right,
+		bottom
+	}, function(data) {
 		store.dispatch(RESTORE, data);
 	});
 
@@ -63,7 +75,7 @@ function SBM(wrapperId) {
 			}, false);
 		},
 		methods: {
-			getFocus(){
+			getFocus() {
 				this.$store.commit(UPDATE_FOCUSSTATE, false);
 			}
 		}
@@ -72,4 +84,3 @@ function SBM(wrapperId) {
 }
 
 export default SBM;
-

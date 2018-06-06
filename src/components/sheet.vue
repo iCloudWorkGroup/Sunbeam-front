@@ -10,15 +10,13 @@
                         <col-head class="frozen-right-border"
                         :frozen-rule="leftRule" 
                         :col-head-width="leftRule.width" 
-                        :scroll-left="0">
-                        </col-head>
+                        :scroll-left="0"></col-head>
                     </td>
                     <td>
                         <col-head 
                         :frozen-rule="mainRule" 
                         :scroll-left="scrollLeft" 
-                        :col-head-width="colHeadWidth">
-                        </col-head>
+                        :col-head-width="colHeadWidth"></col-head>
                     </td>
                 </tr>
                 <tr v-if="rowFrozen">
@@ -71,8 +69,8 @@
             </tbody>
         </table>
         <input-box 
-            :scroll-left="scrollLeft" 
-            :scroll-top="scrollTop">         
+        :scroll-left="scrollLeft" 
+        :scroll-top="scrollTop">         
         </input-box>
     </div>
 </template>

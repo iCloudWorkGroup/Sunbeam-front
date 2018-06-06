@@ -1,7 +1,5 @@
-
 <template>
-    <div class="edit-panel" ref="panel" @mousedown="locate" @mousemove="mouseMoveHandle"
-        :style="{width: width, height: height}">
+    <div class="edit-panel" ref="panel" @mousedown="locate" @mousemove="mouseMoveHandle" :style="{width: width, height: height}">
         <row-grid-group :frozenRule="frozenRule"></row-grid-group>
         <col-grid-group :frozenRule="frozenRule"></col-grid-group>
         <cell-group :frozenRule="frozenRule"></cell-group>
@@ -9,13 +7,20 @@
     </div>
 </template>
 <script type="text/javascript">
-import { SELECTS_UPDATESELECT } from '../store/action-types';
-import { UPDATE_MOUSESTATE } from '../store/mutation-types';
+import {
+    SELECTS_UPDATESELECT
+} from '../store/action-types';
+import {
+    UPDATE_MOUSESTATE
+} from '../store/mutation-types';
 import ColGridGroup from './col-grid-group.vue';
 import RowGridGroup from './row-grid-group.vue';
 import CellGroup from './cell-group.vue';
 import SelectGroup from './select-group.vue';
-import { LOCATE, DRAG } from '../tools/constant';
+import {
+    LOCATE,
+    DRAG
+} from '../tools/constant';
 export default {
     props: ['editPanelWidth', 'editPanelHeight', 'frozenRule'],
     components: {
@@ -38,8 +43,8 @@ export default {
                 startColIndex = frozenRule.startColIndex;
                 if (frozenRule.endColIndex !== undefined) {
                     endColIndex = frozenRule.endColIndex;
-                }else{
-                    endColIndex = cols.length -1;
+                } else {
+                    endColIndex = cols.length - 1;
                 }
                 startCol = cols[startColIndex];
                 lastCol = cols[endColIndex];
@@ -63,7 +68,7 @@ export default {
                 startRowIndex = frozenRule.startRowIndex;
                 if (frozenRule.endRowIndex !== undefined) {
                     endRowIndex = frozenRule.endRowIndex;
-                }else {
+                } else {
                     endRowIndex = rows.length - 1;
                 }
                 startRow = rows[startRowIndex];
@@ -80,7 +85,7 @@ export default {
         }
     },
     methods: {
-        locate(e){
+        locate(e) {
             let getters = this.$store.getters,
                 elem = this.$refs.panel,
                 frozenRule = this.frozenRule,

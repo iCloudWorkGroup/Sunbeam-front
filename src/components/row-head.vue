@@ -1,13 +1,15 @@
 <template>
     <div class="row-head-container" :style="{ height: height + 'px'}">
-        <div class="row-head-bg row-head-width" :style="{
-        height: totalHeight}">
+        <div class="row-head-bg row-head-width" 
+        :style="{
+        	height: totalHeight
+    	}">
             <row-head-panel :frozenRule = "frozenRule"></row-head-panel>
             <div class="row-head-line" v-for="item in selectList"
-				:style="{
-            		top: item.physicsBox.top - offsetTop + 'px', 
-            		height: item.physicsBox.height - 2 + 'px'
-            	}"></div>
+			:style="{
+        		top: item.physicsBox.top - offsetTop + 'px', 
+        		height: item.physicsBox.height - 2 + 'px'
+            }"></div>
         </div>
     </div>
 </template>

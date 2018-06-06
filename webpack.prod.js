@@ -10,6 +10,7 @@ const baseConfig = merge(base, {
 		main: './src/sbm.js'
 	},
 	output: {
+		publicPath: '/',
 		filename: 'sbm.js',
 		library: 'SBM',
 		libraryExport: 'default'
@@ -30,6 +31,9 @@ const baseConfig = merge(base, {
 			'process.env.NODE_ENV': JSON.stringify('production')
 		}),
 		new CleanWebpackPlugin(['dist']),
+		new HtmlWebpackPlugin({
+			template: 'index.tps'
+		})
 	]
 })
 baseConfig.module.rules[0].loader = 'vue-loader'

@@ -134,6 +134,7 @@ export default {
 		propNames,
 		value
 	}){
+		//获取操作区域
 		if(typeof startColIndex === 'undefined'){
 			let select = getters.activeSelect,
 				wholePosi = select.wholePosi;
@@ -156,7 +157,7 @@ export default {
 				propValue = propValue[propNames[i]];
 			}
 		}
-
+		//获取更新值
 		if (value === undefined && (typeof propValue === 'boolean' ||
 				propValue === 0 || propValue === 1)) {
 			let cellList = getters.getCellsByVertical({
@@ -287,8 +288,11 @@ export default {
 				}
 			}
 		}
+
 		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
-		commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+		if (updateCellInfo.length > 0) {
+			commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+		}
 	},
 	[actionTypes.CELLS_UPDATE_BORDER]({commit, dispatch, getters}, {
 		startColIndex,

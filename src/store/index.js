@@ -7,7 +7,9 @@ import selects from './modules/selects/index';
 import sheets from './modules/sheets/index';
 import pointsInfo from './modules/pointsinfo/index';
 import input from './modules/input/index';
+import history from './modules//history/index';
 import { LOCATE } from '../tools/constant';
+import historyPlugin from './plugins/historyplugin';
 
 const state = {
 	/**
@@ -36,6 +38,8 @@ export default {
 		selects,
 		sheets,
 		pointsInfo,
-		input
-	}
+		input,
+		history
+	},
+	plugins: [historyPlugin]
 };

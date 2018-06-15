@@ -14,7 +14,7 @@ import {getColDisplayName, getRowDisplayName} from '../util/displayname';
  * @return {[type]}           [description]
  */
 export default function(viewBox, fn) {
-	let build = false;
+	let build = true;
 	if (build === true) {
 		buildSBM(fn);
 		return;

@@ -67,10 +67,16 @@ export default {
 		'background': 'color',
 		'texts': 'content'
 	},
+	historyRecordActions: {
+	},
+	historyUndo: {
+
+	},
 	/**
 	 * 请求地址根路径
 	 * @type {String}
 	 */
 	// rootPath: 'http://192.168.1.173:8080/sunbeam/'
-	rootPath: 'http://192.168.3.96:8080/spreadsheet/'
+	// rootPath: 'http://192.168.3.96:8080/spreadsheet/'
+	rootPath: 'http://localhost:8080/'
 };

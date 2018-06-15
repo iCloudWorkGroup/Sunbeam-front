@@ -2,6 +2,7 @@ import Vue from 'vue';
 import * as types from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
 import extend from '../../../util/extend';
+import template from './template';
 
 export default {
 	[types.INSERT_SHEET](state, sheet) {
@@ -50,6 +51,18 @@ export default {
 		info.forEach(function({row, props}){
 			extend(row, props);
 		});
+	},
+	[types.UPDATE_ROW](state, info){
+		info.forEach(function({row, props}){
+			extend(row, props);
+		});
+		let rowOprProp = row.oprProp;
+		let templateOprProp = template.oprProp;
+		for(let name in templateOprProp){
+			if(templateOprProp[name] === rowOprProp[name]){
+				delete rowOprProp[name];
+			}
+		}
 	},
 	[types.DELETE_ROW](state, {currentSheet, index}){
 		let list = state[currentSheet].list;

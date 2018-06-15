@@ -98,23 +98,13 @@ export default {
 				return;
 			}
 		}
-
-		if (frozenColIndex === userViewLeftIndex) {
-			dispatch(actionTypes.SHEET_FIRSTROWFROZEN, frozenRowIndex);
-			return;
-		}
-		if (frozenRowIndex === userViewTopIndex) {
-			dispatch(actionTypes.SHEET_FIRSTCOLFROZEN, frozenColIndex);
-			return;
-		}
-
 		let rowList = getters.rowList,
 			colList = getters.colList,
 			userViewCol = colList[userViewLeftIndex],
 			userViewRow = rowList[userViewTopIndex],
 			frozenCol = colList[frozenColIndex],
 			frozenRow = rowList[frozenRowIndex];
-
+		
 		if (!frozen || frozen.type !== 'restore') {
 			send({
 				url: config.operUrl['frozen'],
@@ -126,56 +116,22 @@ export default {
 				}),
 			});
 		}
-
-		let rules = [];
-
-		rules.push({
-			type: 'cornerRule',
-			startRowIndex: userViewTopIndex,
-			endRowIndex: frozenRowIndex - 1,
-			startColIndex: userViewLeftIndex,
-			endColIndex: frozenColIndex - 1,
-			offsetTop: userViewRow.top,
-			offsetLeft: userViewCol.left,
-			width: frozenCol.left - userViewCol.left - 1, //减1为边框的宽度
-			height: frozenRow.top - userViewRow.top - 1
-		}, {
-			type: 'topRule',
-			startRowIndex: userViewTopIndex,
-			endRowIndex: frozenRowIndex - 1,
-			startColIndex: frozenColIndex,
-			userViewLeft: userViewCol.left,
-			offsetTop: userViewRow.top,
-			offsetLeft: frozenCol.left,
-			height: frozenRow.top - userViewRow.top - 1
-		}, {
-			type: 'leftRule',
-			startRowIndex: frozenRowIndex,
-			startColIndex: userViewLeftIndex,
-			endColIndex: frozenColIndex - 1,
-			userViewTop: userViewRow.top,
-			offsetLeft: userViewCol.left,
-			offsetTop: frozenRow.top,
-			width: frozenCol.left - userViewCol.left - 1
-		}, {
-			type: 'mainRule',
-			startRowIndex: frozenRowIndex,
-			startColIndex: frozenColIndex,
-			userViewTop: userViewRow.top,
-			userViewLeft: userViewCol.left,
-			offsetLeft: frozenCol.left,
-			offsetTop: frozenRow.top
-		});
-
-		commit(mutationTypes.UPDATE_FROZENSTATE, {
-			isFrozen: true,
-			rowFrozen: true,
-			colFrozen: true,
-			rules,
-			currentSheet
-		});
+		if (frozenColIndex === userViewLeftIndex) {
+			dispatch(actionTypes.SHEET_ROWFROZEN, frozenRowIndex);
+			return;
+		}else if (frozenRowIndex === userViewTopIndex) {
+			dispatch(actionTypes.SHEET_COLFROZEN, frozenColIndex);
+			return;
+		}else {
+			dispatch(actionTypes.SHEET_POINTFROZEN, {
+				frozenColIndex,
+				frozenRowIndex,
+				userViewLeftIndex,
+				userViewTopIndex
+			});
+		}
 	},
-	[actionTypes.SHEET_FIRSTCOLFROZEN]({
+	[actionTypes.SHEET_COLFROZEN]({
 		commit,
 		state,
 		getters,
@@ -246,7 +202,7 @@ export default {
 			currentSheet
 		});
 	},
-	[actionTypes.SHEET_FIRSTROWFROZEN]({
+	[actionTypes.SHEET_ROWFROZEN]({
 		commit,
 		state,
 		getters,
@@ -316,15 +272,86 @@ export default {
 			currentSheet
 		});
 	},
-	[actionTypes.SHEET_UNFROZEN]({
+	[actionTypes.SHEET_POINTFROZEN]({
 		commit,
 		state,
 		getters,
 		rootState
-	}, sheet) {
+	}, {
+		userViewTopIndex,
+		userViewLeftIndex,
+		frozenColIndex,
+		frozenRowIndex
+	}) {
+
+		let rowList = getters.rowList,
+			colList = getters.colList,
+			userViewCol = colList[userViewLeftIndex],
+			userViewRow = rowList[userViewTopIndex],
+			frozenCol = colList[frozenColIndex],
+			frozenRow = rowList[frozenRowIndex];
+
+		let rules = [];
+		rules.push({
+			type: 'cornerRule',
+			startRowIndex: userViewTopIndex,
+			endRowIndex: frozenRowIndex - 1,
+			startColIndex: userViewLeftIndex,
+			endColIndex: frozenColIndex - 1,
+			offsetTop: userViewRow.top,
+			offsetLeft: userViewCol.left,
+			width: frozenCol.left - userViewCol.left - 1, //减1为边框的宽度
+			height: frozenRow.top - userViewRow.top - 1
+		}, {
+			type: 'topRule',
+			startRowIndex: userViewTopIndex,
+			endRowIndex: frozenRowIndex - 1,
+			startColIndex: frozenColIndex,
+			userViewLeft: userViewCol.left,
+			offsetTop: userViewRow.top,
+			offsetLeft: frozenCol.left,
+			height: frozenRow.top - userViewRow.top - 1
+		}, {
+			type: 'leftRule',
+			startRowIndex: frozenRowIndex,
+			startColIndex: userViewLeftIndex,
+			endColIndex: frozenColIndex - 1,
+			userViewTop: userViewRow.top,
+			offsetLeft: userViewCol.left,
+			offsetTop: frozenRow.top,
+			width: frozenCol.left - userViewCol.left - 1
+		}, {
+			type: 'mainRule',
+			startRowIndex: frozenRowIndex,
+			startColIndex: frozenColIndex,
+			userViewTop: userViewRow.top,
+			userViewLeft: userViewCol.left,
+			offsetLeft: frozenCol.left,
+			offsetTop: frozenRow.top
+		});
+
+		commit(mutationTypes.UPDATE_FROZENSTATE, {
+			isFrozen: true,
+			rowFrozen: true,
+			colFrozen: true,
+			// frozenColAlias,
+			// frozenRowAlias,
+			// userViewColAlias,
+			// userViewRowAlias,
+			rules,
+			currentSheet
+		});
+	},
+	[actionTypes.SHEET_UNFROZEN]({dispatch}) {
 		send({
 			url: config.operUrl['unfrozen']
 		});
+		dispatch(actionTypes.SHEET_EXECUNFROZEN);
+	},
+	[actionTypes.SHEET_EXECUNFROZEN]({
+		commit,
+		rootState
+	}) {
 		commit(mutationTypes.UPDATE_FROZENSTATE, {
 			isFrozen: false,
 			rowFrozen: false,
@@ -333,7 +360,7 @@ export default {
 			currentSheet: rootState.currentSheet
 		});
 	},
-	[actionTypes.OCCUPY_UPDATE]({commit, getters, rootState}, {
+	[actionTypes.OCCUPY_UPDATE]({commit, rootState}, {
 		type = 'mainRule',
 		col,
 		row

@@ -1,6 +1,6 @@
 import './css/main.css';
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex from './lib/vuex.esm.js';
 import options from './store/index';
 import {RESTORE} from './store/action-types';
 import {UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE} from './store/mutation-types';
@@ -25,6 +25,11 @@ function SBM(wrapperId) {
 		right = wrapper.offsetWidth,
 		bottom = wrapper.offsetHeight,
 		store = new Vuex.Store(options);
+
+	let btn = document.getElementById('btn');
+	btn.addEventListener('click', function(e) {
+		store.dispatch('HISTORY_UNDO');
+	}, true);
 
 	dataloader({left: 0, top: 0, right, bottom}, function(data) {
 		store.dispatch(RESTORE, data);

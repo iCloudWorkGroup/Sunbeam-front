@@ -78,20 +78,33 @@ export default {
             }
             index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
+
         let rows = getters.rowList,
             visibleRows = getters.visibleRowList,
-            row = rows[index],
-            updateCellInfo = [],
-            rowHeight = row.height,
-            rowAlias = row.alias;
-        
+            row = rows[index];
         send({
             url: config.operUrl['hiderow'],
             data: JSON.stringify({
                 row: row.sort
             }),
         });
+        dispatch(actionTypes.ROWS_EXECHIDE, index);
+    },
+    [actionTypes.ROWS_EXECHIDE]({
+        state,
+        rootState,
+        commit,
+        getters,
+        dispatch
+    }, index){
+        let rows = getters.rowList;
+        let visibleRows = getters.visibleRowList;
+        let row = rows[index];
 
+        let updateCellInfo = [],
+            rowHeight = row.height,
+            rowAlias = row.alias;
+    
        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
@@ -278,7 +291,6 @@ export default {
                     }
                 }
             }
-
         }
         if (index === undefined || !rows[index].hidden) {
             return;
@@ -295,6 +307,21 @@ export default {
                 row: row.sort
             }),
         });
+        dispatch(actionTypes.ROWS_EXECCANCELHIDE, index);
+    },
+    [actionTypes.ROWS_EXECCANCELHIDE]({
+        state,
+        rootState,
+        commit,
+        getters,
+        dispatch
+    }, index) {
+
+        let row = rows[index],
+            updateCellInfo = [],
+            rowHeight = row.height,
+            rowAlias = row.alias;
+
        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,

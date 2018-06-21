@@ -1,41 +1,41 @@
 <template>
-    <div class="row-head-item" :class="{active: active}" :style="{
-    	top: top + 'px',
+<div class="row-head-item"
+     :class="{active: active}"
+     :style="{
+        top: top + 'px',
         borderBottom: borderBottom,
-    	height: height + 'px'}">
-        <div class="item">{{displayName}}</div>
-    </div>
+        height: height + 'px'}">
+    <div class="item">{{displayName}}</div>
+</div>
 </template>
 <script type="text/javascript">
 export default {
     props: ['row', 'offsetTop'],
     computed: {
         top() {
-            return this.row.top - this.offsetTop;
+            return this.row.top - this.offsetTop
         },
         height() {
-            if(this.row.bottomAjacentHide){
-                return this.row.height - 2;
+            if (this.row.bottomAjacentHide) {
+                return this.row.height - 2
             }
-            return this.row.height;
+            return this.row.height
         },
         displayName() {
-            return this.row.displayName;
+            return this.row.displayName
         },
         active() {
-            return this.row.active;
+            return this.row.active
         },
-        borderBottom(){
-            if(this.row.bottomAjacentHide){
-                return 'double #bfbfbf';
+        borderBottom() {
+            if (this.row.bottomAjacentHide) {
+                return 'double #bfbfbf'
             }
-            return;
+            return
         }
     },
     methods: {
 
     }
-};
+}
 </script>
-<style type="text/css">
-</style>

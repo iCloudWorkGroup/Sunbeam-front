@@ -1,37 +1,39 @@
 <template>
-    <div class="col-head-item" :style="{
-        left: (col.left - offsetLeft) + 'px', 
+<div class="col-head-item"
+     :style="{
+        left: (col.left - offsetLeft) + 'px',
         borderRight: borderRight,
         width: width + 'px'
-    }" :class="{active: col.active}">
-        <div class="item">{{col.displayName}}</div>
-    </div>
+    }"
+     :class="{active: col.active}">
+    <div class="item">{{col.displayName}}</div>
+</div>
 </template>
-<script type="text/javascript">
+<script>
 export default {
     props: ['col', 'offsetLeft'],
     computed: {
         // left() {
-        //     return this.col.left - this.offsetLeft;
+        //     return this.col.left - this.offsetLeft
         // },
         width() {
             if (this.col.rightAjacentHide) {
-                return this.col.width - 2;
+                return this.col.width - 2
             }
-            return this.col.width;
+            return this.col.width
         },
         // displayName() {
-        //     return this.col.displayName;
+        //     return this.col.displayName
         // },
         // isActive() {
-        //     return this.col.active;
+        //     return this.col.active
         // },
         borderRight() {
             if (this.col.rightAjacentHide) {
-                return 'double #bfbfbf';
+                return 'double #bfbfbf'
             }
-            return;
+            return
         }
     }
-};
+}
 </script>

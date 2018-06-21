@@ -1,23 +1,28 @@
 <template>
-    <div class="select-group">
-        <select-item v-for="item in selectList" :key="item.alias" :select="item" :frozenRule="frozenRule">
-        </select-item>
-    </div>
+<div class="select-group">
+    <select-item v-for="item in selectList"
+                 :key="item.alias"
+                 :select="item"
+                 :frozenRule="frozenRule">
+    </select-item>
+</div>
+
 </template>
+
 <script type="text/javascript">
-import SelectItem from './select-item.vue';
+import SelectItem from './select-item.vue'
 
 export default {
     props: ['frozenRule'],
     computed: {
         selectList() {
-            return this.$store.getters.selectList;
+            return this.$store.getters.selectList
         }
     },
     components: {
         SelectItem
     }
-};
+}
 </script>
 <style type="text/css">
 .select-group {

@@ -1,14 +1,17 @@
 <template>
-    <div class="book" 
-        :width="width + 'px'" 
-        :style="{ width: width + 'px', 
+<div class="book"
+     :width="width + 'px'"
+     :style="{ width: width + 'px',
             height: height + 'px'}">
-        <sheet :sheet-width="width" :sheet-height="sheetHeight"></sheet>
-        <!-- <tab></tab> -->
-    </div>
+    <sheet :sheet-width="width"
+           :sheet-height="sheetHeight"></sheet>
+    <!-- <tab></tab> -->
+</div>
+
 </template>
+
 <script type="text/javascript">
-import Sheet from './sheet.vue';
+import Sheet from './sheet.vue'
 
 export default {
     props: [
@@ -18,22 +21,22 @@ export default {
     ],
     computed: {
         width() {
-            return this.bookWidth;
+            return this.bookWidth
         },
         height() {
-            return this.bookHeight;
+            return this.bookHeight
         },
         sheetHeight() {
-            return this.bookHeight - 26;
+            return this.bookHeight - 26
         },
         tabHeight() {
-            return 26;
+            return 26
         }
     },
     components: {
         Sheet
     }
-};
+}
 </script>
 <style type="text/css">
 .book {

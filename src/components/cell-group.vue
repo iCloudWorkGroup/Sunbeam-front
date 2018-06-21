@@ -1,29 +1,31 @@
 <template>
-    <div class="cell-group">
-        <cell-item v-for="item in cellList" 
-        :key="item.alias" 
-        :item="item" 
-        :frozenRule="frozenRule">
-        </cell-item>
-    </div>
+<div class="cell-group">
+    <cell-item v-for="item in cellList"
+               :key="item.alias"
+               :item="item"
+               :frozenRule="frozenRule">
+    </cell-item>
+</div>
+
 </template>
+
 <script type="text/javascript">
-import CellItem from './cell-item.vue';
+import CellItem from './cell-item.vue'
 export default {
     props: [
         'frozenRule'
     ],
     data() {
-        let startColIndex,
-            endColIndex,
-            startRowIndex,
-            endRowIndex;
+        let startColIndex
+        let endColIndex
+        let startRowIndex
+        let endRowIndex
 
         if (this.frozenRule) {
-            startColIndex = this.frozenRule.startColIndex;
-            endColIndex = this.frozenRule.endColIndex;
-            startRowIndex = this.frozenRule.startRowIndex;
-            endRowIndex = this.frozenRule.endRowIndex;
+            startColIndex = this.frozenRule.startColIndex
+            endColIndex = this.frozenRule.endColIndex
+            startRowIndex = this.frozenRule.startRowIndex
+            endRowIndex = this.frozenRule.endRowIndex
         }
         return {
             startColIndex,
@@ -34,26 +36,27 @@ export default {
     },
     computed: {
         cellList() {
-            if (this.endRowIndex !== undefined && this.endColIndex !== undefined ){
+            if (this.endRowIndex !== 'undefined' &&
+                this.endColIndex !== 'undefined') {
                 return this.$store.getters.getCellsByVertical({
                     startColIndex: this.startColIndex,
                     endColIndex: this.endColIndex,
                     startRowIndex: this.startRowIndex,
                     endRowIndex: this.endRowIndex
-                });
-            }else if (this.endRowIndex !== undefined) {
-                return this.$store.getters.topRegionCellList;
-            } else if (this.endColIndex !== undefined) {
-                return this.$store.getters.leftRegionCellList;
-            } else{
-                return this.$store.getters.userViewCellList;
+                })
+            } else if (this.endRowIndex !== 'undefined') {
+                return this.$store.getters.topRegionCellList
+            } else if (this.endColIndex !== 'undefined') {
+                return this.$store.getters.leftRegionCellList
+            } else {
+                return this.$store.getters.userViewCellList
             }
         }
     },
     components: {
         CellItem
     }
-};
+}
 </script>
 <style type="text/css">
 .cell-group {

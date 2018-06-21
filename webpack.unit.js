@@ -1,36 +1,40 @@
+const webpack = require('webpack');
 module.exports = {
     devtool: 'inline-source-map',
+    entry: ['./src/app.js'],
     module: {
         rules: [{
-            test: /\.vue(\?[^?]+)?$/,
-            loader: 'vue-loader'
+            test: /\.js$/,
+            exclude: /(node_modules|bower_components)/,
+            loader: 'babel-loader'
         }, {
             test: /\.js$/,
+            exclude: /(node_modules|bower_components|\.spec\.js)/,
             use: {
                 loader: 'istanbul-instrumenter-loader',
                 options: {
                     esModules: true
                 }
             },
-            enforce: 'pre',
-            exclude: /node_modules|\.spec\.js%/,
+            enforce: 'post'
         }, {
-            test: /\.js$/,
-            use: {
-                loader: 'babel-loader',
-                options: {
-                    presets: ['env'],
-                    plugins: ['istanbul', 
-                    "transform-object-rest-spread", 
-                    ["transform-runtime", {
-                        "helpers": false,
-                        "polyfill": false,
-                        "regenerator": true,
-                        "moduleName": "babel-runtime"
-                    }]]
+            test: /\.vue$/,
+            loader: 'vue-loader',
+            options: {
+                loaders: {
+                    js: 'babel-loader'
+                },
+                postLoaders: {
+                    js: 'istanbul-instrumenter-loader?esModules=true'
                 }
-            },
-            exclude: /node_modules/
+            }
         }]
-    }
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('production')
+            }
+        }),
+    ]
 }

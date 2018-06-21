@@ -1,16 +1,14 @@
-import getters from './getters';
-import mutations from './mutations';
+import getters from './getters'
+import mutations from './mutations'
 
 /**
  * 状态值
  * @type {Object}
  */
-const state = {
-	
-};
+const state = {}
 
 export default {
-	state,
-	getters,
-	mutations
-};
+    state,
+    getters,
+    mutations
+}

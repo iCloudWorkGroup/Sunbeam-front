@@ -15,25 +15,18 @@ const baseConfig = merge(base, {
 		library: 'SBM',
 		libraryExport: 'default'
 	},
-	module: {
-		rules: [{
-			test: /\.(js)$/,
-			exclude: /(node_modules|bower_components)/,
-			use: 'babel-loader'
-		}]
-	},
 	plugins: [
-		// new UglifyJsPlugin({
-		// 	exclude: '/(node_modules|bower_components)/',
-		// 	sourceMap: true
-		// }),
+		new UglifyJsPlugin({
+			exclude: '/(node_modules|bower_components)/',
+			sourceMap: true
+		}),
 		new webpack.DefinePlugin({
 			'process.env.NODE_ENV': JSON.stringify('production')
 		}),
-		new CleanWebpackPlugin(['dist']),
 		new HtmlWebpackPlugin({
 			template: 'index.tps'
-		})
+		}),
+		new CleanWebpackPlugin(['dist']),
 	]
 })
 baseConfig.module.rules[0].loader = 'vue-loader'

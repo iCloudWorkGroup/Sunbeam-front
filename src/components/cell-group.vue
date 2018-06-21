@@ -36,8 +36,8 @@ export default {
     },
     computed: {
         cellList() {
-            if (this.endRowIndex !== 'undefined' &&
-                this.endColIndex !== 'undefined') {
+            if (this.endRowIndex != null &&
+                this.endColIndex != null) {
                 return this.$store.getters.getCellsByVertical({
                     startColIndex: this.startColIndex,
                     endColIndex: this.endColIndex,

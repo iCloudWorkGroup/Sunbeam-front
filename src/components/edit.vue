@@ -125,7 +125,7 @@ export default {
                 self.recordScrollTop = currentScrollTop
                 self.recordScrollLeft = currentScrollLeft
 
-                if ((vertical !== 0 && endRowIndex === 'undefined') || adjustRow) {
+                if ((vertical !== 0 && endRowIndex == null) || adjustRow) {
                     limitTop = self.recordScrollTop - config.prestrainHeight
                     limitTop = limitTop > 0 ? limitTop : 0
                     limitTop += self.offsetTop
@@ -150,7 +150,7 @@ export default {
                     })
                 }
 
-                if ((transverse !== 0 && endColIndex === 'undefined') || adjustCol) {
+                if ((transverse !== 0 && endColIndex == null) || adjustCol) {
                     limitLeft = self.recordScrollLeft - config.prestrainWidth
                     limitLeft = limitLeft > 0 ? limitLeft : 0
                     limitLeft += self.offsetLeft
@@ -776,11 +776,11 @@ export default {
             }
 
 
-            endColIndex = endColIndex !== 'undefined' ? endColIndex :
+            endColIndex = endColIndex != null ? endColIndex :
                 getters.getColIndexByPosi(offsetLeft + clientWidth +
                     config.prestrainWidth)
 
-            endRowIndex = endRowIndex !== 'undefined' ? endRowIndex :
+            endRowIndex = endRowIndex != null ? endRowIndex :
                 getters.getRowIndexByPosi(offsetTop + clientHeight +
                     config.prestrainHeight)
 
@@ -865,13 +865,13 @@ export default {
         },
         colMaxPosi(newVal, oldVal) {
             let frozenRule = this.frozenRule
-            if (newVal < oldVal && (!frozenRule || frozenRule.endColIndex === 'undefined')) {
+            if (newVal < oldVal && (!frozenRule || frozenRule.endColIndex == null)) {
                 this.handleScroll(this.recordScrollLeft, this.recordScrollTop, true, false)
             }
         },
         rowMaxPosi(newVal, oldVal) {
             let frozenRule = this.frozenRule
-            if (newVal < oldVal && (!frozenRule || frozenRule.endRowIndex === 'undefined')) {
+            if (newVal < oldVal && (!frozenRule || frozenRule.endRowIndex == null)) {
                 this.handleScroll(this.recordScrollLeft, this.recordScrollTop, false, true)
             }
         }

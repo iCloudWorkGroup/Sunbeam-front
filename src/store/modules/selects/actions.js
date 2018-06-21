@@ -27,10 +27,9 @@ export default {
         let rows = rootState.rows[currentSheet].list
         let cols = rootState.cols[currentSheet].list
         let select = extend(template)
-
         let region = getters.getFullOprRegion({
-            startColIndex: 0,
-            startRowIndex: 0
+            startColIndexArgs: 0,
+            startRowIndexArgs: 0
         })
 
         let startColIndex = region.startColIndex

@@ -240,6 +240,9 @@ export default {
     },
     topRegionCellList(state, getters, rootState) {
         let rules = getters.frozenState.rules
+        if (!rules.length) {
+            return
+        }
         let userView = rootState.userView
         let startRowIndex
         let endRowIndex
@@ -268,6 +271,9 @@ export default {
     },
     leftRegionCellList(state, getters, rootState) {
         let rules = getters.frozenState.rules
+        if (!rules.length) {
+            return
+        }
         let userView = rootState.userView
         let startRowIndex
         let endRowIndex

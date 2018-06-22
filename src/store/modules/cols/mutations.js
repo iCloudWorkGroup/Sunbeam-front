@@ -56,6 +56,8 @@ export default {
 	},
 	[types.DELETE_COL](state, {currentSheet, index}){
 		let list = state[currentSheet].list;
+		let map = state[currentSheet].map;	
+		map.delete(list[index].alias);
 		list.splice(index, 1);
 	}
 };

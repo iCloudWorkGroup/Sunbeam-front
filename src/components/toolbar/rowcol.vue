@@ -60,8 +60,8 @@
 </template>
 <script type="text/javascript">
 	import {
-		COLS_DELETECOLS,
-		COLS_INSERTCOLS,
+		COLS_DELETECOL,
+		COLS_INSERTCOL,
 		ROWS_DELETEROWS,
 		ROWS_INSERTROWS
 	} from '../../store/action-types';
@@ -88,7 +88,7 @@
 				this.$emit('updateActiveWidgetId', widgetId);
 			},
 			insertCol() {
-				this.$store.dispatch(COLS_INSERTCOLS);
+				this.$store.dispatch(COLS_INSERTCOL);
 				this.$emit('updateActiveWidgetId', '');
 			},
 			insertRow() {
@@ -96,7 +96,7 @@
 				this.$emit('updateActiveWidgetId', '');
 			},
 			deleteCol() {
-				this.$store.dispatch(COLS_DELETECOLS);
+				this.$store.dispatch(COLS_DELETECOL);
 				this.$emit('updateActiveWidgetId', '');
 			},
 			deleteRow() {

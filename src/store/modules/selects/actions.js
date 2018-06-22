@@ -128,6 +128,19 @@ export default {
 
         let {startColIndex, startRowIndex, endColIndex, endRowIndex} = region;
 
+        while (cols[startColIndex].hidden) {
+            startColIndex++;
+        }
+        while (rows[startRowIndex].hidden) {
+            startRowIndex++;
+        }
+        while (endColIndex !== 'MAX' && cols[endColIndex].hidden) {
+            endColIndex--;
+        }
+        while (endRowIndex !== 'MAX' && rows[endRowIndex].hidden) {
+            endRowIndex--;
+        }
+
         select.physicsBox = {
             top: rows[startRowIndex].top,
             left: cols[startColIndex].left

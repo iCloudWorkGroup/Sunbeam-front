@@ -11,7 +11,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import {CELLS_MERGE} from '../../store/action-types';
+	import {CELLS_HANDLEMERGE} from '../../store/action-types';
 
 	export default {
 		computed: {
@@ -21,7 +21,7 @@
 		},
 		methods: {
 			setMerge() {
-				this.$store.dispatch(CELLS_MERGE);
+				this.$store.dispatch(CELLS_HANDLEMERGE);
 			}
 		}
 	}

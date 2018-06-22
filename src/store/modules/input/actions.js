@@ -90,6 +90,22 @@ export default {
 			cols = getters.colList,
 			rows = getters.rowList;
 
+		commit(mutationTypes.UPDATE_EDIT, {
+			currentSheet: rootState.currentSheet,
+			inputInfo: {
+				editState: false,
+				width: 0,
+				height: 0,
+				left: -9999,
+				top: -9999,
+				texts: ''
+			}
+		});
+		let cell = getters.getCellsByVertical({startColIndex, startRowIndex})[0];
+
+		if(cell && cell.content.texts === texts){
+			 return;
+		}
 		send({
 			url: config.operUrl['texts'],
 			data: JSON.stringify({
@@ -111,17 +127,6 @@ export default {
 				content: {
 					texts: texts
 				}
-			}
-		});
-		commit(mutationTypes.UPDATE_EDIT, {
-			currentSheet: rootState.currentSheet,
-			inputInfo: {
-				editState: false,
-				width: 0,
-				height: 0,
-				left: -9999,
-				top: -9999,
-				texts: ''
 			}
 		});
 	}

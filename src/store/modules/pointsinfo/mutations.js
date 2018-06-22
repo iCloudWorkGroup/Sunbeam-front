@@ -21,15 +21,24 @@ export default {
 			tmp[type] = value;
 		} else {
 			if (!colInfo[colAlias]) {
-				colInfo[colAlias] = {};
+				Vue.set(colInfo, colAlias, {
+					[rowAlias]: extend(template)
+				});
 			}
 			if (!rowInfo[rowAlias]) {
-				rowInfo[rowAlias] = {};
+				Vue.set(rowInfo, rowAlias, {
+					[colAlias]: extend(template)
+				});
 			}
-			tmp = colInfo[colAlias][rowAlias] = extend(template);
-			tmp[type] = value;
-			tmp = rowInfo[rowAlias][colAlias] = extend(template);
-			tmp[type] = value;
+			if(!colInfo[colAlias][rowAlias]){
+				Vue.set(colInfo[colAlias], rowAlias, extend(template));
+			}
+			if(!rowInfo[rowAlias][colAlias] ){
+				Vue.set(rowInfo[rowAlias], colAlias, extend(template));
+			}
+
+			colInfo[colAlias][rowAlias][type] = value;
+			rowInfo[rowAlias][colAlias][type] = value;
 		}
 	},
 	[types.DELETE_CELL_POINTINFO](state, {currentSheet, occupys}) {

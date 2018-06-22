@@ -3,6 +3,7 @@ import * as types from '../../mutation-types';
 import {indexAttrBinary} from '../../../util/binary';
 import extend from '../../../util/extend';
 import template from './template';
+import cellTemplate from '../cells/template';
 
 export default {
 	[types.INSERT_SHEET](state, sheet) {
@@ -48,21 +49,40 @@ export default {
 		}
 	},
 	[types.UPDATE_ROW](state, info){
-		info.forEach(function({row, props}){
+		info.forEach(function({
+			row,
+			props
+		}) {
 			extend(row, props);
-		});
-	},
-	[types.UPDATE_ROW](state, info){
-		info.forEach(function({row, props}){
-			extend(row, props);
-		});
-		let rowOprProp = row.oprProp;
-		let templateOprProp = template.oprProp;
-		for(let name in templateOprProp){
-			if(templateOprProp[name] === rowOprProp[name]){
-				delete rowOprProp[name];
+			let rowOprProp = row.oprProp;
+			clearDefaultValue(rowOprProp, cellTemplate);
+
+			function clearDefaultValue(object, template) {
+				for (let name in object) {
+					let currentProp = object[name];
+					let defaultValue = template[name];
+					if (typeof currentProp === 'object') {
+						if (isEmptyObj(currentProp)) {
+							delete object[name];
+						}else{
+							let result = clearDefaultValue(currentProp, defaultValue);
+							if(result){
+								delete object[name];
+							}
+						}
+					} else if (currentProp === defaultValue) {
+						delete object[name];
+					}
+				}
+				return isEmptyObj(object);
 			}
-		}
+			function isEmptyObj(obj){
+				for(name in obj){
+					return false;
+				}
+				return true;
+			}
+		});
 	},
 	[types.DELETE_ROW](state, {currentSheet, index}){
 		let list = state[currentSheet].list;

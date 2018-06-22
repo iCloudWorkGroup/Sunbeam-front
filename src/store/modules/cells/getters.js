@@ -299,8 +299,8 @@ export default {
             rows: visibleRowList
         });
     },
-    getMergeState(state, getters, rootState){
-        return function(){
+    getMergeState(state, getters, rootState) {
+        return function() {
             let wholePosi = getters.activeSelect.wholePosi,
                 startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias),
                 startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias),
@@ -316,21 +316,15 @@ export default {
                 endColIndex,
                 endRowIndex
             });
-
-            if(cellList.length !== 1){
-                return false;
+            for (let i = 0, len = cellList.length; i < len; i++) {
+                let cell = cellList[i];
+                let occupyCol = cell.occupy.col;
+                let occupyRow = cell.occupy.row;
+                if (occupyRow.length > 1 || occupyCol.length > 1) {
+                    return true;
+                }
             }
-            let cell = cellList[0],
-                occupyCol = cell.occupy.col,
-                occupyRow = cell.occupy.row;
-
-            if(occupyCol[0] !== wholePosi.startColAlias ||
-                occupyRow[0] !== wholePosi.startRowAlias ||
-                occupyCol[occupyCol.length -1] !== wholePosi.endColAlias ||
-                occupyRow[occupyRow.length -1] !== wholePosi.endRowAlias){
-                return false;
-            }
-            return true;
+            return false;
         }
     }
 };

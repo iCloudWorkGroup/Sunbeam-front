@@ -27,7 +27,6 @@ export default function(store) {
 	let listenMutations = null;
 
 	store.subscribeBeforeAction((action, state) => {
-
 		let type = action.type;
 		if (lockAction) {
 			if (userAction[type]) {
@@ -42,8 +41,11 @@ export default function(store) {
 		if (recordAction[type]){
 			actionItem = extend(actionItemTemplate);
 			actionItem.type = type;
-			actionItem.payload = extend(action.payload);
-
+			if(isObject(actionItem.payload)){
+				actionItem.payload = extend(action.payload);
+			}else{
+				actionItem.payload = action.payload;
+			}
 			//解冻需要记录原冻结状态
 			// if(type === 'SHEET_EXECUNFROZEN'){
 			// 	let alias = state.currentSheet;
@@ -60,6 +62,26 @@ export default function(store) {
 			// 		//冻结别名
 			// 	}
 			// }
+			if (type === actionTypes.ROWS_EXECADJUSTHEIGHT) {
+				let sort = actionItem.payload.sort;
+				let index = store.getters.getRowIndexBySort(sort);
+				let row = store.getters.rowList[index];
+				let height = row.height;
+				actionItem.originalValue = height;
+			}
+			if (type === actionTypes.COLS_EXECADJUSTWIDTH) {
+				let sort = actionItem.payload.sort;
+				let index = store.getters.getColIndexBySort(sort);
+				let col = store.getters.colList[index];
+				let width = col.width;
+				actionItem.originalValue = width;
+			}
+			if (type === actionTypes.COLS_EXECDELETECOL) {
+				let sort = actionItem.payload;
+				let index = store.getters.getColIndexBySort(sort);
+				let col = store.getters.colList[index];
+				actionItem.originalValue = col;
+			}
 			userActionItem.actions.push(actionItem);
 			if(recordMutations[type]){
 				currentAction = type;
@@ -103,118 +125,162 @@ export default function(store) {
 		if(listenMutations[mutationType]){
 			let payload = mutation.payload;
 
-			if(mutationType === 'UPDATE_CELL'){
+			if(mutationType === mutationTypes.UPDATE_CELL){
 				let mutationInfo = {
 					type: mutationType,
 					updateCells: []
 				};
 				payload.forEach(function({cell, props}) {
-					let props = getOriginalValueByProps(cell, props);
+					props = getDiffValue(cell, props);
 					mutationInfo.updateCells.push({
 						cell,
-						props: getOriginalValueByProps(cell, props)
+						props: getDiffValue(cell, props)
 					});
 				});
 				actionItem.mutations.push(mutationInfo);
 			}
-			if (mutationType === 'INSERT_CELL') {
+			if (mutationType === mutationTypes.INSERT_CELL) {
 				let mutationInfo = {
 					type: mutationType,
 					updateCells: []
 				};
-				let props = {};
-				props.content = cellTemplate.content;
-				props.decoration = cellTemplate.decoration;
-				props.physicsBox = {};
-				props.physicsBox.border = cellTemplate.physicsBox.border;
-				props = getDiffValue(props, payload.cell) || {};
+				let props = extend({}, cellTemplate);
+				let physicsBox = props.physicsBox;
+				delete props.occupy;
+				delete physicsBox.top;
+				delete physicsBox.left;
+				delete physicsBox.right;
+				delete physicsBox.bottom;
+				delete props.alias;
+
 				mutationInfo.updateCells.push({
 					cell: payload.cell,
 					props
 				});
 				actionItem.mutations.push(mutationInfo);
 			}
-			if (mutationType === 'UPDATE_ROW') {
+			if (mutationType === mutationTypes.UPDATE_ROW) {
 				let mutationInfo = {
 					type: mutationType,
 					updateRows: []
 				};
+				let defaultValue = {
+					oprProp: {
+						content: cellTemplate.content,
+						physicsBox: cellTemplate.physicsBox,
+						decoration: cellTemplate.decoration
+					}
+				};
 				payload.forEach(function({row, props}) {
 					mutationInfo.updateRows.push({
 						row,
-						props: getOriginalValueByProps(row, props)
+						props: getDiffValue(row, props, defaultValue)
 					});
 				});
+				actionItem.mutations.push(mutationInfo);
+			}
+			if (mutationType === mutationTypes.UPDATE_COL) {
+				let mutationInfo = {
+					type: mutationType,
+					updateCols: []
+				};
+				let defaultValue = {
+					oprProp: {
+						content: cellTemplate.content,
+						physicsBox: cellTemplate.physicsBox,
+						decoration: cellTemplate.decoration
+					}
+				};
+				payload.forEach(function({col, props}) {
+					mutationInfo.updateCols.push({
+						col,
+						props: getDiffValue(col, props, defaultValue)
+					});
+				});
+				actionItem.mutations.push(mutationInfo);
+			}
+			if(mutationType === mutationTypes.UPDATE_POINTINFO){
+				let {colAlias, rowAlias, type} = payload.info;
+				let originalValue = store.getters.getPointInfo(colAlias, rowAlias, type);
+				let reversePayload = extend(payload);
+				reversePayload.info.value = originalValue;
+				let mutationInfo = {
+					type: mutationType,
+					payload: reversePayload
+				};
 				actionItem.mutations.push(mutationInfo);
 			}
 		}
 	});
 }
 
-function getOriginalValueByProps(object, props){
+function getDiffValue(object, props, defaultValue) {
 	let result = {};
 	for (let name in props) {
-		let src = object[name];
 		let value = props[name];
+		let src = object[name];
 
-		if (value === undefined) {
-			continue;
-		}
 		if (isObject(value)) {
-			if (Array.isArray(value)) {
+			if (Array.isArray(value) && Array.isArray(src)) {
 				result[name] = [...src];
 			} else {
-				result[name] = getOriginalValueByProps(src, value);
+				if (src === undefined) {
+					if (defaultValue !== undefined) {
+						result[name] = getDiffValue(defaultValue[name], value, defaultValue[name]);
+					}
+				} else {
+					if (defaultValue !== undefined) {
+						result[name] = getDiffValue(defaultValue[name], value, defaultValue[name]);
+					} else {
+						result[name] = getDiffValue(src, value);
+					}
+				}
 			}
 		} else {
-			result[name] = src;
-		}
-	}
-	return result;
-}
-
-function getDiffValue(object1, object2){
-	let result;
-	for (let name in object1) {
-		let src = object1[name];
-		let value = object2[name];
-
-		if(!Array.isArray(value)){
-			if (isObject(value)) {
-				let temp = getDiffValue(src, value);
-				if(temp){
-					result = result || {};
-					result[name] = temp;
+			if (src === undefined) {
+				if (defaultValue !== undefined) {
+					result[name] = defaultValue[name];
 				}
-			} else{
-				if(src!== value){
-					result = result || {};
-					result[name] = src;
-				}
+			} else {
+				result[name] = src;
 			}
 		}
 	}
 	return result;
 }
+
 function isObject(obj) {
 	return typeof obj === 'object' && obj !== null;
 }
+
 let userAction = {
+	[actionTypes.EDIT_HIDE]: true,
+	[actionTypes.CELLS_HANDLEMERGE]: true,
+	[actionTypes.CELLS_UPDATE_BORDER]: true,
 	[actionTypes.CELLS_UPDATE]: true,
-	[actionTypes.CELLS_UPDATE_PROP]: true,
-	// [actionTypes.SHEET_FROZEN]: true,
-	// [actionTypes.SHEET_UNFROZEN]: true,
 	[actionTypes.ROWS_HIDE]: true,
-	[actionTypes.ROWS_CANCELHIDE]: true
+	[actionTypes.ROWS_CANCELHIDE]: true,
+	[actionTypes.COLS_HIDE]: true,
+	[actionTypes.COLS_CANCELHIDE]: true,
+	[actionTypes.ROWS_ADJUSTHEIGHT]: true,
+	[actionTypes.COLS_ADJUSTWIDTH]: true,
+	[actionTypes.COLS_INSERTCOL]: true,
+	[actionTypes.COLS_DELETECOL]: true
 }
 let recordAction = {
 	[actionTypes.CELLS_UPDATE_PROP]: true,
+	[actionTypes.CELLS_MERGE]: true,
+	[actionTypes.CELLS_SPLIT]: true,
 	[actionTypes.ROWS_OPERROWS]: true,
-	[actionTypes.COLS_OPERCOLS]: true
-// 	[actionTypes.SHEET_ROWFROZEN]: true,
-// 	[actionTypes.SHEET_COLFROZEN]: true,
-// 	[actionTypes.SHEET_POINTFROZEN]: true,
-// 	[actionTypes.ROWS_EXECHIDE]: true
+	[actionTypes.COLS_OPERCOLS]: true,
+	[actionTypes.ROWS_EXECADJUSTHEIGHT]: true,
+	[actionTypes.COLS_EXECADJUSTWIDTH]: true,
+	[actionTypes.ROWS_EXECHIDE]: true,
+	[actionTypes.ROWS_EXECCANCELHIDE]: true,
+	[actionTypes.COLS_EXECHIDE]: true,
+	[actionTypes.COLS_EXECCANCELHIDE]: true,
+	[actionTypes.COLS_EXECINSERTCOL]: true,
+	[actionTypes.COLS_EXECDELETECOL]: true
 }
 let recordMutations = {
 	[actionTypes.CELLS_UPDATE_PROP]: {
@@ -223,29 +289,24 @@ let recordMutations = {
 	},
 	[actionTypes.ROWS_OPERROWS] : {
 		[mutationTypes.UPDATE_CELL] : true,
-		[mutationTypes.UPDATE_ROW] : true
+		[mutationTypes.UPDATE_ROW] : true,
+		[mutationTypes.INSERT_CELL] : true,
 	},
 	[actionTypes.COLS_OPERCOLS] : {
 		[mutationTypes.UPDATE_CELL] : true,
+		[mutationTypes.INSERT_CELL] : true,
 		[mutationTypes.UPDATE_COL] : true
 	},
+	[actionTypes.CELLS_MERGE]: {
+		[mutationTypes.UPDATE_POINTINFO]: true
+	}, 
+	[actionTypes.CELLS_SPLIT]: {
+		[mutationTypes.UPDATE_POINTINFO]: true
+	},
+	[actionTypes.COLS_EXECDELETECOL]: {
+		[mutationTypes.UPDATE_POINTINFO]: true,
+		[mutationTypes.UPDATE_CELL]: true
+	}
 }
-// let recordMutations = {
-// 	'CELLS_UPDATE_PROP': {
-// 		'UPDATE_CELL': true,
-// 		'INSERT_CELL': true
-// 	},
-// 	'ROWS_OPERROWS': {
-// 		'UPDATE_CELL': true
-// 	},
-// 	'COLS_OPERCOLS': {
-// 		'UPDATE_CELL': true
-// 	},
-// 	'SHEET_EXECUNFROZEN': {
-// 		'UPDATE_FROZENSTATE': true
-// 	},
-// 	'SHEET_EXECUNFROZEN': {
 
-// 	}
-// }
 

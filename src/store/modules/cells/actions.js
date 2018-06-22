@@ -816,16 +816,15 @@ export default {
 			return true;
 		}
 	},
-	[actionTypes.CELLS_MERGE]({
-		commit,
+	[actionTypes.CELLS_HANDLEMERGE]({
 		dispatch,
 		getters,
 		rootState
 	}, {
 		startColIndex,
-		endColIndex,
 		startRowIndex,
 		endRowIndex,
+		endColIndex,
 		value
 	} = {}) {
 		if (typeof startColIndex === 'undefined') {
@@ -846,12 +845,6 @@ export default {
 		if (value === undefined) {
 			value = !getters.getMergeState();
 		}
-		let cellList = getters.getCellsByTransverse({
-			startColIndex,
-			endColIndex,
-			startRowIndex,
-			endRowIndex
-		});
 		let action = value ? 'merge' : 'split',
 			url = config.operUrl[action],
 			cols = getters.colList,
@@ -870,77 +863,113 @@ export default {
 			url,
 			data: JSON.stringify(data)
 		});
+
 		if (value) {
-			merge();
+			dispatch(actionTypes.CELLS_MERGE, {
+				startColIndex,
+				endColIndex,
+				startRowIndex,
+				endRowIndex
+			});
 		} else {
-			split();
+			dispatch(actionTypes.CELLS_SPLIT, {
+				startColIndex,
+				endColIndex,
+				startRowIndex,
+				endRowIndex
+			});
+		}
+	},
+	[actionTypes.CELLS_MERGE]({
+		dispatch,
+		getters
+	}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex
+	}) {
+		let cellList = getters.getCellsByTransverse({
+			startColIndex,
+			endColIndex,
+			startRowIndex,
+			endRowIndex
+		});
+		let cell;
+		for (let i = 0, len = cellList.length; i < len; i++) {
+			if (cellList[i].content.texts) {
+				cell = cellList[i];
+				break;
+			}
+		}
+		if (!cell) {
+			cell = getters.getCellsByTransverse({startColIndex, startRowIndex})[0];
+		}
+		cell = extend({}, cell || {});
+
+		let cols = getters.colList,
+			rows = getters.rowList,
+			rowAliasList = [],
+			colAliasList = [];
+
+		for (let i = startColIndex; i < endColIndex + 1; i++) {
+			colAliasList.push(cols[i].alias);
+		}
+		for (let i = startRowIndex; i < endRowIndex + 1; i++) {
+			rowAliasList.push(rows[i].alias);
 		}
 
-		function merge() {
-			let cell;
-			for (let i = 0, len = cellList.length; i < len; i++) {
-				if (cellList[i].content.texts) {
-					cell = cellList[i];
-					break;
-				}
-			}
-			if (!cell) {
-				cell = cellList[0];
-			}
-			cell = extend({}, cell || {});
-
-			let cols = getters.colList,
-				rows = getters.rowList,
-				rowAliasList = [],
-				colAliasList = [];
-
-			for (let i = startColIndex; i < endColIndex + 1; i++) {
-				colAliasList.push(cols[i].alias);
-			}
-			for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-				rowAliasList.push(rows[i].alias);
-			}
-			cell.occupy = {
-				row: rowAliasList,
-				col: colAliasList
-			}
-			dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+		cell.occupy = {
+			row: rowAliasList,
+			col: colAliasList
 		}
+		dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+	},
+	[actionTypes.CELLS_SPLIT]({
+		rootState,
+		dispatch,
+		getters,
+		commit
+	}, {
+		startColIndex,
+		endColIndex,
+		startRowIndex,
+		endRowIndex
+	}) {
+		let cellList = getters.getCellsByTransverse({
+			startColIndex,
+			endColIndex,
+			startRowIndex,
+			endRowIndex
+		});
 
-		function split() {
-			let currentSheet = rootState.currentSheet,
-				cols = getters.colList,
-				rows = getters.rowList;
-			for (let i = startColIndex; i < endColIndex + 1; i++) {
-				for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-					commit(mutationTypes.UPDATE_POINTINFO, {
-						currentSheet,
-						info: {
-							colAlias: cols[i].alias,
-							rowAlias: rows[j].alias,
-							type: 'cellIndex',
-							value: null
-						}
-					});
-				}
-			}
-			let insertCellList = [];
-			cellList.forEach(function(cell) {
-				let rowAliasList = cell.occupy.row,
-					colAliasList = cell.occupy.col;
-				for (let i = 0, len1 = colAliasList.length; i < len1; i++) {
-					for (let j = 0, len2 = rowAliasList.length; j < len2; j++) {
-						let insertCell = extend({}, cell);
-						insertCell.occupy.col = [colAliasList[i]];
-						insertCell.occupy.row = [rowAliasList[j]];
-						if (i !== 0 || j !== 0) {
-							insertCell.content.texts = '';
-						}
-						insertCellList.push(insertCell);
+		let insertCellList = [];
+		let currentSheet = rootState.currentSheet;
+
+		cellList.forEach(cell => {
+			let occupyCol = cell.occupy.col;
+			let occupyRow = cell.occupy.row;
+			if (occupyRow.length > 1 || occupyCol.length > 1) {
+				for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
+					for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
+						commit(mutationTypes.UPDATE_POINTINFO, {
+							currentSheet,
+							info: {
+								colAlias: occupyCol[i],
+								rowAlias: occupyRow[j],
+								type: 'cellIndex',
+								value: null
+							}
+						});
 					}
 				}
-			});
-			dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
-		}
+				cell.occupy = {
+					col: occupyCol[0],
+					row: occupyRow[0]
+				}
+				insertCellList.push(cell);
+			}
+		});
+		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
 	}
 };

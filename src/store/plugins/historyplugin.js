@@ -47,21 +47,24 @@ export default function(store) {
 				actionItem.payload = action.payload;
 			}
 			//解冻需要记录原冻结状态
-			// if(type === 'SHEET_EXECUNFROZEN'){
-			// 	let alias = state.currentSheet;
-			// 	let list = state.sheets.list;
-			// 	let sheet;
-			// 	for (let i = 0, len = list.length; i < len; i++) {
-			// 		if (list[i].alias === alias) {
-			// 			sheet = list[i];
-			// 			break;
-			// 		}
-			// 	}
-			// 	sheet.frozenState;
-			// 	actionItem.frozen ={
-			// 		//冻结别名
-			// 	}
-			// }
+			if(type === 'SHEET_EXECUNFROZEN'){
+				let alias = state.currentSheet;
+				let list = state.sheets.list;
+				let sheet;
+				for (let i = 0, len = list.length; i < len; i++) {
+					if (list[i].alias === alias) {
+						sheet = list[i];
+						break;
+					}
+				}
+				let currentFrozenState = sheet.frozenState;
+				actionItem.frozenRecord = {
+					frozenColSort: currentFrozenState.frozenColSort,
+					frozenRowSort: currentFrozenState.frozenRowSort,
+					userViewColSort: currentFrozenState.userViewColSort,
+					userViewRowSort: currentFrozenState.userViewRowSort
+				}
+			}
 			if (type === actionTypes.ROWS_EXECADJUSTHEIGHT) {
 				let sort = actionItem.payload.sort;
 				let index = store.getters.getRowIndexBySort(sort);
@@ -81,6 +84,12 @@ export default function(store) {
 				let index = store.getters.getColIndexBySort(sort);
 				let col = store.getters.colList[index];
 				actionItem.originalValue = col;
+			}
+			if (type === actionTypes.ROWS_EXECDELETEROW) {
+				let sort = actionItem.payload;
+				let index = store.getters.getRowIndexBySort(sort);
+				let row = store.getters.rowList[index];
+				actionItem.originalValue = row;
 			}
 			userActionItem.actions.push(actionItem);
 			if(recordMutations[type]){
@@ -265,7 +274,11 @@ let userAction = {
 	[actionTypes.ROWS_ADJUSTHEIGHT]: true,
 	[actionTypes.COLS_ADJUSTWIDTH]: true,
 	[actionTypes.COLS_INSERTCOL]: true,
-	[actionTypes.COLS_DELETECOL]: true
+	[actionTypes.COLS_DELETECOL]: true,
+	[actionTypes.ROWS_INSERTROW]: true,
+	[actionTypes.ROWS_DELETEROW]: true,
+	[actionTypes.SHEET_FROZEN]: true,
+	[actionTypes.SHEET_UNFROZEN]: true,
 }
 let recordAction = {
 	[actionTypes.CELLS_UPDATE_PROP]: true,
@@ -280,7 +293,13 @@ let recordAction = {
 	[actionTypes.COLS_EXECHIDE]: true,
 	[actionTypes.COLS_EXECCANCELHIDE]: true,
 	[actionTypes.COLS_EXECINSERTCOL]: true,
-	[actionTypes.COLS_EXECDELETECOL]: true
+	[actionTypes.COLS_EXECDELETECOL]: true,
+	[actionTypes.ROWS_EXECINSERTROW]: true,
+	[actionTypes.ROWS_EXECDELETEROW]: true,
+	[actionTypes.SHEET_COLFROZEN]: true,
+	[actionTypes.SHEET_ROWFROZEN]: true,
+	[actionTypes.SHEET_POINTFROZEN]: true,
+	[actionTypes.SHEET_EXECUNFROZEN]: true
 }
 let recordMutations = {
 	[actionTypes.CELLS_UPDATE_PROP]: {
@@ -304,6 +323,10 @@ let recordMutations = {
 		[mutationTypes.UPDATE_POINTINFO]: true
 	},
 	[actionTypes.COLS_EXECDELETECOL]: {
+		[mutationTypes.UPDATE_POINTINFO]: true,
+		[mutationTypes.UPDATE_CELL]: true
+	},
+	[actionTypes.ROWS_EXECDELETEROW]: {
 		[mutationTypes.UPDATE_POINTINFO]: true,
 		[mutationTypes.UPDATE_CELL]: true
 	}

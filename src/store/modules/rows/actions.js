@@ -428,7 +428,7 @@ export default {
         }
         commit(mutationTypes.UPDATE_ROW, updateRowInfo);  
     },
-    [actionTypes.COLS_INSERTCOL]({
+    [actionTypes.ROWS_INSERTROW]({
         getters,
         dispatch
     }, index) {
@@ -441,94 +441,93 @@ export default {
                     break;
                 }
             }
-            if(select.wholePosi.endColAlias === 'MAX'){
+            if(select.wholePosi.endRowAlias === 'MAX'){
                 return;
             }
-            index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
+            index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
-
-        let sort = getters.colList[index].sort;
+        let sort = getters.rowList[index].sort;
         send({
-            url: config.operUrl['insertcol'],
+            url: config.operUrl['insertrow'],
             data: JSON.stringify({
-                col: sort,
+                row: sort,
             }),
         });
-        dispatch(actionTypes.COLS_EXECINSERTCOL, {sort});
+        dispatch(actionTypes.ROWS_EXECINSERTROW, {sort});
     },
-    [actionTypes.COLS_EXECINSERTCOL]({
+    [actionTypes.ROWS_EXECINSERTROW]({
         getters,
         commit,
         dispatch,
         rootState
     }, {
         sort,
-        colModel
+        rowModel
     }) {
-        let insertCol;
-        let cols = getters.colList;
-        let index = getters.getColIndexBySort(sort);
-        if (!colModel) {
-            insertCol = extend(template);
-            insertCol.alias = generator.colAliasGenerator();
-            insertCol.sort = sort;
-            insertCol.displayName = getColDisplayName(sort);
-            insertCol.left = cols[index].left;
+        let insertRow;
+        let rows = getters.rowList;
+        let index = getters.getRowIndexBySort(sort);
+        if (!rowModel) {
+            insertRow = extend(template);
+            insertRow.alias = generator.rowAliasGenerator();
+            insertRow.sort = sort;
+            insertRow.displayName = getRowDisplayName(sort);
+            insertRow.top = rows[index].top;
         } else {
-            insertCol = colModel;
+            insertRow = rowModel;
         }
 
-        let colWidth = insertCol.width;
-        let insertColAlias = insertCol.alias;
-        let currentColAlias = cols[index].alias;
-        let insertColLeft = insertCol.left;
+        let rowHeight = insertRow.height;
+        let insertRowAlias = insertRow.alias;
+        let currentRowAlias = rows[index].alias;
+        let insertRowTop = insertRow.top;
         let cellList;
         let currentSheet = rootState.currentSheet;
 
         cellList = getters.getCellsByVertical({
-            startColIndex: index,
-            startRowIndex: 0,
+            startColIndex: 0,
+            startRowIndex: index,
             endColIndex: 'MAX',
             endRowIndex: 'MAX',
         });
 
         let updateCellInfo = [];
         cellList.forEach(function(cell) {
-            let occupyCol = cell.occupy.col;
-            if (cell.physicsBox.left >= insertColLeft) {
+            let occupyRow = cell.occupy.row;
+            if (cell.physicsBox.top >= insertRowTop) {
                 updateCellInfo.push({
                     cell,
                     props: {
                         physicsBox: {
-                            left: cell.physicsBox.left + colWidth + 1
+                            top: cell.physicsBox.top + rowHeight + 1
                         }
                     }
                 });
             } else {
-                let aliasIndex = occupyCol.indexOf(currentColAlias),
-                    newOccupy = [...occupyCol],
-                    occupyRow = cell.occupy.row,
+                let aliasIndex = occupyRow.indexOf(currentRowAlias),
+                    newOccupy = [...occupyRow],
+                    occupyCol = cell.occupy.col,
                     cellIndex;
 
-                newOccupy.splice(aliasIndex, 0, insertColAlias);
+                newOccupy.splice(aliasIndex, 0, insertRowAlias);
                 cellIndex = getters.getPointInfo(occupyCol[0], occupyRow[0], 'cellIndex');
                 updateCellInfo.push({
                     cell,
                     props: {
                         physicsBox: {
-                            width: cell.physicsBox.width + colWidth + 1
+                            height: cell.physicsBox.height + rowHeight + 1
                         },
                         occupy: {
-                            col: newOccupy
+                            row: newOccupy
                         }
                     }
                 });
-                occupyRow.forEach(function(rowAlias) {
+                occupyCol.forEach(function(colAlias) {
                     commit(mutationTypes.UPDATE_POINTINFO, {
                         currentSheet,
                         info: {
-                            colAlias: insertColAlias,
-                            rowAlias,
+                            colAlias,
+                            rowAlias: insertRowAlias,
                             type: 'cellIndex',
                             value: cellIndex
                         }
@@ -544,15 +543,15 @@ export default {
             let wholePosi = select.wholePosi,
                 startIndex,
                 endIndex;
-            startIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
-            endIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
+            startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+            endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
 
             if (startIndex >= index) {
                 updateSelectInfo.push({
                     select,
                     props: {
                         physicsBox: {
-                            left: select.physicsBox.left + colWidth + 1
+                            top: select.physicsBox.top + rowHeight + 1
                         }
                     }
                 });
@@ -561,59 +560,58 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width + colWidth + 1
+                            height: select.physicsBox.height + rowHeight + 1
                         }
                     }
                 });
-                insertCol.active = true;
+                insertRow.active = true;
             }
         });
         commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
 
-
-        insertCol.left = cols[index].left;
-        let updateColInfo = [];
-        for (let i = index, len = cols.length; i < len; i++) {
-            let col = cols[i];
-            updateColInfo.push({
-                col,
+        insertRow.top = rows[index].top;
+        let updateRowInfo = [];
+        for (let i = index, len = rows.length; i < len; i++) {
+            let row = rows[i];
+            updateRowInfo.push({
+                row,
                 props: {
-                    left: col.left + colWidth + 1,
-                    sort: col.sort + 1,
-                    displayName: getColDisplayName(col.sort + 1)
+                    top: row.top + rowHeight + 1,
+                    sort: row.sort + 1,
+                    displayName: getRowDisplayName(row.sort + 1)
                 }
             });
         }
-        commit(mutationTypes.UPDATE_COL, updateColInfo);
-        commit(mutationTypes.INSERT_COL, {
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo);
+        commit(mutationTypes.INSERT_ROW, {
             currentSheet: rootState.currentSheet,
-            cols: [insertCol]
+            rows: [insertRow]
         });
-        if (cache.localColPosi > 0) {
-            cache.localColPosi += colWidth + 1;
+        if (cache.localRowPosi > 0) {
+            cache.localRowPosi += rowHeight + 1;
         }
         /**
          * 只有在删除单元格的回退操作，才会传入列对象
          * 回退操作不需要进行前一列上单元格的复制操作
          */
-        if (!colModel && index > 0) {
+        if (!rowModel && index > 0) {
             cellList = getters.getCellsByVertical({
-                startColIndex: index - 1,
-                startRowIndex: 0,
-                endColIndex: index - 1,
-                endRowIndex: 'MAX',
+                startRowIndex: index - 1,
+                startColIndex: 0,
+                endRowIndex: index - 1,
+                endColIndex: 'MAX',
             });
             let insertCellList = [];
-            let previousAlias = cols[index - 1].alias;
+            let previousAlias = rows[index - 1].alias;
             cellList.forEach(cell => {
                 let occupyCol = cell.occupy.col;
                 let occupyRow = cell.occupy.row;
-                if (occupyCol.indexOf(previousAlias) === occupyCol.length - 1) {
-                    occupyRow.forEach(alias => {
+                if (occupyRow.indexOf(previousAlias) === occupyRow.length - 1) {
+                    occupyCol.forEach(alias => {
                         let insertCell = extend(cell);
                         insertCell.occupy = {
-                            col: [insertColAlias],
-                            row: [alias]
+                            col: [alias],
+                            row: [insertRowAlias]
                         };
                         insertCell.content.texts = '';
                         insertCellList.push(insertCell);
@@ -755,14 +753,11 @@ export default {
         }
         commit(mutationTypes.UPDATE_ROW, updateRowInfo);
     },
-    [actionTypes.ROWS_DELETEROWS]({
-        state,
-        rootState,
-        commit,
-        getters
+    [actionTypes.ROWS_DELETEROW]({
+        getters,
+        dispatch,
     }, index) {
-        let selects = getters.selectList,
-            currentSheet = rootState.currentSheet;
+        let selects = getters.selectList;
 
         if (index === undefined) {
             let select;
@@ -772,18 +767,15 @@ export default {
                     break;
                 }
             }
-            if(select.wholePosi.endRowAlias === 'MAX'){
+            if (select.wholePosi.endRowAlias === 'MAX') {
                 return;
             }
             index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias);
         }
 
+
         let rows = getters.rowList,
-            row = rows[index],
-            deleteOccupys = [],
-            updateCellInfo = [],
-            rowHeight = row.height,
-            rowAlias = row.alias;
+            row = rows[index];
 
         send({
             url: config.operUrl['deleterow'],
@@ -791,93 +783,126 @@ export default {
                 row: row.sort,
             }),
         });
-        
+        dispatch(actionTypes.ROWS_EXECDELETEROW, row.sort);
+    },
+    [actionTypes.ROWS_EXECDELETEROW]({
+        rootState,
+        commit,
+        getters,
+        dispatch
+    }, sort) {
+        let currentSheet = rootState.currentSheet;
+        let index = getters.getRowIndexBySort(sort);
         let cellList = getters.getCellsByVertical({
-            startColIndex: 0,
             startRowIndex: index,
+            startColIndex: 0,
             endColIndex: 'MAX',
             endRowIndex: 'MAX',
         });
 
-        cellList.forEach(function(cell) {
-            let occupy = cell.occupy.row,
-                temp;
+        let rows = getters.rowList;
+        let deleteRow = rows[index];
+        let deleteRowAlias = deleteRow.alias;
+        let deleteRowHeight = deleteRow.height;
+        let updateOccupys = [];
+        let updateCellInfo = [];
 
-            if ((temp = occupy.indexOf(rowAlias)) !== -1) {
-                if (occupy.length === 1) {
-                    deleteOccupys.push(cell.occupy);
-                }else{
-                    deleteOccupys.push({
-                        col: cell.occupy.col,
-                        row: [rowAlias]
+        cellList.forEach(function(cell) {
+            let occupyRow = cell.occupy.row;
+            let aliasIndex;
+            if ((aliasIndex = occupyRow.indexOf(deleteRowAlias)) !== -1) {             
+                cell.occupy.col.forEach(alias => {
+                    updateOccupys.push({
+                        rowAlias: deleteRowAlias,
+                        colAlias: alias,
+                        type: 'cellIndex',
+                        value: null
                     });
+                });
+                if (occupyRow.length !== 1) {
+                    let newOccupyRow = [...occupyRow];
+                    newOccupyRow.splice(aliasIndex, 1);
                     updateCellInfo.push({
                         cell,
                         props: {
+                            occupy: {
+                                row: newOccupyRow
+                            },
                             physicsBox: {
-                                height: cell.physicsBox.height - rowHeight - 1
+                                height: cell.physicsBox.height - deleteRowHeight - 1
                             }
                         }
                     });
                 }
             } else {
-                let newOccupy = occupy.slice(0).splice(temp, 1);
                 updateCellInfo.push({
                     cell,
                     props: {
                         physicsBox: {
-                            top: cell.physicsBox.top - rowHeight - 1
-                        },
-                        occupy: {
-                            row: newOccupy
+                            top: cell.physicsBox.top - deleteRowHeight - 1
                         }
                     }
                 });
             }
         });
-
-        commit(mutationTypes.DELETE_CELL_POINTINFO, {
-            currentSheet,
-            occupys: deleteOccupys
-        });
+        updateOccupys.forEach(info => {
+            commit(mutationTypes.UPDATE_POINTINFO, {
+                currentSheet,
+                info
+            });
+        })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
-
-        let updateSelectInfo = [],
-            rowTop = row.top;
-
+        let updateSelectInfo = [];
+        let selects = getters.selectList;
         selects.forEach(function(select) {
-            let wholePosi = select.wholePosi,
-                startPosi,
-                endPosi;
+            let wholePosi = select.wholePosi;
+            let startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
+            let endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
 
-            startPosi = getters.getRowByAlias(wholePosi.startRowAlias).top;
-            endPosi = getters.getRowByAlias(wholePosi.endRowAlias).top;
-
-            if (startPosi >= rowTop) {
-                if (startPosi === endPosi) {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                height: rows[index + 1].height
-                            },
-                            wholePosi: {
-                                startRowAlias: rows[index + 1].alias,
-                                endRowAlias: rows[index + 1].alias
+            if (startIndex === index) {
+                if (startIndex === endIndex) {
+                    if (index === rows.length - 1) {
+                        updateSelectInfo.push({
+                            select,
+                            props: {
+                                physicsBox: {
+                                    height: rows[index - 1].height
+                                },
+                                wholePosi: {
+                                    startRowAlias: rows[index - 1].alias,
+                                    endRowAlias: rows[index - 1].alias
+                                }
                             }
-                        }
-                    });
-                    commit(mutationTypes.ACTIVE_ROW, {
-                        currentSheet,
-                        startIndex: index + 1
-                    });
+                        });
+                        commit(mutationTypes.ACTIVE_ROW, {
+                            currentSheet,
+                            startIndex: index - 1
+                        });
+                    } else {
+                        updateSelectInfo.push({
+                            select,
+                            props: {
+                                physicsBox: {
+                                    height: rows[index + 1].height
+                                },
+                                wholePosi: {
+                                    startRowAlias: rows[index + 1].alias,
+                                    endRowAlias: rows[index + 1].alias
+                                }
+                            }
+                        });
+                        commit(mutationTypes.ACTIVE_ROW, {
+                            currentSheet,
+                            startIndex: index + 1
+                        });
+                    }
                 } else {
                     updateSelectInfo.push({
                         select,
                         props: {
                             physicsBox: {
-                                height: select.physicsBox.height - rowHeight - 1
+                                height: select.physicsBox.height - rows[index + 1].height - 1
                             },
                             wholePosi: {
                                 startRowAlias: rows[index + 1].alias
@@ -885,13 +910,33 @@ export default {
                         }
                     });
                 }
-
-            } else if (endPosi > rowTop) {
+            } else if (startIndex > index) {
                 updateSelectInfo.push({
                     select,
                     props: {
                         physicsBox: {
-                            top: select.physicsBox.top + rowHeight + 1
+                            top: select.physicsBox.top - deleteRowHeight - 1
+                        }
+                    }
+                });
+            } else if (endIndex === index) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height - rows[index + 1].height - 1
+                        },
+                        wholePosi: {
+                            endRowAlias: rows[index - 1].alias
+                        }
+                    }
+                });
+            } else if (endIndex < index) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height - rows[index + 1].height - 1
                         }
                     }
                 });
@@ -901,12 +946,12 @@ export default {
         commit(mutationTypes.UPDATE_SELECT, updateSelectInfo);
 
         let updateRowInfo = [];
-        for (let i = index, len = rows.length; i < len; i++) {
+        for (let i = index + 1, len = rows.length; i < len; i++) {
             let row = rows[i];
             updateRowInfo.push({
                 row,
                 props: {
-                    top:  row.top - rowHeight - 1,
+                    top: row.top - deleteRowHeight - 1,
                     sort: row.sort - 1,
                     displayName: getRowDisplayName(row.sort - 1)
                 }
@@ -914,15 +959,17 @@ export default {
         }
 
         if (cache.localRowPosi > 0) {
-            cache.localRowPosi -= rowHeight + 1;
+            cache.localRowPosi -= deleteRowHeight + 1;
         }
         commit(mutationTypes.UPDATE_ROW, updateRowInfo);
+
+        let self = this;
         Vue.nextTick(function() {
             let rowRecord = cache.rowRecord,
                 temp;
-            if ((temp = rowRecord.indexOf(rowAlias)) !== -1) {
+            if ((temp = rowRecord.indexOf(deleteRowAlias)) !== -1) {
                 _updateLoadInfo(temp, getters);
-                dispatch(actionTypes.OCCUPY_DELETEROW, rowAlias);
+                dispatch(actionTypes.OCCUPY_DELETEROW, deleteROWAlias);
                 rowRecord.splice(temp, 1);
             }
             commit(mutationTypes.DELETE_ROW, {

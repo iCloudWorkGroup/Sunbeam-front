@@ -9,8 +9,6 @@ export default {
 		dispatch(actionTypes.COLS_ADDCOLS, cols);
 		dispatch(actionTypes.CELLS_RESTORECELL, cells);
 		dispatch(actionTypes.SELECTS_INITSELECT);
-		if(frozen){
-			dispatch(actionTypes.SHEET_FROZEN, frozen);
-		}
+		dispatch(actionTypes.SHEET_RESTOREFROZEN, frozen);
 	}
 };

@@ -36,6 +36,15 @@ export default {
 					}
 				});
 			}
+			//单元格覆盖回退操作
+			if (currentStyle === actionTypes.CELLS_MERGE ||
+				currentStyle === actionTypes.CELLS_SPLIT) {
+				mutations.forEach(mutationInfo => {
+					if (mutationInfo.type === mutationTypes.UPDATE_POINTINFO) {
+						commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload);
+					}
+				});
+			}
 			//整列整行属性回退操作
 			if(currentStyle === actionTypes.ROWS_OPERROWS ||
 				action.type === actionTypes.COLS_OPERCOLS){
@@ -107,6 +116,72 @@ export default {
 						commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload);
 					}
 				});
+			}
+			//删除行回退
+			if (currentStyle === actionTypes.ROWS_EXECDELETEROW) {
+				let originalValue = action.originalValue;
+				originalValue.active = false;
+				dispatch(actionTypes.ROWS_EXECINSERTROW, {
+					sort: action.payload,
+					rowModel: originalValue
+				});
+				let mutations = action.mutations;
+				mutations.forEach(mutationInfo => {
+					if(mutationInfo.type === mutationTypes.UPDATE_SELECT){
+						mutationInfo.updateCells.forEach(({cell, props}) =>{
+							if (props.occupy && cell.occupy.row.length !== props.occupy.row.length) {
+								commit(mutationTypes.UPDATE_CELL, {
+									cell,
+									props: {
+										occupy: {
+											row: props.occupy.row
+										},
+										physicsBox: {
+				                            height: cell.physicsBox.height + originalValue.height + 1
+				                        }
+									}
+								});
+							}
+						});
+					}
+					if(mutationInfo.type === mutationTypes.UPDATE_POINTINFO){
+						commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload);
+					}
+				});
+			}
+			//冻结回退
+			if (currentStyle === actionTypes.SHEET_POINTFROZEN ||
+				currentStyle === actionTypes.SHEET_COLFROZEN||
+				currentStyle === actionTypes.SHEET_ROWFROZEN){
+				dispatch(actionTypes.SHEET_EXECUNFROZEN);
+			}
+			//取消冻结回退
+			if (currentStyle === actionTypes.SHEET_EXECUNFROZEN){
+				let {
+					userViewRowSort,
+					frozenRowSort,
+					userViewColSort,
+					frozenColSort
+				} = action.frozenRecord;
+
+				if (frozenColSort === userViewColSort) {
+					dispatch(actionTypes.SHEET_ROWFROZEN, {
+						userViewSort: userViewRowSort,
+						frozenRowSort: frozenRowSort
+					});
+				} else if (frozenRowSort === userViewRowSort) {
+					dispatch(actionTypes.SHEET_COLFROZEN, {
+						userViewSort: userViewColSort,
+						frozenColSort: frozenColSort
+					});
+				} else {
+					dispatch(actionTypes.SHEET_POINTFROZEN, {
+						frozenColSort,
+						frozenRowSort,
+						userViewColSort,
+						userViewRowSort
+					});
+				}
 			}
 		});
 		commit(mutationTypes.MOVE_HISTORYINDEX, --index);

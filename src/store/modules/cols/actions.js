@@ -293,7 +293,7 @@ export default {
                 currentSheet,
                 info
             });
-        })
+        });
         commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 
         let updateSelectInfo = [];

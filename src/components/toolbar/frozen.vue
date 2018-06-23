@@ -51,7 +51,7 @@
 	</div>
 </template>
 <script type="text/javascript">
-	import {SHEET_FROZEN, SHEET_FIRSTCOLFROZEN, SHEET_FIRSTROWFROZEN, SHEET_UNFROZEN} from '../../store/action-types';
+	import {SHEET_FROZEN, SHEET_UNFROZEN} from '../../store/action-types';
 
 	export default {
 		props: [
@@ -99,10 +99,10 @@
 				this.$store.dispatch(SHEET_FROZEN);
 			},
 			rowFrozen(e) {
-				this.$store.dispatch(SHEET_FIRSTROWFROZEN);
+				this.$store.dispatch(SHEET_FROZEN, 'firstRowFrozen');
 			},
 			colFrozen(e) {
-				this.$store.dispatch(SHEET_FIRSTCOLFROZEN);
+				this.$store.dispatch(SHEET_FROZEN, 'firstColFrozen');
 			},
 			getValue(elem, currentTarget) {
 				let value = elem.dataset.value;

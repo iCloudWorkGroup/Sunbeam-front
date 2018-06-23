@@ -952,22 +952,17 @@ export default {
 			if (occupyRow.length > 1 || occupyCol.length > 1) {
 				for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
 					for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-						commit(mutationTypes.UPDATE_POINTINFO, {
-							currentSheet,
-							info: {
-								colAlias: occupyCol[i],
-								rowAlias: occupyRow[j],
-								type: 'cellIndex',
-								value: null
-							}
-						});
+						let insertCell = extend(cell);
+						if (i !== 0 || j !== 0) {
+							insertCell.content.texts = '';
+						}
+						insertCell.occupy = {
+							col: [occupyCol[i]],
+							row: [occupyRow[j]]
+						}
+						insertCellList.push(insertCell);
 					}
 				}
-				cell.occupy = {
-					col: occupyCol[0],
-					row: occupyRow[0]
-				}
-				insertCellList.push(cell);
 			}
 		});
 		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);

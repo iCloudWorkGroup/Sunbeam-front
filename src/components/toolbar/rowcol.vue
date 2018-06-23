@@ -62,8 +62,8 @@
 	import {
 		COLS_DELETECOL,
 		COLS_INSERTCOL,
-		ROWS_DELETEROWS,
-		ROWS_INSERTROWS
+		ROWS_DELETEROW,
+		ROWS_INSERTROW
 	} from '../../store/action-types';
 
 	export default {
@@ -92,7 +92,7 @@
 				this.$emit('updateActiveWidgetId', '');
 			},
 			insertRow() {
-				this.$store.dispatch(ROWS_INSERTROWS);
+				this.$store.dispatch(ROWS_INSERTROW);
 				this.$emit('updateActiveWidgetId', '');
 			},
 			deleteCol() {
@@ -100,7 +100,7 @@
 				this.$emit('updateActiveWidgetId', '');
 			},
 			deleteRow() {
-				this.$store.dispatch(ROWS_DELETEROWS);
+				this.$store.dispatch(ROWS_DELETEROW);
 				this.$emit('updateActiveWidgetId', '');
 			},
 		}

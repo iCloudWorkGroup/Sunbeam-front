@@ -40,7 +40,7 @@ export default {
 		getters,
 		rootState,
 		dispatch
-	}, frozen) {
+	}, type) {
 		let currentSheet = rootState.currentSheet,
 			selects = rootState.selects[currentSheet].list,
 			stateList = state.list,
@@ -56,79 +56,104 @@ export default {
 		if (frozenState.isFrozen) {
 			return;
 		}
+		let select = getters.activeSelect;
+		let frozenRowAlias = select.wholePosi.startRowAlias;
+		let frozenColAlias = select.wholePosi.startColAlias;
+		let frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias);
+	    let frozenColIndex = getters.getColIndexByAlias(frozenColAlias);
 
-		let frozenColAlias,
-			frozenRowAlias,
-			frozenColIndex,
-			frozenRowIndex,
-			userViewTopIndex,
-			userViewLeftIndex;
+		let userView = rootState.userView;
+		let userViewTopIndex = getters.getRowIndexByPosi(userView.top);
+		let userViewLeftIndex = getters.getColIndexByPosi(userView.left);
+		let userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
+		let userViewRightIndex = getters.getColIndexByPosi(userView.right);
 
-		if(frozen){
-			frozenRowAlias = frozen.rowAlias;
-			frozenColAlias = frozen.colAlias;
-			userViewLeftIndex = getters.getColIndexByAlias(frozen.viewColAlias);
-			userViewTopIndex = getters.getRowIndexByAlias(frozen.viewRowAlias);
-		}else{
-			let select = getters.activeSelect;
-			frozenRowAlias = select.wholePosi.startRowAlias;
-			frozenColAlias = select.wholePosi.startColAlias;
 
-			let userView = rootState.userView;
-			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
-			userViewLeftIndex = getters.getColIndexByPosi(userView.left);
+		//非可视范围，不能进行冻结
+		if (frozenRowIndex - userViewTopIndex < 0 ||
+			userViewBottomIndex - frozenRowIndex < 0 ||
+			frozenColIndex - userViewLeftIndex < 0 ||
+			userViewRightIndex - frozenColIndex < 0) {
+			return;
 		}
-		frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias);
-		frozenColIndex = getters.getColIndexByAlias(frozenColAlias);
-
-		if (!frozen || frozen.type !== 'restore') {
-			let userView = rootState.userView;
-			let userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom);
-			let userViewRightIndex = getters.getColIndexByPosi(userView.right);
-			//非可视范围，不能进行冻结
-			if (frozenRowIndex - userViewTopIndex < 0 ||
-				userViewBottomIndex - frozenRowIndex < 0 ||
-				frozenColIndex - userViewLeftIndex < 0 ||
-				userViewRightIndex - frozenColIndex < 0) {
-				return;
-			}
-			//左上角位置不能进行冻结
-			if (frozenRowIndex === userViewTopIndex &&
-				frozenColIndex === userViewLeftIndex) {
-				return;
-			}
+		//左上角位置不能进行冻结
+		if (frozenRowIndex === userViewTopIndex &&
+			frozenColIndex === userViewLeftIndex) {
+			return;
 		}
-		let rowList = getters.rowList,
-			colList = getters.colList,
-			userViewCol = colList[userViewLeftIndex],
-			userViewRow = rowList[userViewTopIndex],
-			frozenCol = colList[frozenColIndex],
-			frozenRow = rowList[frozenRowIndex];
+		let rows = getters.rowList,
+			cols = getters.colList,
+			userViewLeft = cols[userViewLeftIndex],
+			userViewTop = rows[userViewTopIndex],
+			frozenCol = cols[frozenColIndex],
+			frozenRow = rows[frozenRowIndex];
 		
-		if (!frozen || frozen.type !== 'restore') {
-			send({
-				url: config.operUrl['frozen'],
-				data: JSON.stringify({
-					viewRow: userViewRow.alias,
-					viewCol: userViewCol.alias,
-					oprCol: frozenCol.alias,
-					oprRow: frozenRow.alias
-				}),
+		send({
+			url: config.operUrl['frozen'],
+			data: JSON.stringify({
+				viewRow: userViewTop.alias,
+				viewCol: userViewLeft.alias,
+				oprCol: frozenCol.alias,
+				oprRow: frozenRow.alias
+			}),
+		});
+		if (type === 'firstRowFrozen') {
+			dispatch(actionTypes.SHEET_ROWFROZEN, {
+				userViewSort: userViewTop.sort,
+				frozenRowSort: userViewTop.sort + 1
+			});
+		} else if (type === 'firstColFrozen') {
+			dispatch(actionTypes.SHEET_COLFROZEN, {
+				userViewSort: userViewLeft.sort,
+				frozenColSort: userViewLeft.sort + 1
+			});
+		} else if (frozenColIndex === userViewLeftIndex) {
+			dispatch(actionTypes.SHEET_ROWFROZEN, {
+				userViewSort: userViewTop.sort,
+				frozenRowSort: frozenRow.sort
+			});
+		} else if (frozenRowIndex === userViewTopIndex) {
+			dispatch(actionTypes.SHEET_COLFROZEN, {
+				userViewSort: userViewLeft.sort,
+				frozenColSort: frozenCol.sort
+			});
+		} else {
+			dispatch(actionTypes.SHEET_POINTFROZEN, {
+				frozenColSort: frozenCol.sort,
+				frozenRowSort: frozenRow.sort,
+				userViewColSort: userViewLeft.sort,
+				userViewRowSort: userViewTop.sort
 			});
 		}
-		if (frozenColIndex === userViewLeftIndex) {
-			dispatch(actionTypes.SHEET_ROWFROZEN, frozenRowIndex);
-			return;
-		}else if (frozenRowIndex === userViewTopIndex) {
-			dispatch(actionTypes.SHEET_COLFROZEN, frozenColIndex);
-			return;
-		}else {
-			dispatch(actionTypes.SHEET_POINTFROZEN, {
-				frozenColIndex,
-				frozenRowIndex,
-				userViewLeftIndex,
-				userViewTopIndex
-			});
+	},
+	[actionTypes.SHEET_RESTOREFROZEN]({
+		dispatch,
+		getters
+	}, frozen) {
+		if (frozen) {
+			let userViewLeft = getters.getColByAlias(frozen.viewColAlias);
+			let userViewTop = getters.getRowByAlias(frozen.viewRowAlias);
+			let frozenCol = getters.getColByAlias(frozen.colAlias);
+			let frozenRow = getters.getRowByAlias(frozen.rowAlias);
+
+			if (frozenCol.sort === userViewLeft.sort) {
+				dispatch(actionTypes.SHEET_ROWFROZEN, {
+					userViewSort: userViewTop.sort,
+					frozenRowSort: frozenRow.sort
+				});
+			} else if (frozenRow.sort === userViewTop.sort) {
+				dispatch(actionTypes.SHEET_COLFROZEN, {
+					userViewSort: userViewLeft.sort,
+					frozenColSort: frozenCol.sort
+				});
+			} else {
+				dispatch(actionTypes.SHEET_POINTFROZEN, {
+					frozenColSort: frozenCol.sort,
+					frozenRowSort: frozenRow.sort,
+					userViewColSort: userViewLeft.sort,
+					userViewRowSort: userViewTop.sort
+				});
+			}
 		}
 	},
 	[actionTypes.SHEET_COLFROZEN]({
@@ -136,46 +161,17 @@ export default {
 		state,
 		getters,
 		rootState
-	}, index) {
-		let currentSheet = rootState.currentSheet,
-			stateList = state.list,
-			frozenState;
-
-		for (let i = 0, len = stateList.length; i < len; i++) {
-			if (stateList[i].alias === currentSheet) {
-				frozenState = stateList[i].frozenState;
-				break;
-			}
-		}
-		if (frozenState.isFrozen) {
-			return;
-		}
-
-		let frozenColIndex;
-
-		let userView = rootState.userView,
-			userViewLeftIndex = getters.getColIndexByPosi(userView.left);
-
-		if (index === undefined) {
-			index = userViewLeftIndex + 1;
-		}
-		frozenColIndex = index;
-
-		let rowList = getters.rowList,
-			colList = getters.colList,
-			userViewCol = colList[userViewLeftIndex],
-			frozenCol = colList[frozenColIndex];
-
-		send({
-			url: config.operUrl['frozen'],
-			data: JSON.stringify({
-				viewRow: rowList[0].alias,
-				viewCol: userViewCol.alias,
-				oprCol: frozenCol.alias,
-				oprRow: rowList[0].alias
-			}),
-		});
-
+	}, {
+		userViewSort,
+		frozenColSort
+	}) {
+		let rowList = getters.rowList;
+		let	colList = getters.colList;
+		let	frozenColIndex = getters.getColIndexBySort(frozenColSort);
+		let	userViewLeftIndex = getters.getColIndexBySort(userViewSort);
+		let	userViewCol = colList[userViewLeftIndex];
+		let	frozenCol = colList[frozenColIndex];
+		let currentSheet = rootState.currentSheet;
 		let rules = [];
 
 		rules.push({
@@ -198,6 +194,10 @@ export default {
 			isFrozen: true,
 			rowFrozen: false,
 			colFrozen: true,
+			frozenColSort,
+			frozenRowSort: 0,
+			userViewColSort: userViewSort,
+			userViewRowSort: 0,
 			rules,
 			currentSheet
 		});
@@ -207,45 +207,17 @@ export default {
 		state,
 		getters,
 		rootState
-	}, index) {
-		let currentSheet = rootState.currentSheet,
-			stateList = state.list,
-			frozenState;
-
-		for (let i = 0, len = stateList.length; i < len; i++) {
-			if (stateList[i].alias === currentSheet) {
-				frozenState = stateList[i];
-				break;
-			}
-		}
-		if (frozenState.isFrozen) {
-			return;
-		}
-
-		let frozenRowIndex;
-
-		let userView = rootState.userView,
-			userViewTopIndex = getters.getRowIndexByPosi(userView.top);
-
-		if (index === undefined) {
-			index = userViewTopIndex + 1;
-		}
-		frozenRowIndex = index;
-
-		let rowList = getters.rowList,
-			colList = getters.colList,
-			userViewRow = rowList[userViewTopIndex],
-			frozenRow = rowList[frozenRowIndex];
-
-		send({
-			url: config.operUrl['frozen'],
-			data: JSON.stringify({
-				viewCol: colList[0].alias,
-				viewRow: userViewRow.alias,
-				oprRow: frozenRow.alias,
-				oprCol: colList[0].alias
-			}),
-		});
+	}, {
+		userViewSort,
+		frozenRowSort
+	}) {
+		let rowList = getters.rowList;
+		let	colList = getters.colList;
+		let	frozenRowIndex = getters.getRowIndexBySort(frozenRowSort);
+		let	userViewTopIndex = getters.getRowIndexBySort(userViewSort);
+		let	userViewRow = rowList[userViewTopIndex];
+		let	frozenRow = rowList[frozenRowIndex];
+		let currentSheet = rootState.currentSheet;
 		let rules = [];
 
 		rules.push({
@@ -268,6 +240,10 @@ export default {
 			isFrozen: true,
 			rowFrozen: true,
 			colFrozen: false,
+			frozenColSort: 0,
+			frozenRowSort,
+			userViewColSort: userViewSort,
+			userViewRowSort: 0,
 			rules,
 			currentSheet
 		});
@@ -278,25 +254,30 @@ export default {
 		getters,
 		rootState
 	}, {
-		userViewTopIndex,
-		userViewLeftIndex,
-		frozenColIndex,
-		frozenRowIndex
+		userViewRowSort,
+		userViewColSort,
+		frozenColSort,
+		frozenRowSort
 	}) {
+		let rows = getters.rowList;
+		let	cols = getters.colList;
 
-		let rowList = getters.rowList,
-			colList = getters.colList,
-			userViewCol = colList[userViewLeftIndex],
-			userViewRow = rowList[userViewTopIndex],
-			frozenCol = colList[frozenColIndex],
-			frozenRow = rowList[frozenRowIndex];
+		let userViewColIndex = getters.getColIndexBySort(userViewColSort);
+		let userViewRowIndex = getters.getRowIndexBySort(userViewRowSort);
+		let frozenColIndex = getters.getColIndexBySort(frozenColSort);
+		let frozenRowIndex = getters.getRowIndexBySort(frozenRowSort);
+
+		let userViewCol = cols[userViewColIndex];
+		let userViewRow = rows[userViewRowIndex];
+		let frozenCol = cols[frozenColIndex];
+		let frozenRow = rows[frozenRowIndex];
 
 		let rules = [];
 		rules.push({
 			type: 'cornerRule',
-			startRowIndex: userViewTopIndex,
+			startRowIndex: userViewRowIndex,
 			endRowIndex: frozenRowIndex - 1,
-			startColIndex: userViewLeftIndex,
+			startColIndex: userViewColIndex,
 			endColIndex: frozenColIndex - 1,
 			offsetTop: userViewRow.top,
 			offsetLeft: userViewCol.left,
@@ -304,7 +285,7 @@ export default {
 			height: frozenRow.top - userViewRow.top - 1
 		}, {
 			type: 'topRule',
-			startRowIndex: userViewTopIndex,
+			startRowIndex: userViewRowIndex,
 			endRowIndex: frozenRowIndex - 1,
 			startColIndex: frozenColIndex,
 			userViewLeft: userViewCol.left,
@@ -314,7 +295,7 @@ export default {
 		}, {
 			type: 'leftRule',
 			startRowIndex: frozenRowIndex,
-			startColIndex: userViewLeftIndex,
+			startColIndex: userViewColIndex,
 			endColIndex: frozenColIndex - 1,
 			userViewTop: userViewRow.top,
 			offsetLeft: userViewCol.left,
@@ -334,12 +315,12 @@ export default {
 			isFrozen: true,
 			rowFrozen: true,
 			colFrozen: true,
-			// frozenColAlias,
-			// frozenRowAlias,
-			// userViewColAlias,
-			// userViewRowAlias,
+			frozenColSort,
+			frozenRowSort,
+			userViewColSort,
+			userViewRowSort,
 			rules,
-			currentSheet
+			currentSheet: rootState.currentSheet
 		});
 	},
 	[actionTypes.SHEET_UNFROZEN]({dispatch}) {

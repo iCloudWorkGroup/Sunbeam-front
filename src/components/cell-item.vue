@@ -5,35 +5,36 @@
         </div>
     </div>
 </template>
-<script type="text/javascript">
+<script>
+
 import { unit } from '../filters/unit'
 export default {
     props: ['item', 'frozenRule'],
     computed: {
         cellPosi() {
-            const physicsBox = this.item.physicsBox,
-                  border = physicsBox.border;
-            let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0,
-                offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0,
-                top = physicsBox.top - offsetTop,
-                left = physicsBox.left - offsetLeft,
-                width = physicsBox.width,
-                height = physicsBox.height;
+            const physicsBox = this.item.physicsBox
+            const border = physicsBox.border
+            let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
+            let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
+            let top = physicsBox.top - offsetTop
+            let left = physicsBox.left - offsetLeft
+            let width = physicsBox.width
+            let height = physicsBox.height
 
-            top -= border.top && 1;
-            left -= border.left && 1;
+            top -= border.top && 1
+            left -= border.left && 1
 
-            if(border.left === 2){
-                width--;
+            if (border.left === 2) {
+                width--
             }
-            if(border.right === 2){
-                width--;
+            if (border.right === 2) {
+                width--
             }
-            if(border.top === 2){
-                height--;
+            if (border.top === 2) {
+                height--
             }
-            if(border.bottom === 2){
-                height--;
+            if (border.bottom === 2) {
+                height--
             }
 
             return {
@@ -48,11 +49,19 @@ export default {
             }
         },
         cellProps() {
+<<<<<<< HEAD
             let cellContent = this.item.content,
                 italic = cellContent.italic ? 'italic ' : '',
                 weight = cellContent.weight ? 'bold' : 'normal',
                 underline = cellContent.underline ? 'underline': '',
                 font = cellContent.size + 'pt ' + cellContent.family;
+=======
+            let cellContent = this.item.content
+            let italic = cellContent.italic ? 'italic ' : ''
+            let weight = cellContent.weight ? 'bold' : 'normal'
+            let underline = cellContent.underline ? 'underline' : ''
+            let font = unit(cellContent.size) + ' ' + cellContent.family
+>>>>>>> master
 
             return {
                 background: cellContent.background,
@@ -72,7 +81,7 @@ export default {
     filters: {
         unit
     }
-};
+}
 </script>
 <style type="text/css">
 .cell {

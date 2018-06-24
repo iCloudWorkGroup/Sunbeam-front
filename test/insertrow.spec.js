@@ -7,26 +7,28 @@ import {
 	ROWS_INSERTROWS,
 	SELECTS_UPDATESELECT
 } from '../src/store/action-types';
-import {UPDATE_MOUSESTATE} from '../src/store/mutation-types';
+import {
+	UPDATE_MOUSESTATE
+} from '../src/store/mutation-types';
 import generator from '../src/tools/generator';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store(index);
 
-describe('插入行对象测试',function(){
-	beforeAll(function(){
+describe('插入行对象测试', function() {
+	beforeAll(function() {
 		store.dispatch(RESTORE, data);
 		generator.rowAliasGenerator(17);
 		generator.colAliasGenerator(10);
 	});
 
 
-	it('行对象判断',function(){
+	it('行对象判断', function() {
 		let rows = store.getters.rowList,
 			len = rows.length;
 
-		store.dispatch(ROWS_INSERTROWS, rows.length -1);
+		store.dispatch(ROWS_INSERTROWS, rows.length - 1);
 		store.dispatch(ROWS_INSERTROWS);
 		expect(rows.length).toBe(len + 2);
 		expect(rows[0].top).toBe(0);
@@ -42,7 +44,7 @@ describe('插入行对象测试',function(){
 	});
 
 
-	it('选中区判断',function(){
+	it('选中区判断', function() {
 		let select = store.getters.selectList[0];
 		expect(select.physicsBox.top).toBe(20);
 		store.dispatch(SELECTS_UPDATESELECT, {
@@ -60,7 +62,7 @@ describe('插入行对象测试',function(){
 		expect(select.physicsBox.top).toBe(0);
 		expect(select.physicsBox.height).toBe(99);
 	});
-	it('单元格判断',function(){
+	it('单元格判断', function() {
 		let cell1 = store.getters.cellList[0],
 			cell2 = store.getters.cellList[1];
 
@@ -70,10 +72,10 @@ describe('插入行对象测试',function(){
 
 		expect(cell2.physicsBox.top).toBe(80);
 		expect(cell2.physicsBox.height).toBe(19);
-		
+
 	});
-	it('坐标信息判断',function(){
-		expect(store.getters.getPointInfo('1','20','cellIndex')).toBe(0);
-		expect(store.getters.getPointInfo('2','20','cellIndex')).toBe(0);
+	it('坐标信息判断', function() {
+		expect(store.getters.getPointInfo('1', '20', 'cellIndex')).toBe(0);
+		expect(store.getters.getPointInfo('2', '20', 'cellIndex')).toBe(0);
 	});
 });

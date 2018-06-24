@@ -10,9 +10,14 @@ before_install:
 before_script:
 - mv -fv tools/deploy/ssh_config ~/.ssh/config
 - cat /home/travis/.ssh/config
+- git checkout -qf $TRAVIS_BRANCH
 script:
+
 - git remote add deploy root@sunbeam:/usr/local/codelib/sunbeam-front.git
-- git push --force deploy $TRAVIS_BRANCH
+- if [ $TRAVIS_BRANCH = master ]; then git push deploy $TRAVIS_BRANCH; fi
+
+git:
+  depth: false
 cache:
   directories:
   - node_modules

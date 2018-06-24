@@ -1,6 +1,6 @@
-import actions from './actions';
-import mutations from './mutations';
-import getters from './getters';
+import actions from './actions'
+import mutations from './mutations'
+import getters from './getters'
 
 /**
  * 状态值
@@ -8,12 +8,11 @@ import getters from './getters';
  * list为cell对象数组
  * @type {Object}
  */
-const state = {
-};
+const state = {}
 
 export default {
-	state,
-	actions,
-	mutations,
-	getters
-};
+    state,
+    actions,
+    mutations,
+    getters
+}

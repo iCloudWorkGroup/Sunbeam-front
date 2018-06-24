@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="1"
+            failures="0"
+            tests="1">
+
+  <testsuite name="reload"
+    errors="1" failures="0" hostname="" id="" package="reload" skipped="0"
+    tests="1" time="6.283" timestamp="Mon, 04 Jun 2018 09:32:11 GMT">
+  
+    <testcase name="reload" classname="reload" time="6.283" assertions="1">
+
+    
+    </testcase>
+  
+
+  
+    <system-err>
+      ERROR: Unable to locate element: &#34;function (e) {
+				console.log(e)
+				// brower.dblClick(&#39;.select-group&#39;)
+			}&#34; using: css selector
+    at Object.exports.command (D:\test\github\Sunbeam-front\node_modules\_nightwatch-helpers@1.2.0@nightwatch-helpers\commands\dblClick.js:2:15)
+    at Object.F.command (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\api.js:274:31)
+    at Object.commandFn (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\api.js:287:24)
+    at AsyncTree.runCommand (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:154:30)
+    at AsyncTree.runChildNode (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:114:8)
+    at AsyncTree.walkDown (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:80:10)
+    at AsyncTree.walkUp (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:97:8)
+    at AsyncTree.walkDown (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:90:12)
+    at AsyncTree.traverse (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:73:8)
+    at HttpRequest.onCommandComplete (D:\test\github\Sunbeam-front\node_modules\_nightwatch@0.9.20@nightwatch\lib\core\queue.js:131:12)
+    </system-err>
+  
+
+  
+  </testsuite>
+</testsuites>

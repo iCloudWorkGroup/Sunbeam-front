@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-import actions from './actions';
-import mutations from './mutations';
-import cols from './modules/cols/index';
-import rows from './modules/rows/index';
-import cells from './modules/cells/index';
-import selects from './modules/selects/index';
-import sheets from './modules/sheets/index';
-import pointsInfo from './modules/pointsinfo/index';
-import input from './modules/input/index';
-import history from './modules//history/index';
-import { LOCATE } from '../tools/constant';
-import historyPlugin from './plugins/historyplugin';
-=======
 import actions from './actions'
 import mutations from './mutations'
 import cols from './modules/cols/index'
@@ -21,10 +7,10 @@ import selects from './modules/selects/index'
 import sheets from './modules/sheets/index'
 import pointsInfo from './modules/pointsinfo/index'
 import input from './modules/input/index'
-import {
-    LOCATE
-} from '../tools/constant'
->>>>>>> master
+import history from './modules//history/index'
+import {LOCATE} from '../tools/constant'
+import historyPlugin from './plugins/historyplugin'
+
 
 const state = {
     /**
@@ -43,7 +29,6 @@ const state = {
 }
 
 export default {
-<<<<<<< HEAD
 	state,
 	actions,
 	mutations,
@@ -58,19 +43,4 @@ export default {
 		history
 	},
 	plugins: [historyPlugin]
-};
-=======
-    state,
-    actions,
-    mutations,
-    modules: {
-        cols,
-        rows,
-        cells,
-        selects,
-        sheets,
-        pointsInfo,
-        input
-    }
 }
->>>>>>> master

@@ -41,24 +41,6 @@ export default {
             return this.colHeadWidth
         },
         totalWidth() {
-<<<<<<< HEAD
-            let cols = this.$store.getters.colList,
-                visibleCols = this.$store.getters.visibleColList,
-                frozenRule = this.frozenRule,
-                lastCol,
-                startCol;
-
-            if (frozenRule) {
-                startCol = cols[frozenRule.startColIndex];
-                if (frozenRule.endColIndex !== undefined) {
-                    lastCol = cols[frozenRule.endColIndex];
-                }else{
-                    lastCol = visibleCols[visibleCols.length - 1];
-                }
-            } else {
-                startCol = visibleCols[0];
-                lastCol = visibleCols[visibleCols.length - 1];
-=======
             let visibleCols = this.$store.getters.visibleColList
             let frozenRule = this.frozenRule
             let startColIndex
@@ -68,7 +50,7 @@ export default {
 
             if (frozenRule) {
                 startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex !== 'undefined') {
+                if (typeof frozenRule.endColIndex !== 'undefined') {
                     endColIndex = frozenRule.endColIndex
                 } else {
                     endColIndex = visibleCols.length - 1
@@ -79,7 +61,6 @@ export default {
                 endColIndex = visibleCols.length - 1
                 startCol = visibleCols[0]
                 lastCol = visibleCols[endColIndex]
->>>>>>> master
             }
             return lastCol.left + lastCol.width - startCol.left + 'px'
         },

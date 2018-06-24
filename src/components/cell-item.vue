@@ -49,19 +49,11 @@ export default {
             }
         },
         cellProps() {
-<<<<<<< HEAD
-            let cellContent = this.item.content,
-                italic = cellContent.italic ? 'italic ' : '',
-                weight = cellContent.weight ? 'bold' : 'normal',
-                underline = cellContent.underline ? 'underline': '',
-                font = cellContent.size + 'pt ' + cellContent.family;
-=======
             let cellContent = this.item.content
             let italic = cellContent.italic ? 'italic ' : ''
             let weight = cellContent.weight ? 'bold' : 'normal'
             let underline = cellContent.underline ? 'underline' : ''
             let font = unit(cellContent.size) + ' ' + cellContent.family
->>>>>>> master
 
             return {
                 background: cellContent.background,

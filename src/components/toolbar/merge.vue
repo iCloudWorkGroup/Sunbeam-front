@@ -11,40 +11,19 @@
 </div>
 </template>
 <script type="text/javascript">
-<<<<<<< HEAD
-	import {CELLS_HANDLEMERGE} from '../../store/action-types';
+	import {CELLS_HANDLEMERGE} from '../../store/action-types'
 
 	export default {
 		computed: {
 			mergeState(){
-				return this.$store.getters.getMergeState();
+				return this.$store.getters.getMergeState()
 			}
 		},
 		methods: {
 			setMerge() {
-				this.$store.dispatch(CELLS_HANDLEMERGE);
+				this.$store.dispatch(CELLS_HANDLEMERGE)
 			}
 		}
 	}
 </script>
-<style type="text/css">
-	
-</style>
-=======
-import {
-    CELLS_MERGE
-} from '../../store/action-types'
-export default {
-    computed: {
-        mergeState() {
-            return this.$store.getters.getMergeState()
-        }
-    },
-    methods: {
-        setMerge() {
-            this.$store.dispatch(CELLS_MERGE)
-        }
-    }
-}
-</script>
->>>>>>> master
+

@@ -55,17 +55,8 @@
 </div>
 </template>
 <script type="text/javascript">
-<<<<<<< HEAD
-	import {SHEET_FROZEN, SHEET_UNFROZEN} from '../../store/action-types';
-=======
-import {
-    SHEET_FROZEN,
-    SHEET_FIRSTCOLFROZEN,
-    SHEET_FIRSTROWFROZEN,
-    SHEET_UNFROZEN,
-    CELLS_UPDATE_BORDER
-} from '../../store/action-types'
->>>>>>> master
+
+import {SHEET_FROZEN, SHEET_UNFROZEN} from '../../store/action-types'
 
 export default {
     props: [
@@ -98,46 +89,6 @@ export default {
             if (!widgetId) {
                 return
             }
-
-<<<<<<< HEAD
-				this.$emit('updateActiveWidgetId', widgetId);
-			},
-			unFrozen(e) {
-				this.$store.dispatch(SHEET_UNFROZEN);
-			},
-			frozen(e) {
-				this.$store.dispatch(SHEET_FROZEN);
-			},
-			rowFrozen(e) {
-				this.$store.dispatch(SHEET_FROZEN, 'firstRowFrozen');
-			},
-			colFrozen(e) {
-				this.$store.dispatch(SHEET_FROZEN, 'firstColFrozen');
-			},
-			getValue(elem, currentTarget) {
-				let value = elem.dataset.value;
-				if (value === undefined) {
-					if (elem === currentTarget) {
-						return;
-					} else {
-						return this.getValue(elem.parentNode, currentTarget);
-					}
-				} else {
-					return value;
-				}
-			},
-			setBorder(e) {
-				e.stopPropagation();
-				let currentTarget = e.currentTarget,
-					target = e.target,
-					value;
-=======
-            box = elem.getBoundingClientRect()
-            widget = this.$refs[widgetId]
-            widget.style.top = box.top + box.height + 'px'
-            widget.style.left = box.left + 'px'
->>>>>>> master
-
             this.$emit('updateActiveWidgetId', widgetId)
         },
         unFrozen(e) {
@@ -147,14 +98,14 @@ export default {
             this.$store.dispatch(SHEET_FROZEN)
         },
         rowFrozen(e) {
-            this.$store.dispatch(SHEET_FIRSTROWFROZEN)
+            this.$store.dispatch(SHEET_FROZEN, 'firstRowFrozen')
         },
         colFrozen(e) {
-            this.$store.dispatch(SHEET_FIRSTCOLFROZEN)
+            this.$store.dispatch(SHEET_FROZEN, 'firstColFrozen')
         },
         getValue(elem, currentTarget) {
             let value = elem.dataset.value
-            if (value === 'undefined') {
+            if (value === undefined) {
                 if (elem === currentTarget) {
                     return
                 } else {
@@ -163,21 +114,6 @@ export default {
             } else {
                 return value
             }
-        },
-        setBorder(e) {
-            e.stopPropagation()
-            let currentTarget = e.currentTarget
-            let target = e.target
-            let value
-
-            value = this.getValue(target, currentTarget)
-            if (value === 'undefined') {
-                return
-            }
-            this.$store.dispatch(CELLS_UPDATE_BORDER, {
-                value
-            })
-            this.$emit('updateActiveWidgetId', '')
         }
     }
 }

@@ -1,23 +1,12 @@
-<<<<<<< HEAD
-import * as actionTypes from '../../action-types';
-import * as mutationTypes from '../../mutation-types';
-import {indexAttrBinary} from '../../../util/binary';
-import extend from '../../../util/extend';
-import template from './template';
-import {SELECT} from '../../../tools/constant';
-import generator from '../../../tools/generator';
-import config from '../../../config';
-import send from '../../../util/send';
-=======
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
+import {indexAttrBinary} from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
-import {
-    SELECT
-} from '../../../tools/constant'
+import {SELECT} from '../../../tools/constant'
 import generator from '../../../tools/generator'
->>>>>>> master
+import config from '../../../config'
+import send from '../../../util/send'
 
 export default {
     /**
@@ -29,8 +18,8 @@ export default {
         state,
         rootState,
         getters
-    }, cellListArgs) {
-        let cellList = cellListArgs
+    }, payload) {
+        let cellList = payload
         if (!Array.isArray(cellList)) {
             cellList = [cellList]
         }
@@ -46,19 +35,19 @@ export default {
         let getRowIndexByAlias = getters.getRowIndexByAlias
 
         for (let i = 0, len = cellList.length; i < len; i++) {
-<<<<<<< HEAD
-			let cell = cellList[i],
-				aliasColList = cell.occupy.col,
-				aliasRowList = cell.occupy.row,
-				startRowIndex,
-				startColIndex,
-				endRowIndex,
-				endColIndex,
-				aliasCol, aliasRow,
-				cellIndex,
-				width = 0,
-				height = 0,
-				physicsBox;
+			let cell = cellList[i]
+			let aliasColList = cell.occupy.col
+			let aliasRowList = cell.occupy.row
+			let startRowIndex
+			let startColIndex
+			let endRowIndex
+			let endColIndex
+			let aliasCol
+			let aliasRow
+			let cellIndex
+			let width = 0
+			let height = 0
+			let physicsBox
 
 			aliasCol = aliasColList[0];
 			aliasRow = aliasRowList[0];
@@ -69,32 +58,31 @@ export default {
 			endRowIndex = startRowIndex + aliasRowList.length - 1;
 
 			if (endRowIndex > limitRowIndex) {
-				endRowIndex = limitRowIndex;
+				endRowIndex = limitRowIndex
 			}
 			if (startRowIndex === -1) {
-				continue;
+				continue
 			}
-
-			startColIndex = getColIndexByAlias(aliasCol);
-			endColIndex = startColIndex + aliasColList.length - 1;
+			startColIndex = getColIndexByAlias(aliasCol)
+			endColIndex = startColIndex + aliasColList.length - 1
 
 			if (endColIndex > limitColIndex) {
-				endColIndex = limitColIndex;
+				endColIndex = limitColIndex
 			}
 			if (endColIndex === -1) {
-				continue;
+				continue
 			}
 
 			for (let j = startColIndex; j < endColIndex + 1; j++) {
-				let col = cols[j];
+				let col = cols[j]
 				if (!col.hidden) {
-					width += col.width + 1;
+					width += col.width + 1
 				}
 			}
 			for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-				let row = rows[j];
+				let row = rows[j]
 				if (!row.hidden) {
-					height += row.height + 1;
+					height += row.height + 1
 				}
 			}
 			physicsBox = {
@@ -102,16 +90,16 @@ export default {
 				left: cols[startColIndex].left,
 				width: width - 1,
 				height: height - 1
-			};
+			}
 			/**
 			 * 更新坐标信息
 			 */
 			if (typeof cellIndex !== 'number') {
-				let colAlias, rowAlias;
+				let colAlias, rowAlias
 				for (let j = 0; j < aliasColList.length; j++) {
 					for (let k = 0; k < aliasRowList.length; k++) {
-						colAlias = aliasColList[j];
-						rowAlias = aliasRowList[k];
+						colAlias = aliasColList[j]
+						rowAlias = aliasRowList[k]
 						commit(mutationTypes.UPDATE_POINTINFO, {
 							currentSheet: sheet,
 							info: {
@@ -120,17 +108,17 @@ export default {
 								type: 'cellIndex',
 								value: cells.length
 							}
-						});
+						})
 					}
 				}
-				physicsBox.border = cell.border;
-				delete cell.border;
-				cell.physicsBox = physicsBox;
-				cell = extend({}, template, cell);
+				physicsBox.border = cell.border
+				delete cell.border
+				cell.physicsBox = physicsBox
+				cell = extend({}, template, cell)
 				commit(mutationTypes.INSERT_CELL, {
 					currentSheet: sheet,
 					cell
-				});
+				})
 			} else {
 				commit(mutationTypes.UPDATE_CELL, [{
 					cell: cells[cellIndex],
@@ -140,39 +128,41 @@ export default {
 							width: physicsBox.width
 						}
 					}
-				}]);
+				}])
 			}
 		}
 	},
-	[actionTypes.CELLS_UPDATE]({commit, dispatch, getters}, {
-		startColIndex,
-		endColIndex,
-		startRowIndex,
-		endRowIndex,
-		propNames,
-		value
-	}){
+	[actionTypes.CELLS_UPDATE]({commit, dispatch, getters}, payload){
+		let {
+			startColIndex,
+			endColIndex,
+			startRowIndex,
+			endRowIndex,
+			propNames,
+			value
+		} = payload;
+
 		//获取操作区域
 		if(typeof startColIndex === 'undefined'){
-			let select = getters.activeSelect,
-				wholePosi = select.wholePosi;
+			let select = getters.activeSelect
+			let	wholePosi = select.wholePosi
 			
-			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
-			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
-			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
-			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
 		}
-		endColIndex = endColIndex || startColIndex;
-		endRowIndex = endRowIndex || startRowIndex;
+		endColIndex = endColIndex || startColIndex
+		endRowIndex = endRowIndex || startRowIndex
 
-		propNames = propNames.split('.');
+		propNames = propNames.split('.')
 
-		let propValue;
+		let propValue
 		for (let i = 0; i < propNames.length; i++) {
 			if(i === 0){
-				propValue = template[propNames[i]];
+				propValue = template[propNames[i]]
 			}else{
-				propValue = propValue[propNames[i]];
+				propValue = propValue[propNames[i]]
 			}
 		}
 		//获取更新值
@@ -183,77 +173,77 @@ export default {
 				endColIndex,
 				startRowIndex,
 				endRowIndex
-			});
+			})
 			if (cellList.length === 0) {
 				if(typeof propValue === 'boolean'){
-					value = true;
+					value = true
 				}else{
-					value = 1;
+					value = 1
 				}
 			} else {
 				let temp;
 				for (let i = 0; i < propNames.length; i++) {
 					if (i === 0) {
-						temp = cellList[0][propNames[i]];
+						temp = cellList[0][propNames[i]]
 					} else {
-						temp = temp[propNames[i]];
+						temp = temp[propNames[i]]
 					}
 				}
 				if(typeof propValue === 'boolean'){
-					value = !temp; 
+					value = !temp
 				}else{
-					value = 1^temp;
+					value = 1^temp
 				}
 			}
 		}
 
-		let	props = {},
-			temp;
+		let	props = {}
+		let	temp
 
 		for (let i = 0, len = propNames.length; i < len; i++) {
 			if (i === 0) {
-				temp = props[propNames[0]] = {};
+				temp = props[propNames[0]] = {}
 			}else if (i < len - 1) {	
-				temp[propNames[i]] = temp = {};
+				temp[propNames[i]] = temp = {}
 			}else {
-				temp[propNames[i]] = value;
+				temp[propNames[i]] = value
 			} 
 		}
 
-		let cols = getters.colList,
-			rows = getters.rowList,
-			oper = propNames[propNames.length - 1],
-			url = config.operUrl[oper],
-			data = {};
+		let cols = getters.colList
+		let	rows = getters.rowList
+		let	oper = propNames[propNames.length - 1]
+		let	url = config.operUrl[oper]
+		let	data = {}
 
 		data.coordinate = [{
 			startCol: cols[startColIndex].sort,
 			startRow: rows[startRowIndex].sort,
 			endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
 			endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
-		}];
+		}]
 		if(value !== undefined){
-			let sendPropName = config.operSendPropName[oper] || oper;
-			data[sendPropName] = value; 
+			let sendPropName = config.operSendPropName[oper] || oper
+			data[sendPropName] = value
 		}
 		send({
 			url,
-			data: JSON.stringify(data),
+			data: JSON.stringify(data)
 		});
-		success();
+		success()
 		function success() {
 			if (endRowIndex === 'MAX') {
 				dispatch(actionTypes.COLS_OPERCOLS, {
 					startIndex: startColIndex,
 					endIndex: endColIndex,
 					props
-				});
+				})
 			} else if (endColIndex === 'MAX') {
 				dispatch(actionTypes.ROWS_OPERROWS, {
 					startIndex: startRowIndex,
 					endIndex: endRowIndex,
 					props
-				});
+				})
 			} else {
 				dispatch(actionTypes.CELLS_UPDATE_PROP, {
 					startColIndex,
@@ -261,7 +251,7 @@ export default {
 					startRowIndex,
 					endRowIndex,
 					props
-				});
+				})
 			}
 		}
 	},
@@ -312,51 +302,53 @@ export default {
 			commit(mutationTypes.UPDATE_CELL, updateCellInfo);
 		}
 	},
-	[actionTypes.CELLS_UPDATE_BORDER]({commit, dispatch, getters}, {
-		startColIndex,
-		endColIndex,
-		startRowIndex,
-		endRowIndex,
-		value
-	}) {
+	[actionTypes.CELLS_UPDATE_BORDER]({commit, dispatch, getters}, payload) {
+		let {
+			startColIndex,
+			endColIndex,
+			startRowIndex,
+			endRowIndex,
+			value
+		} = payload
+
 		if(typeof startColIndex === 'undefined'){
-			let select = getters.activeSelect,
-				wholePosi = select.wholePosi;
-			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
-			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
-			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
-			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+			let select = getters.activeSelect
+			let	wholePosi = select.wholePosi
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
 		}
-		let thick = false;
+		let thick = false
 		if (value.indexOf('-thick') !== -1) {
-			thick = true;
-			value = value.split('-')[0];
+			thick = true
+			value = value.split('-')[0]
 		}
 
-		let operates = []; 
+		let operates = []
 
 		switch (value) {
 			case 'bottom':
-				setBottom();
-				break;
+				setBottom()
+				break
 			case 'top':
-				setTop();
-				break;
+				setTop()
+				break
 			case 'left':
-				setLeft();
-				break;
+				setLeft()
+				break
 			case 'right':
-				setRight();
-				break;
+				setRight()
+				break
 			case 'none':
-				setNone();
-				break;
+				setNone()
+				break
 			case 'all':
-				setAll();
-				break;
+				setAll()
+				break
 			case 'outer':
-				setOuter();
-				break;
+				setOuter()
+				break
 		}
 
 
@@ -374,7 +366,7 @@ export default {
 							}
 						}
 					}
-				});
+				})
 			}
 		}
 
@@ -391,7 +383,7 @@ export default {
 						}
 					}
 				}
-			});
+			})
 		}
 
 		function setLeft() {
@@ -407,7 +399,7 @@ export default {
 						}
 					}
 				}
-			});
+			})
 		}
 
 		function setRight() {
@@ -424,7 +416,7 @@ export default {
 							}
 						}
 					}
-				});
+				})
 			}
 		}
 
@@ -444,7 +436,7 @@ export default {
 						}
 					}
 				}
-			});
+			})
 		}
 
 		function setAll() {
@@ -463,7 +455,7 @@ export default {
 						}
 					}
 				}
-			});
+			})
 		}
 
 		function setOuter() {
@@ -480,7 +472,7 @@ export default {
 							}
 						}
 					}
-				});
+				})
 				operates.push({
 					startRowIndex,
 					startColIndex,
@@ -493,7 +485,7 @@ export default {
 							}
 						}
 					}
-				});
+				})
 			}
 
 			if (endColIndex !== 'MAX') {
@@ -509,7 +501,7 @@ export default {
 							}
 						}
 					}
-				});
+				})
 				operates.push({
 					startRowIndex,
 					startColIndex,
@@ -522,13 +514,13 @@ export default {
 							}
 						}
 					}
-				});
+				})
 			}
 		}
-		let url = config.operUrl.border,
-			cols = getters.colList,
-			rows = getters.rowList,
-			data;
+		let url = config.operUrl.border
+		let	cols = getters.colList
+		let	rows = getters.rowList
+		let	data
 
 		data = {
 			coordinate: [{
@@ -538,16 +530,15 @@ export default {
 				endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
 			}],
 			direction: value
-
-		};
+		}
 		if (value !== 'none') {
 			data.line = thick ? 2 : 1
 		}
 		send({
 			url,
 			data: JSON.stringify(data),
-		});
-		success();
+		})
+		success()
 		function success() {
 			if (endRowIndex === 'MAX') {
 				operates.forEach((item) => {
@@ -555,20 +546,20 @@ export default {
 						startIndex: item.startColIndex,
 						endIndex: item.endColIndex,
 						props: item.props
-					});
-				});
+					})
+				})
 			} else if (endColIndex === 'MAX') {
 				operates.forEach((item) => {
 					dispatch(actionTypes.ROWS_OPERROWS, {
 						startIndex: item.startRowIndex,
 						endIndex: item.endRowIndex,
 						props: item.props
-					});
-				});
+					})
+				})
 			} else {
 				operates.forEach((item) => {
-					dispatch(actionTypes.CELLS_UPDATE_PROP, item);
-				});
+					dispatch(actionTypes.CELLS_UPDATE_PROP, item)
+				})
 			}
 		}
 		
@@ -579,70 +570,70 @@ export default {
 	 * 计算出单元格的盒模型，同时维护pointsinfo
 	 */
 	[actionTypes.CELLS_INSERTCELL]({commit, state, rootState, getters}, cellList){
-		let insertCellInfo = [],
-			cols = getters.colList,
-			rows = getters.rowList,
-			sheet = rootState.currentSheet,
-			indexCounter = getters.cellList.length;
+		let insertCellInfo = []
+		let	cols = getters.colList
+		let	rows = getters.rowList
+		let	sheet = rootState.currentSheet
+		let	indexCounter = getters.cellList.length
 			
 		cellList.forEach(function(cell) {
-			let aliasColList = cell.occupy.col,
-				aliasRowList = cell.occupy.row,
-				startRowIndex,
-				startColIndex,
-				endColIndex,
-				endRowIndex;
+			let aliasColList = cell.occupy.col
+			let	aliasRowList = cell.occupy.row
+			let	startRowIndex
+			let	startColIndex
+			let	endColIndex
+			let	endRowIndex
 
-			cell = extend({}, template, cell);
+			cell = extend({}, template, cell)
 
-			startColIndex = getters.getColIndexByAlias(aliasColList[0]);			
-			endColIndex = getters.getColIndexByAlias(aliasColList[aliasColList.length -1]);
-			startRowIndex = getters.getRowIndexByAlias(aliasRowList[0]);
-			endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length -1]);
+			startColIndex = getters.getColIndexByAlias(aliasColList[0])			
+			endColIndex = getters.getColIndexByAlias(aliasColList[aliasColList.length -1])
+			startRowIndex = getters.getRowIndexByAlias(aliasRowList[0])
+			endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length -1])
 
-			let top = rows[startRowIndex].top,
-				left = cols[startColIndex].left,
-				width,
-				height;
+			let top = rows[startRowIndex].top
+			let	left = cols[startColIndex].left
+			let	width
+			let	height
 
 			for (let i = endColIndex; i > startColIndex - 1; i--) {
 				if (cols[i].hidden) {
-					continue;
+					continue
 				} else {
-					width = cols[i].left + cols[i].width - cols[startColIndex].left;
-					break;
+					width = cols[i].left + cols[i].width - cols[startColIndex].left
+					break
 				}
 			}
-			width = width || -1;
+			width = width || -1
 
 			for (let i = endRowIndex; i > startRowIndex - 1; i--) {
 				if (rows[i].hidden) {
-					continue;
+					continue
 				} else {
-					height = rows[i].top + rows[i].height - rows[startRowIndex].top;
-					break;
+					height = rows[i].top + rows[i].height - rows[startRowIndex].top
+					break
 				}
 			}
-			height = height || -1;
+			height = height || -1
 
 			let physicsBox = {
 				top,
 				left,
 				width,
 				height
-			};
+			}
 
-			extend(cell, {physicsBox});
+			extend(cell, {physicsBox})
 
-			cell.alias = generator.cellAliasGenerator();
+			cell.alias = generator.cellAliasGenerator()
 			commit(mutationTypes.INSERT_CELL, {
 				currentSheet: rootState.currentSheet,
 				cell
-			});
+			})
 			for (let j = 0; j < aliasColList.length; j++) {
 				for (let k = 0; k < aliasRowList.length; k++) {
-					let colAlias = aliasColList[j],
-						rowAlias = aliasRowList[k];
+					let colAlias = aliasColList[j]
+					let	rowAlias = aliasRowList[k]
 
 					commit(mutationTypes.UPDATE_POINTINFO, {
 						currentSheet: rootState.currentSheet,
@@ -652,67 +643,67 @@ export default {
 							type: 'cellIndex',
 							value: indexCounter
 						}
-					});
+					})
 				}
 			}
-			indexCounter++;
-		});
+			indexCounter++
+		})
 	},
 	[actionTypes.COLS_OPERCOLS]({getters, state, rootState, commit, dispatch}, 
         {startIndex, endIndex, props}){
 
-        let updateCellInfo = [];
+        let updateCellInfo = []
        	let cellList = getters.getCellsByVertical({
        		startRowIndex: 0,
        		endRowIndex: 'MAX',
        		startColIndex: startIndex,
        		endColIndex: endIndex
-       	});
+       	})
        	cellList.forEach(function(cell){
        		updateCellInfo.push({
        			cell,
        			props
        		})
-       	});
-       	commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+       	})
+       	commit(mutationTypes.UPDATE_CELL, updateCellInfo)
 
-       	let insertCellInfo = [],
-			editViewOccupy = getters.getEditViewOccupy(),
-			cols = getters.colList,
-			rows = getters.rowList;
+       	let insertCellInfo = []
+		let	editViewOccupy = getters.getEditViewOccupy()
+		let	cols = getters.colList
+		let	rows = getters.rowList
 
        	for(let key in editViewOccupy){
 			let viewOccupyRow = editViewOccupy[key].row,
 				startRowIndex,
 				endRowIndex;
 			if (viewOccupyRow.length == 0) {
-				continue;
+				continue
 			}
-			startRowIndex = getters.getRowIndexByAlias(viewOccupyRow[0]);
-			endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[viewOccupyRow.length - 1]);
+			startRowIndex = getters.getRowIndexByAlias(viewOccupyRow[0])
+			endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[viewOccupyRow.length - 1])
 
 			for (let i = startRowIndex; i < endRowIndex + 1; i++) {
 				for (let j = startIndex; j < endIndex + 1; j++) {
-					let colAlias = cols[j].alias,
-						rowAlias = rows[i].alias,
-						cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex');
+					let colAlias = cols[j].alias
+					let	rowAlias = rows[i].alias
+					let	cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
 					if (typeof cellIndex !== 'number') {
-						let cell = extend({}, props);
+						let cell = extend({}, props)
 						cell.occupy = {
 							col: [colAlias],
 							row: [rowAlias]
-						};
-						insertCellInfo.push(cell);
+						}
+						insertCellInfo.push(cell)
 					}
 				}
 			}
        	}
-       	dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo);	
+       	dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
 	},
 	[actionTypes.ROWS_OPERROWS]({getters, state, rootState, commit, dispatch}, 
         {startIndex, endIndex, props}){
 
-		let updateCellInfo = [];
+		let updateCellInfo = []
 
 		let cellList = getters.getCellsByVertical({
 			startRowIndex: startIndex,
@@ -725,70 +716,71 @@ export default {
 				cell,
 				props
 			})
-		});
-		commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+		})
+		commit(mutationTypes.UPDATE_CELL, updateCellInfo)
 
-		let insertCellInfo = [],
-			editViewOccupy = getters.getEditViewOccupy(),
-			cols = getters.colList,
-			rows = getters.rowList;
+		let insertCellInfo = []
+		let	editViewOccupy = getters.getEditViewOccupy()
+		let	cols = getters.colList
+		let	rows = getters.rowList
 
 		for (let key in editViewOccupy) {
-			let viewOccupyCol = editViewOccupy[key].col,
-				startColIndex,
-				endColIndex;
+			let viewOccupyCol = editViewOccupy[key].col
+			let	startColIndex
+			let	endColIndex
+
 			if (viewOccupyCol.length === 0) {
-				continue;
+				continue
 			}
-			startColIndex = getters.getColIndexByAlias(viewOccupyCol[0]),
-			endColIndex = getters.getColIndexByAlias(viewOccupyCol[viewOccupyCol.length - 1]);
+			startColIndex = getters.getColIndexByAlias(viewOccupyCol[0])
+			endColIndex = getters.getColIndexByAlias(viewOccupyCol[viewOccupyCol.length - 1])
 
 			for (let i = startColIndex; i < endColIndex + 1; i++) {
 				for (let j = startIndex; j < endIndex + 1; j++) {
-					let colAlias = cols[i].alias,
-						rowAlias = rows[j].alias,
-						cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex'),
-						cell = extend({}, props);
+					let colAlias = cols[i].alias
+					let	rowAlias = rows[j].alias
+					let	cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
+					let	cell = extend({}, props)
 
 					cell.occupy = {
 						col: [colAlias],
 						row: [rowAlias]
-					};
+					}
 					if (typeof cellIndex !== 'number') {
-						insertCellInfo.push(cell);
+						insertCellInfo.push(cell)
 					}
 				}
 			}
 		}
-		dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo);
+		dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
 	},
 	[actionTypes.OCCUPY_UPDATE]({commit, getters, rootState, dispatch}, {col, row}){
 		if (col.length === 0 || row.length === 0) {
-			return;
+			return
 		}
-		let startRowIndex = getters.getRowIndexByAlias(row[0]),
-			startColIndex = getters.getColIndexByAlias(col[0]),
-			endRowIndex = getters.getRowIndexByAlias(row[row.length - 1]),
-			endColIndex = getters.getColIndexByAlias(col[col.length - 1]),
-			cols = getters.colList,
-			rows = getters.rowList,
-			getPointInfo = getters.getPointInfo,
-			temp;
+		let startRowIndex = getters.getRowIndexByAlias(row[0])
+		let	startColIndex = getters.getColIndexByAlias(col[0])
+		let	endRowIndex = getters.getRowIndexByAlias(row[row.length - 1])
+		let	endColIndex = getters.getColIndexByAlias(col[col.length - 1])
+		let	cols = getters.colList
+		let	rows = getters.rowList
+		let	getPointInfo = getters.getPointInfo
+		let	temp
 
 		for (let i = startRowIndex; i < endRowIndex + 1; i++) {
 			if (!isEmpty((temp = rows[i].props))) {
 				for (let j = startColIndex; j < endColIndex + 1; j++) {
-					let rowAlias = rows[i].alias,
-						colAlias = cols[j].alias,
-						index = getPointInfo(colAlias, rowAlias, 'cellIndex'),
-						cell = extend({}, temp);
+					let rowAlias = rows[i].alias
+					let	colAlias = cols[j].alias
+					let	index = getPointInfo(colAlias, rowAlias, 'cellIndex')
+					let	cell = extend({}, temp)
 
 					cell.occupy = {
 						col: [colAlias],
 						row: [rowAlias]
-					};
+					}
 					if (typeof index !== 'number') {
-						dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+						dispatch(actionTypes.CELLS_INSERTCELL, [cell])
 					}
 				}
 			}
@@ -798,76 +790,78 @@ export default {
 		for (let i = startColIndex; i < endColIndex + 1; i++) {
 			if (!isEmpty((temp = cols[i].props))) {
 				for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-					let rowAlias = rows[j].alias,
-						colAlias = cols[i].alias,
-						index = getPointInfo(colAlias, rowAlias, 'cellIndex'),
-						cell = extend({}, temp);
+					let rowAlias = rows[j].alias
+					let	colAlias = cols[i].alias
+					let	index = getPointInfo(colAlias, rowAlias, 'cellIndex')
+					let	cell = extend({}, temp)
 
 					cell.occupy = {
 						col: [colAlias],
 						row: [rowAlias]
-					};
+					}
 					if (typeof index !== 'number') {
-						dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+						dispatch(actionTypes.CELLS_INSERTCELL, [cell])
 					}
 				}
 			}
 		}
 
 		function isEmpty(obj) {
-			let flag = true;
+			let flag = true
 			for (let key in obj) {
-				flag = false;
+				flag = false
 			}
 			if(flag){
-				return true;
+				return true
 			}
 			for (let key in obj.content) {
-				return false;
+				return false
 			}
 			for (let key in obj.border) {
-				return false;
+				return false
 			}
 			for (let key in obj.customProp) {
-				return false;
+				return false
 			}
-			return true;
+			return true
 		}
 	},
 	[actionTypes.CELLS_HANDLEMERGE]({
 		dispatch,
 		getters,
 		rootState
-	}, {
-		startColIndex,
-		startRowIndex,
-		endRowIndex,
-		endColIndex,
-		value
-	} = {}) {
-		if (typeof startColIndex === 'undefined') {
-			let select = getters.activeSelect,
-				wholePosi = select.wholePosi;
+	}, payload) {
+		let {
+			startColIndex,
+			startRowIndex,
+			endRowIndex,
+			endColIndex,
+			value
+		} = payload
 
-			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
-			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
-			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias);
-			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
+		if (typeof startColIndex === 'undefined') {
+			let select = getters.activeSelect
+			let	wholePosi = select.wholePosi
+
+			startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+			endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+			startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+			endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
 		}
-		endColIndex = endColIndex || startColIndex;
-		endRowIndex = endRowIndex || startRowIndex;
+		endColIndex = endColIndex || startColIndex
+		endRowIndex = endRowIndex || startRowIndex
 		if(endRowIndex === 'MAX' || endColIndex === 'MAX'){
-			return;
+			return
 		}
 
 		if (value === undefined) {
-			value = !getters.getMergeState();
+			value = !getters.getMergeState()
 		}
-		let action = value ? 'merge' : 'split',
-			url = config.operUrl[action],
-			cols = getters.colList,
-			rows = getters.rowList,
-			data;
+		let action = value ? 'merge' : 'split'
+		let	url = config.operUrl[action]
+		let	cols = getters.colList
+		let	rows = getters.rowList
+		let	data
 
 		data = {
 			coordinate: [{
@@ -876,11 +870,11 @@ export default {
 				endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
 				endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
 			}]
-		};
+		}
 		send({
 			url,
 			data: JSON.stringify(data)
-		});
+		})
 
 		if (value) {
 			dispatch(actionTypes.CELLS_MERGE, {
@@ -888,14 +882,14 @@ export default {
 				endColIndex,
 				startRowIndex,
 				endRowIndex
-			});
+			})
 		} else {
 			dispatch(actionTypes.CELLS_SPLIT, {
 				startColIndex,
 				endColIndex,
 				startRowIndex,
 				endRowIndex
-			});
+			})
 		}
 	},
 	[actionTypes.CELLS_MERGE]({
@@ -912,36 +906,36 @@ export default {
 			endColIndex,
 			startRowIndex,
 			endRowIndex
-		});
-		let cell;
+		})
+		let cell
 		for (let i = 0, len = cellList.length; i < len; i++) {
 			if (cellList[i].content.texts) {
-				cell = cellList[i];
-				break;
+				cell = cellList[i]
+				break
 			}
 		}
 		if (!cell) {
-			cell = getters.getCellsByTransverse({startColIndex, startRowIndex})[0];
+			cell = getters.getCellsByTransverse({startColIndex, startRowIndex})[0]
 		}
-		cell = extend({}, cell || {});
+		cell = extend({}, cell || {})
 
-		let cols = getters.colList,
-			rows = getters.rowList,
-			rowAliasList = [],
-			colAliasList = [];
+		let cols = getters.colList
+		let	rows = getters.rowList
+		let	rowAliasList = []
+		let	colAliasList = []
 
 		for (let i = startColIndex; i < endColIndex + 1; i++) {
-			colAliasList.push(cols[i].alias);
+			colAliasList.push(cols[i].alias)
 		}
 		for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-			rowAliasList.push(rows[i].alias);
+			rowAliasList.push(rows[i].alias)
 		}
 
 		cell.occupy = {
 			row: rowAliasList,
 			col: colAliasList
 		}
-		dispatch(actionTypes.CELLS_INSERTCELL, [cell]);
+		dispatch(actionTypes.CELLS_INSERTCELL, [cell])
 	},
 	[actionTypes.CELLS_SPLIT]({
 		rootState,
@@ -959,826 +953,31 @@ export default {
 			endColIndex,
 			startRowIndex,
 			endRowIndex
-		});
+		})
 
-		let insertCellList = [];
-		let currentSheet = rootState.currentSheet;
+		let insertCellList = []
+		let currentSheet = rootState.currentSheet
 
 		cellList.forEach(cell => {
-			let occupyCol = cell.occupy.col;
-			let occupyRow = cell.occupy.row;
+			let occupyCol = cell.occupy.col
+			let occupyRow = cell.occupy.row
 			if (occupyRow.length > 1 || occupyCol.length > 1) {
 				for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
 					for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-						let insertCell = extend(cell);
+						let insertCell = extend(cell)
 						if (i !== 0 || j !== 0) {
-							insertCell.content.texts = '';
+							insertCell.content.texts = ''
 						}
 						insertCell.occupy = {
 							col: [occupyCol[i]],
 							row: [occupyRow[j]]
 						}
-						insertCellList.push(insertCell);
+						insertCellList.push(insertCell)
 					}
 				}
 			}
 		});
-		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList);
+		dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
 	}
 };
-=======
-            let cell = cellList[i]
-            let aliasColList = cell.occupy.col
-            let aliasRowList = cell.occupy.row
-            let startRowIndex
-            let startColIndex
-            let endRowIndex
-            let endColIndex
-            let aliasCol
-            let aliasRow
-            let cellIndex
-            let width = 0
-            let height = 0
 
-            aliasCol = aliasColList[0]
-            aliasRow = aliasRowList[0]
-
-            cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex')
-
-            startRowIndex = getRowIndexByAlias(aliasRow)
-            endRowIndex = startRowIndex + aliasRowList.length - 1
-
-            if (endRowIndex > limitRowIndex) {
-                endRowIndex = limitRowIndex
-            }
-            if (startRowIndex === -1) {
-                continue
-            }
-
-            startColIndex = getColIndexByAlias(aliasCol)
-            endColIndex = startColIndex + aliasColList.length - 1
-
-            if (endColIndex > limitColIndex) {
-                endColIndex = limitColIndex
-            }
-            if (endColIndex === -1) {
-                continue
-            }
-
-            for (let j = startColIndex; j < endColIndex + 1; j++) {
-                let col = cols[j]
-                if (!col.hidden) {
-                    width += col.width + 1
-                }
-            }
-            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                let row = rows[j]
-                if (!row.hidden) {
-                    height += row.height + 1
-                }
-            }
-            let physicsBox = {
-                top: rows[startRowIndex].top,
-                left: cols[startColIndex].left,
-                width: width - 1,
-                height: height - 1
-            }
-
-            /**
-             * 更新坐标信息
-             */
-
-            if (typeof cellIndex !== 'number') {
-                let colAlias
-                let rowAlias
-                for (let j = 0; j < aliasColList.length; j++) {
-                    for (let k = 0; k < aliasRowList.length; k++) {
-                        colAlias = aliasColList[j]
-                        rowAlias = aliasRowList[k]
-                        commit(mutationTypes.UPDATE_POINTINFO, {
-                            currentSheet: sheet,
-                            info: {
-                                colAlias,
-                                rowAlias,
-                                type: 'cellIndex',
-                                value: cells.length
-                            }
-                        })
-                    }
-                }
-                cell.physicsBox = physicsBox
-                cell = extend({}, template, cell)
-                commit(mutationTypes.INSERT_CELL, {
-                    currentSheet: sheet,
-                    cell
-                })
-            } else {
-                commit(mutationTypes.UPDATE_CELL, [{
-                    cell: cells[cellIndex],
-                    props: {
-                        physicsBox: {
-                            height: physicsBox.height,
-                            width: physicsBox.width
-                        }
-                    }
-                }])
-            }
-        }
-    },
-
-    [actionTypes.CELLS_UPDATE]({
-        commit,
-        dispatch,
-        getters
-    }, {
-        startColIndexArgs,
-        endColIndexArgs,
-        startRowIndexArgs,
-        endRowIndexArgs,
-        propNamesArgs,
-        valueArgs
-    }) {
-        let startColIndex = startColIndexArgs
-        let endColIndex = endColIndexArgs
-        let startRowIndex = startRowIndexArgs
-        let endRowIndex = endRowIndexArgs
-        let propNames = propNamesArgs
-
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        endColIndex = endColIndex || startColIndex
-        endRowIndex = endRowIndex || startRowIndex
-
-        propNames = propNames.split('.')
-        let value = valueArgs
-        if (value === 'undefined') {
-            let cellList = getters.getCellsByVertical({
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex
-            })
-            if (cellList.length === 0) {
-                value = true
-            } else {
-                let temp
-                for (let i = 0; i < propNames.length; i++) {
-                    if (i === 0) {
-                        temp = cellList[0][propNames[i]]
-                    } else {
-                        temp = temp[propNames[i]]
-                    }
-                }
-                value = !temp
-            }
-        }
-
-        let props = {}
-        let temp
-        let len = propNames.length
-        for (let i = 0; i < len; i++) {
-            if (i === 0) {
-                temp = props[propNames[0]] = {}
-            } else if (i < len - 1) {
-                temp[propNames[i]] = temp = {}
-            } else {
-                temp[propNames[i]] = value
-            }
-        }
-
-        let getPointInfo = getters.getPointInfo
-        let tempSign = {}
-        let cols = getters.colList
-        let rows = getters.rowList
-        let cells = getters.cellList
-        let updateCellInfo = []
-        let insertCellList = []
-        let colAlias
-        let rowAlias
-        let cellIndex
-
-        for (let i = startColIndex; i <= endColIndex; i++) {
-            for (let j = startRowIndex; j <= endRowIndex; j++) {
-                colAlias = cols[i].alias
-                rowAlias = rows[j].alias
-                cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                if (typeof cellIndex === 'number') {
-                    let cell
-                    if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
-                        updateCellInfo.push({
-                            cell,
-                            props
-                        })
-                    }
-                } else {
-                    insertCellList.push(extend({
-                        occupy: {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                    }, props))
-                }
-            }
-        }
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-    },
-    [actionTypes.CELLS_UPDATE_BORDER]({
-        commit,
-        dispatch,
-        getters
-    }, {
-        startColIndexArgs,
-        endColIndexArgs,
-        startRowIndexArgs,
-        endRowIndexArgs,
-        valueArgs
-    }) {
-        let startColIndex = startColIndexArgs
-        let endColIndex = endColIndexArgs
-        let startRowIndex = startRowIndexArgs
-        let endRowIndex = endRowIndexArgs
-        let value = valueArgs
-
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        let thick = false
-        if (value.indexOf('-thick') !== -1) {
-            thick = true
-            value = value.split('-')[0]
-        }
-
-        switch (value) {
-            case 'bottom':
-                setBottom()
-                break
-            case 'top':
-                setTop()
-                break
-            case 'left':
-                setLeft()
-                break
-            case 'right':
-                setRight()
-                break
-            case 'none':
-                setNone()
-                break
-            case 'all':
-                setAll()
-                break
-            case 'outer':
-                setOuter()
-                break
-        }
-
-        function setBottom() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex: endRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border.bottom',
-                value: thick ? 2 : 1
-            })
-        }
-
-        function setTop() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex: startRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border.top',
-                value: thick ? 2 : 1
-            })
-        }
-
-        function setLeft() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex: startColIndex,
-                propNames: 'physicsBox.border.left',
-                value: thick ? 2 : 1
-            })
-        }
-
-        function setRight() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex: endColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border.right',
-                value: thick ? 2 : 1
-            })
-        }
-
-        function setNone() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0
-                }
-            })
-        }
-
-        function setAll() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    top: 1,
-                    left: 1,
-                    right: 1,
-                    bottom: 1
-                }
-            })
-        }
-
-        function setOuter() {
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex: startRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    top: 1
-                }
-            })
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex: startColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    left: 1
-                }
-            })
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex: endRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    bottom: 1
-                }
-            })
-            dispatch(actionTypes.CELLS_UPDATE, {
-                startRowIndex,
-                startColIndex: endColIndex,
-                endRowIndex,
-                endColIndex,
-                propNames: 'physicsBox.border',
-                value: {
-                    right: 1
-                }
-            })
-        }
-    },
-    /**
-     * 插入单元格
-     */
-    [actionTypes.CELLS_INSERTCELL]({
-        commit,
-        state,
-        rootState,
-        getters
-    }, cellList) {
-        let cols = getters.colList
-        let rows = getters.rowList
-        let indexCounter = getters.cellList.length
-
-        cellList.forEach(function(cellArgs) {
-            let cell = cellArgs
-            let aliasColList = cell.occupy.col
-            let aliasRowList = cell.occupy.row
-            let startRowIndex
-            let startColIndex
-            let endColIndex
-            let endRowIndex
-
-            cell = extend({}, template, cell)
-
-            startColIndex = getters.getColIndexByAlias(aliasColList[0])
-            endColIndex = getters.getColIndexByAlias(aliasColList[
-                aliasColList.length -
-                1])
-            startRowIndex = getters.getRowIndexByAlias(aliasRowList[0])
-            endRowIndex = getters.getRowIndexByAlias(aliasRowList[
-                aliasRowList.length -
-                1])
-
-
-            let physicsBox = {
-                top: rows[startRowIndex].top,
-                left: cols[startColIndex].left,
-                width: cols[endColIndex].left + cols[endColIndex].width -
-                    cols[
-                        startColIndex].left,
-                height: rows[endRowIndex].top + rows[endRowIndex].height -
-                    rows[
-                        startRowIndex].top
-            }
-
-            extend(cell, {
-                physicsBox
-            })
-
-            cell.alias = generator.cellAliasGenerator()
-            commit(mutationTypes.INSERT_CELL, {
-                currentSheet: rootState.currentSheet,
-                cell
-            })
-            for (let j = 0; j < aliasColList.length; j++) {
-                for (let k = 0; k < aliasRowList.length; k++) {
-                    let colAlias = aliasColList[j]
-                    let rowAlias = aliasRowList[k]
-                    commit(mutationTypes.UPDATE_POINTINFO, {
-                        currentSheet: rootState.currentSheet,
-                        info: {
-                            colAlias,
-                            rowAlias,
-                            type: 'cellIndex',
-                            value: indexCounter
-                        }
-                    })
-                }
-            }
-            indexCounter++
-        })
-    },
-    [actionTypes.COLS_OPERCOLS]({
-        getters,
-        state,
-        rootState,
-        commit,
-        dispatch
-    }, {
-        startIndexArgs,
-        endIndexArgs,
-        propsArgs
-    }) {
-        let startIndex = startIndexArgs
-        let endIndex = endIndexArgs
-        let props = propsArgs
-        if (startIndex === 'undefined') {
-            let selects = getters.selectList
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-            startIndex = getters.getColIndexByAlias(select.wholePosi.startColAlias)
-            endIndex = getters.getColIndexByAlias(select.wholePosi.endColAlias)
-        }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
-
-        let updateCellInfo = []
-        let cellList = getters.getCellsByVertical({
-            startRowIndex: 0,
-            endRowIndex: 'MAX',
-            startColIndex: startIndex,
-            endColIndex: endIndex
-        })
-        cellList.forEach(function(cell) {
-            updateCellInfo.push({
-                cell,
-                props
-            })
-        })
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-
-        let insertCellInfo = []
-        let editViewOccupy = getters.getEditViewOccupy()
-        let cols = getters.colList
-        let rows = getters.rowList
-
-        for (let key in editViewOccupy) {
-            if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
-                let viewOccupyRow = editViewOccupy[key].row
-                let startRowIndex
-                let endRowIndex
-                if (viewOccupyRow.length === 0) {
-                    continue
-                }
-                startRowIndex = getters.getRowIndexByAlias(viewOccupyRow[0])
-                endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[
-                    viewOccupyRow.length -
-                    1])
-
-                for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-                    for (let j = startIndex; j < endIndex + 1; j++) {
-                        let colAlias = cols[j].alias
-                        let rowAlias = rows[i].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
-                            'cellIndex')
-                        if (typeof cellIndex !== 'number') {
-                            let cell = extend({}, props)
-                            cell.occupy = {
-                                col: [colAlias],
-                                row: [rowAlias]
-                            }
-                            insertCellInfo.push(cell)
-                        }
-                    }
-                }
-            }
-        }
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
-    },
-    [actionTypes.ROWS_OPERROWS]({
-        getters,
-        state,
-        rootState,
-        commit,
-        dispatch
-    }, {
-        startIndexArgs,
-        endIndexArgs,
-        propsArgs
-    }) {
-        let startIndex = startIndexArgs
-        let endIndex = endIndexArgs
-        let props = propsArgs
-
-        if (startIndex === 'undefined') {
-            let selects = getters.selectList
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-            startIndex = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
-            endIndex = getters.getRowIndexByAlias(select.wholePosi.endRowAlias)
-        }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
-
-        if (endIndex === 'MAX') {
-            return
-        }
-        let updateCellInfo = []
-
-        let cellList = getters.getCellsByVertical({
-            startRowIndex: startIndex,
-            endRowIndex: endIndex,
-            startColIndex: 0,
-            endColIndex: 'MAX'
-        })
-        cellList.forEach(function(cell) {
-            updateCellInfo.push({
-                cell,
-                props
-            })
-        })
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-
-        let insertCellInfo = []
-        let editViewOccupy = getters.getEditViewOccupy()
-        let cols = getters.colList
-        let rows = getters.rowList
-
-        for (let key in editViewOccupy) {
-            if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
-                let viewOccupyCol = editViewOccupy[key].col
-                let startColIndex
-                let endColIndex
-                if (viewOccupyCol.length === 0) {
-                    continue
-                }
-                startColIndex = getters.getColIndexByAlias(viewOccupyCol[0])
-                endColIndex = getters.getColIndexByAlias(viewOccupyCol[
-                    viewOccupyCol.length - 1])
-
-                for (let i = startColIndex; i < endColIndex + 1; i++) {
-                    for (let j = startIndex; j < endIndex + 1; j++) {
-                        let colAlias = cols[i].alias
-                        let rowAlias = rows[j].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
-                            'cellIndex')
-                        let cell = extend({}, props)
-                        cell.occupy = {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                        if (typeof cellIndex !== 'number') {
-                            insertCellInfo.push(cell)
-                        }
-                    }
-                }
-            }
-        }
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
-    },
-    [actionTypes.OCCUPY_UPDATE]({
-        commit,
-        getters,
-        rootState,
-        dispatch
-    }, {
-        col,
-        row
-    }) {
-
-        let startRowIndex = getters.getRowIndexByAlias(row[0])
-        let startColIndex = getters.getColIndexByAlias(col[0])
-        let endRowIndex = getters.getRowIndexByAlias(row[row.length - 1])
-        let endColIndex = getters.getColIndexByAlias(col[col.length - 1])
-        let cols = getters.colList
-        let rows = getters.rowList
-        let getPointInfo = getters.getPointInfo
-        let temp
-
-        for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            if (!isEmpty((temp = rows[i].oprProp))) {
-                for (let j = startColIndex; j < endColIndex + 1; j++) {
-                    let rowAlias = rows[i].alias
-                    let colAlias = cols[j].alias
-                    let index = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                    let cell = extend({}, temp)
-
-                    cell.occupy = {
-                        col: [colAlias],
-                        row: [rowAlias]
-                    }
-                    if (typeof index !== 'number') {
-                        dispatch(actionTypes.CELLS_INSERTCELL, [cell])
-                    }
-                }
-            }
-        }
-
-
-        for (let i = startColIndex; i < endColIndex + 1; i++) {
-            if (!isEmpty((temp = cols[i].oprProp))) {
-                for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                    let rowAlias = rows[j].alias
-                    let colAlias = cols[i].alias
-                    let index = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                    let cell = extend({}, temp)
-
-                    cell.occupy = {
-                        col: [colAlias],
-                        row: [rowAlias]
-                    }
-                    if (typeof index !== 'number') {
-                        dispatch(actionTypes.CELLS_INSERTCELL, [cell])
-                    }
-                }
-            }
-        }
-
-        function isEmpty(obj) {
-            for (let key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                    return false
-                }
-
-            }
-            return true
-        }
-    },
-    [actionTypes.CELLS_MERGE]({
-        commit,
-        dispatch,
-        getters,
-        rootState
-    }, {
-        startColIndexArgs,
-        endColIndexArgs,
-        startRowIndexArgs,
-        endRowIndexArgs,
-        valueArgs
-    }) {
-        let startColIndex = startColIndexArgs
-        let endColIndex = endColIndexArgs
-        let startRowIndex = startRowIndexArgs
-        let endRowIndex = endRowIndexArgs
-        let value = valueArgs
-
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        endColIndex = endColIndex || startColIndex
-        endRowIndex = endRowIndex || startRowIndex
-
-        if (value === 'undefined') {
-            value = !getters.getMergeState()
-        }
-        let cellList = getters.getCellsByTransverse({
-            startColIndex,
-            endColIndex,
-            startRowIndex,
-            endRowIndex
-        })
-
-        if (value) {
-            let cell
-            for (let i = 0, len = cellList.length; i < len; i++) {
-                if (cellList[i].content.texts) {
-                    cell = cellList[i]
-                    break
-                }
-            }
-            if (!cell) {
-                cell = getters.getCellsByTransverse({
-                    startColIndex,
-                    endColIndex
-                })[0]
-            }
-            cell = extend({}, cell || {})
-
-            let cols = getters.colList
-            let rows = getters.rowList
-            let rowAliasList = []
-            let colAliasList = []
-
-            for (let i = startColIndex; i < endColIndex + 1; i++) {
-                colAliasList.push(cols[i].alias)
-            }
-            for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-                rowAliasList.push(rows[i].alias)
-            }
-            cell.occupy = {
-                row: rowAliasList,
-                col: colAliasList
-            }
-            dispatch(actionTypes.CELLS_INSERTCELL, [cell])
-        } else {
-            let currentSheet = rootState.currentSheet
-            let cols = getters.colList
-            let rows = getters.rowList
-            for (let i = startColIndex; i < endColIndex + 1; i++) {
-                for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                    commit(mutationTypes.UPDATE_POINTINFO, {
-                        currentSheet,
-                        info: {
-                            colAlias: cols[i].alias,
-                            rowAlias: rows[j].alias,
-                            type: 'cellIndex',
-                            value: null
-                        }
-                    })
-                }
-            }
-            let insertCellList = []
-            cellList.forEach(function(cell) {
-                let rowAliasList = cell.occupy.row
-                let colAliasList = cell.occupy.col
-                for (let i = 0, len1 = colAliasList.length; i < len1; i++) {
-                    for (let j = 0, len2 = rowAliasList.length; j <
-                        len2; j++) {
-                        let insertCell = extend({}, cell)
-                        insertCell.occupy.col = [colAliasList[i]]
-                        insertCell.occupy.row = [rowAliasList[j]]
-                        if (i !== 0 || j !== 0) {
-                            insertCell.content.texts = ''
-                        }
-                        insertCellList.push(insertCell)
-                    }
-                }
-            })
-            dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
-        }
-
-    }
-}
->>>>>>> master

@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-import extend from '../../../util/extend';
-import cellTemplate from '../cells/template';
-import * as mutationTypes from '../../mutation-types';
-import * as actionTypes from '../../action-types';
-import send from '../../../util/send';
-import config from '../../../config';
-=======
 import extend from '../../../util/extend'
+import cellTemplate from '../cells/template'
 import * as mutationTypes from '../../mutation-types'
 import * as actionTypes from '../../action-types'
->>>>>>> master
+import send from '../../../util/send'
+import config from '../../../config'
 
 export default {
     [actionTypes.EDIT_SHOW]({
@@ -59,30 +53,29 @@ export default {
             })
         }
 
-<<<<<<< HEAD
-		let frozenState = getters.frozenState;
+		let frozenState = getters.frozenState
 		if(frozenState.isFrozen){
-			let rules = frozenState.rules,
-				rule;
+			let rules = frozenState.rules
+			let	rule
 			for (let i = 0, len = rules.length; i < len; i++) {
-				rule = rules[i];
+				rule = rules[i]
 				if(rule.type === 'mainRule'){
-					break;
+					break
 				}
 			}
-			let frozenRowIndex = rule.startRowIndex,
-			frozenColIndex = rule.startColIndex;
+			let frozenRowIndex = rule.startRowIndex
+			let frozenColIndex = rule.startColIndex
 			if(colIndex < frozenColIndex){
-				props.transverseScroll = false;
+				props.transverseScroll = false
 			}
 			if(rowIndex < frozenRowIndex){
-				props.verticalScroll = false;
+				props.verticalScroll = false
 			}
 		}
 		commit(mutationTypes.UPDATE_EDIT, {
 			currentSheet: rootState.currentSheet,
 			inputInfo: props
-		});
+		})
 	},
 	[actionTypes.EDIT_HIDE]({
 		state,
@@ -91,11 +84,11 @@ export default {
 		commit,
 		dispatch
 	}, texts) {
-		let inputState = getters.getInputState,
-			startColIndex = getters.getColIndexByAlias(inputState.colAlias),
-			startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias),
-			cols = getters.colList,
-			rows = getters.rowList;
+		let inputState = getters.getInputState
+		let	startColIndex = getters.getColIndexByAlias(inputState.colAlias)
+		let	startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias)
+		let	cols = getters.colList
+		let	rows = getters.rowList
 
 		commit(mutationTypes.UPDATE_EDIT, {
 			currentSheet: rootState.currentSheet,
@@ -107,11 +100,11 @@ export default {
 				top: -9999,
 				texts: ''
 			}
-		});
-		let cell = getters.getCellsByVertical({startColIndex, startRowIndex})[0];
+		})
+		let cell = getters.getCellsByVertical({startColIndex, startRowIndex})[0]
 
 		if(cell && cell.content.texts === texts){
-			 return;
+			 return
 		}
 		send({
 			url: config.operUrl['texts'],
@@ -124,7 +117,7 @@ export default {
 				},
 				content: texts
 			}),
-		});
+		})
 		dispatch(actionTypes.CELLS_UPDATE_PROP, {
 			startColIndex,
 			startRowIndex,
@@ -135,61 +128,6 @@ export default {
 					texts: texts
 				}
 			}
-		});
+		})
 	}
-=======
-        let frozenState = getters.frozenState
-        if (frozenState.isFrozen) {
-            let rules = frozenState.rules
-            let rule
-            for (let i = 0, len = rule.length; i < len; i++) {
-                rule = rules[i]
-                if (rule.type === 'mainRule') {
-                    break
-                }
-            }
-            let frozenRowIndex = rule.startRowIndex
-            let frozenColIndex = rule.startColIndex
-            if (colIndex < frozenColIndex) {
-                props.transverseScroll = false
-            }
-            if (rowIndex < frozenRowIndex) {
-                props.verticalScroll = false
-            }
-        }
-        commit(mutationTypes.UPDATE_EDIT, {
-            currentSheet: rootState.currentSheet,
-            inputInfo: props
-        })
-    },
-    [actionTypes.EDIT_HIDE]({
-        state,
-        rootState,
-        getters,
-        commit,
-        dispatch
-    }, texts) {
-        let inputState = getters.getInputState
-        let startColIndex = getters.getColIndexByAlias(inputState.colAlias)
-        let startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias)
-
-        dispatch(actionTypes.CELLS_UPDATE, {
-            startColIndex,
-            startRowIndex,
-            propNames: 'content.texts',
-            value: texts
-        })
-        commit(mutationTypes.UPDATE_EDIT, {
-            currentSheet: rootState.currentSheet,
-            inputInfo: {
-                editState: false,
-                width: 0,
-                height: 0,
-                left: -9999,
-                top: -9999,
-                texts: ''
-            }
-        })
-    }
->>>>>>> master
 }

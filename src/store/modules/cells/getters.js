@@ -1,9 +1,7 @@
-import {
-    rangeBinary,
-    indexAttrBinary
-} from '../../../util/binary'
+import {rangeBinary, indexAttrBinary} from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
+
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet
@@ -37,37 +35,21 @@ export default {
      * 区域内只能包含完整的单元格
      */
     getFullOprRegion(state, getters, rootState) {
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs
-        }) {
-<<<<<<< HEAD
-            let currentSheet = rootState.currentSheet,
-                rows = getters.rowList,
-                cols = getters.colList,
-                cellStartColIndex,
-                cellStartRowIndex,
-                cellEndColIndex,
-                cellEndRowIndex,
-                cellList,
-                flag = true;
-=======
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex
+            } = payload
             let rows = getters.rowList
+            let cols = getters.colList
             let cellStartColIndex
             let cellStartRowIndex
             let cellEndColIndex
             let cellEndRowIndex
             let cellList
-            let temp
             let flag = true
->>>>>>> master
 
             if (startColIndex === 'MAX' || endColIndex === 'MAX') {
                 return {
@@ -85,24 +67,14 @@ export default {
                     endRowIndex: 'MAX'
                 }
             }
-<<<<<<< HEAD
             if (startRowIndex > endRowIndex) {
-                [startRowIndex, endRowIndex] = [endRowIndex, startRowIndex];
+                [startRowIndex, endRowIndex] = [endRowIndex, startRowIndex]
             }
             if (startColIndex > endColIndex) {
-                [startColIndex, endColIndex] = [endColIndex, startColIndex];
-=======
-            if ((temp = startRowIndex) > endRowIndex) {
-                startRowIndex = endRowIndex
-                endRowIndex = temp
-            }
-            if ((temp = startColIndex) > endColIndex) {
-                startColIndex = endColIndex
-                endColIndex = temp
->>>>>>> master
+                [startColIndex, endColIndex] = [endColIndex, startColIndex]
             }
 
-            let temp = new Map();
+            let temp = new Map()
             while (flag) {
                 flag = false
                 cellList = getters.getCellsByVertical({
@@ -113,30 +85,20 @@ export default {
                 })
 
                 for (let i = 0, len = cellList.length; i < len; i++) {
-<<<<<<< HEAD
-                    let cell = cellList[i];
+                    let cell = cellList[i]
                     if(temp.get(cell.alias)){
-                        break;
+                        break
                     }
-                    temp.set(cell.alias, true);
+                    temp.set(cell.alias, true)
 
-                    let occupyCol = cell.occupy.col,
-                        occupyRow = cell.occupy.row;
-                    cellStartRowIndex = getters.getRowIndexByAlias(occupyRow[0]);
-                    cellEndRowIndex = getters.getRowIndexByAlias(occupyRow[occupyRow.length - 1]);
+                    let occupyCol = cell.occupy.col
+                    let occupyRow = cell.occupy.row
 
-                    cellStartColIndex = getters.getColIndexByAlias(occupyCol[0]);
-                    cellEndColIndex = getters.getColIndexByAlias(occupyCol[occupyCol.length - 1]);
-=======
-                    temp = cellList[i].physicsBox
-                    cellStartRowIndex = rangeBinary(temp.top, rows, 'top',
-                        'height')
-                    cellEndRowIndex = rangeBinary(temp.top + temp.height,
-                        rows, 'top', 'height')
-                    cellStartColIndex = getters.getColIndexByPosi(temp.left)
-                    cellEndColIndex = getters.getColIndexByPosi(temp.left +
-                        temp.width)
->>>>>>> master
+                    cellStartRowIndex = getters.getRowIndexByAlias(occupyRow[0])
+                    cellEndRowIndex = getters.getRowIndexByAlias(occupyRow[occupyRow.length - 1])
+
+                    cellStartColIndex = getters.getColIndexByAlias(occupyCol[0])
+                    cellEndColIndex = getters.getColIndexByAlias(occupyCol[occupyCol.length - 1])
 
                     if (cellStartColIndex < startColIndex) {
                         startColIndex = cellStartColIndex
@@ -171,20 +133,15 @@ export default {
         let currentSheet = rootState.currentSheet
         let cells = state[currentSheet]
 
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs,
-            colsArgs,
-            rowsArgs
-        }) {
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-            let cols = colsArgs
-            let rows = rowsArgs
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex,
+                cols,
+                rows
+            } = payload
 
             let result = []
             let pointInfo = rootState.pointsInfo[currentSheet].col
@@ -225,21 +182,15 @@ export default {
         let currentSheet = rootState.currentSheet
         let cells = state[currentSheet]
 
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs,
-            colsArgs,
-            rowsArgs
-        }) {
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-            let cols = colsArgs
-            let rows = rowsArgs
-
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex,
+                cols,
+                rows
+            } = payload
             let result = []
             let pointInfo = rootState.pointsInfo[currentSheet].row
             let index
@@ -260,13 +211,8 @@ export default {
                 if (typeof pointInfo[rowAlias] !== 'undefined') {
                     for (let j = startColIndex, len2 = endColIndex + 1; j <
                         len2; j++) {
-<<<<<<< HEAD
-                        colAlias = cols[j].alias;
-                        temp = pointInfo[rowAlias][colAlias];
-=======
-                        colAlias = rows[j].alias
+                        colAlias = cols[j].alias
                         temp = pointInfo[rowAlias][colAlias]
->>>>>>> master
                         if (temp && temp.cellIndex !== null) {
                             index = temp.cellIndex
                             if (!tempObj[index]) {
@@ -366,19 +312,11 @@ export default {
     },
     getMergeState(state, getters, rootState) {
         return function() {
-<<<<<<< HEAD
-            let wholePosi = getters.activeSelect.wholePosi,
-                startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias),
-                startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias),
-                endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias),
-                endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias);
-=======
             let wholePosi = getters.activeSelect.wholePosi
             let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
             let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
             let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
->>>>>>> master
 
             if (startColIndex === endColIndex && startRowIndex ===
                 endRowIndex) {
@@ -389,35 +327,16 @@ export default {
                 startRowIndex,
                 endColIndex,
                 endRowIndex
-<<<<<<< HEAD
-            });
+            })
             for (let i = 0, len = cellList.length; i < len; i++) {
-                let cell = cellList[i];
-                let occupyCol = cell.occupy.col;
-                let occupyRow = cell.occupy.row;
+                let cell = cellList[i]
+                let occupyCol = cell.occupy.col
+                let occupyRow = cell.occupy.row
                 if (occupyRow.length > 1 || occupyCol.length > 1) {
-                    return true;
+                    return true
                 }
             }
-            return false;
-=======
-            })
-
-            if (cellList.length !== 1) {
-                return false
-            }
-            let cell = cellList[0]
-            let occupyCol = cell.occupy.col
-            let occupyRow = cell.occupy.row
-
-            if (occupyCol[0] !== wholePosi.startColAlias ||
-                occupyRow[0] !== wholePosi.startRowAlias ||
-                occupyCol[occupyCol.length - 1] !== wholePosi.endColAlias ||
-                occupyRow[occupyRow.length - 1] !== wholePosi.endRowAlias) {
-                return false
-            }
-            return true
->>>>>>> master
+            return false
         }
     }
 }

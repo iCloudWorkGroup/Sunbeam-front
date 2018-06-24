@@ -54,43 +54,19 @@ export default {
         currentSheet
     }) {
         let list = state[currentSheet].list
-
-<<<<<<< HEAD
 		for (let i = startIndex; i <= endIndex; i++) {
-			list[i].active = true;
+			list[i].active = true
 		}
 	},
 	[types.UPDATE_COL](state, info){
 		info.forEach(function({col, props}){
-			extend(col, props);
-		});
+			extend(col, props)
+		})
 	},
 	[types.DELETE_COL](state, {currentSheet, index}){
-		let list = state[currentSheet].list;
-		let map = state[currentSheet].map;	
-		map.delete(list[index].alias);
-		list.splice(index, 1);
+		let list = state[currentSheet].list
+		let map = state[currentSheet].map
+		map.delete(list[index].alias)
+		list.splice(index, 1)
 	}
-};
-=======
-        for (let i = startIndex; i <= endIndex; i++) {
-            list[i].active = true
-        }
-    },
-    [types.UPDATE_COL](state, info) {
-        info.forEach(function({
-            col,
-            props
-        }) {
-            extend(col, props)
-        })
-    },
-    [types.DELETE_COL](state, {
-        currentSheet,
-        index
-    }) {
-        let list = state[currentSheet].list
-        list.splice(index, 1)
-    }
 }
->>>>>>> master

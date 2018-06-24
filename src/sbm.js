@@ -1,42 +1,20 @@
-<<<<<<< HEAD
-import './css/main.css';
-import Vue from 'vue';
-import Vuex from './lib/vuex.esm.js';
-import options from './store/index';
-import {RESTORE} from './store/action-types';
-import {UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE} from './store/mutation-types';
-import Book from './components/book.vue';
-=======
 import './css/main.css'
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex from './lib/vuex.esm.js'
 import options from './store/index'
-import {
-    RESTORE
-} from './store/action-types'
-import {
-    UPDATE_MOUSESTATE,
-    UPDATE_FOCUSSTATE
-} from './store/mutation-types'
+import {RESTORE} from './store/action-types'
+import {UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE} from './store/mutation-types'
 import Book from './components/book.vue'
->>>>>>> master
 import Toolbar from './components/toolbar/toolbar.vue'
-import {
-    LOCATE
-} from './tools/constant'
+import {LOCATE} from './tools/constant'
 import dataloader from './tools/dataloader'
 import font from './entrance/font'
 import config from './config'
 
 Vue.use(Vuex)
 
-<<<<<<< HEAD
 //后期需要进行修改
 window.SPREADSHEET_AUTHENTIC_KEY = '9e417dc6-e85d-45cd-991f-577b642cfb81';
-=======
-// 后期需要进行修改
-window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec'
->>>>>>> master
 
 function SBM(wrapperId) {
     if (!(this instanceof SBM)) {
@@ -48,7 +26,6 @@ function SBM(wrapperId) {
     let bottom = wrapper.offsetHeight
     let store = new Vuex.Store(options)
 
-<<<<<<< HEAD
 	let btn1 = document.getElementById('btn1');
 	btn1.addEventListener('click', function(e) {
 		store.dispatch('HISTORY_UNDO');
@@ -61,16 +38,6 @@ function SBM(wrapperId) {
 	dataloader({left: 0, top: 0, right, bottom}, function(data) {
 		store.dispatch(RESTORE, data);
 	});
-=======
-    dataloader({
-        left: 0,
-        top: 0,
-        right,
-        bottom
-    }, function(data) {
-        store.dispatch(RESTORE, data)
-    })
->>>>>>> master
 
     let template =
         `<div style="position:absolute;left:0;right:0;top:0;bottom:0;"

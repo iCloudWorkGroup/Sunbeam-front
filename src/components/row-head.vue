@@ -18,62 +18,6 @@
 <script type="text/javascript">
 import RowHeadPanel from './row-head-panel.vue'
 
-<<<<<<< HEAD
-			if(this.frozenRule){
-				startIndex = this.frozenRule.startRowIndex;
-				endIndex = this.frozenRule.endRowIndex;
-			}
-			return {
-				startIndex,
-				endIndex
-			}
-		},
-		components: {
-			RowHeadPanel,
-		},
-		computed: {
-			height() {
-				return this.rowHeadHeight;
-			},
-			totalHeight() {
-	            let rows = this.$store.getters.rowList,
-	                visibleRows = this.$store.getters.visibleRowList,
-	                frozenRule = this.frozenRule,
-	                lastRow,
-	                startRow;
-
-	            if (frozenRule) {
-	            	startRow = rows[frozenRule.startRowIndex];
-	                if (frozenRule.endRowIndex !== undefined) {
-						lastRow = rows[frozenRule.endRowIndex];
-	                }else {
-	                	lastRow = visibleRows[visibleRows.length -1];
-	                }
-	            } else {
-	                startRow = visibleRows[0];
-	                lastRow = visibleRows[visibleRows.length - 1];
-	            }
-	            return lastRow.top + lastRow.height - startRow.top + 'px';
-			},
-			selectList() {
-				return this.$store.getters.selectList;
-			},
-			offsetTop() {
-				if(this.frozenRule){
-					return this.frozenRule.offsetTop; 
-				}else{
-					return 0;
-				}
-			},
-		},
-		watch: {
-			scrollTop(val) {
-				this.$el.scrollTop = val;
-			}
-		},
-		methods: {}
-	};
-=======
 export default {
     props: ['rowHeadHeight', 'scrollTop', 'frozenRule'],
     data() {
@@ -139,7 +83,6 @@ export default {
     },
     methods: {}
 }
->>>>>>> master
 </script>
 <style>
     .row-head-container{

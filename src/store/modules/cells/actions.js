@@ -1,9 +1,7 @@
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
-import { indexAttrBinary } from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
-import { SELECT } from '../../../tools/constant'
 import generator from '../../../tools/generator'
 import config from '../../../config'
 import send from '../../../util/send'
@@ -49,13 +47,13 @@ export default {
 			let height = 0
 			let physicsBox
 
-			aliasCol = aliasColList[0];
-			aliasRow = aliasRowList[0];
+			aliasCol = aliasColList[0]
+			aliasRow = aliasRowList[0]
 
-			cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex');
+			cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex')
 
-			startRowIndex = getRowIndexByAlias(aliasRow);
-			endRowIndex = startRowIndex + aliasRowList.length - 1;
+			startRowIndex = getRowIndexByAlias(aliasRow)
+			endRowIndex = startRowIndex + aliasRowList.length - 1
 
 			if (endRowIndex > limitRowIndex) {
 				endRowIndex = limitRowIndex
@@ -95,7 +93,8 @@ export default {
 			 * 更新坐标信息
 			 */
 			if (typeof cellIndex !== 'number') {
-				let colAlias, rowAlias
+				let colAlias
+				let rowAlias
 				for (let j = 0; j < aliasColList.length; j++) {
 					for (let k = 0; k < aliasRowList.length; k++) {
 						colAlias = aliasColList[j]
@@ -140,7 +139,7 @@ export default {
 			endRowIndex,
 			propNames,
 			value
-		} = payload;
+		} = payload
 
 		//获取操作区域
 		if(typeof startColIndex === 'undefined'){

@@ -1,5 +1,4 @@
 import extend from '../../../util/extend'
-import cellTemplate from '../cells/template'
 import * as mutationTypes from '../../mutation-types'
 import * as actionTypes from '../../action-types'
 import send from '../../../util/send'
@@ -12,63 +11,63 @@ export default {
         getters,
         commit
     }) {
-        let wholePosi = getters.activeSelect.wholePosi
-        let colAlias = wholePosi.startColAlias
-        let rowAlias = wholePosi.startRowAlias
-        let colIndex
-        let rowIndex
+		let wholePosi = getters.activeSelect.wholePosi
+		let colAlias = wholePosi.startColAlias
+		let rowAlias = wholePosi.startRowAlias
+		let colIndex
+		let rowIndex
 
-        colIndex = getters.getColIndexByAlias(colAlias)
-        rowIndex = getters.getRowIndexByAlias(rowAlias)
+		colIndex = getters.getColIndexByAlias(colAlias)
+		rowIndex = getters.getRowIndexByAlias(rowAlias)
 
-        let cellList = getters.getCellsByVertical({
-            startColIndex: colIndex,
-            startRowIndex: rowIndex
-        })
-        let cell = cellList[0]
-        let colList = getters.colList
-        let rowList = getters.rowList
-        let props
+		let cellList = getters.getCellsByVertical({
+			startColIndex: colIndex,
+			startRowIndex: rowIndex
+		})
+		let cell = cellList[0]
+		let colList = getters.colList
+		let rowList = getters.rowList
+		let props
 
-        props = {
-            editState: true,
-            transverseScroll: true,
-            verticalScroll: true
-        }
-        if (cell) {
-            props = extend(props, cell.content, cell.physicsBox)
-            props.colAlias = cell.occupy.col[0]
-            props.rowAlias = cell.occupy.row[0]
-        } else {
-            let row = rowList[rowIndex]
-            let col = colList[colIndex]
+		props = {
+			editState: true,
+			transverseScroll: true,
+			verticalScroll: true
+		}
+		if (cell) {
+			props = extend(props, cell.content, cell.physicsBox)
+			props.colAlias = cell.occupy.col[0]
+			props.rowAlias = cell.occupy.row[0]
+		} else {
+			let row = rowList[rowIndex]
+			let col = colList[colIndex]
 
-            props = extend(props, {
-                colAlias,
-                rowAlias,
-                left: col.left,
-                width: col.width,
-                top: row.top,
-                height: row.height
-            })
-        }
+			props = extend(props, {
+				colAlias,
+				rowAlias,
+				left: col.left,
+				width: col.width,
+				top: row.top,
+				height: row.height
+			})
+		}
 
 		let frozenState = getters.frozenState
-		if(frozenState.isFrozen){
+		if (frozenState.isFrozen) {
 			let rules = frozenState.rules
-			let	rule
+			let rule
 			for (let i = 0, len = rules.length; i < len; i++) {
 				rule = rules[i]
-				if(rule.type === 'mainRule'){
+				if (rule.type === 'mainRule') {
 					break
 				}
 			}
 			let frozenRowIndex = rule.startRowIndex
 			let frozenColIndex = rule.startColIndex
-			if(colIndex < frozenColIndex){
+			if (colIndex < frozenColIndex) {
 				props.transverseScroll = false
 			}
-			if(rowIndex < frozenRowIndex){
+			if (rowIndex < frozenRowIndex) {
 				props.verticalScroll = false
 			}
 		}
@@ -101,10 +100,10 @@ export default {
 				texts: ''
 			}
 		})
-		let cell = getters.getCellsByVertical({startColIndex, startRowIndex})[0]
+		let cell = getters.getCellsByVertical({ startColIndex, startRowIndex })[0]
 
-		if(cell && cell.content.texts === texts){
-			 return
+		if (cell && cell.content.texts === texts) {
+			return
 		}
 		send({
 			url: config.operUrl['texts'],

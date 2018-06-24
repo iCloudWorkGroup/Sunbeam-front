@@ -23,24 +23,24 @@ export default {
         rootState,
         rootGetters
     }) {
-        let currentSheet = rootState.currentSheet;
-        let rows = getters.rowList;
-        let cols = getters.colList;
-        let visibleRows = getters.visibleRowList;
-        let visibleCols = getters.visibleColList;
-        let select = extend(template);
-        let region;
-        let width;
-        let height;
+        let currentSheet = rootState.currentSheet
+        let rows = getters.rowList
+        let cols = getters.colList
+        let visibleRows = getters.visibleRowList
+        let visibleCols = getters.visibleColList
+        let select = extend(template)
+        let region
+        let width
+        let height
 
-        let col = visibleCols[0];
-        let row = visibleRows[0];
+        let col = visibleCols[0]
+        let row = visibleRows[0]
 
         region = getters.getFullOprRegion({
             startColIndex: getters.getColIndexByAlias(col.alias),
             startRowIndex: getters.getRowIndexByAlias(row.alias)
-        });
-        let {startColIndex, startRowIndex, endColIndex, endRowIndex} = region;
+        })
+        let { startColIndex, startRowIndex, endColIndex, endRowIndex } = region
 
         width = cols[endColIndex].width + cols[endColIndex].left - cols[
             startColIndex].left
@@ -88,8 +88,7 @@ export default {
         dispatch
     }, payload) {
 
-        let {colIndex, rowIndex} = payload
-        let currentSheet = rootState.currentSheet
+        let { colIndex, rowIndex } = payload
         let rows = getters.rowList
         let cols = getters.colList
         let select = {}
@@ -136,16 +135,16 @@ export default {
         } = region
 
         while (cols[startColIndex].hidden) {
-            startColIndex++;
+            startColIndex++
         }
         while (rows[startRowIndex].hidden) {
-            startRowIndex++;
+            startRowIndex++
         }
         while (endColIndex !== 'MAX' && cols[endColIndex].hidden) {
-            endColIndex--;
+            endColIndex--
         }
         while (endRowIndex !== 'MAX' && rows[endRowIndex].hidden) {
-            endRowIndex--;
+            endRowIndex--
         }
 
         select.physicsBox = {

@@ -8,13 +8,21 @@ export default {
 		Vue.set(state, sheet.alias, {
 			col: {},
 			row: {}
-		});
+		})
 	},
-	[types.UPDATE_POINTINFO](state, {currentSheet, info: {colAlias, rowAlias, type, value}}) {
+	[types.UPDATE_POINTINFO](state, {
+		currentSheet,
+		info: {
+			colAlias,
+			rowAlias,
+			type,
+			value
+		}
+	}) {
 		let colInfo = state[currentSheet].col
-		let	rowInfo = state[currentSheet].row
-		let	tmp
-			
+		let rowInfo = state[currentSheet].row
+		let tmp
+
 		if (colInfo[colAlias] && (tmp = colInfo[colAlias][rowAlias])) {
 			tmp[type] = value
 			tmp = rowInfo[rowAlias][colAlias]
@@ -30,10 +38,10 @@ export default {
 					[colAlias]: extend(template)
 				})
 			}
-			if(!colInfo[colAlias][rowAlias]){
+			if (!colInfo[colAlias][rowAlias]) {
 				Vue.set(colInfo[colAlias], rowAlias, extend(template))
 			}
-			if(!rowInfo[rowAlias][colAlias] ){
+			if (!rowInfo[rowAlias][colAlias]) {
 				Vue.set(rowInfo[rowAlias], colAlias, extend(template))
 			}
 

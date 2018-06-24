@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import * as types from '../../mutation-types'
-import {indexAttrBinary} from '../../../util/binary'
+import { indexAttrBinary } from '../../../util/binary'
 import extend from '../../../util/extend'
 import cellTemplate from '../cells/template'
 
@@ -44,13 +44,13 @@ export default {
 			list[i].active = false
 		}
 	},
-	[types.ACTIVE_ROW](state, {startIndex, endIndex= startIndex, currentSheet}){
+	[types.ACTIVE_ROW](state, { startIndex, endIndex = startIndex, currentSheet }) {
 		let list = state[currentSheet].list
 		for (let i = startIndex; i <= endIndex; i++) {
 			list[i].active = true
 		}
 	},
-	[types.UPDATE_ROW](state, info){
+	[types.UPDATE_ROW](state, info) {
 		info.forEach(function({
 			row,
 			props
@@ -61,32 +61,36 @@ export default {
 
 			function clearDefaultValue(object, template) {
 				for (let name in object) {
-					let currentProp = object[name]
-					let defaultValue = template[name]
-					if (typeof currentProp === 'object') {
-						if (isEmptyObj(currentProp)) {
-							delete object[name]
-						}else{
-							let result = clearDefaultValue(currentProp, defaultValue);
-							if(result){
+					if (Object.prototype.hasOwnPropertyOf.call(object, name)) {
+						let currentProp = object[name]
+						let defaultValue = template[name]
+						if (typeof currentProp === 'object') {
+							if (isEmptyObj(currentProp)) {
 								delete object[name]
+							} else {
+								let result = clearDefaultValue(currentProp, defaultValue)
+								if (result) {
+									delete object[name]
+								}
 							}
+						} else if (currentProp === defaultValue) {
+							delete object[name]
 						}
-					} else if (currentProp === defaultValue) {
-						delete object[name]
 					}
 				}
 				return isEmptyObj(object)
 			}
-			function isEmptyObj(obj){
-				for(name in obj){
-					return false
+			function isEmptyObj(obj) {
+				for (let name in obj) {
+					if (Object.prototype.hasOwnPropertyOf.call(obj, name)) {
+						return false
+					}
 				}
 				return true
 			}
-		});
+		})
 	},
-	[types.DELETE_ROW](state, {currentSheet, index}){
+	[types.DELETE_ROW](state, { currentSheet, index }) {
 		let list = state[currentSheet].list
 		list.splice(index, 1)
 	}

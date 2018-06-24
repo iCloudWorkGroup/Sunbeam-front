@@ -7,7 +7,6 @@
  * @fixable 表示此配置支持 --fix
  * @off 表示此配置被关闭了，并且后面说明了关闭的原因
  */
-
 module.exports = {
     extends: ['plugin:vue/base'],
     parser: "vue-eslint-parser",
@@ -561,14 +560,6 @@ module.exports = {
         // 限制变量名必须匹配指定的正则表达式
         // @off 没必要限制变量名
         'id-match': 'off',
-        // @fixable 一个缩进必须用四个空格替代
-        'indent': [
-            'error',
-            4, {
-                SwitchCase: 1,
-                flatTernaryExpressions: true
-            }
-        ],
         // @fixable jsx 中的属性必须用双引号
         'jsx-quotes': [
             'error',
@@ -690,8 +681,6 @@ module.exports = {
         // 禁止使用特定的语法
         // @off 它用于限制某个具体的语法不能使用
         'no-restricted-syntax': 'off',
-        // 禁止使用 tabs
-        'no-tabs': 'error',
         // 禁止使用三元表达式
         // @off 三元表达式很常用
         'no-ternary': 'off',

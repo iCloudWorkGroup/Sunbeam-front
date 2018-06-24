@@ -1,13 +1,13 @@
 <template>
 <textarea class="edit-frame"
-          :value="texts"
-          @blur="completeEdit"
-          :style="styleObject">
+        :value="texts"
+        @blur="completeEdit"
+        :style="styleObject">
 </textarea>
 </template>
 <script type="text/javascript">
-import {EDIT_HIDE} from '../store/action-types'
-import {UPDATE_FOCUSSTATE} from '../store/mutation-types'
+import { EDIT_HIDE } from '../store/action-types'
+import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
 import config from '../config'
 
 export default {

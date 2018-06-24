@@ -58,8 +58,7 @@ export default {
 		'hiderow': 'row/hide',
 		'hidecol': 'col/hide',
 		'showrow': 'row/show',
-		'showcol': 'col/show',
-		
+		'showcol': 'col/show'
 	},
 	operSendPropName: {
 		'alignRow': 'align',

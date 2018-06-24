@@ -1,19 +1,16 @@
 <template>
-<div class="book"
-     :width="width + 'px'"
-     :style="{ width: width + 'px',
+    <div class="book"
+        :width="width + 'px'"
+        :style="{ width: width + 'px',
             height: height + 'px'}">
-        <sheet :sheet-width="width" 
+        <sheet :sheet-width="width"
             :sheet-height="sheetHeight"></sheet>
         <sheet-edit></sheet-edit>
     </div>
-
 </template>
-
 <script type="text/javascript">
 import Sheet from './sheet.vue'
 import SheetEdit from './sheet-edit.vue'
-
 export default {
     props: [
         'bookWidth',

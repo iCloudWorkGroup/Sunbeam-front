@@ -56,7 +56,7 @@
 </template>
 <script type="text/javascript">
 
-import {SHEET_FROZEN, SHEET_UNFROZEN} from '../../store/action-types'
+import { SHEET_FROZEN, SHEET_UNFROZEN } from '../../store/action-types'
 
 export default {
     props: [
@@ -83,8 +83,6 @@ export default {
         activeWidget(e) {
             let elem = e.currentTarget
             let widgetId = elem.dataset.widget
-            let widget
-            let box
 
             if (!widgetId) {
                 return
@@ -105,7 +103,7 @@ export default {
         },
         getValue(elem, currentTarget) {
             let value = elem.dataset.value
-            if (value === undefined) {
+            if (typeof value === 'undefined') {
                 if (elem === currentTarget) {
                     return
                 } else {

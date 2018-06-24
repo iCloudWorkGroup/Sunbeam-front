@@ -4,7 +4,7 @@
 			<div class="fui-section fui-alone" data-widget="insert" @click="activeWidget">
 				<div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
 				<div class="fui-cf-desc">
-					<div class="fui-cf-text">　插入　</div>
+					<div class="fui-cf-text">插入</div>
 					<div class="fui-cf-extend caret"></div>
 				</div>
 			</div>
@@ -13,7 +13,7 @@
 			<div class="fui-section fui-alone" data-widget="delete" @click="activeWidget">
 				<div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
 				<div class="fui-cf-desc">
-					<div class="fui-cf-text">　删除　</div>
+					<div class="fui-cf-text">删除</div>
 					<div class="fui-cf-extend caret"></div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 				</ul>
 			</div>
 		</div>
-		<div class="widget" ref="delete" 
+		<div class="widget" ref="delete"
 			v-show="activeWidgetId === 'delete'">
 			<div class="widget-panel" @mousedown.stop="setAction">
 				<ul class="widget-menu frozenBox" style="min-width:220px">
@@ -64,7 +64,7 @@
 		COLS_INSERTCOL,
 		ROWS_DELETEROW,
 		ROWS_INSERTROW
-	} from '../../store/action-types';
+	} from '../../store/action-types'
 
 	export default {
 		props: [
@@ -72,40 +72,39 @@
 		],
 		methods: {
 			activeWidget(e) {
-				let elem = e.currentTarget,
-					widgetId = elem.dataset.widget,
-					widget,
-					box;
+				let elem = e.currentTarget
+				let	widgetId = elem.dataset.widget
+				let	widget
+				let	box
 
 				if (!widgetId) {
-					return;
+					return
 				}
 
-				box = elem.getBoundingClientRect();
-				widget = this.$refs[widgetId];
-				widget.style.top = box.top + box.height + 'px';
-				widget.style.left = box.left + 'px';
-				this.$emit('updateActiveWidgetId', widgetId);
+				box = elem.getBoundingClientRect()
+				widget = this.$refs[widgetId]
+				widget.style.top = box.top + box.height + 'px'
+				widget.style.left = box.left + 'px'
+				this.$emit('updateActiveWidgetId', widgetId)
 			},
 			insertCol() {
-				this.$store.dispatch(COLS_INSERTCOL);
-				this.$emit('updateActiveWidgetId', '');
+				this.$store.dispatch(COLS_INSERTCOL)
+				this.$emit('updateActiveWidgetId', '')
 			},
 			insertRow() {
-				this.$store.dispatch(ROWS_INSERTROW);
-				this.$emit('updateActiveWidgetId', '');
+				this.$store.dispatch(ROWS_INSERTROW)
+				this.$emit('updateActiveWidgetId', '')
 			},
 			deleteCol() {
-				this.$store.dispatch(COLS_DELETECOL);
-				this.$emit('updateActiveWidgetId', '');
+				this.$store.dispatch(COLS_DELETECOL)
+				this.$emit('updateActiveWidgetId', '')
 			},
 			deleteRow() {
-				this.$store.dispatch(ROWS_DELETEROW);
-				this.$emit('updateActiveWidgetId', '');
-			},
+				this.$store.dispatch(ROWS_DELETEROW)
+				this.$emit('updateActiveWidgetId', '')
+			}
 		}
 	}
 </script>
 <style type="text/css">
-	
 </style>

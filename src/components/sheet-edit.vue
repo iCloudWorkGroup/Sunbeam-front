@@ -14,12 +14,11 @@
 <script type="text/javascript">
 	export default {
 		computed: {
-			sheetName(){
-				return this.$store.state.sheets.list[0].name;
+			sheetName() {
+				return this.$store.state.sheets.list[0].name
 			}
 		}
 	}
 </script>
 <style type="text/css">
-	
 </style>

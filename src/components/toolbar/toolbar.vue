@@ -20,9 +20,9 @@
 		<div class="menu-container">
 			<ul id="homeTool" v-show="activeTabId === 'homeTool'">
 				<tool-panel  title="字体">
-					<font 
+					<font
 						:active-widget-id="activeWidgetId"
-						 @updateActiveWidgetId = "updateActiveWidgetId">	
+						@updateActiveWidgetId = "updateActiveWidgetId">
 					</font>
 				</tool-panel>
 				<tool-panel  title="对齐方式">
@@ -38,15 +38,15 @@
 			</ul>
 			<ul id="reviewTool" v-show="activeTabId === 'reviewTool'">
 				<tool-panel  title="视图">
-					<frozen 
+					<frozen
 						:active-widget-id="activeWidgetId"
-						 @updateActiveWidgetId = "updateActiveWidgetId">	
+						@updateActiveWidgetId = "updateActiveWidgetId">
 					</frozen>
 				</tool-panel>
 				<tool-panel  title="隐藏">
-					<hide 
+					<hide
 						:active-widget-id="activeWidgetId"
-						 @updateActiveWidgetId = "updateActiveWidgetId">	
+						@updateActiveWidgetId = "updateActiveWidgetId">
 					</hide>
 				</tool-panel>
 			</ul>

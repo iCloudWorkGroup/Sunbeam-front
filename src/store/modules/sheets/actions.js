@@ -178,7 +178,6 @@ export default {
 
         let userView = rootState.userView
         let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
-
         if (index == null) {
             index = userViewLeftIndex + 1
         }
@@ -237,7 +236,6 @@ export default {
 
         let userView = rootState.userView
         let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
-
         if (index == null) {
             index = userViewTopIndex + 1
         }

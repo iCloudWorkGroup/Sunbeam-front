@@ -774,8 +774,6 @@ export default {
                 offsetTop += frozenRule.offsetTop
                 offsetLeft += frozenRule.offsetLeft
             }
-
-
             endColIndex = endColIndex != null ? endColIndex :
                 getters.getColIndexByPosi(offsetLeft + clientWidth +
                     config.prestrainWidth)

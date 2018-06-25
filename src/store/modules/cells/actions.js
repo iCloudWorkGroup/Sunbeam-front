@@ -578,7 +578,6 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
-
         if (startIndex == null) {
             let selects = getters.selectList
             let select
@@ -747,7 +746,11 @@ export default {
         endColIndex = endColIndex || startColIndex
         endRowIndex = endRowIndex || startRowIndex
 
+<<<<<<< HEAD
         if (value == null) {
+=======
+        if (value === 'undefined') {
+>>>>>>> 3e001fc902449975b99dbac54b88150a74e5f956
             value = !getters.getMergeState()
         }
         let cellList = getters.getCellsByTransverse({

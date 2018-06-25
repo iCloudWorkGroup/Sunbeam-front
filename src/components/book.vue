@@ -11,10 +11,7 @@
         <!-- <tab></tab> -->
     </div>
 </div>
-
 </template>
-
-
 <script type="text/javascript">
 import Toolbar from './toolbar/toolbar.vue'
 import Sheet from './sheet.vue'
@@ -30,11 +27,25 @@ import {
 export default {
     props: ['focusState'],
     computed: {
+<<<<<<< HEAD
         tabHeight() {
             return 26
         },
         sheetHeight() {
             return this.height - this.tabHeight
+=======
+        width() {
+            return this.bookWidth
+        },
+        height() {
+            return this.bookHeight
+        },
+        sheetHeight() {
+            return this.bookHeight - 26
+        },
+        tabHeight() {
+            return 26
+>>>>>>> 3e001fc902449975b99dbac54b88150a74e5f956
         }
     },
     components: {

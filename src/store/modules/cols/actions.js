@@ -179,7 +179,6 @@ export default {
         let index = indexArgs
         let selects = getters.selectList
         let currentSheet = rootState.currentSheet
-
         if (index == null) {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -727,7 +726,6 @@ export default {
         let index = indexArgs
         let selects = getters.selectList
         let currentSheet = rootState.currentSheet
-
         if (index == null) {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -938,7 +936,11 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
+<<<<<<< HEAD
         if (startIndex == null) {
+=======
+        if (startIndex === 'undefined') {
+>>>>>>> 3e001fc902449975b99dbac54b88150a74e5f956
             let selects = getters.selectList
             let select
             for (let i = 0, len = selects.length; i < len; i++) {

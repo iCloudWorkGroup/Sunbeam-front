@@ -302,7 +302,6 @@ export default {
             offsetLeft: frozenCol.left,
             offsetTop: frozenRow.top
         })
-
         commit(mutationTypes.UPDATE_FROZENSTATE, {
             isFrozen: true,
             rowFrozen: true,

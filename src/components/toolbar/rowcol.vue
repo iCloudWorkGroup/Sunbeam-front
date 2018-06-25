@@ -4,7 +4,7 @@
             <div class="fui-section fui-alone" data-widget="insert" @click="activeWidget">
                 <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
                 <div class="fui-cf-desc">
-                    <div class="fui-cf-text">插入</div>
+                    <div class="fui-cf-text">&nbsp;&nbsp;插入&nbsp;&nbsp;</div>
                     <div class="fui-cf-extend caret"></div>
                 </div>
             </div>
@@ -13,7 +13,7 @@
             <div class="fui-section fui-alone" data-widget="delete" @click="activeWidget">
                 <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
                 <div class="fui-cf-desc">
-                    <div class="fui-cf-text">删除</div>
+                    <div class="fui-cf-text">&nbsp;&nbsp;删除&nbsp;&nbsp;</div>
                     <div class="fui-cf-extend caret"></div>
                 </div>
             </div>
@@ -59,52 +59,52 @@
     </div>
 </template>
 <script type="text/javascript">
-    import {
-        COLS_DELETECOL,
-        COLS_INSERTCOL,
-        ROWS_DELETEROW,
-        ROWS_INSERTROW
-    } from '../../store/action-types'
+import {
+    COLS_DELETECOL,
+    COLS_INSERTCOL,
+    ROWS_DELETEROW,
+    ROWS_INSERTROW
+} from '../../store/action-types'
 
-    export default {
-        props: [
-            'activeWidgetId'
-        ],
-        methods: {
-            activeWidget(e) {
-                let elem = e.currentTarget
-                let widgetId = elem.dataset.widget
-                let widget
-                let box
+export default {
+    props: [
+        'activeWidgetId'
+    ],
+    methods: {
+        activeWidget(e) {
+            let elem = e.currentTarget
+            let widgetId = elem.dataset.widget
+            let widget
+            let box
 
-                if (!widgetId) {
-                    return
-                }
-
-                box = elem.getBoundingClientRect()
-                widget = this.$refs[widgetId]
-                widget.style.top = box.top + box.height + 'px'
-                widget.style.left = box.left + 'px'
-                this.$emit('updateActiveWidgetId', widgetId)
-            },
-            insertCol() {
-                this.$store.dispatch(COLS_INSERTCOL)
-                this.$emit('updateActiveWidgetId', '')
-            },
-            insertRow() {
-                this.$store.dispatch(ROWS_INSERTROW)
-                this.$emit('updateActiveWidgetId', '')
-            },
-            deleteCol() {
-                this.$store.dispatch(COLS_DELETECOL)
-                this.$emit('updateActiveWidgetId', '')
-            },
-            deleteRow() {
-                this.$store.dispatch(ROWS_DELETEROW)
-                this.$emit('updateActiveWidgetId', '')
+            if (!widgetId) {
+                return
             }
+
+            box = elem.getBoundingClientRect()
+            widget = this.$refs[widgetId]
+            widget.style.top = box.top + box.height + 'px'
+            widget.style.left = box.left + 'px'
+            this.$emit('updateActiveWidgetId', widgetId)
+        },
+        insertCol() {
+            this.$store.dispatch(COLS_INSERTCOL)
+            this.$emit('updateActiveWidgetId', '')
+        },
+        insertRow() {
+            this.$store.dispatch(ROWS_INSERTROW)
+            this.$emit('updateActiveWidgetId', '')
+        },
+        deleteCol() {
+            this.$store.dispatch(COLS_DELETECOL)
+            this.$emit('updateActiveWidgetId', '')
+        },
+        deleteRow() {
+            this.$store.dispatch(ROWS_DELETEROW)
+            this.$emit('updateActiveWidgetId', '')
         }
     }
+}
 </script>
 <style type="text/css">
 </style>

@@ -302,7 +302,7 @@ export default {
         let rowHeight = row.height
         let rowAlias = row.alias
 
-       let cellList = getters.getCellsByVertical({
+        let cellList = getters.getCellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -742,7 +742,7 @@ export default {
     }, payload) {
         let selects = getters.selectList
         let index = payload
-        if (index === 'undefined') {
+        if (typeof index === 'undefined') {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -1074,14 +1074,12 @@ export default {
         state,
         rootState,
         commit
-    }, {
-        startIndexArgs,
-        endIndexArgs,
-        propsArgs
-    }) {
-        let startIndex = startIndexArgs
-        let endIndex = endIndexArgs
-        let props = propsArgs
+    }, payload) {
+        let {
+            startIndex,
+            endIndex,
+            props
+        } = payload
         if (typeof startIndex === 'undefined') {
             let selects = getters.selectList
             let select

@@ -18,11 +18,11 @@ function SBM(selector) {
         bottom: $rootEl.offsetHeight
     }, function(data) {
         store.dispatch(RESTORE, data)
+        new Vue({
+            store,
+            render: h => h(Book)
+        }).$mount(selector)
     })
-    new Vue({
-        store,
-        render: h => h(Book)
-    }).$mount(selector)
     // font(this, store)
 }
 

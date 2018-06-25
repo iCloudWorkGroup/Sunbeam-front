@@ -19,6 +19,9 @@
         </div>
         <div class="menu-container">
             <ul id="homeTool" v-show="activeTabId === 'homeTool'">
+                <tool-panel  title="撤销">
+                    <undo></undo>
+                </tool-panel>
                 <tool-panel  title="字体">
                     <font
                         :active-widget-id="activeWidgetId"
@@ -54,49 +57,51 @@
     </div>
 </template>
 <script type="text/javascript">
-    import ToolPanel from './toolpanel.vue'
-    import Font from './font.vue'
-    import Frozen from './frozen.vue'
-    import Align from './align.vue'
-    import Merge from './merge.vue'
-    import Rowcol from './rowcol.vue'
-    import Hide from './hide.vue'
-    import '../../css/toolbar.css'
-    import '../../css/widget.css'
+import ToolPanel from './toolpanel.vue'
+import Font from './font.vue'
+import Frozen from './frozen.vue'
+import Align from './align.vue'
+import Merge from './merge.vue'
+import Rowcol from './rowcol.vue'
+import Hide from './hide.vue'
+import Undo from './undo.vue'
+import '../../css/toolbar.css'
+import '../../css/widget.css'
 
-    export default {
-        data() {
-            return {
-                activeTabId: '',
-                activeWidgetId: ''
-            }
+export default {
+    data() {
+        return {
+            activeTabId: '',
+            activeWidgetId: ''
+        }
+    },
+    components: {
+        ToolPanel,
+        Font,
+        Frozen,
+        Align,
+        Merge,
+        Rowcol,
+        Hide,
+        Undo
+    },
+    mounted() {
+        this.activeTabId = this.$refs.initTab.dataset.tabId
+        document.addEventListener('mousedown', () => {
+            this.activeWidgetId = ''
+        }, false)
+    },
+    methods: {
+        switchTabs(e) {
+            let elem = e.target
+            let tabId = elem.dataset.tabId
+            this.activeTabId = tabId
         },
-        components: {
-            ToolPanel,
-            Font,
-            Frozen,
-            Align,
-            Merge,
-            Rowcol,
-            Hide
-        },
-        mounted() {
-            this.activeTabId = this.$refs.initTab.dataset.tabId
-            document.addEventListener('mousedown', () => {
-                this.activeWidgetId = ''
-            }, false)
-        },
-        methods: {
-            switchTabs(e) {
-                let elem = e.target
-                let tabId = elem.dataset.tabId
-                this.activeTabId = tabId
-            },
-            updateActiveWidgetId(val) {
-                this.activeWidgetId = val
-            }
+        updateActiveWidgetId(val) {
+            this.activeWidgetId = val
         }
     }
+}
 </script>
 <style type="text/css">
     .toolBar{
@@ -105,5 +110,6 @@
     }
     .menu-container{
         padding-top: 1px;
+        padding-left: 2px;
     }
 </style>

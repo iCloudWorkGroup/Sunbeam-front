@@ -40,58 +40,58 @@ export default {
         currentSheet
     }) {
         let list = state[currentSheet].list
-		for (let i = startIndex; i <= endIndex; i++) {
-			list[i].active = false
-		}
-	},
-	[types.ACTIVE_ROW](state, { startIndex, endIndex = startIndex, currentSheet }) {
-		let list = state[currentSheet].list
-		for (let i = startIndex; i <= endIndex; i++) {
-			list[i].active = true
-		}
-	},
-	[types.UPDATE_ROW](state, info) {
-		info.forEach(function({
-			row,
-			props
-		}) {
-			extend(row, props)
-			let rowOprProp = row.oprProp
-			clearDefaultValue(rowOprProp, cellTemplate)
+        for (let i = startIndex; i <= endIndex; i++) {
+            list[i].active = false
+        }
+    },
+    [types.ACTIVE_ROW](state, { startIndex, endIndex = startIndex, currentSheet }) {
+        let list = state[currentSheet].list
+        for (let i = startIndex; i <= endIndex; i++) {
+            list[i].active = true
+        }
+    },
+    [types.UPDATE_ROW](state, info) {
+        info.forEach(function({
+            row,
+            props
+        }) {
+            extend(row, props)
+            let rowOprProp = row.oprProp
+            clearDefaultValue(rowOprProp, cellTemplate)
 
-			function clearDefaultValue(object, template) {
-				for (let name in object) {
-					if (Object.prototype.hasOwnPropertyOf.call(object, name)) {
-						let currentProp = object[name]
-						let defaultValue = template[name]
-						if (typeof currentProp === 'object') {
-							if (isEmptyObj(currentProp)) {
-								delete object[name]
-							} else {
-								let result = clearDefaultValue(currentProp, defaultValue)
-								if (result) {
-									delete object[name]
-								}
-							}
-						} else if (currentProp === defaultValue) {
-							delete object[name]
-						}
-					}
-				}
-				return isEmptyObj(object)
-			}
-			function isEmptyObj(obj) {
-				for (let name in obj) {
-					if (Object.prototype.hasOwnPropertyOf.call(obj, name)) {
-						return false
-					}
-				}
-				return true
-			}
-		})
-	},
-	[types.DELETE_ROW](state, { currentSheet, index }) {
-		let list = state[currentSheet].list
-		list.splice(index, 1)
-	}
+            function clearDefaultValue(object, template) {
+                for (let name in object) {
+                    if (Object.prototype.hasOwnProperty.call(object, name)) {
+                        let currentProp = object[name]
+                        let defaultValue = template[name]
+                        if (typeof currentProp === 'object') {
+                            if (isEmptyObj(currentProp)) {
+                                delete object[name]
+                            } else {
+                                let result = clearDefaultValue(currentProp, defaultValue)
+                                if (result) {
+                                    delete object[name]
+                                }
+                            }
+                        } else if (currentProp === defaultValue) {
+                            delete object[name]
+                        }
+                    }
+                }
+                return isEmptyObj(object)
+            }
+            function isEmptyObj(obj) {
+                for (let name in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, name)) {
+                        return false
+                    }
+                }
+                return true
+            }
+        })
+    },
+    [types.DELETE_ROW](state, { currentSheet, index }) {
+        let list = state[currentSheet].list
+        list.splice(index, 1)
+    }
 }

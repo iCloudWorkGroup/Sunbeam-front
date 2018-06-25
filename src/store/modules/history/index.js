@@ -5,12 +5,12 @@ import mutations from './mutations'
  * @type {Object}
  */
 const state = {
-	list: [],
-	currentIndex: -1
+    list: [],
+    currentIndex: -1
 }
 
 export default {
-	state,
-	actions,
-	mutations
+    state,
+    actions,
+    mutations
 }

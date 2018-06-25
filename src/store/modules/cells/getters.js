@@ -127,10 +127,8 @@ export default {
     /**
      * 查选区域内所有单元格(垂直方向)
      */
-    getCellsByVertical(state, getters, rootState) {
-        let currentSheet = rootState.currentSheet
-        let cells = state[currentSheet]
-
+    getCellsByVertical(state, getters) {
+        let cells = getters.cellList
         return function(payload) {
             let {
                 startColIndex,
@@ -142,9 +140,7 @@ export default {
             } = payload
 
             let result = []
-            let pointInfo = rootState.pointsInfo[currentSheet].col
             let index
-            let temp
             let tempObj = {}
             let rowAlias
             let colAlias
@@ -157,19 +153,13 @@ export default {
                 endRowIndex
 
             for (let i = startColIndex, len1 = endColIndex + 1; i < len1; i++) {
-                colAlias = cols[i].alias
-                if (typeof pointInfo[colAlias] !== 'undefined') {
-                    for (let j = startRowIndex, len2 = endRowIndex + 1; j <
-                        len2; j++) {
-                        rowAlias = rows[j].alias
-                        temp = pointInfo[colAlias][rowAlias]
-                        if (temp && temp.cellIndex !== null) {
-                            index = temp.cellIndex
-                            if (!tempObj[index]) {
-                                result.push(cells[index])
-                                tempObj[index] = 1
-                            }
-                        }
+                for (let j = startRowIndex, len2 = endRowIndex + 1; j < len2; j++) {
+                    colAlias = cols[i].alias
+                    rowAlias = rows[j].alias
+                    index = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
+                    if (index != null && !tempObj[index]) {
+                        result.push(cells[index])
+                        tempObj[index] = true
                     }
                 }
             }
@@ -287,10 +277,10 @@ export default {
     },
     userViewCellList(state, getters, rootState) {
         let userView = rootState.userView
-        let cols = getters.colList
-        let rows = getters.rowList
         let visibleColList = getters.visibleColList
         let visibleRowList = getters.visibleRowList
+        let cols = getters.colList
+        let rows = getters.rowList
         let startRowIndex = getters.getRowIndexByPosi(userView.top)
         let endRowIndex = getters.getRowIndexByPosi(userView.bottom)
         let startColIndex = getters.getColIndexByPosi(userView.left)
@@ -304,7 +294,6 @@ export default {
             visibleColList, 'sort')
         endColIndex = indexAttrBinary(cols[endColIndex].sort, visibleColList,
             'sort')
-
         return getters.getCellsByVertical({
             startRowIndex,
             endRowIndex,

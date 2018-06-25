@@ -116,10 +116,10 @@ export default {
             this.currentMouseMoveState(e)
         },
         currentMouseDownState(e) {
-            console.log('empty function')
+            this.locateState(e)
         },
         currentMouseMoveState(e) {
-            console.log('empty function')
+            this.routineMoveState(e)
         },
         locateState(e) {
             let colPosi = this.getRelativePosi(e.clientX)

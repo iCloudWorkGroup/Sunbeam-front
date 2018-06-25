@@ -54,10 +54,10 @@ export default {
         currentSheet
     }) {
         let list = state[currentSheet].list
-		for (let i = startIndex; i <= endIndex; i++) {
-			list[i].active = true
-		}
-	},
+        for (let i = startIndex; i <= endIndex; i++) {
+            list[i].active = true
+        }
+    },
     [types.UPDATE_COL](state, info) {
         info.forEach(function({
             col,

@@ -501,13 +501,13 @@ export default {
         getters,
         dispatch
     }, sort) {
-            let cols = getters.colList
-            let index = getters.getColIndexBySort(sort)
-            let col = cols[index]
-            let visibleCols = getters.visibleColList
-            let updateCellInfo = []
-            let colWidth = col.width
-            let colAlias = col.alias
+        let cols = getters.colList
+        let index = getters.getColIndexBySort(sort)
+        let col = cols[index]
+        let visibleCols = getters.visibleColList
+        let updateCellInfo = []
+        let colWidth = col.width
+        let colAlias = col.alias
 
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
@@ -876,7 +876,6 @@ export default {
         } else {
             insertCol = colModel
         }
-
         let colWidth = insertCol.width
         let insertColAlias = insertCol.alias
         let currentColAlias = cols[index].alias
@@ -1085,14 +1084,12 @@ export default {
     [actionTypes.COLS_OPERCOLS]({
         getters,
         commit
-    }, {
-        startIndexArgs,
-        endIndexArgs,
-        propsArgs
-    }) {
-        let startIndex = startIndexArgs
-        let endIndex = endIndexArgs
-        let props = propsArgs
+    }, payload) {
+        let {
+            startIndex,
+            endIndex,
+            props
+        } = payload
         if (typeof startIndex === 'undefined') {
             let selects = getters.selectList
             let select

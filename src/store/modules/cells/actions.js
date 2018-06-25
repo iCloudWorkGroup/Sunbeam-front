@@ -7,7 +7,6 @@ import config from '../../../config'
 import send from '../../../util/send'
 
 export default {
-<<<<<<< HEAD
     /**
      * 还原单元格, 由occupy生成盒模型信息
      */
@@ -835,7 +834,7 @@ export default {
         let temp
 
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            if (!isEmpty((temp = rows[i].props))) {
+            if (!isEmpty(temp = rows[i].oprProp)) {
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let rowAlias = rows[i].alias
                     let colAlias = cols[j].alias
@@ -855,7 +854,7 @@ export default {
 
 
         for (let i = startColIndex; i < endColIndex + 1; i++) {
-            if (!isEmpty((temp = cols[i].props))) {
+            if (!isEmpty(temp = cols[i].oprProp)) {
                 for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                     let rowAlias = rows[j].alias
                     let colAlias = cols[i].alias
@@ -913,7 +912,7 @@ export default {
             endRowIndex,
             endColIndex,
             value
-        } = payload
+        } = payload || {}
 
         if (typeof startColIndex === 'undefined') {
             let select = getters.activeSelect

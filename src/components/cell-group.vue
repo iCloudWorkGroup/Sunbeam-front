@@ -36,19 +36,20 @@ export default {
     },
     computed: {
         cellList() {
-            if (this.endRowIndex != null &&
-                this.endColIndex != null) {
+            if (typeof this.endRowIndex !== 'undefined' &&
+                typeof this.endColIndex !== 'undefined') {
                 return this.$store.getters.getCellsByVertical({
                     startColIndex: this.startColIndex,
                     endColIndex: this.endColIndex,
                     startRowIndex: this.startRowIndex,
                     endRowIndex: this.endRowIndex
                 })
-            } else if (this.endRowIndex !== 'undefined') {
+            } else if (typeof this.endRowIndex !== 'undefined') {
                 return this.$store.getters.topRegionCellList
-            } else if (this.endColIndex !== 'undefined') {
+            } else if (typeof this.endColIndex !== 'undefined') {
                 return this.$store.getters.leftRegionCellList
             } else {
+
                 return this.$store.getters.userViewCellList
             }
         }

@@ -178,8 +178,7 @@ export default {
 
         let userView = rootState.userView
         let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
-
-        if (index === 'undefined') {
+        if (index == null) {
             index = userViewLeftIndex + 1
         }
         let frozenColIndex = index
@@ -237,8 +236,7 @@ export default {
 
         let userView = rootState.userView
         let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
-
-        if (index === 'undefined') {
+        if (index == null) {
             index = userViewTopIndex + 1
         }
         let frozenRowIndex = index

@@ -15,5 +15,7 @@ export default {
      */
     colRecord: [],
     rowRecord: [],
-    regionRecord: map
+    regionRecord: map,
+    // 存储rootElement元素
+    rootEl: ''
 }

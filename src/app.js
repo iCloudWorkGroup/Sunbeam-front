@@ -1,2 +1,2 @@
 import SBM from './sbm'
-SBM('app')
+SBM('#app')

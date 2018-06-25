@@ -47,7 +47,7 @@ export default {
 
             if (frozenRule) {
                 startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex !== 'undefined') {
+                if (frozenRule.endColIndex != null) {
                     endColIndex = frozenRule.endColIndex
                 } else {
                     endColIndex = cols.length - 1
@@ -72,7 +72,7 @@ export default {
 
             if (frozenRule) {
                 startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex !== 'undefined') {
+                if (frozenRule.endRowIndex != null) {
                     endRowIndex = frozenRule.endRowIndex
                 } else {
                     endRowIndex = rows.length - 1

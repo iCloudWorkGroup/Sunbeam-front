@@ -50,7 +50,7 @@ export default {
 
             if (frozenRule) {
                 startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex !== 'undefined') {
+                if (frozenRule.endColIndex != null) {
                     endColIndex = frozenRule.endColIndex
                 } else {
                     endColIndex = visibleCols.length - 1

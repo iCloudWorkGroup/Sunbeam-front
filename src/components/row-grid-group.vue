@@ -44,7 +44,7 @@ export default {
 
             if (frozenRule) {
                 startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex !== 'undefined') {
+                if (frozenRule.endRowIndex != null) {
                     endRowIndex = frozenRule.endRowIndex
                 } else {
                     endRowIndex = visibleRows.length - 1

@@ -165,7 +165,7 @@ export default {
 
         propNames = propNames.split('.')
         let value = valueArgs
-        if (value === 'undefined') {
+        if (value == null) {
             let cellList = getters.getCellsByVertical({
                 startColIndex,
                 endColIndex,
@@ -497,7 +497,7 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
-        if (startIndex === 'undefined') {
+        if (startIndex == null) {
             let selects = getters.selectList
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -509,7 +509,7 @@ export default {
             startIndex = getters.getColIndexByAlias(select.wholePosi.startColAlias)
             endIndex = getters.getColIndexByAlias(select.wholePosi.endColAlias)
         }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
+        endIndex = endIndex == null ? startIndex : endIndex
 
         let updateCellInfo = []
         let cellList = getters.getCellsByVertical({
@@ -578,8 +578,7 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
-
-        if (startIndex === 'undefined') {
+        if (startIndex == null) {
             let selects = getters.selectList
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -591,7 +590,7 @@ export default {
             startIndex = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
             endIndex = getters.getRowIndexByAlias(select.wholePosi.endRowAlias)
         }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
+        endIndex = endIndex == null ? startIndex : endIndex
 
         if (endIndex === 'MAX') {
             return
@@ -747,7 +746,11 @@ export default {
         endColIndex = endColIndex || startColIndex
         endRowIndex = endRowIndex || startRowIndex
 
+<<<<<<< HEAD
+        if (value == null) {
+=======
         if (value === 'undefined') {
+>>>>>>> 3e001fc902449975b99dbac54b88150a74e5f956
             value = !getters.getMergeState()
         }
         let cellList = getters.getCellsByTransverse({

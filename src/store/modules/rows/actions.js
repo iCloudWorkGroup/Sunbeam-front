@@ -61,8 +61,7 @@ export default {
         if (getters.visibleRowList.length < 2) {
             return
         }
-
-        if (index === 'undefined') {
+        if (index == null) {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -229,7 +228,7 @@ export default {
         let rows = getters.rowList
         let visibleRows = getters.visibleRowList
 
-        if (index === 'undefined') {
+        if (index == null) {
             let select
             let startIndex
             let endIndex
@@ -263,7 +262,7 @@ export default {
             }
 
         }
-        if (index === 'undefined' || !rows[index].hidden) {
+        if (index == null || !rows[index].hidden) {
             return
         }
 
@@ -381,7 +380,7 @@ export default {
         let index = indexArgs
         let selects = getters.selectList
         let currentSheet = rootState.currentSheet
-        if (index === 'undefined') {
+        if (index == null) {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -632,8 +631,7 @@ export default {
         let index = indexArgs
         let selects = getters.selectList
         let currentSheet = rootState.currentSheet
-
-        if (index === 'undefined') {
+        if (index == null) {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -920,7 +918,11 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
+<<<<<<< HEAD
+        if (startIndex == null) {
+=======
         if (startIndex === 'undefined') {
+>>>>>>> 3e001fc902449975b99dbac54b88150a74e5f956
             let selects = getters.selectList
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -932,7 +934,7 @@ export default {
             startIndex = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
             endIndex = getters.getRowIndexByAlias(select.wholePosi.endRowAlias)
         }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
+        endIndex = endIndex == null ? startIndex : endIndex
 
         let updateRowInfo = []
         let rows = getters.rowList

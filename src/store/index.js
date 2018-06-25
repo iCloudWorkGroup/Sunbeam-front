@@ -7,11 +7,11 @@ import selects from './modules/selects/index'
 import sheets from './modules/sheets/index'
 import pointsInfo from './modules/pointsinfo/index'
 import input from './modules/input/index'
-import {
-    LOCATE
-} from '../tools/constant'
+import history from './modules/history/index'
+import historyPlugin from './plugins/historyplugin'
+import { LOCATE } from '../tools/constant'
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex from '../lib/vuex.esm'
 Vue.use(Vuex)
 
 const state = {
@@ -29,7 +29,6 @@ const state = {
     mouseState: LOCATE,
     focusState: false
 }
-
 export default new Vuex.Store({
     state,
     actions,
@@ -41,6 +40,8 @@ export default new Vuex.Store({
         selects,
         sheets,
         pointsInfo,
-        input
-    }
+        input,
+        history
+    },
+    plugins: [historyPlugin]
 })

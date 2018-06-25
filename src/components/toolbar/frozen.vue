@@ -55,13 +55,8 @@
 </div>
 </template>
 <script type="text/javascript">
-import {
-    SHEET_FROZEN,
-    SHEET_FIRSTCOLFROZEN,
-    SHEET_FIRSTROWFROZEN,
-    SHEET_UNFROZEN,
-    CELLS_UPDATE_BORDER
-} from '../../store/action-types'
+
+import { SHEET_FROZEN, SHEET_UNFROZEN } from '../../store/action-types'
 
 export default {
     props: [
@@ -88,18 +83,10 @@ export default {
         activeWidget(e) {
             let elem = e.currentTarget
             let widgetId = elem.dataset.widget
-            let widget
-            let box
 
             if (!widgetId) {
                 return
             }
-
-            box = elem.getBoundingClientRect()
-            widget = this.$refs[widgetId]
-            widget.style.top = box.top + box.height + 'px'
-            widget.style.left = box.left + 'px'
-
             this.$emit('updateActiveWidgetId', widgetId)
         },
         unFrozen(e) {
@@ -109,14 +96,14 @@ export default {
             this.$store.dispatch(SHEET_FROZEN)
         },
         rowFrozen(e) {
-            this.$store.dispatch(SHEET_FIRSTROWFROZEN)
+            this.$store.dispatch(SHEET_FROZEN, 'firstRowFrozen')
         },
         colFrozen(e) {
-            this.$store.dispatch(SHEET_FIRSTCOLFROZEN)
+            this.$store.dispatch(SHEET_FROZEN, 'firstColFrozen')
         },
         getValue(elem, currentTarget) {
             let value = elem.dataset.value
-            if (value == null) {
+            if (typeof value === 'undefined') {
                 if (elem === currentTarget) {
                     return
                 } else {
@@ -125,21 +112,6 @@ export default {
             } else {
                 return value
             }
-        },
-        setBorder(e) {
-            e.stopPropagation()
-            let currentTarget = e.currentTarget
-            let target = e.target
-            let value
-
-            value = this.getValue(target, currentTarget)
-            if (value == null) {
-                return
-            }
-            this.$store.dispatch(CELLS_UPDATE_BORDER, {
-                value
-            })
-            this.$emit('updateActiveWidgetId', '')
         }
     }
 }

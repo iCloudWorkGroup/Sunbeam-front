@@ -1,4 +1,5 @@
 import * as types from '../../mutation-types'
+import extend from '../../../util/extend'
 
 export default {
     [types.INSERT_SHEET](state, sheet) {
@@ -14,11 +15,7 @@ export default {
                 frozenState = item.frozenState
             }
         })
-
-        frozenState.rules.splice(0, frozenState.rules.length, ...payload.rules)
-        frozenState.isFrozen = payload.isFrozen
-        frozenState.rowFrozen = payload.rowFrozen
-        frozenState.colFrozen = payload.colFrozen
+        extend(frozenState, payload)
     },
     [types.UPDATE_OCCUPY](state, payload) {
         let list = state.list

@@ -53,7 +53,7 @@ export default {
             let italic = cellContent.italic ? 'italic ' : ''
             let weight = cellContent.weight ? 'bold' : 'normal'
             let underline = cellContent.underline ? 'underline' : ''
-            let font = unit(cellContent.size) + ' ' + cellContent.family
+            let font = cellContent.size + 'pt ' + cellContent.family
 
             return {
                 background: cellContent.background,
@@ -61,6 +61,7 @@ export default {
                 textAlign: cellContent.alignRow,
                 verticalAlign: cellContent.alignCol,
                 font: font,
+                fontFamily: cellContent.family,
                 textDecoration: underline,
                 fontWeight: weight,
                 fontStyle: italic

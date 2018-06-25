@@ -25,6 +25,10 @@ export default {
         isFrozen: false,
         rowFrozen: false,
         colFrozen: false,
+        frozenColSort: 0,
+        frozenRowSort: 0,
+        userViewColSort: 0,
+        userViewRowSort: 0,
         rules: []
     },
     /**

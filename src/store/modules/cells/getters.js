@@ -1,9 +1,7 @@
-import {
-    rangeBinary,
-    indexAttrBinary
-} from '../../../util/binary'
+import { indexAttrBinary } from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
+
 export default {
     cellList(state, getters, rootState) {
         let currentSheet = rootState.currentSheet
@@ -37,24 +35,18 @@ export default {
      * 区域内只能包含完整的单元格
      */
     getFullOprRegion(state, getters, rootState) {
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs
-        }) {
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-
-            let rows = getters.rowList
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex
+            } = payload
             let cellStartColIndex
             let cellStartRowIndex
             let cellEndColIndex
             let cellEndRowIndex
             let cellList
-            let temp
             let flag = true
 
             if (startColIndex === 'MAX' || endColIndex === 'MAX') {
@@ -73,15 +65,14 @@ export default {
                     endRowIndex: 'MAX'
                 }
             }
-            if ((temp = startRowIndex) > endRowIndex) {
-                startRowIndex = endRowIndex
-                endRowIndex = temp
+            if (startRowIndex > endRowIndex) {
+                [startRowIndex, endRowIndex] = [endRowIndex, startRowIndex]
             }
-            if ((temp = startColIndex) > endColIndex) {
-                startColIndex = endColIndex
-                endColIndex = temp
+            if (startColIndex > endColIndex) {
+                [startColIndex, endColIndex] = [endColIndex, startColIndex]
             }
 
+            let temp = new Map()
             while (flag) {
                 flag = false
                 cellList = getters.getCellsByVertical({
@@ -92,14 +83,20 @@ export default {
                 })
 
                 for (let i = 0, len = cellList.length; i < len; i++) {
-                    temp = cellList[i].physicsBox
-                    cellStartRowIndex = rangeBinary(temp.top, rows, 'top',
-                        'height')
-                    cellEndRowIndex = rangeBinary(temp.top + temp.height,
-                        rows, 'top', 'height')
-                    cellStartColIndex = getters.getColIndexByPosi(temp.left)
-                    cellEndColIndex = getters.getColIndexByPosi(temp.left +
-                        temp.width)
+                    let cell = cellList[i]
+                    if (temp.get(cell.alias)) {
+                        break
+                    }
+                    temp.set(cell.alias, true)
+
+                    let occupyCol = cell.occupy.col
+                    let occupyRow = cell.occupy.row
+
+                    cellStartRowIndex = getters.getRowIndexByAlias(occupyRow[0])
+                    cellEndRowIndex = getters.getRowIndexByAlias(occupyRow[occupyRow.length - 1])
+
+                    cellStartColIndex = getters.getColIndexByAlias(occupyCol[0])
+                    cellEndColIndex = getters.getColIndexByAlias(occupyCol[occupyCol.length - 1])
 
                     if (cellStartColIndex < startColIndex) {
                         startColIndex = cellStartColIndex
@@ -130,29 +127,20 @@ export default {
     /**
      * 查选区域内所有单元格(垂直方向)
      */
-    getCellsByVertical(state, getters, rootState) {
-        let currentSheet = rootState.currentSheet
-        let cells = state[currentSheet]
-
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs,
-            colsArgs,
-            rowsArgs
-        }) {
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-            let cols = colsArgs
-            let rows = rowsArgs
+    getCellsByVertical(state, getters) {
+        let cells = getters.cellList
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex,
+                cols,
+                rows
+            } = payload
 
             let result = []
-            let pointInfo = rootState.pointsInfo[currentSheet].col
             let index
-            let temp
             let tempObj = {}
             let rowAlias
             let colAlias
@@ -165,19 +153,13 @@ export default {
                 endRowIndex
 
             for (let i = startColIndex, len1 = endColIndex + 1; i < len1; i++) {
-                colAlias = cols[i].alias
-                if (typeof pointInfo[colAlias] !== 'undefined') {
-                    for (let j = startRowIndex, len2 = endRowIndex + 1; j <
-                        len2; j++) {
-                        rowAlias = rows[j].alias
-                        temp = pointInfo[colAlias][rowAlias]
-                        if (temp && temp.cellIndex !== null) {
-                            index = temp.cellIndex
-                            if (!tempObj[index]) {
-                                result.push(cells[index])
-                                tempObj[index] = 1
-                            }
-                        }
+                for (let j = startRowIndex, len2 = endRowIndex + 1; j < len2; j++) {
+                    colAlias = cols[i].alias
+                    rowAlias = rows[j].alias
+                    index = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
+                    if (index != null && !tempObj[index]) {
+                        result.push(cells[index])
+                        tempObj[index] = true
                     }
                 }
             }
@@ -188,21 +170,15 @@ export default {
         let currentSheet = rootState.currentSheet
         let cells = state[currentSheet]
 
-        return function({
-            startColIndexArgs,
-            startRowIndexArgs,
-            endColIndexArgs = startColIndexArgs,
-            endRowIndexArgs = startRowIndexArgs,
-            colsArgs,
-            rowsArgs
-        }) {
-            let startColIndex = startColIndexArgs
-            let startRowIndex = startRowIndexArgs
-            let endColIndex = endColIndexArgs
-            let endRowIndex = endRowIndexArgs
-            let cols = colsArgs
-            let rows = rowsArgs
-
+        return function(payload) {
+            let {
+                startColIndex,
+                startRowIndex,
+                endColIndex = startColIndex,
+                endRowIndex = startRowIndex,
+                cols,
+                rows
+            } = payload
             let result = []
             let pointInfo = rootState.pointsInfo[currentSheet].row
             let index
@@ -223,7 +199,7 @@ export default {
                 if (typeof pointInfo[rowAlias] !== 'undefined') {
                     for (let j = startColIndex, len2 = endColIndex + 1; j <
                         len2; j++) {
-                        colAlias = rows[j].alias
+                        colAlias = cols[j].alias
                         temp = pointInfo[rowAlias][colAlias]
                         if (temp && temp.cellIndex !== null) {
                             index = temp.cellIndex
@@ -301,10 +277,10 @@ export default {
     },
     userViewCellList(state, getters, rootState) {
         let userView = rootState.userView
-        let cols = getters.colList
-        let rows = getters.rowList
         let visibleColList = getters.visibleColList
         let visibleRowList = getters.visibleRowList
+        let cols = getters.colList
+        let rows = getters.rowList
         let startRowIndex = getters.getRowIndexByPosi(userView.top)
         let endRowIndex = getters.getRowIndexByPosi(userView.bottom)
         let startColIndex = getters.getColIndexByPosi(userView.left)
@@ -318,7 +294,6 @@ export default {
             visibleColList, 'sort')
         endColIndex = indexAttrBinary(cols[endColIndex].sort, visibleColList,
             'sort')
-
         return getters.getCellsByVertical({
             startRowIndex,
             endRowIndex,
@@ -346,21 +321,15 @@ export default {
                 endColIndex,
                 endRowIndex
             })
-
-            if (cellList.length !== 1) {
-                return false
+            for (let i = 0, len = cellList.length; i < len; i++) {
+                let cell = cellList[i]
+                let occupyCol = cell.occupy.col
+                let occupyRow = cell.occupy.row
+                if (occupyRow.length > 1 || occupyCol.length > 1) {
+                    return true
+                }
             }
-            let cell = cellList[0]
-            let occupyCol = cell.occupy.col
-            let occupyRow = cell.occupy.row
-
-            if (occupyCol[0] !== wholePosi.startColAlias ||
-                occupyRow[0] !== wholePosi.startRowAlias ||
-                occupyCol[occupyCol.length - 1] !== wholePosi.endColAlias ||
-                occupyRow[occupyRow.length - 1] !== wholePosi.endRowAlias) {
-                return false
-            }
-            return true
+            return false
         }
     }
 }

@@ -20,7 +20,11 @@ export default {
     [types.SWITCH_ACTIVESELECT](state, payload) {
         state.activeSelect = payload.select
     },
-    [types.UPDATE_SELECT](state, info) {
+    [types.UPDATE_SELECT](state, payload) {
+        let info = payload
+        if (!Array.isArray(info)) {
+            info = [info]
+        }
         info.forEach(function({
             select,
             props

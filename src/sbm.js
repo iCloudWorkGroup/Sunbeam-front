@@ -5,11 +5,9 @@ import Book from './components/book.vue'
 import dataloader from './tools/dataloader'
 // import font from './entrance/font'
 import cache from './tools/cache'
-import {
-    RESTORE
-} from './store/action-types'
+import { RESTORE } from './store/action-types'
 // 后期需要进行修改
-window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec'
+window.SPREADSHEET_AUTHENTIC_KEY = '9e417dc6-e85d-45cd-991f-577b642cfb81'
 
 function SBM(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)
@@ -20,11 +18,11 @@ function SBM(selector) {
         bottom: $rootEl.offsetHeight
     }, function(data) {
         store.dispatch(RESTORE, data)
+        new Vue({
+            store,
+            render: h => h(Book)
+        }).$mount(selector)
     })
-    new Vue({
-        store,
-        render: h => h(Book)
-    }).$mount(selector)
     // font(this, store)
 }
 

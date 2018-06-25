@@ -17,7 +17,8 @@ const baseConfig = merge(base, {
   output: {
     publicPath: '/dist/',
     filename: 'bundle.web.js',
-    chunkFilename: '[name].chunk.js'
+    chunkFilename: '[name].chunk.js',
+    publicPath: '/dist/'
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),

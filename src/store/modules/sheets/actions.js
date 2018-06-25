@@ -2,10 +2,8 @@ import extend from '../../../util/extend'
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import template from './template'
-import {
-    SELECT
-} from '../../../tools/constant'
-
+import send from '../../../util/send'
+import config from '../../../config'
 
 let viewTypes = {
     mainRule: 'mainView',
@@ -13,7 +11,6 @@ let viewTypes = {
     topRule: 'topView',
     cornerRule: 'cornerView'
 }
-
 export default {
     /**
      * 还原sheet
@@ -35,14 +32,12 @@ export default {
         }
     },
     [actionTypes.SHEET_FROZEN]({
-        commit,
         state,
         getters,
         rootState,
         dispatch
-    }) {
+    }, type) {
         let currentSheet = rootState.currentSheet
-        let selects = rootState.selects[currentSheet].list
         let stateList = state.list
         let frozenState
 
@@ -56,15 +51,7 @@ export default {
         if (frozenState.isFrozen) {
             return
         }
-
-        let select
-
-        selects.forEach(function(item) {
-            if (item.type === SELECT) {
-                select = item
-            }
-        })
-
+        let select = getters.activeSelect
         let frozenRowAlias = select.wholePosi.startRowAlias
         let frozenColAlias = select.wholePosi.startColAlias
         let frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias)
@@ -72,12 +59,12 @@ export default {
 
         let userView = rootState.userView
         let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
+        let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
         let userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom)
         let userViewRightIndex = getters.getColIndexByPosi(userView.right)
-        let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
+
 
         // 非可视范围，不能进行冻结
-
         if (frozenRowIndex - userViewTopIndex < 0 ||
             userViewBottomIndex - frozenRowIndex < 0 ||
             frozenColIndex - userViewLeftIndex < 0 ||
@@ -89,104 +76,95 @@ export default {
             frozenColIndex === userViewLeftIndex) {
             return
         }
-
-        if (frozenColIndex === userViewLeftIndex) {
-            dispatch(actionTypes.SHEET_FIRSTROWFROZEN, frozenRowIndex)
-            return
-        }
-        if (frozenRowIndex === userViewTopIndex) {
-            dispatch(actionTypes.SHEET_FIRSTCOLFROZEN, frozenColIndex)
-            return
-        }
-
-
-        let rowList = getters.rowList
-        let colList = getters.colList
-        let userViewCol = colList[userViewLeftIndex]
-        let userViewRow = rowList[userViewTopIndex]
-        let frozenCol = colList[frozenColIndex]
-        let frozenRow = rowList[frozenRowIndex]
-
-        let rules = []
-
-        rules.push({
-            type: 'cornerRule',
-            startRowIndex: userViewTopIndex,
-            endRowIndex: frozenRowIndex - 1,
-            startColIndex: userViewLeftIndex,
-            endColIndex: frozenColIndex - 1,
-            offsetTop: userViewRow.top,
-            offsetLeft: userViewCol.left,
-            width: frozenCol.left - userViewCol.left - 1, // 减1为边框的宽度
-            height: frozenRow.top - userViewRow.top - 1
-        }, {
-            type: 'topRule',
-            startRowIndex: userViewTopIndex,
-            endRowIndex: frozenRowIndex - 1,
-            startColIndex: frozenColIndex,
-            userViewLeft: userViewCol.left,
-            offsetTop: userViewRow.top,
-            offsetLeft: frozenCol.left,
-            height: frozenRow.top - userViewRow.top - 1
-        }, {
-            type: 'leftRule',
-            startRowIndex: frozenRowIndex,
-            startColIndex: userViewLeftIndex,
-            endColIndex: frozenColIndex - 1,
-            userViewTop: userViewRow.top,
-            offsetLeft: userViewCol.left,
-            offsetTop: frozenRow.top,
-            width: frozenCol.left - userViewCol.left - 1
-        }, {
-            type: 'mainRule',
-            startRowIndex: frozenRowIndex,
-            startColIndex: frozenColIndex,
-            userViewTop: userViewRow.top,
-            userViewLeft: userViewCol.left,
-            offsetLeft: frozenCol.left,
-            offsetTop: frozenRow.top
+        let rows = getters.rowList
+        let cols = getters.colList
+        let userViewLeft = cols[userViewLeftIndex]
+        let userViewTop = rows[userViewTopIndex]
+        let frozenCol = cols[frozenColIndex]
+        let frozenRow = rows[frozenRowIndex]
+        send({
+            url: config.operUrl['frozen'],
+            data: JSON.stringify({
+                viewRow: userViewTop.alias,
+                viewCol: userViewLeft.alias,
+                oprCol: frozenCol.alias,
+                oprRow: frozenRow.alias
+            })
         })
-
-        commit(mutationTypes.UPDATE_FROZENSTATE, {
-            isFrozen: true,
-            rowFrozen: true,
-            colFrozen: true,
-            rules,
-            currentSheet
-        })
+        if (type === 'firstRowFrozen') {
+            dispatch(actionTypes.SHEET_ROWFROZEN, {
+                userViewSort: userViewTop.sort,
+                frozenRowSort: userViewTop.sort + 1
+            })
+        } else if (type === 'firstColFrozen') {
+            dispatch(actionTypes.SHEET_COLFROZEN, {
+                userViewSort: userViewLeft.sort,
+                frozenColSort: userViewLeft.sort + 1
+            })
+        } else if (frozenColIndex === userViewLeftIndex) {
+            dispatch(actionTypes.SHEET_ROWFROZEN, {
+                userViewSort: userViewTop.sort,
+                frozenRowSort: frozenRow.sort
+            })
+        } else if (frozenRowIndex === userViewTopIndex) {
+            dispatch(actionTypes.SHEET_COLFROZEN, {
+                userViewSort: userViewLeft.sort,
+                frozenColSort: frozenCol.sort
+            })
+        } else {
+            dispatch(actionTypes.SHEET_POINTFROZEN, {
+                frozenColSort: frozenCol.sort,
+                frozenRowSort: frozenRow.sort,
+                userViewColSort: userViewLeft.sort,
+                userViewRowSort: userViewTop.sort
+            })
+        }
     },
-    [actionTypes.SHEET_FIRSTCOLFROZEN]({
+    [actionTypes.SHEET_RESTOREFROZEN]({
+        dispatch,
+        getters
+    }, frozen) {
+        if (frozen) {
+            let userViewLeft = getters.getColByAlias(frozen.viewColAlias)
+            let userViewTop = getters.getRowByAlias(frozen.viewRowAlias)
+            let frozenCol = getters.getColByAlias(frozen.colAlias)
+            let frozenRow = getters.getRowByAlias(frozen.rowAlias)
+
+            if (frozenCol.sort === userViewLeft.sort) {
+                dispatch(actionTypes.SHEET_ROWFROZEN, {
+                    userViewSort: userViewTop.sort,
+                    frozenRowSort: frozenRow.sort
+                })
+            } else if (frozenRow.sort === userViewTop.sort) {
+                dispatch(actionTypes.SHEET_COLFROZEN, {
+                    userViewSort: userViewLeft.sort,
+                    frozenColSort: frozenCol.sort
+                })
+            } else {
+                dispatch(actionTypes.SHEET_POINTFROZEN, {
+                    frozenColSort: frozenCol.sort,
+                    frozenRowSort: frozenRow.sort,
+                    userViewColSort: userViewLeft.sort,
+                    userViewRowSort: userViewTop.sort
+                })
+            }
+        }
+    },
+    [actionTypes.SHEET_COLFROZEN]({
         commit,
         state,
         getters,
         rootState
-    }, indexArgs) {
-        let index = indexArgs
-        let currentSheet = rootState.currentSheet
-        let stateList = state.list
-        let frozenState
-
-        for (let i = 0, len = stateList.length; i < len; i++) {
-            if (stateList[i].alias === currentSheet) {
-                frozenState = stateList[i].frozenState
-                break
-            }
-        }
-        if (frozenState.isFrozen) {
-            return
-        }
-
-        let userView = rootState.userView
-        let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
-        if (index == null) {
-            index = userViewLeftIndex + 1
-        }
-        let frozenColIndex = index
-
+    }, {
+        userViewSort,
+        frozenColSort
+    }) {
         let colList = getters.colList
+        let frozenColIndex = getters.getColIndexBySort(frozenColSort)
+        let userViewLeftIndex = getters.getColIndexBySort(userViewSort)
         let userViewCol = colList[userViewLeftIndex]
         let frozenCol = colList[frozenColIndex]
-
+        let currentSheet = rootState.currentSheet
         let rules = []
 
         rules.push({
@@ -209,42 +187,29 @@ export default {
             isFrozen: true,
             rowFrozen: false,
             colFrozen: true,
+            frozenColSort,
+            frozenRowSort: 0,
+            userViewColSort: userViewSort,
+            userViewRowSort: 0,
             rules,
             currentSheet
         })
     },
-    [actionTypes.SHEET_FIRSTROWFROZEN]({
+    [actionTypes.SHEET_ROWFROZEN]({
         commit,
         state,
         getters,
         rootState
-    }, indexArgs) {
-        let index = indexArgs
-        let currentSheet = rootState.currentSheet
-        let stateList = state.list
-        let frozenState
-
-        for (let i = 0, len = stateList.length; i < len; i++) {
-            if (stateList[i].alias === currentSheet) {
-                frozenState = stateList[i]
-                break
-            }
-        }
-        if (frozenState.isFrozen) {
-            return
-        }
-
-        let userView = rootState.userView
-        let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
-        if (index == null) {
-            index = userViewTopIndex + 1
-        }
-        let frozenRowIndex = index
-
+    }, {
+        userViewSort,
+        frozenRowSort
+    }) {
         let rowList = getters.rowList
+        let frozenRowIndex = getters.getRowIndexBySort(frozenRowSort)
+        let userViewTopIndex = getters.getRowIndexBySort(userViewSort)
         let userViewRow = rowList[userViewTopIndex]
         let frozenRow = rowList[frozenRowIndex]
-
+        let currentSheet = rootState.currentSheet
         let rules = []
 
         rules.push({
@@ -267,16 +232,98 @@ export default {
             isFrozen: true,
             rowFrozen: true,
             colFrozen: false,
+            frozenColSort: 0,
+            frozenRowSort,
+            userViewColSort: userViewSort,
+            userViewRowSort: 0,
             rules,
             currentSheet
         })
     },
-    [actionTypes.SHEET_UNFROZEN]({
+    [actionTypes.SHEET_POINTFROZEN]({
         commit,
         state,
         getters,
         rootState
-    }, sheet) {
+    }, {
+        userViewRowSort,
+        userViewColSort,
+        frozenColSort,
+        frozenRowSort
+    }) {
+        let rows = getters.rowList
+        let cols = getters.colList
+
+        let userViewColIndex = getters.getColIndexBySort(userViewColSort)
+        let userViewRowIndex = getters.getRowIndexBySort(userViewRowSort)
+        let frozenColIndex = getters.getColIndexBySort(frozenColSort)
+        let frozenRowIndex = getters.getRowIndexBySort(frozenRowSort)
+
+        let userViewCol = cols[userViewColIndex]
+        let userViewRow = rows[userViewRowIndex]
+        let frozenCol = cols[frozenColIndex]
+        let frozenRow = rows[frozenRowIndex]
+
+        let rules = []
+        rules.push({
+            type: 'cornerRule',
+            startRowIndex: userViewRowIndex,
+            endRowIndex: frozenRowIndex - 1,
+            startColIndex: userViewColIndex,
+            endColIndex: frozenColIndex - 1,
+            offsetTop: userViewRow.top,
+            offsetLeft: userViewCol.left,
+            width: frozenCol.left - userViewCol.left - 1, // 减1为边框的宽度
+            height: frozenRow.top - userViewRow.top - 1
+        }, {
+            type: 'topRule',
+            startRowIndex: userViewRowIndex,
+            endRowIndex: frozenRowIndex - 1,
+            startColIndex: frozenColIndex,
+            userViewLeft: userViewCol.left,
+            offsetTop: userViewRow.top,
+            offsetLeft: frozenCol.left,
+            height: frozenRow.top - userViewRow.top - 1
+        }, {
+            type: 'leftRule',
+            startRowIndex: frozenRowIndex,
+            startColIndex: userViewColIndex,
+            endColIndex: frozenColIndex - 1,
+            userViewTop: userViewRow.top,
+            offsetLeft: userViewCol.left,
+            offsetTop: frozenRow.top,
+            width: frozenCol.left - userViewCol.left - 1
+        }, {
+            type: 'mainRule',
+            startRowIndex: frozenRowIndex,
+            startColIndex: frozenColIndex,
+            userViewTop: userViewRow.top,
+            userViewLeft: userViewCol.left,
+            offsetLeft: frozenCol.left,
+            offsetTop: frozenRow.top
+        })
+        commit(mutationTypes.UPDATE_FROZENSTATE, {
+            isFrozen: true,
+            rowFrozen: true,
+            colFrozen: true,
+            frozenColSort,
+            frozenRowSort,
+            userViewColSort,
+            userViewRowSort,
+            rules,
+            currentSheet: rootState.currentSheet
+        })
+    },
+    [actionTypes.SHEET_UNFROZEN]({ dispatch }) {
+        send({
+            url: config.operUrl['unfrozen']
+        })
+        dispatch(actionTypes.SHEET_EXECUNFROZEN)
+    },
+    [actionTypes.SHEET_EXECUNFROZEN]({
+        commit,
+        rootState
+    }) {
         commit(mutationTypes.UPDATE_FROZENSTATE, {
             isFrozen: false,
             rowFrozen: false,
@@ -287,7 +334,6 @@ export default {
     },
     [actionTypes.OCCUPY_UPDATE]({
         commit,
-        getters,
         rootState
     }, {
         type = 'mainRule',
@@ -337,12 +383,9 @@ export default {
     [actionTypes.OCCUPY_DELETEROW]({
         commit,
         getters,
-        rootState
+        rootState,
+        state
     }, alias) {
-
-        //  为了不抱错误，这里的逻辑是走不通的
-        let state = {}
-
         let currentSheet = rootState.currentSheet
         let stateList = state.list
         let editViewOccupy

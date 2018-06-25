@@ -24,22 +24,26 @@ export default {
         rootGetters
     }) {
         let currentSheet = rootState.currentSheet
-        let rows = rootState.rows[currentSheet].list
-        let cols = rootState.cols[currentSheet].list
+        let rows = getters.rowList
+        let cols = getters.colList
+        let visibleRows = getters.visibleRowList
+        let visibleCols = getters.visibleColList
         let select = extend(template)
-        let region = getters.getFullOprRegion({
-            startColIndexArgs: 0,
-            startRowIndexArgs: 0
+        let region
+        let width
+        let height
+        let col = visibleCols[0]
+        let row = visibleRows[0]
+
+        region = getters.getFullOprRegion({
+            startColIndex: getters.getColIndexByAlias(col.alias),
+            startRowIndex: getters.getRowIndexByAlias(row.alias)
         })
+        let { startColIndex, startRowIndex, endColIndex, endRowIndex } = region
 
-        let startColIndex = region.startColIndex
-        let startRowIndex = region.startRowIndex
-        let endColIndex = region.endColIndex
-        let endRowIndex = region.endRowIndex
-
-        let width = cols[endColIndex].width + cols[endColIndex].left - cols[
+        width = cols[endColIndex].width + cols[endColIndex].left - cols[
             startColIndex].left
-        let height = rows[endRowIndex].height + rows[endRowIndex].top - rows[
+        height = rows[endRowIndex].height + rows[endRowIndex].top - rows[
             startRowIndex].top
 
         select.physicsBox = {
@@ -81,16 +85,11 @@ export default {
         commit,
         rootState,
         dispatch
-    }, {
-        colIndexArgs,
-        rowIndexArgs
-    }) {
-        let colIndex = colIndexArgs
-        let rowIndex = rowIndexArgs
+    }, payload) {
 
-        let currentSheet = rootState.currentSheet
-        let rows = rootState.rows[currentSheet].list
-        let cols = rootState.cols[currentSheet].list
+        let { colIndex, rowIndex } = payload
+        let rows = getters.rowList
+        let cols = getters.colList
         let select = {}
         let activeSelect = state.activeSelect
         let mouseState = rootState.mouseState
@@ -133,6 +132,19 @@ export default {
             endColIndex,
             endRowIndex
         } = region
+
+        while (cols[startColIndex].hidden) {
+            startColIndex++
+        }
+        while (rows[startRowIndex].hidden) {
+            startRowIndex++
+        }
+        while (endColIndex !== 'MAX' && cols[endColIndex].hidden) {
+            endColIndex--
+        }
+        while (endRowIndex !== 'MAX' && rows[endRowIndex].hidden) {
+            endRowIndex--
+        }
 
         select.physicsBox = {
             top: rows[startRowIndex].top,

@@ -26,18 +26,18 @@ function SBM(wrapperId) {
     let bottom = wrapper.offsetHeight
     let store = new Vuex.Store(options)
 
-	let btn1 = document.getElementById('btn1')
-	btn1.addEventListener('click', function(e) {
-		store.dispatch('HISTORY_UNDO')
-	}, true)
-	let btn2 = document.getElementById('btn2')
-	btn2.addEventListener('click', function(e) {
-		store.dispatch('HISTORY_REDO')
-	}, true)
+    let btn1 = document.getElementById('btn1')
+    btn1.addEventListener('click', function(e) {
+        store.dispatch('HISTORY_UNDO')
+    }, true)
+    let btn2 = document.getElementById('btn2')
+    btn2.addEventListener('click', function(e) {
+        store.dispatch('HISTORY_REDO')
+    }, true)
 
-	dataloader({ left: 0, top: 0, right, bottom }, function(data) {
-		store.dispatch(RESTORE, data)
-	})
+    dataloader({ left: 0, top: 0, right, bottom }, function(data) {
+        store.dispatch(RESTORE, data)
+    })
 
     let template =
         `<div style="position:absolute;left:0;right:0;top:0;bottom:0;"

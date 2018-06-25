@@ -11,19 +11,19 @@
 </div>
 </template>
 <script type="text/javascript">
-	import { CELLS_HANDLEMERGE } from '../../store/action-types'
+    import { CELLS_HANDLEMERGE } from '../../store/action-types'
 
-	export default {
-		computed: {
-			mergeState() {
-				return this.$store.getters.getMergeState()
-			}
-		},
-		methods: {
-			setMerge() {
-				this.$store.dispatch(CELLS_HANDLEMERGE)
-			}
-		}
-	}
+    export default {
+        computed: {
+            mergeState() {
+                return this.$store.getters.getMergeState()
+            }
+        },
+        methods: {
+            setMerge() {
+                this.$store.dispatch(CELLS_HANDLEMERGE)
+            }
+        }
+    }
 </script>
 

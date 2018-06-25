@@ -1577,7 +1577,7 @@ export default {
             let value
 
             value = this.getValue(target, currentTarget)
-            if (value === 'undefined') {
+            if (value == null) {
                 return
             }
             this.$store.dispatch(CELLS_UPDATE, {
@@ -1588,7 +1588,7 @@ export default {
         },
         getValue(elem, currentTarget) {
             let value = elem.dataset.value
-            if (value === 'undefined') {
+            if (value == null) {
                 if (elem === currentTarget) {
                     return
                 } else {
@@ -1605,7 +1605,7 @@ export default {
             let value
 
             value = this.getValue(target, currentTarget)
-            if (value === 'undefined') {
+            if (value == null) {
                 return
             }
             this.$store.dispatch(CELLS_UPDATE_BORDER, {

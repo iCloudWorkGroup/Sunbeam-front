@@ -30,7 +30,7 @@ export default {
                     break
                 }
             }
-            if (type === 'undefined') {
+            if (type == null) {
                 return sheet.editViewOccupy
             } else {
                 return sheet.editViewOccupy[viewTypes[type]]

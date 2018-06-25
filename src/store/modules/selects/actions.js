@@ -32,7 +32,6 @@ export default {
         let region
         let width
         let height
-
         let col = visibleCols[0]
         let row = visibleRows[0]
 

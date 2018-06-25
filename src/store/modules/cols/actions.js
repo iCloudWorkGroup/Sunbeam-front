@@ -193,8 +193,7 @@ export default {
     }, payload) {
         let index = payload
         let selects = getters.selectList
-
-        if (index === 'undefined') {
+        if (typeof index === 'undefined') {
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -434,7 +433,7 @@ export default {
                 previousAlias = colLoadRecord[index - 1]
                 nextAlias = colLoadRecord[index + 1]
             }
-            if (nextAlias !== 'undefined' && replaceAlias !== nextAlias) {
+            if (typeof nextAlias !== 'undefined' && replaceAlias !== nextAlias) {
                 for (let i = 0, len = rowLoadRecord.length - 1; i < len; i++) {
                     let sign = alias + '_' + nextAlias + '_' +
                         rowLoadRecord[i] + '_' + rowLoadRecord[i + 1]
@@ -447,7 +446,7 @@ export default {
                     }
                 }
             }
-            if (previousAlias !== 'undefined') {
+            if (typeof previousAlias !== 'undefined') {
                 for (let i = 0, len = rowLoadRecord.length - 1; i < len; i++) {
                     let sign = previousAlias + '_' + alias + '_' +
                         rowLoadRecord[i] + '_' + rowLoadRecord[i + 1]
@@ -698,7 +697,7 @@ export default {
             }
 
         }
-        if (index === 'undefined' || !cols[index].hidden) {
+        if (index == null || !cols[index].hidden) {
             return
         }
         let col = cols[index]
@@ -1094,7 +1093,7 @@ export default {
         let startIndex = startIndexArgs
         let endIndex = endIndexArgs
         let props = propsArgs
-        if (startIndex === 'undefined') {
+        if (typeof startIndex === 'undefined') {
             let selects = getters.selectList
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -1106,7 +1105,7 @@ export default {
             startIndex = getters.getColIndexByAlias(select.wholePosi.startColAlias)
             endIndex = getters.getColIndexByAlias(select.wholePosi.endColAlias)
         }
-        endIndex = endIndex === 'undefined' ? startIndex : endIndex
+        endIndex = endIndex == null ? startIndex : endIndex
 
         let updateColInfo = []
         let cols = getters.colList

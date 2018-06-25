@@ -7,10 +7,11 @@ import selects from './modules/selects/index'
 import sheets from './modules/sheets/index'
 import pointsInfo from './modules/pointsinfo/index'
 import input from './modules/input/index'
-import history from './modules//history/index'
+import history from './modules/history/index'
 import { LOCATE } from '../tools/constant'
-import historyPlugin from './plugins/historyplugin'
-
+import Vue from 'vue'
+import Vuex from '../lib/vuex.esm'
+Vue.use(Vuex)
 
 const state = {
     /**
@@ -27,20 +28,18 @@ const state = {
     mouseState: LOCATE,
     focusState: false
 }
-
-export default {
-	state,
-	actions,
-	mutations,
-	modules: {
-		cols,
-		rows,
-		cells,
-		selects,
-		sheets,
-		pointsInfo,
-		input,
-		history
-	},
-	plugins: [historyPlugin]
-}
+export default new Vuex.Store({
+    state,
+    actions,
+    mutations,
+    modules: {
+        cols,
+        rows,
+        cells,
+        selects,
+        sheets,
+        pointsInfo,
+        input
+    },
+    plugins: [history]
+})

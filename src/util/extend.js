@@ -26,7 +26,7 @@ export default function extend(...values) {
                 copy = options[name]
 
                 // Prevent never-ending loop
-                if (target === copy || copy === 'undefined') {
+                if (target === copy || copy == null) {
                     continue
                 }
 

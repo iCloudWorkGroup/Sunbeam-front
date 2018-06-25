@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
-import {getColDisplayName} from '../../../util/displayname'
+import { getColDisplayName } from '../../../util/displayname'
 import generator from '../../../tools/generator'
 import extend from '../../../util/extend'
 import config from '../../../config'
@@ -50,20 +50,19 @@ export default {
         index,
         width
     }) {
-        let cols = getters.colList,
-            col = cols[index];
-
+        let cols = getters.colList
+        let col = cols[index]
         send({
             url: config.operUrl['adjustcol'],
             data: JSON.stringify({
                 col: col.sort,
                 offset: width
             }),
-        });
+        })
         dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
             sort: col.sort,
             value: width
-        });
+        })
     },
     [actionTypes.COLS_EXECADJUSTWIDTH]({
         state,
@@ -73,8 +72,7 @@ export default {
     }, {
         sort,
         value
-    }){
-        let currentSheet = rootState.currentSheet
+    }) {
         let index = getters.getColIndexBySort(sort)
         let cols = getters.colList
         let col = cols[index]
@@ -91,9 +89,8 @@ export default {
 
         cellList.forEach(function(cell) {
             let occupy = cell.occupy.col
-            let temp
-
-            if ((temp = occupy.indexOf(colAlias)) !== -1) {
+            let temp = occupy.indexOf(colAlias)
+            if (temp !== -1) {
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -196,7 +193,6 @@ export default {
     }, payload) {
         let index = payload
         let selects = getters.selectList
-        let currentSheet = rootState.currentSheet
 
         if (index === 'undefined') {
             let select
@@ -207,9 +203,9 @@ export default {
                 }
             }
             if (select.wholePosi.endColAlias === 'MAX') {
-                return;
+                return
             }
-            index = getters.getColIndexByAlias(select.wholePosi.startColAlias);
+            index = getters.getColIndexByAlias(select.wholePosi.startColAlias)
         }
 
 
@@ -221,8 +217,8 @@ export default {
             data: JSON.stringify({
                 col: col.sort,
             }),
-        });
-        dispatch(actionTypes.COLS_EXECDELETECOL, col.sort);
+        })
+        dispatch(actionTypes.COLS_EXECDELETECOL, col.sort)
     },
     [actionTypes.COLS_EXECDELETECOL]({
         rootState,
@@ -230,8 +226,8 @@ export default {
         getters,
         dispatch
     }, sort) {
-        let currentSheet = rootState.currentSheet;
-        let index = getters.getColIndexBySort(sort);
+        let currentSheet = rootState.currentSheet
+        let index = getters.getColIndexBySort(sort)
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -239,27 +235,27 @@ export default {
             endRowIndex: 'MAX',
         })
 
-        let cols = getters.colList;
-        let deleteCol = cols[index];
-        let deleteColAlias = deleteCol.alias;
-        let deleteColWidth = deleteCol.width;
-        let updateOccupys = [];
-        let updateCellInfo = [];
+        let cols = getters.colList
+        let deleteCol = cols[index]
+        let deleteColAlias = deleteCol.alias
+        let deleteColWidth = deleteCol.width
+        let updateOccupys = []
+        let updateCellInfo = []
         cellList.forEach(function(cell) {
-            let occupyCol = cell.occupy.col;
-            let aliasIndex;
-            if ((aliasIndex = occupyCol.indexOf(deleteColAlias)) !== -1) {             
+            let occupyCol = cell.occupy.col
+            let aliasIndex = occupyCol.indexOf(deleteColAlias)
+            if (aliasIndex !== -1) {
                 cell.occupy.row.forEach(alias => {
                     updateOccupys.push({
                         colAlias: deleteColAlias,
                         rowAlias: alias,
                         type: 'cellIndex',
                         value: null
-                    });
-                });
+                    })
+                })
                 if (occupyCol.length !== 1) {
-                    let newOccupyCol = [...occupyCol];
-                    newOccupyCol.splice(aliasIndex, 1);
+                    let newOccupyCol = [...occupyCol]
+                    newOccupyCol.splice(aliasIndex, 1)
                     updateCellInfo.push({
                         cell,
                         props: {
@@ -282,21 +278,21 @@ export default {
                     }
                 })
             }
-        });
+        })
         updateOccupys.forEach(info => {
             commit(mutationTypes.UPDATE_POINTINFO, {
                 currentSheet,
                 info
-            });
-        });
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo);
+            })
+        })
+        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
 
-        let updateSelectInfo = [];
-        let selects = getters.selectList;
+        let updateSelectInfo = []
+        let selects = getters.selectList
         selects.forEach(function(select) {
-            let wholePosi = select.wholePosi;
-            let startIndex = getters.getColIndexByAlias(wholePosi.startColAlias);
-            let endIndex = getters.getColIndexByAlias(wholePosi.endColAlias);
+            let wholePosi = select.wholePosi
+            let startIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+            let endIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
 
             if (startIndex === index) {
                 if (startIndex === endIndex) {
@@ -312,11 +308,11 @@ export default {
                                     endColAlias: cols[index - 1].alias
                                 }
                             }
-                        });
+                        })
                         commit(mutationTypes.ACTIVE_COL, {
                             currentSheet,
                             startIndex: index - 1
-                        });
+                        })
                     } else {
                         updateSelectInfo.push({
                             select,
@@ -329,11 +325,11 @@ export default {
                                     endColAlias: cols[index + 1].alias
                                 }
                             }
-                        });
+                        })
                         commit(mutationTypes.ACTIVE_COL, {
                             currentSheet,
                             startIndex: index + 1
-                        });
+                        })
                     }
                 } else {
                     updateSelectInfo.push({
@@ -341,7 +337,7 @@ export default {
                         props: {
                             physicsBox: {
                                 width: select.physicsBox.width -
-                                    colWidth - 1
+                                    deleteColWidth - 1
                             },
                             wholePosi: {
                                 startColAlias: cols[index + 1].alias
@@ -402,7 +398,6 @@ export default {
         }
         commit(mutationTypes.UPDATE_COL, updateColInfo)
 
-        let self = this
         Vue.nextTick(function() {
             let colRecord = cache.colRecord
             let temp
@@ -475,9 +470,9 @@ export default {
             return
         }
         let index = payload
-        if (index === undefined) {
-            let selects = getters.selectList;
-            let select;
+        if (typeof index === 'undefined') {
+            let selects = getters.selectList
+            let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
                     select = selects[i]
@@ -506,7 +501,7 @@ export default {
         commit,
         getters,
         dispatch
-    }, sort){
+    }, sort) {
             let cols = getters.colList
             let index = getters.getColIndexBySort(sort)
             let col = cols[index]
@@ -655,7 +650,7 @@ export default {
         commit(mutationTypes.UPDATE_COL, updateColInfo)
 
         if (cache.localColPosi > 0) {
-            cache.localColPosi -= colWidth + 1;
+            cache.localColPosi -= colWidth + 1
         }
     },
     [actionTypes.COLS_CANCELHIDE]({
@@ -665,8 +660,8 @@ export default {
         let visibleCols = getters.visibleColList
         let cols = getters.colList
         let index = payload
-        if (index === undefined) {
-            let selects = getters.selectList;
+        if (typeof index === 'undefined') {
+            let selects = getters.selectList
             let select
             let startIndex
             let endIndex
@@ -679,8 +674,8 @@ export default {
                     break
                 }
             }
-            if(select.wholePosi.endColAlias === 'MAX'){
-                return;
+            if (select.wholePosi.endColAlias === 'MAX') {
+                return
             }
             let startColAlias = select.wholePosi.startColAlias
             let endColAlias = select.wholePosi.endColAlias
@@ -712,7 +707,7 @@ export default {
             data: JSON.stringify({
                 col: col.sort
             })
-        });
+        })
         dispatch(actionTypes.COLS_EXECCANCELHIDE, col.sort)
     },
     [actionTypes.COLS_EXECCANCELHIDE]({
@@ -726,10 +721,7 @@ export default {
         let col = cols[index]
         let colWidth = col.width
         let colAlias = col.alias
-        let currentSheet = rootState.currentSheet
-        let visibleCols = getters.visibleColList
         let updateCellInfo = []
-
         let cellList = getters.getCellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -765,7 +757,6 @@ export default {
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
 
         let updateSelectInfo = []
-        let colLeft = col.left
         let selects = getters.selectList
 
         selects.forEach(function(select) {
@@ -839,18 +830,19 @@ export default {
     [actionTypes.COLS_INSERTCOL]({
         getters,
         dispatch
-    }, index) {
-        let selects = getters.selectList;
-        if (index === undefined) {
-            let select;
+    }, payload) {
+        let index = payload
+        let selects = getters.selectList
+        if (typeof index === 'undefined') {
+            let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
                     select = selects[i]
                     break
                 }
             }
-            if(select.wholePosi.endColAlias === 'MAX'){
-                return;
+            if (select.wholePosi.endColAlias === 'MAX') {
+                return
             }
             index = getters.getColIndexByAlias(select.wholePosi.startColAlias)
         }
@@ -862,7 +854,7 @@ export default {
                 col: sort,
             }),
         })
-        dispatch(actionTypes.COLS_EXECINSERTCOL, {sort})
+        dispatch(actionTypes.COLS_EXECINSERTCOL, { sort })
     },
     [actionTypes.COLS_EXECINSERTCOL]({
         getters,
@@ -900,7 +892,7 @@ export default {
             endRowIndex: 'MAX',
         })
 
-        let updateCellInfo = [];
+        let updateCellInfo = []
         cellList.forEach(function(cell) {
             let occupyCol = cell.occupy.col
             if (cell.physicsBox.left >= insertColLeft) {
@@ -978,7 +970,7 @@ export default {
                 })
                 insertCol.active = true
             }
-        });
+        })
         commit(mutationTypes.UPDATE_SELECT, updateSelectInfo)
 
         insertCol.left = cols[index].left
@@ -1000,7 +992,7 @@ export default {
             cols: [insertCol]
         })
         if (cache.localColPosi > 0) {
-            cache.localColPosi += colWidth + 1;
+            cache.localColPosi += colWidth + 1
         }
         /**
          * 只有在删除单元格的回退操作，才会传入列对象
@@ -1027,7 +1019,7 @@ export default {
                         }
                         insertCell.content.texts = ''
                         insertCellList.push(insertCell)
-                    });
+                    })
                 }
             })
             dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)

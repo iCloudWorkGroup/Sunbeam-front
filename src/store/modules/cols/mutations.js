@@ -58,15 +58,20 @@ export default {
 			list[i].active = true
 		}
 	},
-	[types.UPDATE_COL](state, info){
-		info.forEach(function({col, props}){
-			extend(col, props)
-		})
-	},
-	[types.DELETE_COL](state, {currentSheet, index}){
-		let list = state[currentSheet].list
-		let map = state[currentSheet].map
-		map.delete(list[index].alias)
-		list.splice(index, 1)
-	}
+    [types.UPDATE_COL](state, info) {
+        info.forEach(function({
+            col,
+            props
+        }) {
+            extend(col, props)
+        })
+    }, [types.DELETE_COL](state, {
+        currentSheet,
+        index
+    }) {
+        let list = state[currentSheet].list
+        let map = state[currentSheet].map
+        map.delete(list[index].alias)
+        list.splice(index, 1)
+    }
 }

@@ -1,4 +1,4 @@
-import {rangeBinary, indexAttrBinary} from '../../../util/binary'
+import { indexAttrBinary } from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
 
@@ -42,8 +42,6 @@ export default {
                 endColIndex = startColIndex,
                 endRowIndex = startRowIndex
             } = payload
-            let rows = getters.rowList
-            let cols = getters.colList
             let cellStartColIndex
             let cellStartRowIndex
             let cellEndColIndex
@@ -86,7 +84,7 @@ export default {
 
                 for (let i = 0, len = cellList.length; i < len; i++) {
                     let cell = cellList[i]
-                    if(temp.get(cell.alias)){
+                    if (temp.get(cell.alias)) {
                         break
                     }
                     temp.set(cell.alias, true)

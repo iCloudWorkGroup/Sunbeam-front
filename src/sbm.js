@@ -6,8 +6,10 @@ import dataloader from './tools/dataloader'
 // import font from './entrance/font'
 import cache from './tools/cache'
 import { RESTORE } from './store/action-types'
-// 后期需要进行修改
-window.SPREADSHEET_AUTHENTIC_KEY = '9e417dc6-e85d-45cd-991f-577b642cfb81'
+let excelEL = document.getElementById('excelId')
+let excelId = excelEL.value
+
+window.SPREADSHEET_AUTHENTIC_KEY = excelId
 
 function SBM(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)

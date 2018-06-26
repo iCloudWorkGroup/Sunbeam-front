@@ -54,10 +54,11 @@ function restoreSBM(data, fn, resolve) {
             cellData.forEach(function(cell) {
                 cell.alias = generator.cellAliasGenerator()
             })
-            frozenData.type = 'restore'
-            frozenData.viewColAlias = sheet.viewColAlias
-            frozenData.viewRowAlias = sheet.viewRowAlias
-
+            if (frozenData) {
+                frozenData.type = 'restore'
+                frozenData.viewColAlias = sheet.viewColAlias
+                frozenData.viewRowAlias = sheet.viewRowAlias
+            }
             colRecord.push(colData[0].alias, colData[colData.length - 1].alias)
             rowRecord.push(rowData[0].alias, rowData[rowData.length - 1].alias)
 

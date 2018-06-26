@@ -14,38 +14,32 @@ export default {
         cellPosi() {
             const physicsBox = this.item.physicsBox
             const border = physicsBox.border
+            let borderRightWidth = 0
+            let borderBottomWidth = 0
             let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
             let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
-            let top = physicsBox.top - offsetTop
-            let left = physicsBox.left - offsetLeft
-            let width = physicsBox.width
-            let height = physicsBox.height
-
-            top -= border.top && 1
-            left -= border.left && 1
-
-            if (border.left === 2) {
-                width--
-            }
-            if (border.right === 2) {
-                width--
-            }
-            if (border.top === 2) {
-                height--
-            }
-            if (border.bottom === 2) {
-                height--
-            }
+            let top = physicsBox.top - offsetTop - 1
+            let left = physicsBox.left - offsetLeft - 1
+            let width = physicsBox.width - 2
+            let height = physicsBox.height - 2
+            let paddingLeft = 1
+            let paddingTop = 1
+            let paddingBottom = 1
+            let paddingRight = 1
 
             return {
                 top: unit(top),
                 left: unit(left),
                 width: unit(width),
                 height: unit(height),
-                borderTopWidth: unit(border.top),
-                borderLeftWidth: unit(border.left),
-                borderRightWidth: unit(border.right),
-                borderBottomWidth: unit(border.bottom)
+                borderTopWidth: unit(borderTopWidth),
+                borderLeftWidth: unit(borderLeftWidth),
+                borderRightWidth: unit(borderRightWidth),
+                borderBottomWidth: unit(borderBottomWidth),
+                paddingLeft: unit(paddingLeft),
+                paddingTop: unit(paddingTop),
+                paddingBottom: unit(paddingBottom),
+                paddingRight: unit(paddingRight)
             }
         },
         cellProps() {

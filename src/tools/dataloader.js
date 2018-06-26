@@ -40,7 +40,6 @@ function restoreSBM(data, fn, resolve) {
                 alias: sheet.alias || 'sheet1',
                 name: sheet.name
             }
-
             let rowData = sheet.gridLineRow
             let colData = sheet.gridLineCol
             let cellData = sheet.cells

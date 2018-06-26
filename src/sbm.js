@@ -6,10 +6,10 @@ import dataloader from './tools/dataloader'
 // import font from './entrance/font'
 import cache from './tools/cache'
 import { RESTORE } from './store/action-types'
-let excelEL = document.getElementById('excelId')
-let excelId = excelEL.value
+let sbmEL = document.getElementById('sbmId')
+let sbmId = sbmEL.value
 
-window.SPREADSHEET_AUTHENTIC_KEY = excelId
+window.SPREADSHEET_AUTHENTIC_KEY = sbmId
 
 function SBM(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)

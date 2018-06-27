@@ -28,12 +28,12 @@ export default {
             let left = physicsBox.left - offsetLeft - 1
             let width = physicsBox.width
             let height = physicsBox.height
-            let nextThickBorder = this.nextThickBorder()
-            
-            changeLeftValue()
-            changeTopValue()
-            changeRightValue()
-            changeBottomValue()
+            let nextThickBorder = this.nextThickBorder
+
+            changeLeftValue(border.left, nextThickBorder.left)
+            changeTopValue(border.top, nextThickBorder.top)
+            changeRightValue(border.right, nextThickBorder.right)
+            changeBottomValue(border.bottom, nextThickBorder.bottom)
             return {
                 top: unit(top),
                 left: unit(left),
@@ -51,8 +51,9 @@ export default {
             function changeLeftValue(border, nextBorder) {
                 if (border === 2) {
                     borderLeft = 3
-                    left--
                     paddingLeft = 0
+                    left--
+                    width--
                 } else if (border === 1 && !nextBorder) {
                     paddingLeft = 0
                     borderLeft = 1
@@ -65,8 +66,9 @@ export default {
             function changeTopValue(border, nextBorder) {
                 if (border === 2) {
                     borderTop = 3
-                    top--
                     paddingTop = 0
+                    top--
+                    height--
                 } else if (border === 1 && !nextBorder) {
                     paddingTop = 0
                     borderTop = 1
@@ -79,6 +81,7 @@ export default {
             function changeRightValue(border, nextBorder) {
                 if (border === 2) {
                     borderRight = 3
+                    paddingRight = 0
                     width--
                 } else if (border === 1 && !nextBorder) {
                     paddingRight = 0
@@ -92,18 +95,38 @@ export default {
             function changeBottomValue(border, nextBorder) {
                 if (border === 2) {
                     borderBottom = 3
+                    paddingBottom = 0
                     height--
                 } else if (border === 1 && !nextBorder) {
                     paddingBottom = 0
                     borderBottom = 1
                 } else if (nextBorder) {
-                    width--
-                    paddingLeft = 2
+                    paddingBottom = 2
+                    height--
                 }
             }
         },
+        cellProps() {
+            let cellContent = this.item.content
+            let italic = cellContent.italic ? 'italic ' : ''
+            let weight = cellContent.weight ? 'bold' : 'normal'
+            let underline = cellContent.underline ? 'underline' : ''
+            let font = cellContent.size + 'pt ' + cellContent.family
+
+            return {
+                background: cellContent.background,
+                color: cellContent.color,
+                textAlign: cellContent.alignRow,
+                verticalAlign: cellContent.alignCol,
+                font: font,
+                fontFamily: cellContent.family,
+                textDecoration: underline,
+                fontWeight: weight,
+                fontStyle: italic
+            }
+        },
         nextThickBorder() {
-            let getters = this.getters
+            let getters = this.$store.getters
             let getCells = getters.getCellsByVertical
             let occupyCol = this.item.occupy.col
             let occupyRow = this.item.occupy.row
@@ -169,25 +192,7 @@ export default {
                     }
                 }
             }
-        },
-        cellProps() {
-            let cellContent = this.item.content
-            let italic = cellContent.italic ? 'italic ' : ''
-            let weight = cellContent.weight ? 'bold' : 'normal'
-            let underline = cellContent.underline ? 'underline' : ''
-            let font = cellContent.size + 'pt ' + cellContent.family
-
-            return {
-                background: cellContent.background,
-                color: cellContent.color,
-                textAlign: cellContent.alignRow,
-                verticalAlign: cellContent.alignCol,
-                font: font,
-                fontFamily: cellContent.family,
-                textDecoration: underline,
-                fontWeight: weight,
-                fontStyle: italic
-            }
+            return result
         },
         texts() {
             return this.item.content.texts

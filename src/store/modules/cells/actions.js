@@ -313,7 +313,7 @@ export default {
                     if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
                         let updateProp
                         if (fn) {
-                            updateProp = fn(cell)
+                            updateProp = extend({}, props, fn(cell))
                         } else {
                             updateProp = props
                         }
@@ -717,7 +717,7 @@ export default {
         cellList.forEach(function(cell) {
             let updateProp
             if (fn) {
-                updateProp = fn(cell)
+                updateProp = extend({}, props, fn(cell))
             } else {
                 updateProp = props
             }
@@ -786,7 +786,7 @@ export default {
         cellList.forEach(function(cell) {
             let updateProp
             if (fn) {
-                updateProp = fn(cell)
+                updateProp = extend({}, props, fn(cell))
             } else {
                 updateProp = props
             }

@@ -319,6 +319,7 @@ export default {
                     addRowNum : config.maxRowNum - rowList.length
 
                 if (addRowNum > 0) {
+                    self.sendGeneratorRowCol('row', addRowNum)
                     let tempAlias = rowList[rowList.length - 1].alias
                     let currentAlias
 
@@ -568,6 +569,7 @@ export default {
                     addColNum : config.maxColNum - colList.length
 
                 if (addColNum > 0) {
+                    self.sendGeneratorRowCol('col', addColNum)
                     let tempAlias = colList[colList.length - 1].alias
                     let currentAlias
 
@@ -880,6 +882,15 @@ export default {
                     bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
                 })
             }
+        },
+        sendGeneratorRowCol(type, num) {
+            send({
+                url: config.operUrl['addrowcol'],
+                data: JSON.stringify({
+                    type,
+                    num
+                })
+            })
         }
     },
     watch: {

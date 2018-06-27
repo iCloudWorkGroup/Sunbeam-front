@@ -289,7 +289,8 @@ export default {
         endColIndex,
         startRowIndex,
         endRowIndex,
-        props
+        props,
+        fn
     }) {
         let getPointInfo = getters.getPointInfo
         let tempSign = {}
@@ -310,18 +311,25 @@ export default {
                 if (typeof cellIndex === 'number') {
                     let cell
                     if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
+                        let updateProp
+                        if (fn) {
+                            updateProp = extend({}, props, fn(cell))
+                        } else {
+                            updateProp = props
+                        }
                         updateCellInfo.push({
                             cell,
-                            props
+                            props: updateProp
                         })
                     }
                 } else {
-                    insertCellList.push(extend({
+                    let cell = extend({
                         occupy: {
                             col: [colAlias],
                             row: [rowAlias]
                         }
-                    }, props))
+                    }, props)
+                    insertCellList.push(cell)
                 }
             }
         }
@@ -696,7 +704,8 @@ export default {
     }, {
         startIndex,
         endIndex,
-        props
+        props,
+        fn
     }) {
         let updateCellInfo = []
         let cellList = getters.getCellsByVertical({
@@ -706,9 +715,15 @@ export default {
             endColIndex: endIndex
         })
         cellList.forEach(function(cell) {
+            let updateProp
+            if (fn) {
+                updateProp = extend({}, props, fn(cell))
+            } else {
+                updateProp = props
+            }
             updateCellInfo.push({
                 cell,
-                props
+                updateProp
             })
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
@@ -757,7 +772,8 @@ export default {
     }, {
         startIndex,
         endIndex,
-        props
+        props,
+        fn
     }) {
         let updateCellInfo = []
 
@@ -768,9 +784,15 @@ export default {
             endColIndex: 'MAX'
         })
         cellList.forEach(function(cell) {
+            let updateProp
+            if (fn) {
+                updateProp = extend({}, props, fn(cell))
+            } else {
+                updateProp = props
+            }
             updateCellInfo.push({
                 cell,
-                props
+                updateProp
             })
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)

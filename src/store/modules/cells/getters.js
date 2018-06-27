@@ -30,6 +30,20 @@ export default {
             return extend({}, cellList[0])
         }
     },
+    getOperRegion(state, getters, rootState) {
+        let select = getters.activeSelect
+        let wholePosi = select.wholePosi
+        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        return {
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        }
+    },
     /**
      * 返回合法的操作区域
      * 区域内只能包含完整的单元格

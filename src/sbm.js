@@ -11,7 +11,7 @@ import {
 // 后期需要进行修改
 window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec'
 
-function SBM(selector) {
+const Sunbean = function(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)
     dataloader({
         left: 0,
@@ -25,7 +25,8 @@ function SBM(selector) {
         store,
         render: h => h(Book)
     }).$mount(selector)
+
     // font(this, store)
 }
 
-export default SBM
+export default Sunbean

@@ -25,6 +25,11 @@ export const CELLS_UPDATE = 'CELLS_UPDATE'
 export const CELLS_INSERTCELL = 'CELLS_INSERTCELL'
 export const CELLS_UPDATE_BORDER = 'CELLS_UPDATE_BORDER'
 export const CELLS_MERGE = 'CELLS_MERGE'
+/**
+ * 单元格格式类型
+ * @type {String}
+ */
+export const CELLS_FORMAT = 'CELLS_FORMAT'
 
 export const SELECTS_INITSELECT = 'SELECTS_INITSELECT'
 export const SELECTS_UPDATESELECT = 'SELECTS_UPDATESELECT'

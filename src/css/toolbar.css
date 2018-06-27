@@ -100,8 +100,7 @@ span { display: inline-block; }
 .fui-cf-fontfamily-extend, .fui-cf-fontsize-extend { width: 6px; }
 .fui-cf-fontsize-extend .caret, .fui-cf-fontfamily-extend .caret { margin-top: -3px; }
 .fui-cf-fontfamily-extend.active, .fui-cf-fontsize-extend.active { background: #9fd5b7; }
-.tabContainer { overflow: hidden; padding: 1px 4px 8px; cursor: default; }
-.tabContainer li { float: left; height: 90px; }
+.tab-container { overflow: hidden; padding: 1px 4px 8px; cursor: default; }
 .color-body { width: 13px; height: 13px; border: 1px solid #fff; }
 .color-body:hover { border-color: #e36c09; }
 .widget { font-family: 'Microsoft Yahei'; font-size: 12px; position: absolute; min-width: 75px; background: #fff; z-index: 100;}

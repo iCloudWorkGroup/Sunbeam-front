@@ -7,7 +7,7 @@
 	<body>
 		<div id="app" style="width:100%; height:100%;"></div>
 		<script async>
-			var sbm = new SBM()
+			var sbm = new SBM('#app')
 		</script>
 </body>
 </html>

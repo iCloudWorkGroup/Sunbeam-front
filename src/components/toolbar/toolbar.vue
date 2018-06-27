@@ -23,17 +23,20 @@
     </div>
     <div class="menu-container">
         <ul id="homeTool"
+            class="tab-container"
             v-show="activeTabId === 'homeTool'">
             <tool-panel title="字体">
                 <font :active-widget-id="activeWidgetId"
-                      @updateActiveWidgetId="updateActiveWidgetId">
-                </font>
+                      @updateActiveWidgetId="updateActiveWidgetId"/>
             </tool-panel>
             <tool-panel title="对齐方式">
-                <align></align>
+                <align/>
             </tool-panel>
             <tool-panel title="合并拆分">
-                <merge></merge>
+                <merge/>
+            </tool-panel>
+            <tool-panel>
+                <format/>
             </tool-panel>
         </ul>
         <ul id="reviewTool"
@@ -53,6 +56,7 @@ import Font from './font.vue'
 import Frozen from './frozen.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
+import Format from './format.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 
@@ -68,7 +72,8 @@ export default {
         Font,
         Frozen,
         Align,
-        Merge
+        Merge,
+        Format
     },
     computed: {
 

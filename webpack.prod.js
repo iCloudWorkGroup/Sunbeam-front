@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const baseConfig = merge(base, {
 	devtool: 'source-map',
 	entry: {
-		main: './src/sbm.js'
+		main: './src/app.js'
 	},
 	output: {
 		publicPath: '/',

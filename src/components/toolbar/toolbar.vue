@@ -22,6 +22,9 @@
                 <tool-panel  title="撤销">
                     <undo></undo>
                 </tool-panel>
+                <tool-panel  title="剪切板">
+                    <clip/>
+                </tool-panel>
                 <tool-panel  title="字体">
                     <font
                         :active-widget-id="activeWidgetId"
@@ -33,6 +36,11 @@
                 </tool-panel>
                 <tool-panel  title="合并拆分">
                     <merge></merge>
+                </tool-panel>
+                <tool-panel  title="文本格式">
+                    <format
+                        :active-widget-id="activeWidgetId"
+                        @updateActiveWidgetId = "updateActiveWidgetId"></format>
                 </tool-panel>
                 <tool-panel  title="行列">
                     <rowcol :active-widget-id="activeWidgetId"
@@ -65,6 +73,8 @@ import Merge from './merge.vue'
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Undo from './undo.vue'
+import Clip from './clip.vue'
+import Format from './format.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 
@@ -83,7 +93,9 @@ export default {
         Merge,
         Rowcol,
         Hide,
-        Undo
+        Undo,
+        Clip,
+        Format
     },
     mounted() {
         this.activeTabId = this.$refs.initTab.dataset.tabId

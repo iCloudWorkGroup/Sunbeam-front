@@ -14,14 +14,18 @@ export default {
         cellPosi() {
             const physicsBox = this.item.physicsBox
             const border = physicsBox.border
-            let borderRight = 0
-            let borderBottom = 0
-            let borderLeft = 0
-            let borderTop = 0
-            let paddingLeft = 1
-            let paddingTop = 1
-            let paddingBottom = 1
-            let paddingRight = 1
+            let borderRightWidth = 1
+            let borderBottomWidth = 1
+            let borderLeftWidth = 1
+            let borderTopWidth = 1
+            let borderRightColor = 'transparent'
+            let borderBottomColor = 'transparent'
+            let borderLeftColor = 'transparent'
+            let borderTopColor = 'transparent'
+            let paddingLeft = 0
+            let paddingTop = 0
+            let paddingBottom = 0
+            let paddingRight = 0
             let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
             let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
             let top = physicsBox.top - offsetTop - 1
@@ -39,10 +43,14 @@ export default {
                 left: unit(left),
                 width: unit(width),
                 height: unit(height),
-                borderTopWidth: unit(borderTop),
-                borderLeftWidth: unit(borderLeft),
-                borderRightWidth: unit(borderRight),
-                borderBottomWidth: unit(borderBottom),
+                borderTopWidth: unit(borderTopWidth),
+                borderLeftWidth: unit(borderLeftWidth),
+                borderRightWidth: unit(borderRightWidth),
+                borderBottomWidth: unit(borderBottomWidth),
+                borderTopColor: borderTopColor,
+                borderLeftColor: borderLeftColor,
+                borderRightColor: borderRightColor,
+                borderBottomColor: borderBottomColor,
                 paddingLeft: unit(paddingLeft),
                 paddingTop: unit(paddingTop),
                 paddingBottom: unit(paddingBottom),
@@ -50,58 +58,54 @@ export default {
             }
             function changeLeftValue(border, nextBorder) {
                 if (border === 2) {
-                    borderLeft = 3
-                    paddingLeft = 0
+                    borderLeftWidth = 3
+                    borderLeftColor = 'black'
                     left--
                     width--
                 } else if (border === 1 && !nextBorder) {
-                    paddingLeft = 0
-                    borderLeft = 1
+                    borderLeftColor = 'black'
                 } else if (nextBorder) {
-                    width--
-                    paddingLeft = 2
+                    height--
+                    paddingTop = 1
                 }
             }
 
             function changeTopValue(border, nextBorder) {
                 if (border === 2) {
-                    borderTop = 3
-                    paddingTop = 0
+                    borderTopWidth = 3
+                    borderTopColor = 'black'
                     top--
                     height--
                 } else if (border === 1 && !nextBorder) {
-                    paddingTop = 0
-                    borderTop = 1
+                    borderTopColor = 'black'
                 } else if (nextBorder) {
                     height--
-                    paddingTop = 2
+                    paddingTop = 1
                 }
             }
 
             function changeRightValue(border, nextBorder) {
                 if (border === 2) {
-                    borderRight = 3
-                    paddingRight = 0
+                    borderRightWidth = 3
+                    borderRightColor = 'black'
                     width--
                 } else if (border === 1 && !nextBorder) {
-                    paddingRight = 0
-                    borderRight = 1
+                    borderRightColor = 'black'
                 } else if (nextBorder) {
-                    paddingRight = 2
+                    paddingRight = 1
                     width--
                 }
             }
 
             function changeBottomValue(border, nextBorder) {
                 if (border === 2) {
-                    borderBottom = 3
-                    paddingBottom = 0
+                    borderBottomWidth = 3
+                    borderBottomColor = 'black'
                     height--
                 } else if (border === 1 && !nextBorder) {
-                    paddingBottom = 0
-                    borderBottom = 1
+                    borderBottomColor = 'black'
                 } else if (nextBorder) {
-                    paddingBottom = 2
+                    paddingBottom = 1
                     height--
                 }
             }

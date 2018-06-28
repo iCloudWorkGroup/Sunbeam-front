@@ -22,6 +22,7 @@ function restoreSBM(data, fn, resolve) {
     send({
         url: 'reload',
         async: false,
+        isPublic: false,
         data: JSON.stringify(data),
         success(data) {
             let sheet

@@ -18,13 +18,12 @@ import send from '../util/send'
 import Vue from 'vue'
 import * as actionTypes from '../store/action-types'
 import * as mutationTypes from '../store/mutation-types'
-import {
-    getColDisplayName,
-    getRowDisplayName
-} from '../util/displayname'
+import generator from '../tools/generator'
+import { getColDisplayName, getRowDisplayName } from '../util/displayname'
 
 export default {
-    props: ['editWidth',
+    props: [
+        'editWidth',
         'editHeight',
         'frozenRule',
         'scrollTop',
@@ -85,19 +84,15 @@ export default {
             if (!frozenRule || frozenRule.type === 'mainRule') {
                 this.$emit('changeScrollLeft', currentScrollLeft)
                 this.$emit('changeScrollTop', currentScrollTop)
-
             }
             if (this.timeoutId !== '') {
                 clearTimeout(this.timeoutId)
             }
-
             this.timeoutId = setTimeout(function() {
                 self.handleScroll(currentScrollLeft, currentScrollTop)
             }, 50)
         },
-
-        handleScroll(currentScrollLeft, currentScrollTop, adjustCol = false,
-            adjustRow = false) {
+        handleScroll(currentScrollLeft, currentScrollTop, adjustCol = false, adjustRow = false) {
             let currentPromise = this.currentPromise
             let frozenRule = this.frozenRule
             let endColIndex
@@ -109,9 +104,8 @@ export default {
                 endRowIndex = frozenRule.endRowIndex
             }
 
-            currentPromise = currentPromise || new Promise(function(resolve) {
-                resolve()
-            })
+            currentPromise = currentPromise || Promise.resolve()
+
             this.currentPromise = currentPromise.then(function() {
                 let transverse = currentScrollLeft - self.recordScrollLeft
                 let vertical = currentScrollTop - self.recordScrollTop
@@ -125,13 +119,13 @@ export default {
                 self.recordScrollTop = currentScrollTop
                 self.recordScrollLeft = currentScrollLeft
 
-                if ((vertical !== 0 && endRowIndex == null) || adjustRow) {
+                if ((vertical !== 0 && typeof endRowIndex === 'undefined') || adjustRow) {
                     limitTop = self.recordScrollTop - config.prestrainHeight
                     limitTop = limitTop > 0 ? limitTop : 0
                     limitTop += self.offsetTop
-                    limitBottom = limitTop + self.$el.clientHeight +
-                        config.prestrainHeight +
-                        self.offsetTop
+                    limitBottom = limitTop + self.$el.clientHeight
+                        + config.prestrainHeight
+                        + self.offsetTop
 
                     if (vertical > 0 || adjustRow) {
                         p1 = new Promise(function(resolve) {
@@ -150,13 +144,13 @@ export default {
                     })
                 }
 
-                if ((transverse !== 0 && endColIndex == null) || adjustCol) {
+                if ((transverse !== 0 && typeof endColIndex === 'undefined') || adjustCol) {
                     limitLeft = self.recordScrollLeft - config.prestrainWidth
                     limitLeft = limitLeft > 0 ? limitLeft : 0
                     limitLeft += self.offsetLeft
-                    limitRight = limitLeft + self.$el.clientWidth +
-                        config.prestrainWidth +
-                        self.offsetLeft
+                    limitRight = limitLeft + self.$el.clientWidth
+                        + config.prestrainWidth
+                        + self.offsetLeft
 
                     if (transverse > 0 || adjustCol) {
                         p2 = new Promise(function(resolve) {
@@ -187,10 +181,9 @@ export default {
                 return Promise.all([p1, p2])
             })
         },
-        scrollToBottom(limitTop, limitBottomArgs, resolve) {
-            let limitBottom = limitBottomArgs
+        scrollToBottom(top, bottom, resolve) {
             let rowList = this.$store.getters.rowList
-            let maxBottom = cache.localRowPosi
+            let localMaxBottom = cache.localRowPosi
             let bufferHeight = config.scrollBufferWidth
             let rowRecord = cache.rowRecord
             let rowOccupy = this.rowOccupy.slice(0)
@@ -202,15 +195,28 @@ export default {
             let frozenRule = this.frozenRule
             let addRowNum = 0
             let self = this
-
+            let limitBottom = bottom
+            let limitTop = top
+            limitBottom = parseInt(limitBottom, 0)
             /**
              * 当前视图边界值超过了后台对象的最大值
              * 需要自动增加列
              */
-            if (limitBottom > maxBottom && (!frozenRule || frozenRule.type ===
-                    'mainRule')) {
+            let lastRow = rowList[rowList.length - 1]
+            let maxBottom = lastRow.top + lastRow.height
+            maxBottom = maxBottom > localMaxBottom ? maxBottom : localMaxBottom
+
+            if (limitBottom > maxBottom && (!frozenRule || frozenRule.type === 'mainRule')) {
                 addRowNum = Math.ceil((limitBottom - maxBottom + bufferHeight) / config.rowHeight)
                 limitBottom = maxBottom
+            }
+
+            if (cache.localRowPosi === 0) {
+                addRow()
+                removeOccupyRow()
+                this.updateOccupy(colOccupy, rowOccupy)
+                resolve()
+                return
             }
 
             new Promise(function(currentResolve) {
@@ -235,16 +241,14 @@ export default {
                 let currentMaxBottom = lastRow.top + lastRow.height
 
                 if (currentMaxBottom < limitBottom) {
-
                     limitBottom = limitBottom + bufferHeight
-                    limitBottom = limitBottom < maxBottom ? limitBottom : maxBottom
+                    limitBottom = limitBottom < localMaxBottom ? limitBottom : localMaxBottom
 
                     self.verticalRequest(currentMaxBottom + 1, limitBottom, resolve,
                         function(alias) {
                             let occupyBottomAlias = rowOccupy[rowOccupy.length - 1]
                             let occupyBottomIndex = rowRecord.indexOf(occupyBottomAlias)
                             let temp = [] // 记录请求区间跨域加载块
-
                             temp.push(rowRecord[occupyBottomIndex])
                             for (let i = occupyBottomIndex + 1, len = rowRecord.length; i < len; i++) {
                                 temp.push(rowRecord[i])
@@ -280,6 +284,7 @@ export default {
 
                     for (let len = rowRecord.length; i < len; i++) {
                         let row = self.$store.getters.getRowByAlias(rowRecord[i])
+
                         temp.push(row.alias)
                         rowOccupy.push(row.alias)
                         if (row.top + row.height > limitBottom) {
@@ -314,11 +319,13 @@ export default {
                     addRowNum : config.maxRowNum - rowList.length
 
                 if (addRowNum > 0) {
+                    self.sendGeneratorRowCol('row', addRowNum)
                     let tempAlias = rowList[rowList.length - 1].alias
+                    let currentAlias
 
                     self.$store.dispatch(actionTypes.ROWS_GENERAT, addRowNum)
 
-                    let currentAlias = rowList[rowList.length - 1].alias
+                    currentAlias = rowList[rowList.length - 1].alias
 
                     for (let i = 0, len = colOccupy.length - 1; i < len; i++) {
                         let sign = colOccupy[i] + '_' + colOccupy[i + 1] + '_' +
@@ -329,7 +336,6 @@ export default {
                     rowRecord.push(currentAlias)
                 }
             }
-
             function removeOccupyRow() {
                 let counter = 0
                 for (let i = 0, len = rowOccupy.length; i < len; i++) {
@@ -345,8 +351,7 @@ export default {
                 }
             }
         },
-        scrollToTop(limitTopArgs, limitBottom, resolve) {
-            let limitTop = limitTopArgs
+        scrollToTop(top, bottom, resolve) {
             let rowOccupy = this.rowOccupy.slice(0)
             let colOccupy = this.colOccupy.slice(0)
             let rowRecord = cache.rowRecord
@@ -354,7 +359,15 @@ export default {
             let occupyStartRow = this.$store.getters.getRowByAlias(occupyStartRowAlias)
             let currentTop = occupyStartRow.top
             let self = this
+            let limitTop = top
+            let limitBottom = bottom
 
+            if (cache.localRowPosi === 0) {
+                adjustOccupy()
+                this.updateOccupy(colOccupy, rowOccupy)
+                resolve()
+                return
+            }
             new Promise(function(currentResolve) {
                 getTop(currentResolve)
             }).then(function() {
@@ -406,7 +419,6 @@ export default {
             function adjustOccupy() {
                 // 移除上方多余行
                 let counter = 0
-
                 for (let i = rowOccupy.length - 1; i > -1; i--) {
                     let row = self.$store.getters.getRowByAlias(rowOccupy[i])
                     if (row.top + row.height < limitBottom) {
@@ -420,34 +432,43 @@ export default {
                 }
             }
         },
-        scrollToRight(limitLeft, limitRightArgs, resolve) {
-            let limitRight = limitRightArgs
+        scrollToRight(left, right, resolve) {
             let getters = this.$store.getters
             let colList = getters.colList
-            let maxRight = cache.localColPosi
+            let localMaxRight = cache.localColPosi
             let bufferWidth = config.scrollBufferWidth
             let colRecord = cache.colRecord
             let colOccupy = this.colOccupy.slice(0)
             let rowOccupy = this.rowOccupy.slice(0)
             let regionRecord = cache.regionRecord
-            let lastCol = colList[colList.length - 1]
-            let currentMaxRight = lastCol.left + lastCol.width
             let occupyEndColAlias = colOccupy[colOccupy.length - 1]
             let occupyEndCol = this.$store.getters.getColByAlias(occupyEndColAlias)
             let occupyRight = occupyEndCol.left + occupyEndCol.width
             let frozenRule = this.frozenRule
             let addColNum = 0
             let self = this
-
+            let limitLeft = left
+            let limitRight = right
+            limitRight = parseInt(limitRight, 0)
             /**
              * 当前视图边界值超过了后台对象的最大值
              * 需要自动增加列
              */
+            let lastCol = colList[colList.length - 1]
+            let maxRight = lastCol.left + lastCol.width
+            maxRight = maxRight > localMaxRight ? maxRight : localMaxRight
             if (limitRight > maxRight && (!frozenRule || frozenRule.type === 'mainRule')) {
                 addColNum = Math.ceil((limitRight - maxRight + bufferWidth) / config.colWidth)
                 limitRight = maxRight
             }
 
+            if (cache.localRowPosi === 0) {
+                addCol()
+                removeOccupyCol()
+                this.updateOccupy(colOccupy, rowOccupy)
+                resolve()
+                return
+            }
             new Promise(function(currentResolve) {
                 getNextCol(currentResolve)
             }).then(function() {
@@ -467,6 +488,8 @@ export default {
              * 终止值为视图边界+缓存高度
              */
             function getNextCol(resolve) {
+                let lastCol = colList[colList.length - 1]
+                let currentMaxRight = lastCol.left + lastCol.width
                 if (currentMaxRight < limitRight) {
                     limitRight = limitRight + config.scrollBufferWidth
                     limitRight = limitRight < maxRight ? limitRight : maxRight
@@ -546,11 +569,11 @@ export default {
                     addColNum : config.maxColNum - colList.length
 
                 if (addColNum > 0) {
+                    self.sendGeneratorRowCol('col', addColNum)
                     let tempAlias = colList[colList.length - 1].alias
                     let currentAlias
 
                     self.$store.dispatch(actionTypes.COLS_GENERAT, addColNum)
-
                     currentAlias = colList[colList.length - 1].alias
 
                     for (let i = 0, len = rowOccupy.length - 1; i < len; i++) {
@@ -580,8 +603,7 @@ export default {
                 }
             }
         },
-        scrollToLeft(limitLeftArgs, limitRight, resolve) {
-            let limitLeft = limitLeftArgs
+        scrollToLeft(left, right, resolve) {
             let colOccupy = this.colOccupy.slice(0)
             let rowOccupy = this.rowOccupy.slice(0)
             let occupyStartColAlias = colOccupy[0]
@@ -589,7 +611,15 @@ export default {
             let currentLeft = occupyStartCol.left
             let colRecord = cache.colRecord
             let self = this
+            let limitLeft = left
+            let limitRight = right
 
+            if (cache.localRowPosi === 0) {
+                adjustOccupy()
+                this.updateOccupy(colOccupy, rowOccupy)
+                resolve()
+                return
+            }
             new Promise(function(currentResolve) {
                 getLeft(currentResolve)
             }).then(function() {
@@ -674,27 +704,39 @@ export default {
                     right,
                     bottom
                 }),
-                success: (dataArgs) => {
-                    let sheetData
-                    let data = dataArgs.returndata
+                success: data => {
+                    if (fn) {
+                        let colData = data.gridLineCol
+                        let endColAlias = colData[colData.length - 1].alias
+                        let firstCol = colData[0]
 
-                    if (data.spreadSheet && data.spreadSheet[0] &&
-                        (sheetData = data.spreadSheet[0].sheet)) {
-                        if (fn) {
-                            let cols = sheetData.glX
-                            let endColAlias = cols[cols.length - 1].aliasX
-
-                            cols.forEach(function(col) {
-                                col.sort = col.index
-                                col.alias = col.aliasX
-                                col.displayName = getColDisplayName(col.sort)
-                            })
-                            this.$store.dispatch(actionTypes.COLS_RESTORECOLS, cols)
-                            fn(endColAlias)
+                        if (firstCol.hidden) {
+                            let index = this.$store.getters.getColIndexByAlias(firstCol.alias)
+                            if (index > 0) {
+                                let cols = this.$store.getters.colList
+                                this.$store.commit(mutationTypes.UPDATE_COL, {
+                                    col: cols[index - 1],
+                                    props: {
+                                        rightAjacentHide: true
+                                    }
+                                })
+                            }
                         }
-                        let cells = sheetData.cells
-                        this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
+                        for (let i = 0, len = colData.length; i < len; i++) {
+                            let col = colData[i]
+                            if (col.hidden && i > 0) {
+                                colData[i - 1].rightAjacentHide = true
+                            }
+                            col.displayName = getColDisplayName(col.sort)
+                        }
+                        this.$store.dispatch(actionTypes.COLS_RESTORECOLS, colData)
+                        fn(endColAlias)
                     }
+                    let cells = data.cells
+                    cells.forEach(function(cell) {
+                        cell.alias = generator.cellAliasGenerator()
+                    })
+                    this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
                     resolve()
                 }
             })
@@ -706,7 +748,6 @@ export default {
             let endCol = this.$store.getters.getColByAlias(endColAlias)
             let left = startCol.left
             let right = endCol.left + endCol.width
-
             return send({
                 url: 'sheet/area',
                 isPublic: false,
@@ -716,27 +757,40 @@ export default {
                     right,
                     bottom
                 }),
-                success: (dataArgs) => {
-                    let sheetData
-                    let data = dataArgs.returndata
+                success: (data) => {
+                    if (fn) {
+                        let rowData = data.gridLineRow
+                        let endRowAlias = rowData[rowData.length - 1].alias
+                        let firstRow = rowData[0]
 
-                    if (data.spreadSheet && data.spreadSheet[0] &&
-                        (sheetData = data.spreadSheet[0].sheet)) {
-                        if (fn) {
-                            let rows = sheetData.glY
-                            let endRowAlias = rows[rows.length - 1].aliasY
-
-                            rows.forEach(function(row) {
-                                row.sort = row.index
-                                row.alias = row.aliasY
-                                row.displayName = getRowDisplayName(row.sort)
-                            })
-                            this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rows)
-                            fn(endRowAlias)
+                        if (firstRow.hidden) {
+                            let index = this.$store.getters.getRowIndexByAlias(firstRow.alias)
+                            if (index > 0) {
+                                let rows = this.$store.getters.rowList
+                                this.$store.commit(mutationTypes.UPDATE_ROW, {
+                                    row: rows[index - 1],
+                                    props: {
+                                        bottomAjacentHide: true
+                                    }
+                                })
+                            }
                         }
-                        let cells = sheetData.cells
-                        this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
+                        for (let i = 0, len = rowData.length; i < len; i++) {
+                            let row = rowData[i]
+                            if (row.hidden && i > 0) {
+                                rowData[i - 1].bottomAjacentHide = true
+                            }
+                            row.displayName = getRowDisplayName(row.sort)
+                        }
+
+                        this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rowData)
+                        fn(endRowAlias)
                     }
+                    let cells = data.cells
+                    cells.forEach(function(cell) {
+                        cell.alias = generator.cellAliasGenerator()
+                    })
+                    this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
                     resolve()
                 }
             })
@@ -763,8 +817,6 @@ export default {
             let frozenRule = this.frozenRule
             let colOccupy = []
             let rowOccupy = []
-
-
             if (frozenRule) {
                 startRowIndex = frozenRule.startRowIndex
                 startColIndex = frozenRule.startColIndex
@@ -775,15 +827,13 @@ export default {
                 offsetLeft += frozenRule.offsetLeft
             }
 
-
-            endColIndex = endColIndex != null ? endColIndex :
+            endColIndex = typeof endColIndex !== 'undefined' ? endColIndex :
                 getters.getColIndexByPosi(offsetLeft + clientWidth +
                     config.prestrainWidth)
 
-            endRowIndex = endRowIndex != null ? endRowIndex :
+            endRowIndex = typeof endRowIndex !== 'undefined' ? endRowIndex :
                 getters.getRowIndexByPosi(offsetTop + clientHeight +
                     config.prestrainHeight)
-
             let colRecord = cache.colRecord
             let rowRecord = cache.rowRecord
             let startCol = colList[startColIndex]
@@ -832,6 +882,15 @@ export default {
                     bottom: this.offsetTop + this.$el.clientHeight + config.prestrainHeight
                 })
             }
+        },
+        sendGeneratorRowCol(type, num) {
+            send({
+                url: config.operUrl['addrowcol'],
+                data: JSON.stringify({
+                    type,
+                    num
+                })
+            })
         }
     },
     watch: {
@@ -865,18 +924,19 @@ export default {
         },
         colMaxPosi(newVal, oldVal) {
             let frozenRule = this.frozenRule
-            if (newVal < oldVal && (!frozenRule || frozenRule.endColIndex == null)) {
+            if (newVal < oldVal && (!frozenRule || typeof frozenRule.endColIndex === 'undefined')) {
                 this.handleScroll(this.recordScrollLeft, this.recordScrollTop, true, false)
             }
         },
         rowMaxPosi(newVal, oldVal) {
             let frozenRule = this.frozenRule
-            if (newVal < oldVal && (!frozenRule || frozenRule.endRowIndex == null)) {
+            if (newVal < oldVal && (!frozenRule || typeof frozenRule.endRowIndex === 'undefined')) {
                 this.handleScroll(this.recordScrollLeft, this.recordScrollTop, false, true)
             }
         }
     }
 }
+
 </script>
 <style type="text/css">
 .edit {

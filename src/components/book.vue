@@ -1,32 +1,25 @@
 <template>
-<div class="app"
-     style="position:absolute;left:0;right:0;top:0;bottom:0;">
-    <toolbar></toolbar>
-    <div class="book"
-         @mouseup="getFocus"
-         :style="{ width: width + 'px',
-            height: height + 'px'}">
-        <sheet :sheet-width="width"
-               :sheet-height="sheetHeight"></sheet>
-        <!-- <tab></tab> -->
+    <div class="app"
+         style="position:absolute;left:0;right:0;top:0;bottom:0;">
+        <toolbar></toolbar>
+        <div class="book"
+             @mouseup="getFocus"
+             :style="{ width: width + 'px', height: height + 'px'}">
+            <sheet :sheet-width="width"
+                   :sheet-height="sheetHeight"></sheet>
+            <sheet-edit></sheet-edit>
+        </div>
     </div>
-</div>
-
 </template>
-
-
 <script type="text/javascript">
 import Toolbar from './toolbar/toolbar.vue'
 import Sheet from './sheet.vue'
+import SheetEdit from './sheet-edit.vue'
 import cache from '../tools/cache'
 import config from '../config'
-import {
-    UPDATE_MOUSESTATE,
-    UPDATE_FOCUSSTATE
-} from '../store/mutation-types'
-import {
-    LOCATE
-} from '../tools/constant'
+import { UPDATE_MOUSESTATE, UPDATE_FOCUSSTATE } from '../store/mutation-types'
+import { LOCATE } from '../tools/constant'
+
 export default {
     props: ['focusState'],
     computed: {
@@ -39,11 +32,11 @@ export default {
     },
     components: {
         Toolbar,
-        Sheet
+        Sheet,
+        SheetEdit
     },
     created() {
         this.width = cache.rootEl.offsetWidth
-        console.log(document.querySelector('#app'))
         this.height = cache.rootEl.offsetHeight - config.toolbarHeight
     },
     mounted() {

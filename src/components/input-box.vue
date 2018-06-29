@@ -1,17 +1,13 @@
 <template>
 <textarea class="edit-frame"
-          :value="texts"
-          @blur="completeEdit"
-          :style="styleObject">
+        :value="texts"
+        @blur="completeEdit"
+        :style="styleObject">
 </textarea>
 </template>
 <script type="text/javascript">
-import {
-    EDIT_HIDE
-} from '../store/action-types'
-import {
-    UPDATE_FOCUSSTATE
-} from '../store/mutation-types'
+import { EDIT_HIDE } from '../store/action-types'
+import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
 import config from '../config'
 
 export default {
@@ -42,16 +38,6 @@ export default {
             }
             top += config.cornerHeight
             return top
-
-            // let getters = this.$store.getters,
-            //     getInputState = getters.getInputState,
-            //     top = getters.getInputState.top
-
-            // if (getInputState.verticalScroll) {
-            //     top += this.scrollTop
-            // }
-            // top += config.cornerHeight
-            // return top
         },
         styleObject() {
             let state = this.$store.getters.getInputState
@@ -61,7 +47,7 @@ export default {
                 width: state.width + 'px',
                 height: state.height + 'px',
                 fontFamily: state.family,
-                fontSize: state.size + 'px',
+                fontSize: state.size + 'pt',
                 fontStyle: state.italic,
                 color: state.color,
                 textDecoration: state.underline,

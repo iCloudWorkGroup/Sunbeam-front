@@ -1,6 +1,8 @@
 import extend from '../../../util/extend'
 import * as mutationTypes from '../../mutation-types'
 import * as actionTypes from '../../action-types'
+import send from '../../../util/send'
+import config from '../../../config'
 
 export default {
     [actionTypes.EDIT_SHOW]({
@@ -54,7 +56,7 @@ export default {
         if (frozenState.isFrozen) {
             let rules = frozenState.rules
             let rule
-            for (let i = 0, len = rule.length; i < len; i++) {
+            for (let i = 0, len = rules.length; i < len; i++) {
                 rule = rules[i]
                 if (rule.type === 'mainRule') {
                     break
@@ -84,13 +86,9 @@ export default {
         let inputState = getters.getInputState
         let startColIndex = getters.getColIndexByAlias(inputState.colAlias)
         let startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias)
+        let cols = getters.colList
+        let rows = getters.rowList
 
-        dispatch(actionTypes.CELLS_UPDATE, {
-            startColIndex,
-            startRowIndex,
-            propNames: 'content.texts',
-            value: texts
-        })
         commit(mutationTypes.UPDATE_EDIT, {
             currentSheet: rootState.currentSheet,
             inputInfo: {
@@ -100,6 +98,34 @@ export default {
                 left: -9999,
                 top: -9999,
                 texts: ''
+            }
+        })
+        let cell = getters.getCellsByVertical({ startColIndex, startRowIndex })[0]
+
+        if (cell && cell.content.texts === texts) {
+            return
+        }
+        send({
+            url: config.operUrl['texts'],
+            data: JSON.stringify({
+                coordinate: {
+                    startCol: cols[startColIndex].sort,
+                    startRow: rows[startRowIndex].sort,
+                    endCol: cols[startColIndex].sort,
+                    endRow: rows[startRowIndex].sort
+                },
+                content: texts
+            }),
+        })
+        dispatch(actionTypes.CELLS_UPDATE_PROP, {
+            startColIndex,
+            startRowIndex,
+            endColIndex: startColIndex,
+            endRowIndex: startRowIndex,
+            props: {
+                content: {
+                    texts: texts
+                }
             }
         })
     }

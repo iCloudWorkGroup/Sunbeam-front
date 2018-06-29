@@ -17,20 +17,18 @@ export default function extend(...values) {
     for (let len = values.length; i < len; i++) {
         // Only deal with non-null/undefined values
         options = values[i]
-
         // Extend the base object
-
         for (name in options) {
             if (Object.prototype.hasOwnProperty.call(options, name)) {
                 src = target[name]
                 copy = options[name]
 
                 // Prevent never-ending loop
-                if (target === copy || copy == null) {
+                if (target === copy) {
                     continue
                 }
 
-                if (isObject(copy)) {
+                if (isObject(copy) && copy !== null) {
                     if (Array.isArray(copy)) {
                         clone = src && Array.isArray(src) ? src : []
                         clone.splice(0, clone.length, ...copy)

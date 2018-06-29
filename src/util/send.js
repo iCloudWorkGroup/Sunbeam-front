@@ -5,7 +5,8 @@ import $ from 'jquery'
 
 export default function(optionsArgs) {
     let options = optionsArgs
-    if (options.isPublic) {
+    if (typeof options.isPublic === 'undefined' ||
+        options.isPublic === true) {
         cache.sendQueueStep++
     }
     options = extend({}, {
@@ -21,8 +22,8 @@ export default function(optionsArgs) {
 
     options.url = cfg.rootPath + options.url
     options.beforeSend = function(request) {
-        request.setRequestHeader('step', cache.sendQueueStep)
-        request.setRequestHeader('excelId', window.SPREADSHEET_AUTHENTIC_KEY)
+        request.setRequestHeader('X-Step', cache.sendQueueStep)
+        request.setRequestHeader('X-Book-Id', window.SPREADSHEET_AUTHENTIC_KEY)
     }
     let success = options.success
     options.success = function(data) {

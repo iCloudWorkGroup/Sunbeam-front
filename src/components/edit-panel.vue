@@ -94,7 +94,7 @@ export default {
         locate(e) {
             let getters = this.$store.getters
             let elem = this.$refs.panel
-            let frozenRule = this.frozeRule
+            let frozenRule = this.frozenRule
             let offsetLeft = 0
             let offsetTop = 0
             let box

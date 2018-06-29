@@ -54,7 +54,6 @@ export default {
         currentSheet
     }) {
         let list = state[currentSheet].list
-
         for (let i = startIndex; i <= endIndex; i++) {
             list[i].active = true
         }
@@ -66,12 +65,13 @@ export default {
         }) {
             extend(col, props)
         })
-    },
-    [types.DELETE_COL](state, {
+    }, [types.DELETE_COL](state, {
         currentSheet,
         index
     }) {
         let list = state[currentSheet].list
+        let map = state[currentSheet].map
+        map.delete(list[index].alias)
         list.splice(index, 1)
     }
 }

@@ -5,11 +5,11 @@ import Book from './components/book.vue'
 import dataloader from './tools/dataloader'
 // import font from './entrance/font'
 import cache from './tools/cache'
-import {
-    RESTORE
-} from './store/action-types'
-// 后期需要进行修改
-window.SPREADSHEET_AUTHENTIC_KEY = '1e624f96-17ac-44f5-9def-fe989a1f6bec'
+import { RESTORE } from './store/action-types'
+let sbmEL = document.getElementById('sbmId')
+let sbmId = sbmEL.value
+
+window.SPREADSHEET_AUTHENTIC_KEY = sbmId
 
 const Sunbean = function(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)
@@ -20,12 +20,11 @@ const Sunbean = function(selector) {
         bottom: $rootEl.offsetHeight
     }, function(data) {
         store.dispatch(RESTORE, data)
+        new Vue({
+            store,
+            render: h => h(Book)
+        }).$mount(selector)
     })
-    new Vue({
-        store,
-        render: h => h(Book)
-    }).$mount(selector)
-
     // font(this, store)
 }
 

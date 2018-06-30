@@ -1083,6 +1083,158 @@ export default {
         })
         dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
     },
+    [actionTypes.CELLS_FORMAT]({
+        commit,
+        getters,
+        rootState,
+    }, reg) {
+        function splitReg(str) {
+            let localStr = str
+            let keyRegs = [{
+                reg: /0^\.|0\.0{1,3}/g,
+                match: true,
+                handle: 'decimal'
+            }, {
+                reg: /#,##/g,
+                decorate: 'middle'
+            }, {
+                reg: /%/g,
+                match: true,
+                decorate: 'after',
+                handle: 'percent'
+            }, {
+                reg: /\$|￥/g,
+                match: true,
+                decorate: 'before',
+            }, {
+                reg: /^@$/g,
+                handle: 'article'
+            }, {
+                reg: /^G$/g,
+                handle: 'examine'
+            }, {
+                reg: /^(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|^(y{4})[-/年]?(m{1,2})[-/月]?/g,
+                handle: 'whole',
+                match: true
+            }]
+            let retRegs = []
+            for (let i = 0, len = keyRegs.length; i < len; i++) {
+                let item = keyRegs[i]
+                let reg = item['reg']
+                let ret = reg.exec(localStr)
+                if (ret) {
+                    if (item.match) {
+                        item.match = ret[0]
+                    }
+                    retRegs.push(item)
+                    let arrayStr = localStr.split('')
+                    arrayStr.splice(ret.index, reg.lastIndex - ret.index)
+                    localStr = arrayStr.join('')
+                    if (!localStr.length) {
+                        break
+                    }
+                }
+            }
+            return retRegs
+        }
+        let Complier = function(inptVal, type = '') {
+            this.origin = this.manifest = this.inpt = inptVal
+            this.dateType = type
+        }
+        Complier.prototype = {
+            initilize: function(rules) {
+                let calculate = function(handleType) {
+                    for (let i = 0, len = rules.length; i < len; i++) {
+                        let item = rules[i]
+                        let handleName
+                        if ((handleName = item[handleType]) != null) {
+                            this.manifest = this[handleName](item)
+                        }
+                    }
+                }.bind(this)
+
+                calculate('handle')
+                calculate('decorate')
+            },
+            /**
+             * [返回数字类型]
+             * @param  {[type]} rule [description]
+             * @return {[number]}      [description]
+             */
+            decimal: function(rule) {
+                // 小数变整数，四舍五入
+                // 整数变小数
+                // 小数变小数，四舍五入
+                let exps = rule.match
+                if (exps.indexOf('.') !== -1) {
+                    let figure = exps.length - exps.indexOf('.') - 1
+                    return this.origin.toFixed(figure)
+                }
+                return parseInt(this.origin, 10)
+            },
+            percent: function(rule) {
+                return this.origin * 100
+            },
+            article: function() {
+                return this.origin.toString()
+            },
+            examine: function() {
+                let type = 'text'
+                let localValue
+                if (!isNaN(localValue = parseFloat(this.origin)) &&
+                    typeof localValue === 'number') {
+                    type = 'number'
+                }
+                if (!isNaN(Date.parse(this.origin))) {
+                    type = 'date'
+                }
+                return type
+            },
+            /**
+             * [修饰符在中间，需要number类型]
+             * @return {[String]} [description]
+             */
+            middle: function() {
+                return this.origin.toLocaleString()
+            },
+            /**
+             * [修饰符在前面]
+             * @param  {[type]} rule [description]
+             * @return {[String]}      [description]
+             */
+            before: function(rule) {
+                return rule.match + this.manifest
+            },
+            /**
+             * [修饰符在后面, 但要计算数据值]
+             * @param  {[type]} rule [description]
+             * @return {[String]}      [description]
+             */
+            after: function(rule) {
+                return this.manifest + rule.match
+            },
+            whole: function(rule) {
+                let localDate = new Date(this.origin)
+                let dateMap = {
+                    y: localDate.getFullYear(),
+                    m: localDate.getMonth() + 1,
+                    d: localDate.getDate()
+                }
+                let ret = rule.match.replace(/([ymd]+)/g, function(
+                    match, name) {
+                    let localName = name.substring(0, 1)
+                    return (dateMap[localName] != null) ?
+                        dateMap[localName] : ''
+                })
+                console.log(ret)
+            }
+        }
+        // let rules = splitReg(reg)
+        splitReg(reg)
+        // getters.getSelectCell()
+        // var ec = new Complier(originalValue)
+        // ec.initilize(rules)
+    },
     [actionTypes.CELLS_INNERPASTE]({
         state,
         dispatch,
@@ -1165,24 +1317,31 @@ export default {
             }
         }
         let cells = getters.cellList
-        cacheInfo.forEach(item => {
+        for (let i = 0, len = cacheInfo.length; i < len; i++) {
+            let item = cacheInfo[i]
             let cell = cells[item.cellIndex]
             let insertCell = extend(cell)
             let currentOccupyCol = insertCell.occupy.col
             let currentOccupyRow = insertCell.occupy.row
             let occupyCol = []
             let occupyRow = []
-            for (let i = 0, len = currentOccupyCol.length; i < len; i++) {
-                occupyCol.push(cols[startColIndex + item.colRelative].alias)
+            if (startColIndex + currentOccupyCol.length > cols.length ||
+                startRowIndex + currentOccupyRow.length > rows.length) {
+                continue
             }
-            for (let i = 0, len = currentOccupyRow.length; i < len; i++) {
-                occupyRow.push(rows[startRowIndex + item.rowRelative].alias)
+            for (let j = 0, len = currentOccupyCol.length; j < len; j++) {
+                occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
             }
+            for (let j = 0, len = currentOccupyRow.length; j < len; j++) {
+                occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
+            }
+            console.log(occupyCol)
+            console.log(occupyRow)
             insertCell.occupy = {
                 col: occupyCol,
                 row: occupyRow
             }
             dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
-        })
+        }
     }
 }

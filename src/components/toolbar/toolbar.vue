@@ -22,6 +22,9 @@
                 <tool-panel  title="撤销">
                     <undo></undo>
                 </tool-panel>
+                <tool-panel  title="剪切板">
+                    <clip/>
+                </tool-panel>
                 <tool-panel  title="字体">
                     <font
                         :active-widget-id="activeWidgetId"
@@ -33,6 +36,11 @@
                 </tool-panel>
                 <tool-panel  title="合并拆分">
                     <merge></merge>
+                </tool-panel>
+                <tool-panel  title="文本格式">
+                    <format
+                        :active-widget-id="activeWidgetId"
+                        @updateActiveWidgetId = "updateActiveWidgetId"></format>
                 </tool-panel>
                 <tool-panel  title="行列">
                     <rowcol :active-widget-id="activeWidgetId"
@@ -54,41 +62,6 @@
                 </tool-panel>
             </ul>
         </div>
-<<<<<<< HEAD
-        <div class="excel-name">
-            <div class="textarea">Book Name</div>
-        </div>
-        <div class="version">Version frontend : 1.0.0</div>
-        <div class="version">Version java : 1.0.0</div>
-    </div>
-    <div class="menu-container">
-        <ul id="homeTool"
-            class="tab-container"
-            v-show="activeTabId === 'homeTool'">
-            <tool-panel title="字体">
-                <font :active-widget-id="activeWidgetId"
-                      @updateActiveWidgetId="updateActiveWidgetId"/>
-            </tool-panel>
-            <tool-panel title="对齐方式">
-                <align/>
-            </tool-panel>
-            <tool-panel title="合并拆分">
-                <merge/>
-            </tool-panel>
-            <tool-panel>
-                <format/>
-            </tool-panel>
-        </ul>
-        <ul id="reviewTool"
-            v-show="activeTabId === 'reviewTool'">
-            <tool-panel title="视图">
-                <frozen :active-widget-id="activeWidgetId"
-                        @updateActiveWidgetId="updateActiveWidgetId">
-                </frozen>
-            </tool-panel>
-        </ul>
-=======
->>>>>>> 7ec422f1fb2fbe7991a801d56bab28562e576a98
     </div>
 </template>
 <script type="text/javascript">
@@ -97,13 +70,11 @@ import Font from './font.vue'
 import Frozen from './frozen.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
-<<<<<<< HEAD
 import Format from './format.vue'
-=======
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Undo from './undo.vue'
->>>>>>> 7ec422f1fb2fbe7991a801d56bab28562e576a98
+import Clip from './clip.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 
@@ -123,7 +94,9 @@ export default {
         Format,
         Rowcol,
         Hide,
-        Undo
+        Undo,
+        Clip,
+        Format
     },
     mounted() {
         this.activeTabId = this.$refs.initTab.dataset.tabId

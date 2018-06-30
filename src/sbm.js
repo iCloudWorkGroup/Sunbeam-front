@@ -11,7 +11,7 @@ let sbmId = sbmEL.value
 
 window.SPREADSHEET_AUTHENTIC_KEY = sbmId
 
-function SBM(selector) {
+const Sunbean = function(selector) {
     let $rootEl = cache.rootEl = document.querySelector(selector)
     dataloader({
         left: 0,
@@ -28,4 +28,4 @@ function SBM(selector) {
     // font(this, store)
 }
 
-export default SBM
+export default Sunbean

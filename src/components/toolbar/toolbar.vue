@@ -70,11 +70,11 @@ import Font from './font.vue'
 import Frozen from './frozen.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
+import Format from './format.vue'
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Undo from './undo.vue'
 import Clip from './clip.vue'
-import Format from './format.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 
@@ -91,6 +91,7 @@ export default {
         Frozen,
         Align,
         Merge,
+        Format,
         Rowcol,
         Hide,
         Undo,

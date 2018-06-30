@@ -5,7 +5,8 @@ import $ from 'jquery'
 
 export default function(optionsArgs) {
     let options = optionsArgs
-    if (options.isPublic) {
+    if (typeof options.isPublic === 'undefined' ||
+        options.isPublic === true) {
         cache.sendQueueStep++
     }
     options = extend({}, {

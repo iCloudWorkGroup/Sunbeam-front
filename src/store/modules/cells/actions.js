@@ -1074,9 +1074,9 @@ export default {
                         insertCellList.push(insertCell)
                     }
                 }
-            })
-            dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
-        }
+            }
+        })
+        dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
     },
     [actionTypes.CELLS_FORMAT]({
         commit,
@@ -1224,8 +1224,8 @@ export default {
                 console.log(ret)
             }
         }
-        let rules = splitReg(reg)
-
+        // let rules = splitReg(reg)
+        splitReg(reg)
         // getters.getSelectCell()
         // var ec = new Complier(originalValue)
         // ec.initilize(rules)

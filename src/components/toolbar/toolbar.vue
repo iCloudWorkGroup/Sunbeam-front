@@ -91,7 +91,6 @@ export default {
         Frozen,
         Align,
         Merge,
-        Format,
         Rowcol,
         Hide,
         Undo,

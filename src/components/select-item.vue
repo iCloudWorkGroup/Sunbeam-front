@@ -1,5 +1,5 @@
 <template>
-<div class="select-item"
+<div :class="classStr"
      @dblclick="edit"
      :style="styleObject">
     <div class="box">
@@ -12,9 +12,7 @@
 
 <script type="text/javascript">
 import * as types from '../store/action-types'
-import {
-    SELECT
-} from '../tools/constant'
+import { SELECT, CLIP } from '../tools/constant'
 
 export default {
     props: ['select', 'frozenRule'],
@@ -48,11 +46,20 @@ export default {
                 width: width + 'px',
                 height: height + 'px'
             }
-
             return result
         },
-        wholePosi() {
-            return this.select.wholePosi
+        classStr() {
+            let type = this.select.type
+            let result
+            switch (type) {
+                case SELECT:
+                    result = 'select-item'
+                    break
+                case CLIP:
+                    result = 'clip-item'
+                    break
+            }
+            return result
         }
     },
     methods: {
@@ -83,18 +90,28 @@ export default {
 }
 </script>
 <style type="text/css">
-.select-item {
+.clip-item, .select-item {
     position: absolute;
-    border: 2px solid #217346;
     margin: -1px;
     overflow: hidden;
 }
-
+.select-item {
+    border: 2px solid #217346;
+    z-index: 1;
+}
+.clip-item {
+    border: 2px dashed #217346;
+    z-index: 0;
+}
 .select-item .box {
     position: relative;
     height: inherit;
 }
-
+.clip-item .box {
+    background: #ddd;
+    height: inherit;
+    opacity: 0.35;
+}
 .select-item .box .expand {
     position: absolute;
     bottom: -1px;
@@ -106,13 +123,11 @@ export default {
     border: 1px solid #fff;
     cursor: crosshair;
 }
-
 .select-item .box .bg {
     background: #141414;
     opacity: .24;
     height: 100%;
 }
-
 .select-item {
     transition: .2s;
     -moz-transition: .2s;

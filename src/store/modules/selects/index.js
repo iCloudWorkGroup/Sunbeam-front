@@ -1,7 +1,6 @@
 import actions from './actions'
 import mutations from './mutations'
 import getters from './getters'
-
 /**
  * 状态值
  * 结构为 state = {'sheetAlias' : {list [], state}}
@@ -13,9 +12,14 @@ const state = {
      * 当前活动对象
      * @type {Object}
      */
-    activeSelect: null
+    activeSelect: null,
+    currentOprRegion: {
+        startColIndex: null,
+        endColIndex: null,
+        startRowIndex: null,
+        endRowIndex: null
+    }
 }
-
 export default {
     state,
     getters,

@@ -2,12 +2,17 @@
 <textarea class="edit-frame"
         :value="texts"
         @blur="completeEdit"
+        @copy="copyData"
+        @cut="cutData"
+        @paste="parseData"
         :style="styleObject">
 </textarea>
 </template>
 <script type="text/javascript">
-import { EDIT_HIDE } from '../store/action-types'
+import { EDIT_HIDE, SELECTS_INSERT, CELLS_INNERPASTE } from '../store/action-types'
 import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
+import { CLIP } from '../tools/constant'
+import cache from '../tools/cache'
 import config from '../config'
 
 export default {
@@ -75,6 +80,17 @@ export default {
                 this.$el.focus()
                 this.$store.commit(UPDATE_FOCUSSTATE, true)
             }
+        },
+        copyData() {
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            cache.clipState = 'copy'
+        },
+        cutData() {
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            cache.clipState = 'cut'
+        },
+        parseData() {
+            this.$store.dispatch(CELLS_INNERPASTE)
         }
     },
     watch: {

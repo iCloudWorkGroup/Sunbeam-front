@@ -17,5 +17,6 @@ export default {
     rowRecord: [],
     regionRecord: map,
     // 存储rootElement元素
-    rootEl: ''
+    rootEl: '',
+    clipData: ''
 }

@@ -1,8 +1,12 @@
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
+import {
+    CLIP
+} from '../../../tools/constant'
 import extend from '../../../util/extend'
 import template from './template'
 import generator from '../../../tools/generator'
+import cache from '../../../tools/cache'
 import config from '../../../config'
 import send from '../../../util/send'
 
@@ -247,6 +251,7 @@ export default {
                 })
             }
         }
+
         function getReverseValue() {
             let cell = getters.getCellsByVertical({
                 startColIndex,
@@ -1077,5 +1082,107 @@ export default {
             }
         })
         dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
+    },
+    [actionTypes.CELLS_INNERPASTE]({
+        state,
+        dispatch,
+        getters,
+        commit,
+        rootState
+    }) {
+        let {
+            startColIndex,
+            startRowIndex
+        } = getters.getOprRegion
+        let clip
+        let selects = getters.selectList
+        for (let i = 0, len = selects.length; i < len; i++) {
+            let item = selects[i]
+            if (item.type === CLIP) {
+                clip = item
+            }
+        }
+        if (!clip) {
+            return
+        }
+        let cols = getters.colList
+        let rows = getters.rowList
+
+        let currentSheet = rootState.currentSheet
+        let wholePosi = clip.wholePosi
+        let clipStartColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+        let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+        let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+        let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        let cacheInfo = []
+        let colRelative = 0
+        let rowRelative = 0
+        let temp = {}
+        for (let i = clipStartColIndex; i < clipEndColIndex + 1; i++) {
+            rowRelative = 0
+            for (let j = clipStartRowIndex; j < clipEndRowIndex + 1; j++) {
+                let aliasCol = cols[i].alias
+                let aliasRow = rows[j].alias
+                let cellIndex = getters.getPointInfo(aliasCol, aliasRow, 'cellIndex')
+                if (cellIndex != null || temp[cellIndex]) {
+                    temp[cellIndex] = true
+                    cacheInfo.push({
+                        colRelative,
+                        rowRelative,
+                        cellIndex
+                    })
+                    if (cache.clipState === 'cut') {
+                        commit(mutationTypes.UPDATE_POINTINFO, {
+                            currentSheet,
+                            info: {
+                                colAlias: aliasCol,
+                                rowAlias: aliasRow,
+                                type: 'cellIndex',
+                                value: null
+                            }
+                        })
+                    }
+                }
+                rowRelative++
+            }
+            colRelative++
+        }
+        let colLen = clipEndColIndex - clipStartColIndex + 1
+        let rowLen = clipEndRowIndex - clipStartRowIndex + 1
+        for (let i = startColIndex; i < startColIndex + colLen; i++) {
+            for (let j = startRowIndex; j < startRowIndex + rowLen; j++) {
+                let aliasCol = cols[i]
+                let aliasRow = rows[j]
+                commit(mutationTypes.UPDATE_POINTINFO, {
+                    currentSheet,
+                    info: {
+                        colAlias: aliasCol,
+                        rowAlias: aliasRow,
+                        type: 'cellIndex',
+                        value: null
+                    }
+                })
+            }
+        }
+        let cells = getters.cellList
+        cacheInfo.forEach(item => {
+            let cell = cells[item.cellIndex]
+            let insertCell = extend(cell)
+            let currentOccupyCol = insertCell.occupy.col
+            let currentOccupyRow = insertCell.occupy.row
+            let occupyCol = []
+            let occupyRow = []
+            for (let i = 0, len = currentOccupyCol.length; i < len; i++) {
+                occupyCol.push(cols[startColIndex + item.colRelative].alias)
+            }
+            for (let i = 0, len = currentOccupyRow.length; i < len; i++) {
+                occupyRow.push(rows[startRowIndex + item.rowRelative].alias)
+            }
+            insertCell.occupy = {
+                col: occupyCol,
+                row: occupyRow
+            }
+            dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
+        })
     }
 }

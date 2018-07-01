@@ -9,6 +9,7 @@ import generator from '../../../tools/generator'
 import cache from '../../../tools/cache'
 import config from '../../../config'
 import send from '../../../util/send'
+import parseClipStr form '../../../tools/parseclipstr'
 
 export default {
     /**
@@ -1239,7 +1240,46 @@ export default {
         getters,
         dispatch
     }, text) {
-        
+        let {
+            startColIndex,
+            startRowIndex
+        } = getters.getOprRegion
+        let cols = getters.colList
+        let rows = getters.rowList
+        let startRowSort = rows[startRowIndex].sort
+        let startColSort = cols[startColIndex].sort
+        if (typeof text === 'undefined') {
+            dispatch(actionTypes.OUTERPASTE, {
+                startRowSort,
+                startColSort,
+                parseDate: parseClipStr(text)
+            })
+        } else {
+            let clip
+            let selects = getters.selectList
+            for (let i = 0, len = selects.length; i < len; i++) {
+                let item = selects[i]
+                if (item.type === CLIP) {
+                    clip = item
+                }
+            }
+            if (!clip) {
+                return
+            }
+            let wholePosi = clip.wholePosi
+            let clipStartColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+            let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+            let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            dispatch(actionTypes.CELLS_INNERPASTE, {
+                startRowSort,
+                startColSort,
+                clipStartColSort: cols[clipStartColIndex].sort,
+                clipStartRowSort: rows[clipStartRowIndex].sort,
+                clipEndColSort: cols[clipEndColIndex].sort,
+                clipEndRowSort: rows[clipEndRowIndex].sort
+            })
+        }
     },
     [actionTypes.CELLS_INNERPASTE]({
         state,
@@ -1247,31 +1287,24 @@ export default {
         getters,
         commit,
         rootState
-    }) {
+    }, payload) {
         let {
-            startColIndex,
-            startRowIndex
-        } = getters.getOprRegion
-        let clip
-        let selects = getters.selectList
-        for (let i = 0, len = selects.length; i < len; i++) {
-            let item = selects[i]
-            if (item.type === CLIP) {
-                clip = item
-            }
-        }
-        if (!clip) {
-            return
-        }
+            startRowSort,
+            startColSort,
+            clipStartColSort,
+            clipStartRowSort,
+            clipEndColSort,
+            clipEndRowSort
+        } = payload
+        let currentSheet = rootState.currentSheet
         let cols = getters.colList
         let rows = getters.rowList
-
-        let currentSheet = rootState.currentSheet
-        let wholePosi = clip.wholePosi
-        let clipStartColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-        let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-        let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        let startColIndex = getters.getColIndexBySort(startColSort)
+        let startRowIndex = getters.getRowIndexBySort(startRowSort)
+        let clipStartColIndex = getters.getColIndexBySort(clipStartColSort)
+        let clipStartRowIndex = getters.getRowIndexBySort(clipStartRowSort)
+        let clipEndColIndex = getters.getColIndexBySort(clipEndColSort)
+        let clipEndRowIndex = getters.getRowIndexBySort(clipEndRowSort)
         let cacheInfo = []
         let colRelative = 0
         let rowRelative = 0
@@ -1398,5 +1431,61 @@ export default {
                 })
             }
         }
+    },
+    [actionTypes.OUTERPASTE]({
+        state,
+        dispatch,
+        getters,
+        commit,
+        rootState
+    }, payload) {
+        let {
+            startRowSort,
+            startColSort,
+            parseDate
+        } = payload
+        let currentSheet = rootState.currentSheet
+        let cols = getters.colList
+        let rows = getters.rowList
+        let startColIndex = getters.getColIndexBySort(startColSort)
+        let startRowIndex = getters.getRowIndexBySort(startRowSort)
+        let colLen = parseDate.colLen
+        let rowLen = parseDate.rowLen
+        // 过滤超出加载区域部分
+        if (startColIndex + colLen > cols.length - 1) {
+            colLen = cols.length - startColIndex - 1
+        }
+        if (startRowIndex + rowLen > rows.length - 1) {
+            rowLen = rows.length - startRowIndex - 1
+        }
+        for (let i = startColIndex; i < startColIndex + colLen; i++) {
+            for (let j = startRowIndex; j < startRowIndex + rowLen; j++) {
+                let aliasCol = cols[i]
+                let aliasRow = rows[j]
+                commit(mutationTypes.UPDATE_POINTINFO, {
+                    currentSheet,
+                    info: {
+                        colAlias: aliasCol,
+                        rowAlias: aliasRow,
+                        type: 'cellIndex',
+                        value: null
+                    }
+                })
+            }
+        }
+        let parseCellData = parseDate.data
+        parseCellData.forEach(cellData => {
+            let colAlias = cols[cellData.colRelative + startColIndex].alias
+            let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
+            dispatch(actionTypes.CELLS_INSERTCELL, [{
+                occupy: {
+                    col: [colAlias],
+                    row: [rowAlias]
+                },
+                content: {
+                    texts: cellData.text
+                }
+            }])
+        })
     }
 }

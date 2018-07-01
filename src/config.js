@@ -72,7 +72,6 @@ export default {
     historyUndo: {
 
     },
-    clipState: '',
     /**
      * 请求地址根路径
      * @type {String}

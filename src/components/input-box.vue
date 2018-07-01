@@ -4,7 +4,7 @@
         @blur="completeEdit"
         @copy="copyData"
         @cut="cutData"
-        @paste="parseData"
+        @paste="pasteData"
         :style="styleObject">
 </textarea>
 </template>
@@ -81,16 +81,52 @@ export default {
                 this.$store.commit(UPDATE_FOCUSSTATE, true)
             }
         },
-        copyData() {
+        copyData(e) {
             this.$store.dispatch(SELECTS_INSERT, CLIP)
             cache.clipState = 'copy'
+            let getters = this.$store.getters
+            let text = getters.getClipData()
+            let clipboardData
+            e.preventDefault()
+            if (window.clipboardData && window.clipboardData.getData) {
+                clipboardData = window.clipboardData
+            } else {
+                clipboardData = e.clipboardData
+            }
+            cache.clipData = text
+            clipboardData.setData('Text', text)
         },
-        cutData() {
+        cutData(e) {
             this.$store.dispatch(SELECTS_INSERT, CLIP)
             cache.clipState = 'cut'
+            let getters = this.$store.getters
+            let text = getters.getClipData()
+            let clipboardData
+            e.preventDefault()
+            if (window.clipboardData && window.clipboardData.getData) {
+                clipboardData = window.clipboardData
+            } else {
+                clipboardData = e.clipboardData
+            }
+            cache.clipData = text
+            clipboardData.setData('Text', text)
         },
-        parseData() {
-            this.$store.dispatch(CELLS_INNERPASTE)
+        pasteData(e) {
+            if (this.$store.getters.getEidtState) {
+                return
+            }
+            e.preventDefault()
+            let text
+            if (window.clipboardData && window.clipboardData.getData) {
+                text = window.clipboardData.getData('Text')
+            } else {
+                text = e.clipboardData.getData('Text')
+            }
+            if (cache.clipState !== '' && text === cache.clipData) {
+                this.$store.dispatch(CELLS_PASTE)
+            } else {
+                this.$store.dispatch(CELLS_PASTE, text)
+            }
         }
     },
     watch: {

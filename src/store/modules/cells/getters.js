@@ -30,6 +30,38 @@ export default {
             return extend({}, cellList[0])
         }
     },
+    getClipData(state, getters) {
+        return function() {
+            let select = getters.activeSelect
+            let wholePosi = select.wholePosi
+            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+            let temp = {}
+            let result = ''
+            let cells = getters.cellList
+            let cols = getters.colList
+            let rows = getters.rowList
+            for (let i = startRowIndex; i < endRowIndex + 1; i++) {
+                for (let j = startColIndex; j < endColIndex + 1; j++) {
+                    let aliasCol = cols[j].alias
+                    let aliasRow = rows[i].alias
+                    let cellIndex = getters.getPointInfo(aliasCol, aliasRow, 'cellIndex')
+                    if (cellIndex != null && !temp[cellIndex]) {
+                        let cell = cells[cellIndex]
+                        result += cell.content.texts
+                        temp[cellIndex] = true
+                    }
+                    if (j !== endColIndex) {
+                        result += '\t'
+                    }
+                }
+                result += '\n'
+            }
+            return result
+        }
+    },
     getOperRegion(state, getters, rootState) {
         let select = getters.activeSelect
         let wholePosi = select.wholePosi

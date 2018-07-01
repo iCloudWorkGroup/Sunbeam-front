@@ -18,5 +18,8 @@ export default {
     regionRecord: map,
     // 存储rootElement元素
     rootEl: '',
-    clipData: ''
+    // 剪切板缓存数据
+    clipData: '',
+    // 剪切板状态
+    clipState: ''
 }

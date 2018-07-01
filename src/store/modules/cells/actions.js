@@ -1235,6 +1235,12 @@ export default {
         // var ec = new Complier(originalValue)
         // ec.initilize(rules)
     },
+    [actionTypes.CELLS_PASTE]({
+        getters,
+        dispatch
+    }, text) {
+        
+    },
     [actionTypes.CELLS_INNERPASTE]({
         state,
         dispatch,
@@ -1276,7 +1282,7 @@ export default {
                 let aliasCol = cols[i].alias
                 let aliasRow = rows[j].alias
                 let cellIndex = getters.getPointInfo(aliasCol, aliasRow, 'cellIndex')
-                if (cellIndex != null || temp[cellIndex]) {
+                if (cellIndex != null && !temp[cellIndex]) {
                     temp[cellIndex] = true
                     cacheInfo.push({
                         colRelative,
@@ -1301,6 +1307,13 @@ export default {
         }
         let colLen = clipEndColIndex - clipStartColIndex + 1
         let rowLen = clipEndRowIndex - clipStartRowIndex + 1
+        // 过滤超出加载区域部分
+        if (startColIndex + colLen > cols.length - 1) {
+            colLen = cols.length - startColIndex - 1
+        }
+        if (startRowIndex + rowLen > rows.length - 1) {
+            rowLen = rows.length - startRowIndex - 1
+        }
         for (let i = startColIndex; i < startColIndex + colLen; i++) {
             for (let j = startRowIndex; j < startRowIndex + rowLen; j++) {
                 let aliasCol = cols[i]
@@ -1330,18 +1343,60 @@ export default {
                 continue
             }
             for (let j = 0, len = currentOccupyCol.length; j < len; j++) {
-                occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
+                if (startColIndex + item.colRelative + j < cols.length) {
+                    occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
+                }
             }
             for (let j = 0, len = currentOccupyRow.length; j < len; j++) {
-                occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
+                if (startRowIndex + item.rowRelative + j < rows.length) {
+                    occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
+                }
             }
-            console.log(occupyCol)
-            console.log(occupyRow)
             insertCell.occupy = {
                 col: occupyCol,
                 row: occupyRow
             }
             dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
+        }
+        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+        destoryClip()
+        adaptSelect()
+        function destoryClip() {
+            let flag = true
+            if (startRowIndex > clipEndRowIndex ||
+                endRowIndex < clipStartRowIndex ||
+                startColIndex > clipEndColIndex ||
+                endColIndex < clipStartColIndex
+            ) {
+                flag = false
+            }
+            if (flag) {
+                cache.clipState = ''
+                commit(mutationTypes.DELETE_SELECT, {
+                    currentSheet,
+                    select: clip
+                })
+            }
+        }
+        function adaptSelect() {
+            let flag = false
+            if (endColIndex < startColIndex + colLen) {
+                endColIndex = startColIndex + colLen - 1
+                flag = true
+            }
+            if (endRowIndex < startRowIndex + rowLen) {
+                endRowIndex = startRowIndex + rowLen - 1
+                flag = true
+            }
+            if (flag) {
+                dispatch(actionTypes.SELECTS_UPDATESELECT, {
+                    startRowIndex,
+                    startColIndex,
+                    endRowIndex,
+                    endColIndex
+                })
+            }
         }
     }
 }

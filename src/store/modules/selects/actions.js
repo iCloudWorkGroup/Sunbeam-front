@@ -88,52 +88,42 @@ export default {
         rootState,
         dispatch
     }, payload) {
-        let { colIndex, rowIndex } = payload
+        let { startColIndex, startRowIndex, endRowIndex, endColIndex } = payload
         let rows = getters.rowList
         let cols = getters.colList
         let select = {}
         let activeSelect = state.activeSelect
-        let mouseState = rootState.mouseState
         let region
-
-        if (mouseState === LOCATE) {
-            region = getters.getFullOprRegion({
-                startColIndex: colIndex,
-                startRowIndex: rowIndex
-            })
-        }
-
-        if (mouseState === DRAG) {
+        let mouseState = rootState.mouseState
+        if (typeof endRowIndex === 'undefined' && mouseState === DRAG) {
             let tempPosi = activeSelect.tempPosi
             let wholePosi = activeSelect.wholePosi
-
+            endColIndex = startColIndex
+            endRowIndex = startRowIndex
             if (wholePosi.endColAlias === 'MAX') {
-                colIndex = 'MAX'
-                rowIndex = rowIndex === 'MAX' ? 0 : rowIndex
+                startColIndex = 'MAX'
+                startRowIndex = startRowIndex === 'MAX' ? 0 : startRowIndex
             }
 
             if (wholePosi.endRowAlias === 'MAX') {
-                rowIndex = 'MAX'
-                colIndex = colIndex === 'MAX' ? 0 : colIndex
+                startRowIndex = 'MAX'
+                startColIndex = startColIndex === 'MAX' ? 0 : startColIndex
             }
-
-            region = getters.getFullOprRegion({
-                startColIndex: indexAttrBinary(tempPosi.initColSort,
-                    cols, 'sort'),
-                startRowIndex: indexAttrBinary(tempPosi.initRowSort,
-                    rows, 'sort'),
-                endColIndex: colIndex,
-                endRowIndex: rowIndex
-            })
+            startColIndex = indexAttrBinary(tempPosi.initColSort,
+                cols, 'sort')
+            startRowIndex = indexAttrBinary(tempPosi.initRowSort,
+                rows, 'sort')
         }
-
-        let {
+        region = getters.getFullOprRegion({
             startColIndex,
             startRowIndex,
             endColIndex,
             endRowIndex
-        } = region
-
+        })
+        startColIndex = region.startColIndex
+        startRowIndex = region.startRowIndex
+        endColIndex = region.endColIndex
+        endRowIndex = region.endRowIndex
         while (cols[startColIndex].hidden) {
             startColIndex++
         }

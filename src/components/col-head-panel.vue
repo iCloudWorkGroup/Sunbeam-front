@@ -126,8 +126,8 @@ export default {
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
-                colIndex,
-                rowIndex: 'MAX'
+                startColIndex: colIndex,
+                startRowIndex: 'MAX'
             })
             this.$store.commit(UPDATE_MOUSESTATE, {
                 state: DRAG
@@ -182,8 +182,8 @@ export default {
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
-                colIndex,
-                rowIndex: 'MAX'
+                startColIndex: colIndex,
+                startRowIndex: 'MAX'
             })
         },
         adjustHandleState(e) {

@@ -111,8 +111,8 @@ export default {
             let rowIndex = getters.getRowIndexByPosi(rowPosi)
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
-                colIndex,
-                rowIndex
+                startColIndex: colIndex,
+                startRowIndex: rowIndex
             })
             this.$store.commit(UPDATE_MOUSESTATE, {
                 state: DRAG
@@ -146,8 +146,8 @@ export default {
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
 
             this.$store.dispatch(SELECTS_UPDATESELECT, {
-                colIndex,
-                rowIndex
+                startColIndex: colIndex,
+                startRowIndex: rowIndex
             })
         }
     },

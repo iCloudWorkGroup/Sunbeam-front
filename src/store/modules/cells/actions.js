@@ -1,10 +1,15 @@
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
+import {
+    CLIP
+} from '../../../tools/constant'
 import extend from '../../../util/extend'
 import template from './template'
 import generator from '../../../tools/generator'
+import cache from '../../../tools/cache'
 import config from '../../../config'
 import send from '../../../util/send'
+import parseClipStr from '../../../tools/parseclipstr'
 
 export default {
     /**
@@ -247,6 +252,7 @@ export default {
                 })
             }
         }
+
         function getReverseValue() {
             let cell = getters.getCellsByVertical({
                 startColIndex,
@@ -1229,5 +1235,273 @@ export default {
         // getters.getSelectCell()
         // var ec = new Complier(originalValue)
         // ec.initilize(rules)
+    },
+    [actionTypes.CELLS_PASTE]({
+        getters,
+        dispatch
+    }, text) {
+        let {
+            startColIndex,
+            startRowIndex
+        } = getters.getOprRegion
+        let cols = getters.colList
+        let rows = getters.rowList
+        let startRowSort = rows[startRowIndex].sort
+        let startColSort = cols[startColIndex].sort
+        if (typeof text !== 'undefined') {
+            dispatch(actionTypes.CELLS_OUTERPASTE, {
+                startRowSort,
+                startColSort,
+                parseDate: parseClipStr(text)
+            })
+        } else {
+            let clip
+            let selects = getters.selectList
+            for (let i = 0, len = selects.length; i < len; i++) {
+                let item = selects[i]
+                if (item.type === CLIP) {
+                    clip = item
+                }
+            }
+            if (!clip) {
+                return
+            }
+            let wholePosi = clip.wholePosi
+            let clipStartColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+            let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+            let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            dispatch(actionTypes.CELLS_INNERPASTE, {
+                startRowSort,
+                startColSort,
+                clipStartColSort: cols[clipStartColIndex].sort,
+                clipStartRowSort: rows[clipStartRowIndex].sort,
+                clipEndColSort: cols[clipEndColIndex].sort,
+                clipEndRowSort: rows[clipEndRowIndex].sort
+            })
+        }
+    },
+    [actionTypes.CELLS_INNERPASTE]({
+        state,
+        dispatch,
+        getters,
+        commit,
+        rootState
+    }, payload) {
+        let {
+            startRowSort,
+            startColSort,
+            clipStartColSort,
+            clipStartRowSort,
+            clipEndColSort,
+            clipEndRowSort
+        } = payload
+        let currentSheet = rootState.currentSheet
+        let cols = getters.colList
+        let rows = getters.rowList
+        let startColIndex = getters.getColIndexBySort(startColSort)
+        let startRowIndex = getters.getRowIndexBySort(startRowSort)
+        let clipStartColIndex = getters.getColIndexBySort(clipStartColSort)
+        let clipStartRowIndex = getters.getRowIndexBySort(clipStartRowSort)
+        let clipEndColIndex = getters.getColIndexBySort(clipEndColSort)
+        let clipEndRowIndex = getters.getRowIndexBySort(clipEndRowSort)
+        let cacheInfo = []
+        let colRelative = 0
+        let rowRelative = 0
+        let temp = {}
+        for (let i = clipStartColIndex; i < clipEndColIndex + 1; i++) {
+            rowRelative = 0
+            for (let j = clipStartRowIndex; j < clipEndRowIndex + 1; j++) {
+                let aliasCol = cols[i].alias
+                let aliasRow = rows[j].alias
+                let cellIndex = getters.getPointInfo(aliasCol, aliasRow, 'cellIndex')
+                if (cellIndex != null && !temp[cellIndex]) {
+                    temp[cellIndex] = true
+                    cacheInfo.push({
+                        colRelative,
+                        rowRelative,
+                        cellIndex
+                    })
+                    if (cache.clipState === 'cut') {
+                        commit(mutationTypes.UPDATE_POINTINFO, {
+                            currentSheet,
+                            info: {
+                                colAlias: aliasCol,
+                                rowAlias: aliasRow,
+                                type: 'cellIndex',
+                                value: null
+                            }
+                        })
+                    }
+                }
+                rowRelative++
+            }
+            colRelative++
+        }
+        let endColIndex = startColIndex + clipEndColIndex - clipStartColIndex
+        let endRowIndex = startRowIndex + clipEndRowIndex - clipStartRowIndex
+        // 过滤超出加载区域部分
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+
+        for (let i = startColIndex; i < endColIndex + 1; i++) {
+            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
+                let aliasCol = cols[i]
+                let aliasRow = rows[j]
+                commit(mutationTypes.UPDATE_POINTINFO, {
+                    currentSheet,
+                    info: {
+                        colAlias: aliasCol,
+                        rowAlias: aliasRow,
+                        type: 'cellIndex',
+                        value: null
+                    }
+                })
+            }
+        }
+        let cells = getters.cellList
+        for (let i = 0, len = cacheInfo.length; i < len; i++) {
+            let item = cacheInfo[i]
+            let cell = cells[item.cellIndex]
+            let insertCell = extend(cell)
+            let currentOccupyCol = insertCell.occupy.col
+            let currentOccupyRow = insertCell.occupy.row
+            let occupyCol = []
+            let occupyRow = []
+            for (let j = 0, len = currentOccupyCol.length; j < len; j++) {
+                if (startColIndex + item.colRelative + j < cols.length) {
+                    occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
+                }
+            }
+            for (let j = 0, len = currentOccupyRow.length; j < len; j++) {
+                if (startRowIndex + item.rowRelative + j < rows.length) {
+                    occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
+                }
+            }
+            if (occupyCol.length > 0 && occupyRow.length > 0) {
+                insertCell.occupy = {
+                    col: occupyCol,
+                    row: occupyRow
+                }
+                dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
+            }
+        }
+        destoryClip()
+        adaptSelect()
+        function destoryClip() {
+            let flag = true
+            if (startRowIndex > clipEndRowIndex ||
+                endRowIndex < clipStartRowIndex ||
+                startColIndex > clipEndColIndex ||
+                endColIndex < clipStartColIndex
+            ) {
+                flag = false
+            }
+            if (flag) {
+                let clip
+                let selects = getters.selectList
+                for (let i = 0, len = selects.length; i < len; i++) {
+                    let select = selects[i]
+                    if (select.type === CLIP) {
+                        clip = select
+                        break
+                    }
+                }
+                cache.clipState = ''
+                commit(mutationTypes.DELETE_SELECT, {
+                    currentSheet,
+                    select: clip
+                })
+            }
+        }
+        function adaptSelect() {
+            dispatch(actionTypes.SELECTS_UPDATESELECT, {
+                startRowIndex,
+                startColIndex,
+                endRowIndex,
+                endColIndex
+            })
+        }
+    },
+    [actionTypes.CELLS_OUTERPASTE]({
+        state,
+        dispatch,
+        getters,
+        commit,
+        rootState
+    }, payload) {
+        let {
+            startRowSort,
+            startColSort,
+            parseDate
+        } = payload
+        let currentSheet = rootState.currentSheet
+        let cols = getters.colList
+        let rows = getters.rowList
+        let startColIndex = getters.getColIndexBySort(startColSort)
+        let startRowIndex = getters.getRowIndexBySort(startRowSort)
+        let colLen = parseDate.colLen
+        let rowLen = parseDate.rowLen
+        // 清除复制选中区
+        if (cache.clipState !== '') {
+            let clip
+            let selects = getters.selectList
+            for (let i = 0, len = selects.length; i < len; i++) {
+                let select = selects[i]
+                if (select.type === CLIP) {
+                    clip = select
+                    break
+                }
+            }
+            cache.clipState = ''
+            commit(mutationTypes.DELETE_SELECT, {
+                currentSheet,
+                select: clip
+            })
+        }
+        let endColIndex = startColIndex + colLen - 1
+        let endRowIndex = startRowIndex + rowLen - 1
+        // 过滤超出加载区域部分
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+        for (let i = startColIndex; i < endColIndex + 1; i++) {
+            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
+                let aliasCol = cols[i]
+                let aliasRow = rows[j]
+                commit(mutationTypes.UPDATE_POINTINFO, {
+                    currentSheet,
+                    info: {
+                        colAlias: aliasCol,
+                        rowAlias: aliasRow,
+                        type: 'cellIndex',
+                        value: null
+                    }
+                })
+            }
+        }
+        let parseCellData = parseDate.data
+        parseCellData.forEach(cellData => {
+            if (cellData.colRelative + startColIndex > cols.length - 1 ||
+                cellData.rowRelative + startRowIndex > rows.length - 1) {
+                return
+            }
+            let colAlias = cols[cellData.colRelative + startColIndex].alias
+            let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
+            dispatch(actionTypes.CELLS_INSERTCELL, [{
+                occupy: {
+                    col: [colAlias],
+                    row: [rowAlias]
+                },
+                content: {
+                    texts: cellData.text
+                }
+            }])
+        })
+        dispatch(actionTypes.SELECTS_UPDATESELECT, {
+            startRowIndex,
+            startColIndex,
+            endRowIndex,
+            endColIndex
+        })
     }
 }

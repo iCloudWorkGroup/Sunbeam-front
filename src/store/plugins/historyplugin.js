@@ -148,8 +148,8 @@ export default function(store) {
                 delete props.occupy
                 delete physicsBox.top
                 delete physicsBox.left
-                delete physicsBox.right
-                delete physicsBox.bottom
+                delete physicsBox.width
+                delete physicsBox.height
                 delete props.alias
 
                 mutationInfo.updateCells.push({
@@ -260,6 +260,7 @@ let userAction = {
     [actionTypes.CELLS_HANDLEMERGE]: true,
     [actionTypes.CELLS_UPDATE_BORDER]: true,
     [actionTypes.CELLS_UPDATE]: true,
+    [actionTypes.CELLS_PASTE]: true,
     [actionTypes.ROWS_HIDE]: true,
     [actionTypes.ROWS_CANCELHIDE]: true,
     [actionTypes.COLS_HIDE]: true,
@@ -271,7 +272,7 @@ let userAction = {
     [actionTypes.ROWS_INSERTROW]: true,
     [actionTypes.ROWS_DELETEROW]: true,
     [actionTypes.SHEET_FROZEN]: true,
-    [actionTypes.SHEET_UNFROZEN]: true,
+    [actionTypes.SHEET_UNFROZEN]: true
 }
 let recordAction = {
     [actionTypes.CELLS_UPDATE_PROP]: true,
@@ -292,7 +293,9 @@ let recordAction = {
     [actionTypes.SHEET_COLFROZEN]: true,
     [actionTypes.SHEET_ROWFROZEN]: true,
     [actionTypes.SHEET_POINTFROZEN]: true,
-    [actionTypes.SHEET_EXECUNFROZEN]: true
+    [actionTypes.SHEET_EXECUNFROZEN]: true,
+    [actionTypes.CELLS_OUTERPASTE]: true,
+    [actionTypes.CELLS_INNERPASTE]: true
 }
 let recordMutations = {
     [actionTypes.CELLS_UPDATE_PROP]: {
@@ -313,6 +316,12 @@ let recordMutations = {
         [mutationTypes.UPDATE_POINTINFO]: true
     },
     [actionTypes.CELLS_SPLIT]: {
+        [mutationTypes.UPDATE_POINTINFO]: true
+    },
+    [actionTypes.CELLS_INNERPASTE]: {
+        [mutationTypes.UPDATE_POINTINFO]: true
+    },
+    [actionTypes.CELLS_OUTERPASTE]: {
         [mutationTypes.UPDATE_POINTINFO]: true
     },
     [actionTypes.COLS_EXECDELETECOL]: {

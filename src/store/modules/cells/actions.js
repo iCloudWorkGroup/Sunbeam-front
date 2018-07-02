@@ -9,7 +9,7 @@ import generator from '../../../tools/generator'
 import cache from '../../../tools/cache'
 import config from '../../../config'
 import send from '../../../util/send'
-import parseClipStr form '../../../tools/parseclipstr'
+import parseClipStr from '../../../tools/parseclipstr'
 
 export default {
     /**
@@ -1248,8 +1248,8 @@ export default {
         let rows = getters.rowList
         let startRowSort = rows[startRowIndex].sort
         let startColSort = cols[startColIndex].sort
-        if (typeof text === 'undefined') {
-            dispatch(actionTypes.OUTERPASTE, {
+        if (typeof text !== 'undefined') {
+            dispatch(actionTypes.CELLS_OUTERPASTE, {
                 startRowSort,
                 startColSort,
                 parseDate: parseClipStr(text)
@@ -1338,17 +1338,14 @@ export default {
             }
             colRelative++
         }
-        let colLen = clipEndColIndex - clipStartColIndex + 1
-        let rowLen = clipEndRowIndex - clipStartRowIndex + 1
+        let endColIndex = startColIndex + clipEndColIndex - clipStartColIndex
+        let endRowIndex = startRowIndex + clipEndRowIndex - clipStartRowIndex
         // 过滤超出加载区域部分
-        if (startColIndex + colLen > cols.length - 1) {
-            colLen = cols.length - startColIndex - 1
-        }
-        if (startRowIndex + rowLen > rows.length - 1) {
-            rowLen = rows.length - startRowIndex - 1
-        }
-        for (let i = startColIndex; i < startColIndex + colLen; i++) {
-            for (let j = startRowIndex; j < startRowIndex + rowLen; j++) {
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+
+        for (let i = startColIndex; i < endColIndex + 1; i++) {
+            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
                 commit(mutationTypes.UPDATE_POINTINFO, {
@@ -1371,10 +1368,6 @@ export default {
             let currentOccupyRow = insertCell.occupy.row
             let occupyCol = []
             let occupyRow = []
-            if (startColIndex + currentOccupyCol.length > cols.length ||
-                startRowIndex + currentOccupyRow.length > rows.length) {
-                continue
-            }
             for (let j = 0, len = currentOccupyCol.length; j < len; j++) {
                 if (startColIndex + item.colRelative + j < cols.length) {
                     occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
@@ -1385,14 +1378,14 @@ export default {
                     occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
                 }
             }
-            insertCell.occupy = {
-                col: occupyCol,
-                row: occupyRow
+            if (occupyCol.length > 0 && occupyRow.length > 0) {
+                insertCell.occupy = {
+                    col: occupyCol,
+                    row: occupyRow
+                }
+                dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
             }
-            dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
         }
-        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
         destoryClip()
         adaptSelect()
         function destoryClip() {
@@ -1405,6 +1398,15 @@ export default {
                 flag = false
             }
             if (flag) {
+                let clip
+                let selects = getters.selectList
+                for (let i = 0, len = selects.length; i < len; i++) {
+                    let select = selects[i]
+                    if (select.type === CLIP) {
+                        clip = select
+                        break
+                    }
+                }
                 cache.clipState = ''
                 commit(mutationTypes.DELETE_SELECT, {
                     currentSheet,
@@ -1413,26 +1415,15 @@ export default {
             }
         }
         function adaptSelect() {
-            let flag = false
-            if (endColIndex < startColIndex + colLen) {
-                endColIndex = startColIndex + colLen - 1
-                flag = true
-            }
-            if (endRowIndex < startRowIndex + rowLen) {
-                endRowIndex = startRowIndex + rowLen - 1
-                flag = true
-            }
-            if (flag) {
-                dispatch(actionTypes.SELECTS_UPDATESELECT, {
-                    startRowIndex,
-                    startColIndex,
-                    endRowIndex,
-                    endColIndex
-                })
-            }
+            dispatch(actionTypes.SELECTS_UPDATESELECT, {
+                startRowIndex,
+                startColIndex,
+                endRowIndex,
+                endColIndex
+            })
         }
     },
-    [actionTypes.OUTERPASTE]({
+    [actionTypes.CELLS_OUTERPASTE]({
         state,
         dispatch,
         getters,
@@ -1451,15 +1442,30 @@ export default {
         let startRowIndex = getters.getRowIndexBySort(startRowSort)
         let colLen = parseDate.colLen
         let rowLen = parseDate.rowLen
+        // 清除复制选中区
+        if (cache.clipState !== '') {
+            let clip
+            let selects = getters.selectList
+            for (let i = 0, len = selects.length; i < len; i++) {
+                let select = selects[i]
+                if (select.type === CLIP) {
+                    clip = select
+                    break
+                }
+            }
+            cache.clipState = ''
+            commit(mutationTypes.DELETE_SELECT, {
+                currentSheet,
+                select: clip
+            })
+        }
+        let endColIndex = startColIndex + colLen - 1
+        let endRowIndex = startRowIndex + rowLen - 1
         // 过滤超出加载区域部分
-        if (startColIndex + colLen > cols.length - 1) {
-            colLen = cols.length - startColIndex - 1
-        }
-        if (startRowIndex + rowLen > rows.length - 1) {
-            rowLen = rows.length - startRowIndex - 1
-        }
-        for (let i = startColIndex; i < startColIndex + colLen; i++) {
-            for (let j = startRowIndex; j < startRowIndex + rowLen; j++) {
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+        for (let i = startColIndex; i < endColIndex + 1; i++) {
+            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
                 commit(mutationTypes.UPDATE_POINTINFO, {
@@ -1475,6 +1481,10 @@ export default {
         }
         let parseCellData = parseDate.data
         parseCellData.forEach(cellData => {
+            if (cellData.colRelative + startColIndex > cols.length - 1 ||
+                cellData.rowRelative + startRowIndex > rows.length - 1) {
+                return
+            }
             let colAlias = cols[cellData.colRelative + startColIndex].alias
             let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
             dispatch(actionTypes.CELLS_INSERTCELL, [{
@@ -1486,6 +1496,12 @@ export default {
                     texts: cellData.text
                 }
             }])
+        })
+        dispatch(actionTypes.SELECTS_UPDATESELECT, {
+            startRowIndex,
+            startColIndex,
+            endRowIndex,
+            endColIndex
         })
     }
 }

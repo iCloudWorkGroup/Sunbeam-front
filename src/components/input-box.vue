@@ -9,7 +9,7 @@
 </textarea>
 </template>
 <script type="text/javascript">
-import { EDIT_HIDE, SELECTS_INSERT, CELLS_INNERPASTE } from '../store/action-types'
+import { EDIT_HIDE, SELECTS_INSERT, CELLS_PASTE } from '../store/action-types'
 import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
 import { CLIP } from '../tools/constant'
 import cache from '../tools/cache'
@@ -82,8 +82,13 @@ export default {
             }
         },
         copyData(e) {
-            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            let select = this.$store.getters.activeSelect
+            let wholePosi = select.wholePosi
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+                return
+            }
             cache.clipState = 'copy'
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
             let getters = this.$store.getters
             let text = getters.getClipData()
             let clipboardData
@@ -97,8 +102,13 @@ export default {
             clipboardData.setData('Text', text)
         },
         cutData(e) {
-            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            let select = this.$store.getters.activeSelect
+            let wholePosi = select.wholePosi
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+                return
+            }
             cache.clipState = 'cut'
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
             let getters = this.$store.getters
             let text = getters.getClipData()
             let clipboardData

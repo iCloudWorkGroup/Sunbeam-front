@@ -1229,5 +1229,14 @@ export default {
         // getters.getSelectCell()
         // var ec = new Complier(originalValue)
         // ec.initilize(rules)
+    },
+    [actionTypes.CELLS_WORDWRAP]({
+        dispatch,
+        getters
+    }) {
+        getters.
+    },
+    [actionTypes.CELLS_EXECWORDWRAP]({}){
+
     }
 }

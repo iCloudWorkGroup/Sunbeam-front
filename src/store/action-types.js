@@ -38,6 +38,7 @@ export const CELLS_INSERTCELL = 'CELLS_INSERTCELL'
 export const CELLS_UPDATE_BORDER = 'CELLS_UPDATE_BORDER'
 export const CELLS_HANDLEMERGE = 'CELLS_HANDLEMERGE'
 export const CELLS_MERGE = 'CELLS_MERGE'
+export const CELLS_WORDWRAP = 'CELLS_WORDWRAP'
 /**
  * 单元格格式类型
  * @type {String}

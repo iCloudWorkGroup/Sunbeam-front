@@ -31,5 +31,16 @@ export default {
         }) {
             extend(select, props)
         })
+    },
+    [types.DELETE_SELECT](state, payload) {
+        let currentSheet = payload.currentSheet
+        let select = payload.select
+        let list = state[currentSheet].list
+        for (let i = 0, len = list.length; i < len; i++) {
+            if (list[i] === select) {
+                list.splice(i, 1)
+                break
+            }
+        }
     }
 }

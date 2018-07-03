@@ -1,6 +1,7 @@
 import extend from '../../../util/extend'
 import * as mutationTypes from '../../mutation-types'
 import * as actionTypes from '../../action-types'
+import generator from '../../../tools/generator'
 import template from './template'
 import {
     SELECT,
@@ -58,6 +59,7 @@ export default {
             endColAlias: cols[endColIndex].alias,
             endRowAlias: rows[endRowIndex].alias
         }
+        select.alias = generator.selectAliasGenerator()
         commit(mutationTypes.INSERT_SELECT, {
             currentSheet,
             selects: [select]
@@ -86,53 +88,42 @@ export default {
         rootState,
         dispatch
     }, payload) {
-
-        let { colIndex, rowIndex } = payload
+        let { startColIndex, startRowIndex, endRowIndex, endColIndex } = payload
         let rows = getters.rowList
         let cols = getters.colList
         let select = {}
         let activeSelect = state.activeSelect
-        let mouseState = rootState.mouseState
         let region
-
-        if (mouseState === LOCATE) {
-            region = getters.getFullOprRegion({
-                startColIndex: colIndex,
-                startRowIndex: rowIndex
-            })
-        }
-
-        if (mouseState === DRAG) {
+        let mouseState = rootState.mouseState
+        if (typeof endRowIndex === 'undefined' && mouseState === DRAG) {
             let tempPosi = activeSelect.tempPosi
             let wholePosi = activeSelect.wholePosi
-
+            endColIndex = startColIndex
+            endRowIndex = startRowIndex
             if (wholePosi.endColAlias === 'MAX') {
-                colIndex = 'MAX'
-                rowIndex = rowIndex === 'MAX' ? 0 : rowIndex
+                startColIndex = 'MAX'
+                startRowIndex = startRowIndex === 'MAX' ? 0 : startRowIndex
             }
 
             if (wholePosi.endRowAlias === 'MAX') {
-                rowIndex = 'MAX'
-                colIndex = colIndex === 'MAX' ? 0 : colIndex
+                startRowIndex = 'MAX'
+                startColIndex = startColIndex === 'MAX' ? 0 : startColIndex
             }
-
-            region = getters.getFullOprRegion({
-                startColIndex: indexAttrBinary(tempPosi.initColSort,
-                    cols, 'sort'),
-                startRowIndex: indexAttrBinary(tempPosi.initRowSort,
-                    rows, 'sort'),
-                endColIndex: colIndex,
-                endRowIndex: rowIndex
-            })
+            startColIndex = indexAttrBinary(tempPosi.initColSort,
+                cols, 'sort')
+            startRowIndex = indexAttrBinary(tempPosi.initRowSort,
+                rows, 'sort')
         }
-
-        let {
+        region = getters.getFullOprRegion({
             startColIndex,
             startRowIndex,
             endColIndex,
             endRowIndex
-        } = region
-
+        })
+        startColIndex = region.startColIndex
+        startRowIndex = region.startRowIndex
+        endColIndex = region.endColIndex
+        endRowIndex = region.endRowIndex
         while (cols[startColIndex].hidden) {
             startColIndex++
         }
@@ -197,5 +188,72 @@ export default {
             select: activeSelect,
             props: select
         })
+    },
+    /**
+     * 插入选中区域
+     */
+    [actionTypes.SELECTS_INSERT]({
+        state,
+        getters,
+        commit,
+        rootState,
+        rootGetters
+    }, payload) {
+        let type = payload || SELECT
+        let {
+            startColIndex,
+            startRowIndex,
+            endColIndex,
+            endRowIndex
+        } = getters.getOprRegion
+        let select = extend(template)
+        let cols = getters.colList
+        let rows = getters.rowList
+
+        select.tempPosi = {
+            initColSort: cols[startColIndex].sort,
+            initRowSort: rows[startRowIndex].sort,
+            mouseColSort: endColIndex !== 'MAX' ? cols[endColIndex].sort : 'MAX',
+            mouseRowSort: endRowIndex !== 'MAX' ? rows[endRowIndex].sort : 'MAX'
+        }
+        select.wholePosi = {
+            startColAlias: cols[startColIndex].alias,
+            startRowAlias: rows[startRowIndex].alias,
+            endColAlias: endColIndex !== 'MAX' ? cols[endColIndex].alias : 'MAX',
+            endRowAlias: endRowIndex !== 'MAX' ? rows[endRowIndex].alias : 'MAX'
+        }
+        endColIndex = endColIndex === 'MAX' ? cols.length - 1 : endColIndex
+        endRowIndex = endRowIndex === 'MAX' ? rows.length - 1 : endRowIndex
+
+        let width = cols[endColIndex].width + cols[endColIndex].left -
+            cols[startColIndex].left
+        let height = rows[endRowIndex].height + rows[endRowIndex].top -
+            rows[startRowIndex].top
+
+        select.physicsBox = {
+            top: rows[startRowIndex].top,
+            left: cols[startColIndex].left,
+            width,
+            height
+        }
+        select.type = type
+        select.alias = generator.selectAliasGenerator()
+        let currentSheet = rootState.currentSheet
+        commit(mutationTypes.INSERT_SELECT, {
+            currentSheet,
+            selects: [select]
+        })
+        if (type === SELECT) {
+            commit(mutationTypes.ACTIVE_COL, {
+                currentSheet,
+                startIndex: startColIndex,
+                endIndex: endColIndex
+            })
+            commit(mutationTypes.ACTIVE_ROW, {
+                currentSheet,
+                startIndex: startRowIndex,
+                endIndex: endRowIndex
+            })
+        }
     }
 }

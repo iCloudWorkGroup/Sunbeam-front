@@ -2,12 +2,17 @@
 <textarea class="edit-frame"
         :value="texts"
         @blur="completeEdit"
+        @copy="copyData"
+        @cut="cutData"
+        @paste="pasteData"
         :style="styleObject">
 </textarea>
 </template>
 <script type="text/javascript">
-import { EDIT_HIDE } from '../store/action-types'
+import { EDIT_HIDE, SELECTS_INSERT, CELLS_PASTE } from '../store/action-types'
 import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
+import { CLIP } from '../tools/constant'
+import cache from '../tools/cache'
 import config from '../config'
 
 export default {
@@ -74,6 +79,63 @@ export default {
             if (!this.$store.state.focusState) {
                 this.$el.focus()
                 this.$store.commit(UPDATE_FOCUSSTATE, true)
+            }
+        },
+        copyData(e) {
+            let select = this.$store.getters.activeSelect
+            let wholePosi = select.wholePosi
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+                return
+            }
+            cache.clipState = 'copy'
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            let getters = this.$store.getters
+            let text = getters.getClipData()
+            let clipboardData
+            e.preventDefault()
+            if (window.clipboardData && window.clipboardData.getData) {
+                clipboardData = window.clipboardData
+            } else {
+                clipboardData = e.clipboardData
+            }
+            cache.clipData = text
+            clipboardData.setData('Text', text)
+        },
+        cutData(e) {
+            let select = this.$store.getters.activeSelect
+            let wholePosi = select.wholePosi
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+                return
+            }
+            cache.clipState = 'cut'
+            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            let getters = this.$store.getters
+            let text = getters.getClipData()
+            let clipboardData
+            e.preventDefault()
+            if (window.clipboardData && window.clipboardData.getData) {
+                clipboardData = window.clipboardData
+            } else {
+                clipboardData = e.clipboardData
+            }
+            cache.clipData = text
+            clipboardData.setData('Text', text)
+        },
+        pasteData(e) {
+            if (this.$store.getters.getEidtState) {
+                return
+            }
+            e.preventDefault()
+            let text
+            if (window.clipboardData && window.clipboardData.getData) {
+                text = window.clipboardData.getData('Text')
+            } else {
+                text = e.clipboardData.getData('Text')
+            }
+            if (cache.clipState !== '' && text === cache.clipData) {
+                this.$store.dispatch(CELLS_PASTE)
+            } else {
+                this.$store.dispatch(CELLS_PASTE, text)
             }
         }
     },

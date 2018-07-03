@@ -36,8 +36,13 @@ export default {
             if (currentStyle === actionTypes.CELLS_UPDATE_PROP) {
                 propUpdateUndo(mutations, commit)
             }
-            if (currentStyle === actionTypes.CELLS_MERGE ||
-                currentStyle === actionTypes.CELLS_SPLIT) {
+            let coverActions = {
+                [actionTypes.CELLS_MERGE]: true,
+                [actionTypes.CELLS_SPLIT]: true,
+                [actionTypes.CELLS_INNERPASTE]: true,
+                [actionTypes.CELLS_OUTERPASTE]: true
+            }
+            if (coverActions[currentStyle]) {
                 coverCellUndo(mutations, commit)
             }
             if (currentStyle === actionTypes.ROWS_OPERROWS ||

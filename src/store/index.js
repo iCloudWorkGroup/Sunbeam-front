@@ -9,6 +9,7 @@ import pointsInfo from './modules/pointsinfo/index'
 import input from './modules/input/index'
 import history from './modules/history/index'
 import historyPlugin from './plugins/historyplugin'
+import clipPlugin from './plugins/clipplugin'
 import { LOCATE } from '../tools/constant'
 import Vue from 'vue'
 import Vuex from '../lib/vuex.esm'
@@ -43,5 +44,5 @@ export default new Vuex.Store({
         input,
         history
     },
-    plugins: [historyPlugin]
+    plugins: [historyPlugin, clipPlugin]
 })

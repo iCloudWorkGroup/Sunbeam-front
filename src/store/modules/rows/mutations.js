@@ -56,7 +56,7 @@ export default {
             props
         }) {
             extend(row, props)
-            let rowOprProp = row.oprProp
+            let rowOprProp = row.props
             clearDefaultValue(rowOprProp, cellTemplate)
 
             function clearDefaultValue(object, template) {

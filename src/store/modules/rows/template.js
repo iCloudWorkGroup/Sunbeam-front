@@ -20,5 +20,5 @@ export default {
      * 正行操作属性
      * @type {Object}
      */
-    oprProp: {}
+    props: {}
 }

@@ -861,7 +861,7 @@ export default {
         let temp
 
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            if (!isEmpty(temp = rows[i].oprProp)) {
+            if (!isEmpty(temp = rows[i].props)) {
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let rowAlias = rows[i].alias
                     let colAlias = cols[j].alias
@@ -881,7 +881,7 @@ export default {
 
 
         for (let i = startColIndex; i < endColIndex + 1; i++) {
-            if (!isEmpty(temp = cols[i].oprProp)) {
+            if (!isEmpty(temp = cols[i].props)) {
                 for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                     let rowAlias = rows[j].alias
                     let colAlias = cols[i].alias
@@ -1389,10 +1389,11 @@ export default {
         adaptSelect()
         function destoryClip() {
             let flag = true
-            if (startRowIndex > clipEndRowIndex ||
-                endRowIndex < clipStartRowIndex ||
-                startColIndex > clipEndColIndex ||
-                endColIndex < clipStartColIndex
+            if (cache.clipState !== 'cut' &&
+                (startRowIndex > clipEndRowIndex ||
+                    endRowIndex < clipStartRowIndex ||
+                    startColIndex > clipEndColIndex ||
+                    endColIndex < clipStartColIndex)
             ) {
                 flag = false
             }
@@ -1506,59 +1507,92 @@ export default {
     [actionTypes.CELLS_WORDWRAP]({
         dispatch,
         getters
-    }) {
-        let {
+    }, payload) {
+        let startColIndex
+        let startRowIndex
+        let endColIndex
+        let endRowIndex
+        if (payload) {
+            startColIndex = payload.startColIndex
+            startRowIndex = payload.startRowIndex
+            endRowIndex = startRowIndex
+            endColIndex = startColIndex
+        } else {
+            let region = getters.getOprRegion
+            startColIndex = region.startColIndex
+            startRowIndex = region.startRowIndex
+            endRowIndex = region.endRowIndex
+            endColIndex = region.endColIndex
+        }
+        let value
+        let cell = getters.getCellsByVertical({
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        })[0]
+        if (cell) {
+            value = !cell.content.wordWrap
+        } else {
+            value = true
+        }
+        let oprRows
+        if (value) {
+            oprRows = getAdaptRows()
+        }
+        dispatch(actionTypes.CELLS_UPDATE_PROP, {
             startColIndex,
             startRowIndex,
             endColIndex,
-            endRowIndex
-        } = getters.getOprRegion
-        let cols = getters.colList
-        let rows = getters.rowList
-        let startRowSort = rows[startRowIndex].sort
-        let startColSort = cols[startColIndex].sort
-        let endRowSort = rows[endRowIndex].sort
-        let endColSort = cols[endColIndex].sort
-        let cells = getters.cellList
-        let temp = {}
-        let oprRows = []
-        let sendRows = []
-        for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            let maxHeight = 0
-            let rowAlias = rows[i].alias
-            for (let j = startColIndex; j < endColIndex + 1; j++) {
-                let colAlias = cols[j].alias
-                let cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                if(typeof cellIndex === 'number' && !temp[cellIndex]){
-                    let cell = cells[cellIndex]
-                    if (cell.occupy.col.length === 1 && cell.occupy.row.length === 1) {
-                        let height = getTextHeight(cell.content.texts,
-                            cell.content.size,
-                            cell.content.family,
-                            cell.physicsBox.width)
-                        if(height > maxHeight){
-                            maxHeight = height
+            endRowIndex,
+            props: {
+                content: {
+                    wordWrap: value
+                }
+            }
+        })
+        if (oprRows) {
+            oprRows.forEach(info => {
+                dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
+                    sort: info.sort,
+                    value: info.height
+                })
+            })
+        }
+        function getAdaptRows() {
+            let cols = getters.colList
+            let rows = getters.rowList
+            let cells = getters.cellList
+            let getPointInfo = getters.getPointInfo
+            let temp = {}
+            let oprRows = []
+            for (let i = startRowIndex; i < endRowIndex + 1; i++) {
+                let maxHeight = 0
+                let rowAlias = rows[i].alias
+                for (let j = startColIndex; j < endColIndex + 1; j++) {
+                    let colAlias = cols[j].alias
+                    let cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
+                    if (typeof cellIndex === 'number' && !temp[cellIndex]) {
+                        let cell = cells[cellIndex]
+                        if (cell.occupy.col.length === 1 && cell.occupy.row.length === 1) {
+                            let height = getTextHeight(cell.content.texts,
+                                cell.content.size,
+                                cell.content.family,
+                                cell.physicsBox.width)
+                            if (height > maxHeight) {
+                                maxHeight = height
+                            }
                         }
                     }
                 }
+                if (maxHeight > rows[i].height) {
+                    oprRows.push({
+                        sort: rows[i].sort,
+                        height: maxHeight
+                    })
+                }
             }
-            if (maxHeight > rows[i].height) {
-                oprRows.push({
-                    sort: rows[i],
-                    height: maxHeight
-                })
-            }
+            return oprRows
         }
-        dispatch(actionTypes.CELLS_UPDATE_PROP, {
-            content : {
-                wordWrap: true
-            }
-        })
-        oprRows.forEach(info => {
-            dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
-                sort: info.sort,
-                value: info.height
-            })
-        })
     }
 }

@@ -1,12 +1,11 @@
 export function getTextHeight(text, fontSize, fontFamily, width) {
     let el
-    let innerText
-    innerText = text.replace(/\u0020/g, '&nbsp;')
     el = document.createElement('div')
     el.style.cssText = `font-size:${fontSize}pt;
             font-family:${fontFamily};width:${width}px;
-            word-break:break-word;position:absolute;visibility:hidden;`
-    el.innerText = innerText
+            word-break:break-word;position:absolute;
+            visibility:hidden;white-space:pre-line;`
+    el.innerText = text
     document.body.appendChild(el)
     let style
     if (window.getComputedStyle) {

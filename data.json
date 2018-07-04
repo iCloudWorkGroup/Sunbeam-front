@@ -9,8 +9,7 @@
 	          "left": 0,
 	          "props": {
 	            "border": {},
-	            "content": {
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 0,
@@ -21,9 +20,7 @@
 	          "left": 52,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 1,
@@ -33,10 +30,11 @@
 	          "alias": "3",
 	          "left": 104,
 	          "props": {
-	            "border": {},
-	            "content": {
-	              "size": "11"
+	            "border": {
+	            	"left":true,
+	            	"right": true
 	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 2,
@@ -47,9 +45,7 @@
 	          "left": 235,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 3,
@@ -60,9 +56,7 @@
 	          "left": 287,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 4,
@@ -73,9 +67,7 @@
 	          "left": 339,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 5,
@@ -86,9 +78,7 @@
 	          "left": 391,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 6,
@@ -99,9 +89,7 @@
 	          "left": 443,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 7,
@@ -112,9 +100,7 @@
 	          "left": 495,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 8,
@@ -125,9 +111,7 @@
 	          "left": 547,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 9,
@@ -138,9 +122,7 @@
 	          "left": 617,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 10,
@@ -151,9 +133,7 @@
 	          "left": 687,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 11,
@@ -164,9 +144,7 @@
 	          "left": 757,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 12,
@@ -177,9 +155,7 @@
 	          "left": 827,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 13,
@@ -203,9 +179,7 @@
 	          "left": 967,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 15,
@@ -216,9 +190,7 @@
 	          "left": 1037,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 16,
@@ -229,9 +201,7 @@
 	          "left": 1107,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 17,
@@ -242,9 +212,7 @@
 	          "left": 1177,
 	          "props": {
 	            "border": {},
-	            "content": {
-	              "size": "11"
-	            },
+	            "content": {},
 	            "customProp": {}
 	          },
 	          "sort": 18,

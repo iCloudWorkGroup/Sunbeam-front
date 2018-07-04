@@ -1,8 +1,6 @@
 <template>
     <div class="cell" :style="cellPosi">
-        <div class="cell-content" :style="cellProps">
-            {{texts}}
-        </div>
+        <div class="cell-content" :style="cellProps">{{texts}}</div>
     </div>
 </template>
 <script>
@@ -38,6 +36,7 @@ export default {
             changeTopValue(border.top, nextThickBorder.top)
             changeRightValue(border.right, nextThickBorder.right)
             changeBottomValue(border.bottom, nextThickBorder.bottom)
+
             return {
                 top: unit(top),
                 left: unit(left),
@@ -116,8 +115,7 @@ export default {
             let weight = cellContent.weight ? 'bold' : 'normal'
             let underline = cellContent.underline ? 'underline' : ''
             let font = cellContent.size + 'pt ' + cellContent.family
-
-            return {
+            let result = {
                 background: cellContent.background,
                 color: cellContent.color,
                 textAlign: cellContent.alignRow,
@@ -128,6 +126,13 @@ export default {
                 fontWeight: weight,
                 fontStyle: italic
             }
+            if (cellContent.wordWrap) {
+                result.wordBreak = 'break-word'
+                result.whiteSpace = 'pre-line'
+            } else {
+                result.whiteSpace = 'pre'
+            }
+            return result
         },
         nextThickBorder() {
             let getters = this.$store.getters

@@ -164,7 +164,7 @@ export default function(store) {
                     updateRows: []
                 }
                 let defaultValue = {
-                    oprProp: {
+                    props: {
                         content: cellTemplate.content,
                         physicsBox: cellTemplate.physicsBox,
                         decoration: cellTemplate.decoration
@@ -187,7 +187,7 @@ export default function(store) {
                     updateCols: []
                 }
                 let defaultValue = {
-                    oprProp: {
+                    props: {
                         content: cellTemplate.content,
                         physicsBox: cellTemplate.physicsBox,
                         decoration: cellTemplate.decoration
@@ -272,7 +272,8 @@ let userAction = {
     [actionTypes.ROWS_INSERTROW]: true,
     [actionTypes.ROWS_DELETEROW]: true,
     [actionTypes.SHEET_FROZEN]: true,
-    [actionTypes.SHEET_UNFROZEN]: true
+    [actionTypes.SHEET_UNFROZEN]: true,
+    [actionTypes.CELLS_WORDWRAP]: true
 }
 let recordAction = {
     [actionTypes.CELLS_UPDATE_PROP]: true,

@@ -128,5 +128,17 @@ export default {
                 }
             }
         })
+        if (!cell) {
+            cell = getters.getCellsByVertical({
+                startColIndex,
+                startRowIndex
+            })[0]
+        }
+        if (texts.indexOf('\n') !== -1 && !cell.content.wordWrap) {
+            dispatch(actionTypes.CELLS_WORDWRAP, {
+                startColIndex,
+                startRowIndex
+            })
+        }
     }
 }

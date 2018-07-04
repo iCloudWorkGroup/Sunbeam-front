@@ -37,6 +37,9 @@
                 <tool-panel  title="合并拆分">
                     <merge></merge>
                 </tool-panel>
+                <tool-panel  title="换行">
+                    <word-wrap></word-wrap>
+                </tool-panel>
                 <tool-panel  title="文本格式">
                     <format
                         :active-widget-id="activeWidgetId"
@@ -75,6 +78,7 @@ import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Undo from './undo.vue'
 import Clip from './clip.vue'
+import WordWrap from './wordwrap.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 
@@ -95,7 +99,8 @@ export default {
         Hide,
         Undo,
         Clip,
-        Format
+        Format,
+        WordWrap
     },
     mounted() {
         this.activeTabId = this.$refs.initTab.dataset.tabId

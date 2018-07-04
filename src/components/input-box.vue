@@ -1,6 +1,7 @@
 <template>
 <textarea class="edit-frame"
         :value="texts"
+        @keydown="keydownHandle"
         @blur="completeEdit"
         @copy="copyData"
         @cut="cutData"
@@ -10,7 +11,7 @@
 </template>
 <script type="text/javascript">
 import { EDIT_HIDE, SELECTS_INSERT, CELLS_PASTE } from '../store/action-types'
-import { UPDATE_FOCUSSTATE } from '../store/mutation-types'
+import { UPDATE_FOCUSSTATE, DELETE_SELECT } from '../store/mutation-types'
 import { CLIP } from '../tools/constant'
 import cache from '../tools/cache'
 import config from '../config'
@@ -83,9 +84,19 @@ export default {
         },
         copyData(e) {
             let select = this.$store.getters.activeSelect
+            let selects = this.$store.getters.selectList
             let wholePosi = select.wholePosi
             if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
                 return
+            }
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === CLIP) {
+                    let currentSheet = this.$store.state.currentSheet
+                    this.$store.commit(DELETE_SELECT, {
+                        currentSheet,
+                        select: selects[i]
+                    })
+                }
             }
             cache.clipState = 'copy'
             this.$store.dispatch(SELECTS_INSERT, CLIP)
@@ -103,9 +114,19 @@ export default {
         },
         cutData(e) {
             let select = this.$store.getters.activeSelect
+            let selects = this.$store.getters.selectList
             let wholePosi = select.wholePosi
             if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
                 return
+            }
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === CLIP) {
+                    let currentSheet = this.$store.state.currentSheet
+                    this.$store.commit(DELETE_SELECT, {
+                        currentSheet,
+                        select: selects[i]
+                    })
+                }
             }
             cache.clipState = 'cut'
             this.$store.dispatch(SELECTS_INSERT, CLIP)
@@ -136,6 +157,38 @@ export default {
                 this.$store.dispatch(CELLS_PASTE)
             } else {
                 this.$store.dispatch(CELLS_PASTE, text)
+            }
+        },
+        keydownHandle(e) {
+            let key = e.key
+            let altKey = e.altKey
+            if (key === 'Enter' && !altKey) {
+                this.completeEdit()
+            } else if (key === 'Enter' && altKey) {
+                this.insertAtCursor('\n', e.target)
+            }
+        },
+        insertAtCursor(insertChar, elem) {
+            let cursor
+            if (document.selection) {
+                elem.focus()
+                cursor = document.selection.createRange()
+                cursor.text = insertChar
+                elem.focus()
+            } else if (typeof elem.selectionStart === 'number' &&
+                typeof elem.selectionEnd === 'number') {
+                let startPos = elem.selectionStart
+                let endPos = elem.selectionEnd
+                let scrollTop = elem.scrollTop
+                elem.value = elem.value.substring(0, startPos) +
+                    insertChar + elem.value.substring(endPos, elem.value.length)
+                elem.focus()
+                elem.selectionStart = startPos + insertChar.length
+                elem.selectionEnd = startPos + insertChar.length
+                elem.scrollTop = scrollTop
+            } else {
+                elem.value += insertChar
+                elem.focus()
             }
         }
     },

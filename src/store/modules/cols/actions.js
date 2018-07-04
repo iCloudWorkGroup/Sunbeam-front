@@ -1111,7 +1111,7 @@ export default {
             updateColInfo.push({
                 col: cols[i],
                 props: {
-                    oprProp: props
+                    props
                 }
             })
         }

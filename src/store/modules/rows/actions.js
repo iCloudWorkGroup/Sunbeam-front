@@ -665,16 +665,13 @@ export default {
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
 
         let updateSelectInfo = []
-        let rowTop = row.top
         let selects = getters.selectList
 
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
-
-            let startPosi = getters.getRowByAlias(wholePosi.startRowAlias)
-                .top
-            let endPosi = getters.getRowByAlias(wholePosi.endRowAlias).top
-            if (startPosi === rowTop) {
+            let startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            if (startIndex <= index && endIndex >= index) {
                 updateSelectInfo.push({
                     select,
                     props: {
@@ -684,7 +681,7 @@ export default {
                         }
                     }
                 })
-            } else if (startPosi > rowTop) {
+            } else if (startIndex > index) {
                 updateSelectInfo.push({
                     select,
                     props: {
@@ -695,16 +692,6 @@ export default {
                     }
                 })
 
-            } else if (endPosi > rowTop) {
-                updateSelectInfo.push({
-                    select,
-                    props: {
-                        physicsBox: {
-                            height: select.physicsBox.height +
-                                adjustHeight
-                        }
-                    }
-                })
             }
         })
 
@@ -1101,7 +1088,7 @@ export default {
             updateRowInfo.push({
                 row: rows[i],
                 props: {
-                    oprProp: props
+                    props
                 }
             })
         }

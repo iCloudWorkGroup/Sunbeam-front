@@ -120,19 +120,19 @@ export default {
             }),
         })
         let express
-        let format
+        let type
         if (cell) {
-            format = cell.content.format
+            type = cell.content.type
             express = cell.content.express
         } else {
-            format = cellTemplate.content.format
+            type = cellTemplate.content.type
             express = cellTemplate.content.express
         }
         let rules = parseExpress(express)
         let displayTexts
-        if (format === 'date' && isDate(texts)) {
+        if (type === 'date' && isDate(texts)) {
             displayTexts = formatText(rules, texts)
-        } else if (format !== 'date' && isNum(texts)) {
+        } else if (type !== 'date' && isNum(texts)) {
             displayTexts = formatText(rules, parseFloat(texts, 10))
         } else {
             displayTexts = texts

@@ -19,7 +19,7 @@ export default {
     content: {
         texts: '',
         displayTexts: '',
-        format: 'routine',
+        type: 'routine',
         express: 'G',
         size: '11',
         family: 'SimSun',

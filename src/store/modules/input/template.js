@@ -8,7 +8,7 @@ export default {
     maxWidth: 0,
     maxHeight: 0,
     texts: '',
-    format: '',
+    type: '',
     size: '11',
     family: 'SimSun',
     color: 'rgb(0, 0, 0)',

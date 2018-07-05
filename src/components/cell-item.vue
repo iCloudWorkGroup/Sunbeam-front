@@ -133,11 +133,11 @@ export default {
             }
             if (cellContent.alignCol !== '') {
                 result.verticalAlign = cellContent.alignCol
-            } else if ((cellContent.format === 'routine' ||
-                    cellContent.format === 'number') &&
+            } else if ((cellContent.type === 'routine' ||
+                    cellContent.type === 'number') &&
                     isNum(cellContent.texts)) {
                 result.verticalAlign = 'left'
-            } else if (cellContent.format === 'date' && isDate(cellContent.texts)) {
+            } else if (cellContent.type === 'date' && isDate(cellContent.texts)) {
                 result.verticalAlign = 'left'
             }
             return result

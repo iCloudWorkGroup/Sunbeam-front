@@ -1119,7 +1119,7 @@ export default {
         let rules = parseExpress(value)
         let props = {
             content: {
-                format,
+                type: format,
                 express
             }
         }

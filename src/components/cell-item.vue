@@ -4,7 +4,7 @@
     </div>
 </template>
 <script>
-
+import { isNum, isDate } from '../tools/format'
 import { unit } from '../filters/unit'
 export default {
     props: ['item', 'frozenRule'],
@@ -119,7 +119,6 @@ export default {
                 background: cellContent.background,
                 color: cellContent.color,
                 textAlign: cellContent.alignRow,
-                verticalAlign: cellContent.alignCol,
                 font: font,
                 fontFamily: cellContent.family,
                 textDecoration: underline,
@@ -131,6 +130,15 @@ export default {
                 result.whiteSpace = 'pre-line'
             } else {
                 result.whiteSpace = 'pre'
+            }
+            if (cellContent.alignCol !== '') {
+                result.verticalAlign = cellContent.alignCol
+            } else if ((cellContent.format === 'routine' ||
+                    cellContent.format === 'number') &&
+                    isNum(cellContent.texts)) {
+                result.verticalAlign = 'left'
+            } else if (cellContent.format === 'date' && isDate(cellContent.texts)) {
+                result.verticalAlign = 'left'
             }
             return result
         },
@@ -204,7 +212,7 @@ export default {
             return result
         },
         texts() {
-            return this.item.content.texts
+            return this.item.content.displayTexts
         }
     },
     filters: {

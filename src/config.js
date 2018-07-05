@@ -1,9 +1,9 @@
 export default {
     colWidth: 71,
     rowHeight: 19,
-    initRowNum: 40,
+    initRowNum: 100,
     initColNum: 26,
-    maxRowNum: 2000,
+    maxRowNum: 10000,
     maxColNum: 52,
     /**
      * 页面左侧距离
@@ -59,7 +59,13 @@ export default {
         'hidecol': 'col/hide',
         'showrow': 'row/show',
         'showcol': 'col/show',
-        'addrowcol': 'sheet/expand'
+        'addrowcol': 'sheet/expand',
+        'format': 'cell/format',
+        'undo': 'sheet/undo',
+        'redo': 'sheet/redo',
+        'outerpaste': 'sheet/paste',
+        'cut': 'sheet/cut',
+        'copy': 'sheet/copy'
     },
     operSendPropName: {
         'alignRow': 'align',
@@ -76,6 +82,6 @@ export default {
      * 请求地址根路径
      * @type {String}
      */
-    rootPath: 'http://localhost:8080/'
-    // rootPath: 'http://excel-inc.acmr.com.cn/'
+    // rootPath: 'http://localhost:8080/'
+    rootPath: 'http://excel-inc.acmr.com.cn/'
 }

@@ -1,5 +1,7 @@
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
+import send from '../../../util/send'
+import config from '../../../config'
 
 export default {
     [actionTypes.HISTORY_REDO]({
@@ -12,6 +14,9 @@ export default {
         if (list.length === index + 1) {
             return
         }
+        send({
+            url: config.operUrl['redo']
+        })
         let actions = list[index + 1].actions
         actions.forEach(action => {
             dispatch(action.type, action.payload)
@@ -28,6 +33,9 @@ export default {
         if (index === -1) {
             return
         }
+        send({
+            url: config.operUrl['undo']
+        })
         let list = state.list
         let actions = list[index].actions
         actions.forEach(function(action) {

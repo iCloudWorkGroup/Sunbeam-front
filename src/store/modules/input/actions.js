@@ -3,6 +3,8 @@ import * as mutationTypes from '../../mutation-types'
 import * as actionTypes from '../../action-types'
 import send from '../../../util/send'
 import config from '../../../config'
+import cellTemplate from '../cells/template'
+import { parseExpress, formatText, isNum, isDate } from '../../../tools/format'
 
 export default {
     [actionTypes.EDIT_SHOW]({
@@ -117,6 +119,24 @@ export default {
                 content: texts
             }),
         })
+        let express
+        let type
+        if (cell) {
+            type = cell.content.type
+            express = cell.content.express
+        } else {
+            type = cellTemplate.content.type
+            express = cellTemplate.content.express
+        }
+        let rules = parseExpress(express)
+        let displayTexts
+        if (type === 'date' && isDate(texts)) {
+            displayTexts = formatText(rules, texts)
+        } else if (type !== 'date' && isNum(texts)) {
+            displayTexts = formatText(rules, parseFloat(texts, 10))
+        } else {
+            displayTexts = texts
+        }
         dispatch(actionTypes.CELLS_UPDATE_PROP, {
             startColIndex,
             startRowIndex,
@@ -124,7 +144,8 @@ export default {
             endRowIndex: startRowIndex,
             props: {
                 content: {
-                    texts: texts
+                    texts,
+                    displayTexts
                 }
             }
         })

@@ -2,6 +2,7 @@ import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import { CLIP } from '../../../tools/constant'
 import { getTextHeight } from '../../../tools/calcbox'
+import { parseExpress, formatText, isNum, isDate } from '../../../tools/format'
 import extend from '../../../util/extend'
 import template from './template'
 import generator from '../../../tools/generator'
@@ -728,11 +729,11 @@ export default {
             }
             updateCellInfo.push({
                 cell,
-                updateProp
+                props: updateProp
             })
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-
+        console.log(cellList[0])
         let insertCellInfo = []
         let editViewOccupy = getters.getEditViewOccupy()
         let cols = getters.colList
@@ -797,7 +798,7 @@ export default {
             }
             updateCellInfo.push({
                 cell,
-                updateProp
+                props: updateProp
             })
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
@@ -1087,153 +1088,78 @@ export default {
         commit,
         getters,
         rootState,
-    }, reg) {
-        function splitReg(str) {
-            let localStr = str
-            let keyRegs = [{
-                reg: /0^\.|0\.0{1,3}/g,
-                match: true,
-                handle: 'decimal'
-            }, {
-                reg: /#,##/g,
-                decorate: 'middle'
-            }, {
-                reg: /%/g,
-                match: true,
-                decorate: 'after',
-                handle: 'percent'
-            }, {
-                reg: /\$|￥/g,
-                match: true,
-                decorate: 'before',
-            }, {
-                reg: /^@$/g,
-                handle: 'article'
-            }, {
-                reg: /^G$/g,
-                handle: 'examine'
-            }, {
-                reg: /^(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|^(y{4})[-/年]?(m{1,2})[-/月]?/g,
-                handle: 'whole',
-                match: true
-            }]
-            let retRegs = []
-            for (let i = 0, len = keyRegs.length; i < len; i++) {
-                let item = keyRegs[i]
-                let reg = item['reg']
-                let ret = reg.exec(localStr)
-                if (ret) {
-                    if (item.match) {
-                        item.match = ret[0]
-                    }
-                    retRegs.push(item)
-                    let arrayStr = localStr.split('')
-                    arrayStr.splice(ret.index, reg.lastIndex - ret.index)
-                    localStr = arrayStr.join('')
-                    if (!localStr.length) {
-                        break
-                    }
-                }
-            }
-            return retRegs
-        }
-        let Complier = function(inptVal, type = '') {
-            this.origin = this.manifest = this.inpt = inptVal
-            this.dateType = type
-        }
-        Complier.prototype = {
-            initilize: function(rules) {
-                let calculate = function(handleType) {
-                    for (let i = 0, len = rules.length; i < len; i++) {
-                        let item = rules[i]
-                        let handleName
-                        if ((handleName = item[handleType]) != null) {
-                            this.manifest = this[handleName](item)
-                        }
-                    }
-                }.bind(this)
+        dispatch
+    }, value) {
+        let {
+            startColIndex,
+            startRowIndex,
+            endColIndex,
+            endRowIndex
+        } = getters.getOprRegion
+        let cols = getters.colList
+        let rows = getters.rowList
+        let values = value.split('-')
+        let format = values[0]
+        let express = values[1]
 
-                calculate('handle')
-                calculate('decorate')
-            },
-            /**
-             * [返回数字类型]
-             * @param  {[type]} rule [description]
-             * @return {[number]}      [description]
-             */
-            decimal: function(rule) {
-                // 小数变整数，四舍五入
-                // 整数变小数
-                // 小数变小数，四舍五入
-                let exps = rule.match
-                if (exps.indexOf('.') !== -1) {
-                    let figure = exps.length - exps.indexOf('.') - 1
-                    return this.origin.toFixed(figure)
-                }
-                return parseInt(this.origin, 10)
-            },
-            percent: function(rule) {
-                return this.origin * 100
-            },
-            article: function() {
-                return this.origin.toString()
-            },
-            examine: function() {
-                let type = 'text'
-                let localValue
-                if (!isNaN(localValue = parseFloat(this.origin)) &&
-                    typeof localValue === 'number') {
-                    type = 'number'
-                }
-                if (!isNaN(Date.parse(this.origin))) {
-                    type = 'date'
-                }
-                return type
-            },
-            /**
-             * [修饰符在中间，需要number类型]
-             * @return {[String]} [description]
-             */
-            middle: function() {
-                return this.origin.toLocaleString()
-            },
-            /**
-             * [修饰符在前面]
-             * @param  {[type]} rule [description]
-             * @return {[String]}      [description]
-             */
-            before: function(rule) {
-                return rule.match + this.manifest
-            },
-            /**
-             * [修饰符在后面, 但要计算数据值]
-             * @param  {[type]} rule [description]
-             * @return {[String]}      [description]
-             */
-            after: function(rule) {
-                return this.manifest + rule.match
-            },
-            whole: function(rule) {
-                let localDate = new Date(this.origin)
-                let dateMap = {
-                    y: localDate.getFullYear(),
-                    m: localDate.getMonth() + 1,
-                    d: localDate.getDate()
-                }
-                let ret = rule.match.replace(/([ymd]+)/g, function(
-                    match, name) {
-                    let localName = name.substring(0, 1)
-                    return (dateMap[localName] != null) ?
-                        dateMap[localName] : ''
-                })
-                console.log(ret)
+        let data = {
+            coordinate: [{
+                startCol: cols[startColIndex].sort,
+                startRow: rows[startRowIndex].sort,
+                endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
+                endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+            }],
+            format,
+            express
+        }
+        send({
+            url: config.operUrl['format'],
+            data: JSON.stringify(data)
+        })
+        let rules = parseExpress(value)
+        let props = {
+            content: {
+                type: format,
+                express
             }
         }
-        // let rules = splitReg(reg)
-        splitReg(reg)
-        // getters.getSelectCell()
-        // var ec = new Complier(originalValue)
-        // ec.initilize(rules)
+        if (endRowIndex === 'MAX') {
+            dispatch(actionTypes.COLS_OPERCOLS, {
+                startIndex: startColIndex,
+                endIndex: endColIndex,
+                fn: parseText,
+                props
+            })
+        } else if (endColIndex === 'MAX') {
+            dispatch(actionTypes.ROWS_OPERROWS, {
+                startIndex: startRowIndex,
+                endIndex: endRowIndex,
+                fn: parseText,
+                props
+            })
+        } else {
+            dispatch(actionTypes.CELLS_UPDATE_PROP, {
+                startColIndex,
+                endColIndex,
+                startRowIndex,
+                endRowIndex,
+                props,
+                fn: parseText
+            })
+        }
+        function parseText(cell) {
+            let text = cell.content.texts
+            if (format === 'date' && isDate(text)) {
+                text = formatText(rules, text)
+            } else if (format !== 'date' && isNum(text)) {
+                text = formatText(rules, parseFloat(text, 10))
+            }
+            return {
+                content: {
+                    displayTexts: text
+                }
+            }
+        }
     },
     [actionTypes.CELLS_PASTE]({
         getters,
@@ -1248,10 +1174,22 @@ export default {
         let startRowSort = rows[startRowIndex].sort
         let startColSort = cols[startColIndex].sort
         if (typeof text !== 'undefined') {
-            dispatch(actionTypes.CELLS_OUTERPASTE, {
-                startRowSort,
-                startColSort,
-                parseDate: parseClipStr(text)
+            send({
+                url: config.operUrl['outerpaste'],
+                data: JSON.stringify({
+                    oprCol: startColSort,
+                    oprRow: startRowSort,
+                    content: text
+                }),
+                success(data) {
+                    if (data.isLegal) {
+                        dispatch(actionTypes.CELLS_OUTERPASTE, {
+                            startRowSort,
+                            startColSort,
+                            parseDate: parseClipStr(text)
+                        })
+                    }
+                }
             })
         } else {
             let clip
@@ -1270,13 +1208,32 @@ export default {
             let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
             let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
             let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-            dispatch(actionTypes.CELLS_INNERPASTE, {
-                startRowSort,
-                startColSort,
-                clipStartColSort: cols[clipStartColIndex].sort,
-                clipStartRowSort: rows[clipStartRowIndex].sort,
-                clipEndColSort: cols[clipEndColIndex].sort,
-                clipEndRowSort: rows[clipEndRowIndex].sort
+            send({
+                url: config.operUrl[cache.clipState],
+                data: JSON.stringify({
+                    orignal: {
+                        startCol: cols[clipStartColIndex].sort,
+                        startRow: rows[clipStartRowIndex].sort,
+                        endCol: cols[clipEndColIndex].sort,
+                        endRow: rows[clipEndRowIndex].sort
+                    },
+                    target: {
+                        oprCol: startColSort,
+                        oprRow: startRowSort
+                    }
+                }),
+                success(data) {
+                    if (data.isLegal) {
+                        dispatch(actionTypes.CELLS_INNERPASTE, {
+                            startRowSort,
+                            startColSort,
+                            clipStartColSort: cols[clipStartColIndex].sort,
+                            clipStartRowSort: rows[clipStartRowIndex].sort,
+                            clipEndColSort: cols[clipEndColIndex].sort,
+                            clipEndRowSort: rows[clipEndRowIndex].sort
+                        })
+                    }
+                }
             })
         }
     },
@@ -1493,7 +1450,8 @@ export default {
                     row: [rowAlias]
                 },
                 content: {
-                    texts: cellData.text
+                    texts: cellData.text,
+                    displayTexts: cellData.text
                 }
             }])
         })
@@ -1537,28 +1495,44 @@ export default {
             value = true
         }
         let oprRows
-        if (value) {
-            oprRows = getAdaptRows()
-        }
-        dispatch(actionTypes.CELLS_UPDATE_PROP, {
-            startColIndex,
-            startRowIndex,
-            endColIndex,
-            endRowIndex,
-            props: {
-                content: {
-                    wordWrap: value
-                }
+        let props = {
+            content: {
+                wordWrap: value
             }
-        })
-        if (oprRows) {
-            oprRows.forEach(info => {
-                dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
-                    sort: info.sort,
-                    value: info.height
-                })
-            })
         }
+        if (endRowIndex === 'MAX') {
+            dispatch(actionTypes.COLS_OPERCOLS, {
+                startIndex: startColIndex,
+                endIndex: endColIndex,
+                props
+            })
+        } else if (endColIndex === 'MAX') {
+            dispatch(actionTypes.ROWS_OPERROWS, {
+                startIndex: startRowIndex,
+                endIndex: endRowIndex,
+                props
+            })
+        } else {
+            if (value) {
+                oprRows = getAdaptRows()
+            }
+            dispatch(actionTypes.CELLS_UPDATE_PROP, {
+                startColIndex,
+                startRowIndex,
+                endColIndex,
+                endRowIndex,
+                props
+            })
+            if (oprRows) {
+                oprRows.forEach(info => {
+                    dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
+                        sort: info.sort,
+                        value: info.height
+                    })
+                })
+            }
+        }
+
         function getAdaptRows() {
             let cols = getters.colList
             let rows = getters.rowList

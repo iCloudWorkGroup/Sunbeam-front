@@ -5,7 +5,7 @@
 		<title>product page</title>
 	</head>
 	<body>
-        <input type="hidden" id="excelId" value="123">
+        <input type="hidden" id="sbmId" value="123">
 		<div id="app" style="width:100%; height:100%;"></div>
 		<script type="text/javascript" src="./sbm.js"></script>
 		<script>

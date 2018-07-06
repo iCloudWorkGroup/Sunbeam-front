@@ -9,6 +9,7 @@
 		<div id="app" style="width:100%; height:100%;"></div>
 		<script type="text/javascript" src="./sbm.js"></script>
 		<script>
+		console.log(SBM)
 			var sbm = new SBM('#app');
 		</script>
         

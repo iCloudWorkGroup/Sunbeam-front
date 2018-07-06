@@ -83,5 +83,6 @@ export default {
      * @type {String}
      */
     // rootPath: 'http://localhost:8080/'
+    // rootPath: 'http://localhost:8087/'
     rootPath: 'http://excel-inc.acmr.com.cn/'
 }

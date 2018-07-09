@@ -1,0 +1,19 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.tools {
+    height: 130px;
+    border: 1px solid #d4d4d4;
+}
+
+.table {
+    border: 1px solid #d4d4d4;
+    position: absolute;
+    top: 160px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

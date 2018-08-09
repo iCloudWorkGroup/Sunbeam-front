@@ -1,33 +1,26 @@
 <template>
 <div class="col-head-item"
-     :style="{
-        left: (col.left - offsetLeft) + 'px',
-        borderRight: borderRight,
-        width: width + 'px'
-    }"
+     :style="{left, borderRight, width}"
      :class="{active: col.active}">
     <div class="item">{{col.displayName}}</div>
 </div>
 </template>
 <script>
+import {
+    unit
+} from '../filters/unit'
 export default {
     props: ['col', 'offsetLeft'],
     computed: {
-        // left() {
-        //     return this.col.left - this.offsetLeft
-        // },
+        left() {
+            return unit(this.col.left - this.offsetLeft)
+        },
         width() {
             if (this.col.rightAjacentHide) {
                 return this.col.width - 2
             }
-            return this.col.width
+            return unit(this.col.width)
         },
-        // displayName() {
-        //     return this.col.displayName
-        // },
-        // isActive() {
-        //     return this.col.active
-        // },
         borderRight() {
             if (this.col.rightAjacentHide) {
                 return 'double #bfbfbf'

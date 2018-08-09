@@ -1,57 +1,38 @@
 <template>
 <div class="cell-group">
-    <cell-item v-for="item in cellList"
-               :key="item.alias"
-               :item="item"
-               :frozenRule="frozenRule">
+    <cell-item
+        v-for="item in cells"
+        :key="item.alias"
+        :cell="item"
+        :offsetTop="offsetTop"
+        :offsetLeft="offsetLeft">
     </cell-item>
 </div>
-
 </template>
-
-<script type="text/javascript">
+<script>
 import CellItem from './cell-item.vue'
 export default {
     props: [
-        'frozenRule'
+        'rowStart',
+        'rowOver',
+        'colStart',
+        'colOver',
+        'offsetLeft',
+        'offsetTop'
     ],
-    data() {
-        let startColIndex
-        let endColIndex
-        let startRowIndex
-        let endRowIndex
-
-        if (this.frozenRule) {
-            startColIndex = this.frozenRule.startColIndex
-            endColIndex = this.frozenRule.endColIndex
-            startRowIndex = this.frozenRule.startRowIndex
-            endRowIndex = this.frozenRule.endRowIndex
-        }
-        return {
-            startColIndex,
-            endColIndex,
-            startRowIndex,
-            endRowIndex
-        }
-    },
     computed: {
-        cellList() {
-            if (typeof this.endRowIndex !== 'undefined' &&
-                typeof this.endColIndex !== 'undefined') {
-                return this.$store.getters.getCellsByVertical({
-                    startColIndex: this.startColIndex,
-                    endColIndex: this.endColIndex,
-                    startRowIndex: this.startRowIndex,
-                    endRowIndex: this.endRowIndex
-                })
-            } else if (typeof this.endRowIndex !== 'undefined') {
-                return this.$store.getters.topRegionCellList
-            } else if (typeof this.endColIndex !== 'undefined') {
-                return this.$store.getters.leftRegionCellList
-            } else {
-
-                return this.$store.getters.userViewCellList
-            }
+        cells() {
+            let getters = this.$store.getters
+            let startColIndex = getters.getColIndexByAlias(this.colStart)
+            let endColIndex = getters.getColIndexByAlias(this.colOver)
+            let startRowIndex = getters.getRowIndexByAlias(this.rowStart)
+            let endRowIndex = getters.getRowIndexByAlias(this.rowOver)
+            return this.$store.getters.getCellsByVertical({
+                startColIndex,
+                endColIndex,
+                startRowIndex,
+                endRowIndex
+            })
         }
     },
     components: {
@@ -59,12 +40,3 @@ export default {
     }
 }
 </script>
-<style type="text/css">
-.cell-group {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: inherit;
-    height: inherit;
-}
-</style>

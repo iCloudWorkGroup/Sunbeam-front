@@ -4,7 +4,12 @@ import * as actionTypes from '../../action-types'
 import send from '../../../util/send'
 import config from '../../../config'
 import cellTemplate from '../cells/template'
-import { parseExpress, formatText, isNum, isDate } from '../../../tools/format'
+import {
+    parseExpress,
+    formatText,
+    isNum,
+    isDate
+} from '../../../tools/format'
 
 export default {
     [actionTypes.EDIT_SHOW]({
@@ -16,11 +21,9 @@ export default {
         let wholePosi = getters.activeSelect.wholePosi
         let colAlias = wholePosi.startColAlias
         let rowAlias = wholePosi.startRowAlias
-        let colIndex
-        let rowIndex
 
-        colIndex = getters.getColIndexByAlias(colAlias)
-        rowIndex = getters.getRowIndexByAlias(rowAlias)
+        let colIndex = getters.getColIndexByAlias(colAlias)
+        let rowIndex = getters.getRowIndexByAlias(rowAlias)
 
         let cellList = getters.getCellsByVertical({
             startColIndex: colIndex,
@@ -74,7 +77,6 @@ export default {
             }
         }
         commit(mutationTypes.UPDATE_EDIT, {
-            currentSheet: rootState.currentSheet,
             inputInfo: props
         })
     },
@@ -102,13 +104,16 @@ export default {
                 texts: ''
             }
         })
-        let cell = getters.getCellsByVertical({ startColIndex, startRowIndex })[0]
+        let cell = getters.getCellsByVertical({
+            startColIndex,
+            startRowIndex
+        })[0]
 
         if (cell && cell.content.texts === texts) {
             return
         }
         send({
-            url: config.operUrl['texts'],
+            url: config.url['texts'],
             data: JSON.stringify({
                 coordinate: {
                     startCol: cols[startColIndex].sort,

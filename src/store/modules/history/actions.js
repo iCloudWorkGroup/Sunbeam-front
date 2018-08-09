@@ -15,7 +15,7 @@ export default {
             return
         }
         send({
-            url: config.operUrl['redo']
+            url: config.url['redo']
         })
         let actions = list[index + 1].actions
         actions.forEach(action => {
@@ -34,7 +34,7 @@ export default {
             return
         }
         send({
-            url: config.operUrl['undo']
+            url: config.url['undo']
         })
         let list = state.list
         let actions = list[index].actions
@@ -110,16 +110,16 @@ function propUpdateUndo(mutations, commit) {
             mutationInfo.type === mutationTypes.INSERT_CELL) {
             commit(mutationTypes.UPDATE_CELL, mutationInfo.updateCells)
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTINFO) {
-            commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
+            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
 // 单元格覆盖回退操作
 function coverCellUndo(mutations, commit) {
     mutations.forEach(mutationInfo => {
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTINFO) {
-            commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
+            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
@@ -183,8 +183,8 @@ function deleteColUndo(action, dispatch, commit) {
                 }
             })
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTINFO) {
-            commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
+            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
@@ -218,8 +218,8 @@ function deleteRowUndo(action, dispatch, commit) {
                 }
             })
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTINFO) {
-            commit(mutationTypes.UPDATE_POINTINFO, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
+            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }

@@ -1,6 +1,10 @@
 import extend from '../../../util/extend'
 import * as actionTypes from '../../action-types'
-import * as mutationTypes from '../../mutation-types'
+import {
+    INSERT_SHEET,
+    UPDATE_FROZENSTATE,
+    UPDATE_OCCUPY
+} from '../../mutation-types'
 import template from './template'
 import send from '../../../util/send'
 import config from '../../../config'
@@ -15,21 +19,53 @@ export default {
     /**
      * 还原sheet
      */
-    [actionTypes.SHEET_INSERTSHEET]({
+    [actionTypes.SHEET_INSERT]({
         commit,
-        state
+        getters,
+        state,
+        rootState
     }, sheet) {
-        let list = state.list
-        let flag = true
-        for (let i = 0, len1 = state.length; i < len1; i++) {
-            if (list[i].alias === sheet.alias) {
-                flag = false
-                break
+        let fixedSheet = {
+            alias: sheet.alias,
+            name: sheet.name,
+            frozen: {}
+        }
+        if (sheet.frozen && sheet.frozen.colAlias) {
+            let cols = rootState.cols.list
+            let first = cols[0].alias
+            let last = cols[cols.length - 1].alias
+            let neighbor = getters.neighborColByAlias(sheet.frozen.colAlias,
+                'NEXT')
+            if (neighbor == null) {
+                throw new Error('frozen position error from col')
             }
+            fixedSheet.frozen.col = [{
+                start: first,
+                over: sheet.frozen.colAlias
+            }, {
+                start: neighbor.alias,
+                over: last
+            }]
         }
-        if (flag) {
-            commit(mutationTypes.INSERT_SHEET, extend({}, template, sheet))
+        if (sheet.frozen && sheet.frozen.rowAlias) {
+            let rows = rootState.rows.list
+            let first = rows[0].alias
+            let last = rows[rows.length - 1].alias
+            let neighbor = getters.neighborRowByAlias(sheet.frozen.rowAlias,
+                'NEXT')
+            if (neighbor == null) {
+                throw new Error('frozen position error from row')
+            }
+            fixedSheet.frozen.row = [{
+                start: first,
+                over: sheet.frozen.rowAlias
+            }, {
+                start: neighbor.alias,
+                over: last
+            }]
         }
+        commit(INSERT_SHEET, extend(template, fixedSheet))
+
     },
     [actionTypes.SHEET_FROZEN]({
         state,
@@ -83,7 +119,7 @@ export default {
         let frozenCol = cols[frozenColIndex]
         let frozenRow = rows[frozenRowIndex]
         send({
-            url: config.operUrl['frozen'],
+            url: config.url['frozen'],
             data: JSON.stringify({
                 viewRow: userViewTop.alias,
                 viewCol: userViewLeft.alias,
@@ -183,7 +219,7 @@ export default {
             userViewLeft: userViewCol.left,
             offsetTop: 0
         })
-        commit(mutationTypes.UPDATE_FROZENSTATE, {
+        commit(UPDATE_FROZENSTATE, {
             isFrozen: true,
             rowFrozen: false,
             colFrozen: true,
@@ -228,7 +264,7 @@ export default {
             userViewTop: userViewRow.top,
             offsetLeft: 0
         })
-        commit(mutationTypes.UPDATE_FROZENSTATE, {
+        commit(UPDATE_FROZENSTATE, {
             isFrozen: true,
             rowFrozen: true,
             colFrozen: false,
@@ -302,7 +338,7 @@ export default {
             offsetLeft: frozenCol.left,
             offsetTop: frozenRow.top
         })
-        commit(mutationTypes.UPDATE_FROZENSTATE, {
+        commit(UPDATE_FROZENSTATE, {
             isFrozen: true,
             rowFrozen: true,
             colFrozen: true,
@@ -314,9 +350,11 @@ export default {
             currentSheet: rootState.currentSheet
         })
     },
-    [actionTypes.SHEET_UNFROZEN]({ dispatch }) {
+    [actionTypes.SHEET_UNFROZEN]({
+        dispatch
+    }) {
         send({
-            url: config.operUrl['unfrozen']
+            url: config.url['unfrozen']
         })
         dispatch(actionTypes.SHEET_EXECUNFROZEN)
     },
@@ -324,7 +362,7 @@ export default {
         commit,
         rootState
     }) {
-        commit(mutationTypes.UPDATE_FROZENSTATE, {
+        commit(UPDATE_FROZENSTATE, {
             isFrozen: false,
             rowFrozen: false,
             colFrozen: false,
@@ -340,7 +378,7 @@ export default {
         col,
         row
     }) {
-        commit(mutationTypes.UPDATE_OCCUPY, {
+        commit(UPDATE_OCCUPY, {
             currentSheet: rootState.currentSheet,
             type: viewTypes[type],
             col,
@@ -371,7 +409,7 @@ export default {
 
                 if ((index = occupyCol.indexOf(alias)) !== -1) {
                     occupyCol.splice(index, 1)
-                    commit(mutationTypes.UPDATE_OCCUPY, {
+                    commit(UPDATE_OCCUPY, {
                         currentSheet: rootState.currentSheet,
                         type: key,
                         col: occupyCol
@@ -405,7 +443,7 @@ export default {
                 if ((index = occupyRow.indexOf(alias)) !== -1) {
                     occupyRow.splice(index, 1)
 
-                    commit(mutationTypes.UPDATE_OCCUPY, {
+                    commit(UPDATE_OCCUPY, {
                         currentSheet: rootState.currentSheet,
                         type: key,
                         row: occupyRow

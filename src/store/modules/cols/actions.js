@@ -1,28 +1,47 @@
 import Vue from 'vue'
 import * as actionTypes from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
-import { getColDisplayName } from '../../../util/displayname'
+import {
+    getColDisplayName
+} from '../../../util/displayname'
 import generator from '../../../tools/generator'
 import extend from '../../../util/extend'
 import config from '../../../config'
 import cache from '../../../tools/cache'
 import template from './template'
-import { SELECT } from '../../../tools/constant'
+import {
+    SELECT
+} from '../../../tools/constant'
 import send from '../../../util/send'
 
 export default {
-    [actionTypes.COLS_ADDCOLS]({
+    /**
+     * 添加列，允许批量添加
+     */
+    [actionTypes.COLS_ADD]({
         state,
         rootState,
         commit
     }, cols) {
-        let temp = []
+        let ret = []
         for (let i = 0, len = cols.length; i < len; i++) {
-            temp.push(extend({}, template, cols[i]))
+            ret.push(extend(template, cols[i]))
         }
         commit(mutationTypes.ADD_COL, {
-            cols: temp,
-            currentSheet: rootState.currentSheet
+            cols: ret
+        })
+    },
+    [actionTypes.COLS_ACTIVE]({
+        state,
+        commit
+    }, {
+        startIndex,
+        endIndex
+    }) {
+        commit(mutationTypes.CANCEL_ACTIVE_COL)
+        commit(mutationTypes.ACTIVE_COL, {
+            startIndex,
+            endIndex
         })
     },
     [actionTypes.COLS_RESTORECOLS]({
@@ -35,7 +54,7 @@ export default {
 
         for (let i = 0, len = cols.length; i < len; i++) {
             if (!map.get(cols[i].alias)) {
-                temp.push(extend({}, template, cols[i]))
+                temp.push(extend(template, cols[i]))
             }
         }
         commit(mutationTypes.INSERT_COL, {
@@ -53,7 +72,7 @@ export default {
         let cols = getters.colList
         let col = cols[index]
         send({
-            url: config.operUrl['adjustcol'],
+            url: config.url['adjustcol'],
             data: JSON.stringify({
                 col: col.sort,
                 offset: width
@@ -212,7 +231,7 @@ export default {
         let col = cols[index]
 
         send({
-            url: config.operUrl['deletecol'],
+            url: config.url['deletecol'],
             data: JSON.stringify({
                 col: col.sort,
             }),
@@ -262,7 +281,8 @@ export default {
                                 col: newOccupyCol
                             },
                             physicsBox: {
-                                width: cell.physicsBox.width - deleteColWidth - 1
+                                width: cell.physicsBox.width -
+                                    deleteColWidth - 1
                             }
                         }
                     })
@@ -272,14 +292,15 @@ export default {
                     cell,
                     props: {
                         physicsBox: {
-                            left: cell.physicsBox.left - deleteColWidth - 1
+                            left: cell.physicsBox.left -
+                                deleteColWidth - 1
                         }
                     }
                 })
             }
         })
         updateOccupys.forEach(info => {
-            commit(mutationTypes.UPDATE_POINTINFO, {
+            commit(mutationTypes.UPDATE_POINTS, {
                 currentSheet,
                 info
             })
@@ -303,8 +324,10 @@ export default {
                                     width: cols[index - 1].width
                                 },
                                 wholePosi: {
-                                    startColAlias: cols[index - 1].alias,
-                                    endColAlias: cols[index - 1].alias
+                                    startColAlias: cols[index -
+                                        1].alias,
+                                    endColAlias: cols[index - 1]
+                                        .alias
                                 }
                             }
                         })
@@ -320,8 +343,10 @@ export default {
                                     width: cols[index + 1].width
                                 },
                                 wholePosi: {
-                                    startColAlias: cols[index + 1].alias,
-                                    endColAlias: cols[index + 1].alias
+                                    startColAlias: cols[index +
+                                        1].alias,
+                                    endColAlias: cols[index + 1]
+                                        .alias
                                 }
                             }
                         })
@@ -349,7 +374,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            left: select.physicsBox.left - deleteColWidth - 1
+                            left: select.physicsBox.left -
+                                deleteColWidth - 1
                         }
                     }
                 })
@@ -358,7 +384,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width - cols[index + 1].width - 1
+                            width: select.physicsBox.width -
+                                cols[index + 1].width - 1
                         },
                         wholePosi: {
                             endColAlias: cols[index - 1].alias
@@ -370,7 +397,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width - cols[index + 1].width - 1
+                            width: select.physicsBox.width -
+                                cols[index + 1].width - 1
                         }
                     }
                 })
@@ -487,7 +515,7 @@ export default {
         let col = cols[index]
 
         send({
-            url: config.operUrl['hidecol'],
+            url: config.url['hidecol'],
             data: JSON.stringify({
                 col: col.sort
             }),
@@ -702,7 +730,7 @@ export default {
         }
         let col = cols[index]
         send({
-            url: config.operUrl['showcol'],
+            url: config.url['showcol'],
             data: JSON.stringify({
                 col: col.sort
             })
@@ -848,12 +876,14 @@ export default {
 
         let sort = getters.colList[index].sort
         send({
-            url: config.operUrl['insertcol'],
+            url: config.url['insertcol'],
             data: JSON.stringify({
                 col: sort,
             }),
         })
-        dispatch(actionTypes.COLS_EXECINSERTCOL, { sort })
+        dispatch(actionTypes.COLS_EXECINSERTCOL, {
+            sort
+        })
     },
     [actionTypes.COLS_EXECINSERTCOL]({
         getters,
@@ -910,7 +940,8 @@ export default {
                 let cellIndex
 
                 newOccupy.splice(aliasIndex, 0, insertColAlias)
-                cellIndex = getters.getPointInfo(occupyCol[0], occupyRow[0], 'cellIndex')
+                cellIndex = getters.getPointInfo(occupyCol[0],
+                    occupyRow[0], 'cellIndex')
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -924,7 +955,7 @@ export default {
                     }
                 })
                 occupyRow.forEach(function(rowAlias) {
-                    commit(mutationTypes.UPDATE_POINTINFO, {
+                    commit(mutationTypes.UPDATE_POINTS, {
                         currentSheet,
                         info: {
                             colAlias: insertColAlias,
@@ -962,7 +993,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width + colWidth + 1
+                            width: select.physicsBox.width +
+                                colWidth + 1
                         }
                     }
                 })
@@ -1008,7 +1040,8 @@ export default {
             cellList.forEach(cell => {
                 let occupyCol = cell.occupy.col
                 let occupyRow = cell.occupy.row
-                if (occupyCol.indexOf(previousAlias) === occupyCol.length - 1) {
+                if (occupyCol.indexOf(previousAlias) === occupyCol.length -
+                    1) {
                     occupyRow.forEach(alias => {
                         let insertCell = extend(cell)
                         insertCell.occupy = {
@@ -1020,7 +1053,7 @@ export default {
                     })
                 }
             })
-            dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
+            dispatch(actionTypes.CELLS_INSERT, insertCellList)
         }
     },
     [actionTypes.COLS_GENERAT]({
@@ -1037,12 +1070,12 @@ export default {
         let temp = []
 
         for (let i = 0; i < num; i++) {
-            temp.push(extend({}, template, {
+            temp.push(extend({
                 alias: generator.colAliasGenerator(),
                 left: currentLeft + (initWidth + 1) * i,
                 sort: currentSort + i,
                 displayName: getColDisplayName(currentSort + i)
-            }))
+            }, template))
         }
         commit(mutationTypes.ADD_COL, {
             cols: temp,

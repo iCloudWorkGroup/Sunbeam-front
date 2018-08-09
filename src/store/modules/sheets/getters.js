@@ -7,16 +7,18 @@ let viewTypes = {
 
 export default {
     frozenState(state, getters, rootState) {
-        let alias = rootState.currentSheet
-        let list = state.list
-        let sheet
-        for (let i = 0, len = list.length; i < len; i++) {
-            if (list[i].alias === alias) {
-                sheet = list[i]
-                break
+        return function() {
+            let alias = rootState.currentSheet
+            let list = state.list
+            let sheet
+            for (let i = 0, len = list.length; i < len; i++) {
+                if (list[i].alias === alias) {
+                    sheet = list[i]
+                    break
+                }
             }
+            return sheet.frozenState
         }
-        return sheet.frozenState
     },
     getEditViewOccupy(state, getters, rootState) {
         return function(type) {

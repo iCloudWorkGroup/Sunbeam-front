@@ -1,80 +1,65 @@
 <template>
 <div class="row-head-container"
-     :style="{ height: height + 'px'}">
+     :style="{ height: viewHeight}">
     <div class="row-head-bg row-head-width"
-         :style="{
-            height: totalHeight
-        }">
-        <row-head-panel :frozenRule="frozenRule"></row-head-panel>
-        <div class="row-head-line"
-             v-for="item in selectList"
-             :style="{
-                top: item.physicsBox.top - offsetTop + 'px',
-                height: item.physicsBox.height - 2 + 'px'
-            }"></div>
+         :style="{ height }">
+        <row-head-panel
+            :start="start"
+            :over="over"
+            :offsetTop="offsetTop" />
+        <row-head-line
+            v-for="item in selects"
+            key="item.alias"
+            :row="item"
+            :offsetTop="offsetTop"/>
     </div>
 </div>
 </template>
 <script type="text/javascript">
 import RowHeadPanel from './row-head-panel.vue'
-
+import RowHeadLine from './row-head-line.vue'
+import cache from '../tools/cache'
+import config from '../config'
+import {
+    unit
+} from '../filters/unit'
+import scrollbar from '../util/scrollbar'
 export default {
-    props: ['rowHeadHeight', 'scrollTop', 'frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startRowIndex
-            endIndex = this.frozenRule.endRowIndex
-        }
-        return {
-            startIndex,
-            endIndex
+    props: ['start', 'over', 'needSider'],
+    computed: {
+        offsetTop() {
+            return this.$store.getters.offsetTop(this.start, this.over)
+        },
+        height() {
+            let rowMap = this.$store.state.rows.map
+            let startRow = rowMap.get(this.start)
+            let overRow = rowMap.get(this.over)
+            return unit(overRow.top + overRow.height - startRow.top)
+        },
+        viewHeight() {
+            let rows = this.$store.state.rows
+            let startRow = rows.map.get(this.start)
+            let overRow = rows.map.get(this.over)
+            let lastRow = rows.list[rows.list.length - 1]
+            let limitHeight = 0
+            if (overRow.alias === lastRow.alias) {
+                limitHeight = cache.rootEl.offsetHeight -
+                config.cornerHeight - config.sheetSider
+                if (this.needSider) {
+                    limitHeight -= scrollbar()
+                }
+            } else {
+                limitHeight = overRow.top + overRow.height
+            }
+            return unit(limitHeight - startRow.top)
+        },
+        selects() {
+            return this.$store.getters.allSelects
         }
     },
     components: {
         RowHeadPanel,
-    },
-    computed: {
-        height() {
-            return this.rowHeadHeight
-        },
-        totalHeight() {
-            let rows = this.$store.getters.rowList
-            let visibleRows = this.$store.getters.visibleRowList
-            let frozenRule = this.frozenRule
-            let startRowIndex
-            let endRowIndex
-            let lastRow
-            let startRow
-
-            if (frozenRule) {
-                startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex != null) {
-                    endRowIndex = frozenRule.endRowIndex
-                } else {
-                    endRowIndex = visibleRows.length - 1
-                }
-                startRow = rows[startRowIndex]
-                lastRow = rows[endRowIndex]
-            } else {
-                endRowIndex = visibleRows.length - 1
-                startRow = visibleRows[0]
-                lastRow = visibleRows[endRowIndex]
-            }
-            return lastRow.top + lastRow.height - startRow.top + 'px'
-        },
-        selectList() {
-            return this.$store.getters.selectList
-        },
-        offsetTop() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetTop
-            } else {
-                return 0
-            }
-        },
+        RowHeadLine
     },
     watch: {
         scrollTop(val) {

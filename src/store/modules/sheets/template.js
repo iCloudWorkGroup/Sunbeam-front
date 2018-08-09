@@ -7,12 +7,21 @@ export default {
      * 别名
      * @type {String}
      */
-    alias: '',
+    alias: null,
     /**
      * sheet名
      * @type {String}
      */
     name: 'new sheet',
+    /**
+     * 用户当前可视范围的像素值
+     */
+    userView: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+    },
     /**
      * 活动状态
      * @type {Boolean}
@@ -20,36 +29,14 @@ export default {
     active: true,
     /**
      * 冻结状态
+     * 数组中的内容：
+     *   {
+     *       start: 'alias',
+     *       over: 'alias'
+     *   }
      */
-    frozenState: {
-        isFrozen: false,
-        rowFrozen: false,
-        colFrozen: false,
-        frozenColSort: 0,
-        frozenRowSort: 0,
-        userViewColSort: 0,
-        userViewRowSort: 0,
-        rules: []
-    },
-    /**
-     * 视图占位
-     */
-    editViewOccupy: {
-        leftView: {
-            col: [],
-            row: []
-        },
-        topView: {
-            col: [],
-            row: []
-        },
-        mainView: {
-            col: [],
-            row: []
-        },
-        cornerView: {
-            col: [],
-            row: []
-        }
+    frozen: {
+        col: [],
+        row: []
     }
 }

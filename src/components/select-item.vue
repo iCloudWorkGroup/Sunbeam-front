@@ -7,46 +7,52 @@
         <div class="expand"></div>
     </div>
 </div>
-
 </template>
-
 <script type="text/javascript">
 import * as types from '../store/action-types'
-import { SELECT, CLIP } from '../tools/constant'
-
+import {
+    SELECT,
+    CLIP
+} from '../tools/constant'
+import {
+    unit
+} from '../filters/unit'
 export default {
-    props: ['select', 'frozenRule'],
+    props: [
+        'select',
+        'offsetTop',
+        'offsetLeft'
+    ],
     computed: {
         styleObject() {
             let physicsBox = this.select.physicsBox
-            let left = physicsBox.left
-            let top = physicsBox.top
+            let left = physicsBox.left - this.offsetLeft
+            let top = physicsBox.top - this.offsetTop
             let width = physicsBox.width
             let height = physicsBox.height
-            let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
-            let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
-            let result
-
-            if (left === 0) {
+            // 因为选中区效果上有边框，所以保持跟单元格
+            // 大小一致，需要 -2 距离
+            // 同时，第一列和第一行的情况下，选中的边线
+            // 要和head-line边线重合，所以left，top需要 -1
+            // 即， width属性就可以少 -1
+            if (left === 0 && this.offsetLeft === 0) {
                 left = left - 1
                 width = width - 1
             } else {
                 width = width - 2
             }
-            if (top === 0) {
+            if (top === 0 && this.offsetTop === 0) {
                 top = top - 1
                 height = height - 1
             } else {
                 height = height - 2
             }
-
-            result = {
-                left: left - offsetLeft + 'px',
-                top: top - offsetTop + 'px',
-                width: width + 'px',
-                height: height + 'px'
+            return {
+                left: unit(left),
+                top: unit(top),
+                width: unit(width),
+                height: unit(height)
             }
-            return result
         },
         classStr() {
             let type = this.select.type

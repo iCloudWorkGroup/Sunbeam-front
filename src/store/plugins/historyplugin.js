@@ -204,7 +204,7 @@ export default function(store) {
                 })
                 actionItem.mutations.push(mutationInfo)
             }
-            if (mutationType === mutationTypes.UPDATE_POINTINFO) {
+            if (mutationType === mutationTypes.UPDATE_POINTS) {
                 let { colAlias, rowAlias, type } = payload.info
                 let originalValue = store.getters.getPointInfo(colAlias, rowAlias, type)
                 let reversePayload = extend(payload)
@@ -314,23 +314,23 @@ let recordMutations = {
         [mutationTypes.UPDATE_COL]: true
     },
     [actionTypes.CELLS_MERGE]: {
-        [mutationTypes.UPDATE_POINTINFO]: true
+        [mutationTypes.UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_SPLIT]: {
-        [mutationTypes.UPDATE_POINTINFO]: true
+        [mutationTypes.UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_INNERPASTE]: {
-        [mutationTypes.UPDATE_POINTINFO]: true
+        [mutationTypes.UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_OUTERPASTE]: {
-        [mutationTypes.UPDATE_POINTINFO]: true
+        [mutationTypes.UPDATE_POINTS]: true
     },
     [actionTypes.COLS_EXECDELETECOL]: {
-        [mutationTypes.UPDATE_POINTINFO]: true,
+        [mutationTypes.UPDATE_POINTS]: true,
         [mutationTypes.UPDATE_CELL]: true
     },
     [actionTypes.ROWS_EXECDELETEROW]: {
-        [mutationTypes.UPDATE_POINTINFO]: true,
+        [mutationTypes.UPDATE_POINTS]: true,
         [mutationTypes.UPDATE_CELL]: true
     }
 }

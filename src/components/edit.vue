@@ -1,15 +1,14 @@
 <template>
 <div class="edit"
-     @scroll="onScroll"
-     :style="{
-        width: width + 'px',
-        height: height + 'px'
-        }">
-    <edit-panel :frozenRule="frozenRule"></edit-panel>
+     @scroll=""
+     :style="{ width, height }">
+    <edit-panel
+        :row-start="rowStart"
+        :row-over="rowOver"
+        :col-start="colStart"
+        :col-over="colOver"/>
 </div>
-
 </template>
-
 <script type="text/javascript">
 import EditPanel from './edit-panel.vue'
 import config from '../config'
@@ -19,15 +18,21 @@ import Vue from 'vue'
 import * as actionTypes from '../store/action-types'
 import * as mutationTypes from '../store/mutation-types'
 import generator from '../tools/generator'
-import { getColDisplayName, getRowDisplayName } from '../util/displayname'
-
+import {
+    getColDisplayName,
+    getRowDisplayName
+} from '../util/displayname'
+import {
+    unit
+} from '../filters/unit'
+import scrollbar from '../util/scrollbar'
 export default {
     props: [
-        'editWidth',
-        'editHeight',
-        'frozenRule',
-        'scrollTop',
-        'scrollLeft'
+        'rowStart',
+        'rowOver',
+        'colStart',
+        'colOver',
+        'needSider'
     ],
     data() {
         let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
@@ -43,32 +48,45 @@ export default {
         }
     },
     mounted() {
-        this.setOccupy()
-        this.updateUserView()
+        // this.setOccupy()
+        // this.updateUserView()
     },
     beforeDestroy() {
         this.updateOccupy([], [])
     },
     computed: {
         width() {
-            return this.editWidth
+            let cols = this.$store.state.cols
+            let startCol = cols.map.get(this.colStart)
+            let overCol = cols.map.get(this.colOver)
+            let lastCol = cols.list[cols.list.length - 1]
+            let limitWidth = 0
+            if (overCol.alias === lastCol.alias) {
+                limitWidth = cache.rootEl.offsetWidth - config.cornerWidth
+                if (this.needSider) {
+                    limitWidth -= scrollbar()
+                }
+            } else {
+                limitWidth = overCol.left + overCol.width
+            }
+            return unit(limitWidth - startCol.left)
         },
         height() {
-            return this.editHeight
-        },
-        colOccupy() {
-            let type = this.frozenRule && this.frozenRule.type || 'mainRule'
-            return this.$store.getters.getEditViewOccupy(type).col
-        },
-        rowOccupy() {
-            let type = this.frozenRule && this.frozenRule.type || 'mainRule'
-            return this.$store.getters.getEditViewOccupy(type).row
-        },
-        colMaxPosi() {
-            return this.$store.getters.getColMaxPosi
-        },
-        rowMaxPosi() {
-            return this.$store.getters.getRowMaxPosi
+            let rows = this.$store.state.rows
+            let startRow = rows.map.get(this.rowStart)
+            let overRow = rows.map.get(this.rowOver)
+            let lastRow = rows.list[rows.list.length - 1]
+            let limitHeight = 0
+            if (overRow.alias === lastRow.alias) {
+                limitHeight = cache.rootEl.offsetHeight -
+                config.cornerHeight - config.sheetSider
+                if (this.needSider) {
+                    limitHeight -= scrollbar()
+                }
+            } else {
+                limitHeight = overRow.top + overRow.height
+            }
+            return unit(limitHeight - startRow.top)
         }
     },
     components: {
@@ -885,7 +903,7 @@ export default {
         },
         sendGeneratorRowCol(type, num) {
             send({
-                url: config.operUrl['addrowcol'],
+                url: config.url['addrowcol'],
                 data: JSON.stringify({
                     type,
                     num

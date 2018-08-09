@@ -1,63 +1,23 @@
 <template>
 <div class="row-group">
-    <div v-for="item in rowList"
-         class="row"
-         :key="item.alias"
-         :style="{
-            top: item.top - offsetTop + 'px',
-            height: item.height + 'px'}">
-    </div>
+    <row-grid-item
+        v-for="item in viewRows"
+        :row="item"
+        :offsetTop="offsetTop"
+        :key="item.alias"/>
 </div>
 </template>
-<script type="text/javascript">
+<script>
+import RowGridItem from './row-grid-item.vue'
 export default {
-    props: ['frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startRowIndex
-            endIndex = this.frozenRule.endRowIndex
-        }
-        return {
-            startIndex,
-            endIndex
+    props: ['start', 'over', 'offsetTop'],
+    computed: {
+        viewRows() {
+            return this.$store.getters.rowsByRange(this.start, this.over)
         }
     },
-    computed: {
-        offsetTop() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetTop
-            } else {
-                return 0
-            }
-        },
-        rowList() {
-            let getters = this.$store.getters
-            let rows = getters.rowList
-            let visibleRows = getters.visibleRowList
-            let frozenRule = this.frozenRule
-            let startRowIndex
-            let endRowIndex
-            let lastRow
-            let startRow
-
-            if (frozenRule) {
-                startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex != null) {
-                    endRowIndex = frozenRule.endRowIndex
-                } else {
-                    endRowIndex = visibleRows.length - 1
-                }
-                startRow = rows[startRowIndex]
-                lastRow = rows[endRowIndex]
-                startRowIndex = getters.getVisibleRowIndexBySort(startRow.sort)
-                endRowIndex = getters.getVisibleRowIndexBySort(lastRow.sort)
-                return visibleRows.slice(startRowIndex, endRowIndex + 1)
-            } else {
-                return getters.userViewRowList
-            }
-        }
+    components: {
+        RowGridItem
     }
 }
 </script>

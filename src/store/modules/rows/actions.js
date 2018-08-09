@@ -6,41 +6,42 @@ import cache from '../../../tools/cache'
 import extend from '../../../util/extend'
 import generator from '../../../tools/generator'
 import template from './template'
-import { getRowDisplayName } from '../../../util/displayname'
-import { SELECT } from '../../../tools/constant'
+import {
+    getRowDisplayName
+} from '../../../util/displayname'
+import {
+    SELECT
+} from '../../../tools/constant'
 import send from '../../../util/send'
 
 export default {
-    [actionTypes.ROWS_ADDROWS]({
+    /**
+     * 添加行，允许批量添加
+     */
+    [actionTypes.ROWS_ADD]({
         state,
         rootState,
         commit
     }, rows) {
-        let temp = []
+        let ret = []
         for (let i = 0, len = rows.length; i < len; i++) {
-            temp.push(extend({}, template, rows[i]))
+            ret.push(extend(template, rows[i]))
         }
         commit(mutationTypes.ADD_ROW, {
-            rows: temp,
-            currentSheet: rootState.currentSheet
+            rows: ret
         })
     },
-    [actionTypes.ROWS_RESTOREROWS]({
+    [actionTypes.ROWS_ACTIVE]({
         state,
-        rootState,
         commit
-    }, rows) {
-        let map = state[rootState.currentSheet].map
-        let temp = []
-
-        for (let i = 0, len = rows.length; i < len; i++) {
-            if (!map.get(rows[i].alias)) {
-                temp.push(extend({}, template, rows[i]))
-            }
-        }
-        commit(mutationTypes.INSERT_ROW, {
-            rows: temp,
-            currentSheet: rootState.currentSheet
+    }, {
+        startIndex,
+        endIndex
+    }) {
+        commit(mutationTypes.CANCEL_ACTIVE_ROW)
+        commit(mutationTypes.ACTIVE_ROW, {
+            startIndex,
+            endIndex
         })
     },
     [actionTypes.ROWS_HIDE]({
@@ -49,32 +50,29 @@ export default {
         commit,
         getters,
         dispatch
-    }, payload) {
-        let index = payload
-        let selects = getters.selectList
-
-        if (getters.visibleRowList.length < 2) {
-            return
-        }
-        if (index == null) {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-            if (select.wholePosi.endRowAlias === 'MAX') {
-                return
-            }
-            index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
-        }
-        let row = getters.rowList[index]
+    }) {
+        let activePosi = state.selects.list.activePosi
+        let row = getters.getRowByAlias(activePosi.rowAlias)
         send({
-            url: config.operUrl['hiderow'],
+            url: config.url['hiderow'],
             data: JSON.stringify({
                 row: row.sort
-            }),
+            })
+        }).then(() => {
+            let cellIdx = getters.getRowIndexBySort(row.sort)
+            let cells = getters.getCellsByTransverse({
+                startColIndex: 0,
+                startRowIndex: cellIdx,
+                endColIndex: -1
+            })
+            for (let i = 0, len = cells.length; i < len; i++) {
+                commit(mutationTypes.UPDATE_CELL, {
+                    cell: cells[i],
+                    status: {
+                        hidden: true
+                    }
+                })
+            }
         })
         dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
     },
@@ -125,9 +123,6 @@ export default {
             }
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-
-
-
         let updateSelectInfo = []
         let rowTop = row.top
         let selects = getters.selectList
@@ -136,7 +131,8 @@ export default {
             let wholePosi = select.wholePosi
             let rowSort = row.sort
             let endVisibleSort = visibleRows[visibleRows.length - 1].sort
-            let startSort = getters.getRowByAlias(wholePosi.startRowAlias).sort
+            let startSort = getters.getRowByAlias(wholePosi.startRowAlias)
+                .sort
             let endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort
             if (startSort >= rowSort) {
                 if (startSort === endVisibleSort) {
@@ -280,7 +276,7 @@ export default {
             return
         }
         send({
-            url: config.operUrl['showrow'],
+            url: config.url['showrow'],
             data: JSON.stringify({
                 row: rows[index].sort
             }),
@@ -424,12 +420,14 @@ export default {
         }
         let sort = getters.rowList[index].sort
         send({
-            url: config.operUrl['insertrow'],
+            url: config.url['insertrow'],
             data: JSON.stringify({
                 row: sort,
             }),
         })
-        dispatch(actionTypes.ROWS_EXECINSERTROW, { sort })
+        dispatch(actionTypes.ROWS_EXECINSERTROW, {
+            sort
+        })
     },
     [actionTypes.ROWS_EXECINSERTROW]({
         getters,
@@ -487,7 +485,8 @@ export default {
                 let cellIndex
 
                 newOccupy.splice(aliasIndex, 0, insertRowAlias)
-                cellIndex = getters.getPointInfo(occupyCol[0], occupyRow[0], 'cellIndex')
+                cellIndex = getters.getPointInfo(occupyCol[0],
+                    occupyRow[0], 'cellIndex')
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -501,7 +500,7 @@ export default {
                     }
                 })
                 occupyCol.forEach(function(colAlias) {
-                    commit(mutationTypes.UPDATE_POINTINFO, {
+                    commit(mutationTypes.UPDATE_POINTS, {
                         currentSheet,
                         info: {
                             colAlias,
@@ -586,7 +585,8 @@ export default {
             cellList.forEach(cell => {
                 let occupyCol = cell.occupy.col
                 let occupyRow = cell.occupy.row
-                if (occupyRow.indexOf(previousAlias) === occupyRow.length - 1) {
+                if (occupyRow.indexOf(previousAlias) === occupyRow.length -
+                    1) {
                     occupyCol.forEach(alias => {
                         let insertCell = extend(cell)
                         insertCell.occupy = {
@@ -598,15 +598,21 @@ export default {
                     })
                 }
             })
-            dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
+            dispatch(actionTypes.CELLS_INSERT, insertCellList)
         }
     },
-    [actionTypes.ROWS_ADJUSTHEIGHT]({ dispatch, getters }, { index, height }) {
+    [actionTypes.ROWS_ADJUSTHEIGHT]({
+        dispatch,
+        getters
+    }, {
+        index,
+        height
+    }) {
         let rows = getters.rowList
         let row = rows[index]
 
         send({
-            url: config.operUrl['adjustrow'],
+            url: config.url['adjustrow'],
             data: JSON.stringify({
                 row: row.sort,
                 offset: height
@@ -646,7 +652,8 @@ export default {
                     cell,
                     props: {
                         physicsBox: {
-                            height: cell.physicsBox.height + adjustHeight
+                            height: cell.physicsBox.height +
+                                adjustHeight
                         }
                     }
                 })
@@ -746,7 +753,7 @@ export default {
         let row = rows[index]
 
         send({
-            url: config.operUrl['deleterow'],
+            url: config.url['deleterow'],
             data: JSON.stringify({
                 row: row.sort
             }),
@@ -807,14 +814,15 @@ export default {
                     cell,
                     props: {
                         physicsBox: {
-                            top: cell.physicsBox.top - deleteRowHeight - 1
+                            top: cell.physicsBox.top -
+                                deleteRowHeight - 1
                         }
                     }
                 })
             }
         })
         updateOccupys.forEach(info => {
-            commit(mutationTypes.UPDATE_POINTINFO, {
+            commit(mutationTypes.UPDATE_POINTS, {
                 currentSheet,
                 info
             })
@@ -838,8 +846,10 @@ export default {
                                     height: rows[index - 1].height
                                 },
                                 wholePosi: {
-                                    startRowAlias: rows[index - 1].alias,
-                                    endRowAlias: rows[index - 1].alias
+                                    startRowAlias: rows[index -
+                                        1].alias,
+                                    endRowAlias: rows[index - 1]
+                                        .alias
                                 }
                             }
                         })
@@ -855,8 +865,10 @@ export default {
                                     height: rows[index + 1].height
                                 },
                                 wholePosi: {
-                                    startRowAlias: rows[index + 1].alias,
-                                    endRowAlias: rows[index + 1].alias
+                                    startRowAlias: rows[index +
+                                        1].alias,
+                                    endRowAlias: rows[index + 1]
+                                        .alias
                                 }
                             }
                         })
@@ -884,7 +896,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            top: select.physicsBox.top - deleteRowHeight - 1
+                            top: select.physicsBox.top -
+                                deleteRowHeight - 1
                         }
                     }
                 })
@@ -893,7 +906,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            height: select.physicsBox.height - rows[index + 1].height - 1
+                            height: select.physicsBox.height -
+                                rows[index + 1].height - 1
                         },
                         wholePosi: {
                             endRowAlias: rows[index - 1].alias
@@ -905,7 +919,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            height: select.physicsBox.height - rows[index + 1].height - 1
+                            height: select.physicsBox.height -
+                                rows[index + 1].height - 1
                         }
                     }
                 })

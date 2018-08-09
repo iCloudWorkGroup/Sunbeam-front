@@ -1,63 +1,23 @@
 <template>
 <div class="col-group">
-    <div class="col"
-         v-for="item in colList"
-         :key="item.alias"
-         :style="{
-            left:(item.left - offsetLeft)+'px',
-            width: item.width + 'px'}">
-    </div>
+    <col-grid-item
+        v-for="item in viewCols"
+        :col="item"
+        :offsetLeft="offsetLeft"
+        :key="item.alias"/>
 </div>
 </template>
-<script type="text/javascript">
+<script>
+import ColGridItem from './col-grid-item.vue'
 export default {
-    props: ['frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startColIndex
-            endIndex = this.frozenRule.endColIndex
-        }
-        return {
-            startIndex,
-            endIndex
+    props: ['start', 'over', 'offsetLeft'],
+    computed: {
+        viewCols() {
+            return this.$store.getters.colsByRange(this.start, this.over)
         }
     },
-    computed: {
-        offsetLeft() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetLeft
-            } else {
-                return 0
-            }
-        },
-        colList() {
-            let getters = this.$store.getters
-            let cols = getters.colList
-            let visibleCols = getters.visibleColList
-            let frozenRule = this.frozenRule
-            let startColIndex
-            let endColIndex
-            let lastCol
-            let startCol
-
-            if (frozenRule) {
-                startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex != null) {
-                    endColIndex = frozenRule.endColIndex
-                } else {
-                    endColIndex = cols.length - 1
-                }
-                startCol = cols[startColIndex]
-                lastCol = cols[endColIndex]
-                startColIndex = getters.getVisibleColIndexBySort(startCol.sort)
-                endColIndex = getters.getVisibleColIndexBySort(lastCol.sort)
-                return visibleCols.slice(startColIndex, endColIndex + 1)
-            } else {
-                return getters.userViewColList
-            }
-        }
+    components: {
+        ColGridItem
     }
 }
 </script>

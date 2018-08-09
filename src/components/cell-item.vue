@@ -1,146 +1,142 @@
 <template>
-    <div class="cell" :style="cellPosi">
-        <div class="cell-content" :style="cellProps">{{texts}}</div>
+    <div class="cell"
+        :style="viewPosi">
+        <div class="cell-content"
+             :style="viewProps">
+            {{cell.content.displayTexts}}
+        </div>
     </div>
 </template>
 <script>
-import { isNum, isDate } from '../tools/format'
-import { unit } from '../filters/unit'
+import {
+    isNum,
+    isDate
+} from '../tools/format'
+import {
+    unit
+} from '../filters/unit'
+import extend from '../util/extend'
+function caclBorder({
+    type
+}, {
+    colorName,
+    widthName,
+    paddingName,
+    marginName
+}) {
+    let color
+    let width
+    let padding
+    let margin
+    switch (type) {
+        case 0:
+            width = 1
+            color = 'transparent'
+            margin = 1
+            padding = 1
+            break
+        case 1:
+            width = 1
+            color = '#000'
+            margin = 1
+            padding = 1
+            break
+        case 2:
+            width = 3
+            color = '#000'
+            margin = 0
+            padding = 0
+            break
+    }
+    return {
+        [widthName]: unit(width),
+        [colorName]: color,
+        [paddingName]: unit(padding),
+        [marginName]: unit(margin)
+    }
+}
 export default {
-    props: ['item', 'frozenRule'],
+    props: ['cell', 'offsetTop', 'offsetLeft'],
     computed: {
-        cellPosi() {
-            const physicsBox = this.item.physicsBox
-            const border = physicsBox.border
-            let borderRightWidth = 1
-            let borderBottomWidth = 1
-            let borderLeftWidth = 1
-            let borderTopWidth = 1
-            let borderRightColor = 'transparent'
-            let borderBottomColor = 'transparent'
-            let borderLeftColor = 'transparent'
-            let borderTopColor = 'transparent'
-            let paddingLeft = 0
-            let paddingTop = 0
-            let paddingBottom = 0
-            let paddingRight = 0
-            let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
-            let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
-            let top = physicsBox.top - offsetTop - 1
-            let left = physicsBox.left - offsetLeft - 1
+        viewPosi() {
+            const physicsBox = this.cell.physicsBox
+            const borderProp = this.cell.border
+            let top = physicsBox.top - this.offsetTop
+            let left = physicsBox.left - this.offsetLeft
             let width = physicsBox.width
             let height = physicsBox.height
-            let nextThickBorder = this.nextThickBorder
-
-            changeLeftValue(border.left, nextThickBorder.left)
-            changeTopValue(border.top, nextThickBorder.top)
-            changeRightValue(border.right, nextThickBorder.right)
-            changeBottomValue(border.bottom, nextThickBorder.bottom)
-
-            return {
-                top: unit(top),
-                left: unit(left),
-                width: unit(width),
-                height: unit(height),
-                borderTopWidth: unit(borderTopWidth),
-                borderLeftWidth: unit(borderLeftWidth),
-                borderRightWidth: unit(borderRightWidth),
-                borderBottomWidth: unit(borderBottomWidth),
-                borderTopColor: borderTopColor,
-                borderLeftColor: borderLeftColor,
-                borderRightColor: borderRightColor,
-                borderBottomColor: borderBottomColor,
-                paddingLeft: unit(paddingLeft),
-                paddingTop: unit(paddingTop),
-                paddingBottom: unit(paddingBottom),
-                paddingRight: unit(paddingRight)
-            }
-            function changeLeftValue(border, nextBorder) {
-                if (border === 2) {
-                    borderLeftWidth = 3
-                    borderLeftColor = 'black'
-                    left--
-                    width--
-                } else if (border === 1 && !nextBorder) {
-                    borderLeftColor = 'black'
-                } else if (nextBorder) {
-                    height--
-                    paddingTop = 1
-                }
-            }
-
-            function changeTopValue(border, nextBorder) {
-                if (border === 2) {
-                    borderTopWidth = 3
-                    borderTopColor = 'black'
-                    top--
-                    height--
-                } else if (border === 1 && !nextBorder) {
-                    borderTopColor = 'black'
-                } else if (nextBorder) {
-                    height--
-                    paddingTop = 1
-                }
-            }
-
-            function changeRightValue(border, nextBorder) {
-                if (border === 2) {
-                    borderRightWidth = 3
-                    borderRightColor = 'black'
-                    width--
-                } else if (border === 1 && !nextBorder) {
-                    borderRightColor = 'black'
-                } else if (nextBorder) {
-                    paddingRight = 1
-                    width--
-                }
-            }
-
-            function changeBottomValue(border, nextBorder) {
-                if (border === 2) {
-                    borderBottomWidth = 3
-                    borderBottomColor = 'black'
-                    height--
-                } else if (border === 1 && !nextBorder) {
-                    borderBottomColor = 'black'
-                } else if (nextBorder) {
-                    paddingBottom = 1
-                    height--
-                }
-            }
+            let topBorder = caclBorder({
+                type: borderProp.top
+            }, {
+                colorName: 'borderTopColor',
+                widthName: 'borderTopWidth',
+                paddingName: 'paddingTop',
+                marginName: 'marginTop'
+            })
+            let rightBorder = caclBorder({
+                type: borderProp.right
+            }, {
+                colorName: 'borderRightColor',
+                widthName: 'borderRightWidth',
+                paddingName: 'paddingRight',
+                marginName: 'marginRight'
+            })
+            let bottomBorder = caclBorder({
+                type: borderProp.bottom
+            }, {
+                colorName: 'borderBottomColor',
+                widthName: 'borderBottomWidth',
+                paddingName: 'paddingBottom',
+                marginName: 'marginBottom'
+            })
+            let leftBorder = caclBorder({
+                type: borderProp.left
+            }, {
+                colorName: 'borderLeftColor',
+                widthName: 'borderLeftWidth',
+                paddingName: 'paddingLeft',
+                marginName: 'marginLeft'
+            })
+            return extend({
+                // 因为现实的效果，需要共享单元格的边框
+                // 所以在左、上两面都 -2，这样可以对齐效果
+                top: unit(top - 2),
+                left: unit(left - 2),
+                width: unit(width - 2),
+                height: unit(height - 2)
+            }, topBorder, rightBorder, bottomBorder, leftBorder)
         },
-        cellProps() {
-            let cellContent = this.item.content
-            let italic = cellContent.italic ? 'italic ' : ''
-            let weight = cellContent.weight ? 'bold' : 'normal'
-            let underline = cellContent.underline ? 'underline' : ''
-            let font = cellContent.size + 'pt ' + cellContent.family
-            let result = {
-                background: cellContent.background,
-                color: cellContent.color,
-                textAlign: cellContent.alignRow,
-                font: font,
-                fontFamily: cellContent.family,
-                textDecoration: underline,
-                fontWeight: weight,
-                fontStyle: italic
+        viewProps() {
+            let attrs = this.cell.content
+            let props = {
+                background: attrs.background,
+                color: attrs.color,
+                textAlign: attrs.alignRow,
+                fontSize: attrs.size + 'pt',
+                fontFamily: attrs.family,
+                textDecoration: attrs.underline ? 'underline' : '',
+                fontWeight: attrs.weight ? '900' : 'normal',
+                fontStyle: attrs.italic ? 'italic ' : ''
             }
-            if (cellContent.wordWrap) {
-                result.wordBreak = 'break-word'
-                result.whiteSpace = 'pre-line'
+            if (attrs.wordWrap) {
+                props.wordBreak = 'break-word'
+                props.whiteSpace = 'pre-line'
             } else {
-                result.whiteSpace = 'pre'
+                props.whiteSpace = 'nowrap'
             }
-            if (cellContent.alignCol !== '') {
-                result.verticalAlign = cellContent.alignCol
-            } else if ((cellContent.type === 'routine' ||
-                    cellContent.type === 'number') &&
-                    isNum(cellContent.texts)) {
-                result.verticalAlign = 'left'
-            } else if (cellContent.type === 'date' && isDate(cellContent.texts)) {
-                result.verticalAlign = 'left'
+            if (attrs.alignCol !== '') {
+                props.verticalAlign = attrs.alignCol
+            } else {
+                let type = attrs.type
+                let texts = attrs.texts
+                // 自动判断数据类型，根据类型设置位置效果
+                if ((type === 'routine' && (isNum(texts) || isDate(texts))) || (type === 'number' && isNum(texts)) ||
+                    (type === 'date' && isDate(texts))
+                ) {
+                    props.verticalAlign = 'left'
+                }
             }
-            return result
+            return props
         },
         nextThickBorder() {
             let getters = this.$store.getters
@@ -210,27 +206,7 @@ export default {
                 }
             }
             return result
-        },
-        texts() {
-            return this.item.content.displayTexts
         }
-    },
-    filters: {
-        unit
     }
 }
 </script>
-<style type="text/css">
-.cell {
-    position: absolute;
-    overflow: hidden;
-    cursor: default;
-    border: 0 solid black;
-}
-
-.cell-content {
-    display: table-cell;
-    height: inherit;
-    width: inherit;
-}
-</style>

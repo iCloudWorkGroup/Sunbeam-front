@@ -11,7 +11,10 @@ import getters from './getters'
  * @type {Object}
  */
 // list: [rows]
-const state = {}
+const state = {
+    list: [],
+    map: new Map()
+}
 
 export default {
     state,

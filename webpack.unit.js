@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 module.exports = {
     devtool: 'inline-source-map',
-    entry: ['./src/app.js'],
+    entry: ['./src/enter.js'],
     module: {
         rules: [{
             test: /\.js$/,

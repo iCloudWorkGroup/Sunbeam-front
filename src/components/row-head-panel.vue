@@ -1,14 +1,13 @@
 <template>
-<div class="row-head-panel"
-     ref="panel"
-     @mousedown="mouseDownHandle"
-     @mousemove="mouseMoveHandle">
-    <row-head-item v-for="row in rowList"
-                   :key="row.alias"
-                   :row="row"
-                   :offsetTop="offsetTop">
-    </row-head-item>
-    <row-head-item class="adjust-row-head-item"
+<div class="row-head-panel">
+     <!-- @mousedown="mouseDownHandle"
+     @mousemove="mouseMoveHandle" -->
+    <row-head-item
+        v-for="row in viewRows"
+        :key="row.alias"
+        :row="row"
+        :offsetTop="offsetTop"/>
+<!--     <row-head-item class="adjust-row-head-item"
                    v-if="adjustState"
                    ref="adjustRowView"
                    :offsetTop="offsetTop"
@@ -22,7 +21,7 @@
                        :row="row"
                        :offsetTop="offsetTop">
         </row-head-item>
-    </div>
+    </div> -->
 </div>
 </template>
 <script type="text/javascript">
@@ -40,59 +39,13 @@ import {
 } from '../tools/constant'
 
 export default {
-    props: ['frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startRowIndex
-            endIndex = this.frozenRule.endRowIndex
-        }
-
-        return {
-            startIndex,
-            endIndex,
-            adjustState: false,
-            adjustRow: null,
-            adjustRowIndex: null
-        }
-    },
+    props: ['start', 'over', 'offsetTop'],
     components: {
         RowHeadItem
     },
     computed: {
-        offsetTop() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetTop
-            } else {
-                return 0
-            }
-        },
-        rowList() {
-            let getters = this.$store.getters
-            let rows = getters.rowList
-            let visibleRows = getters.visibleRowList
-            let frozenRule = this.frozenRule
-            let startRowIndex
-            let endRowIndex
-            let lastRow
-            let startRow
-
-            if (frozenRule) {
-                startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex != null) {
-                    endRowIndex = frozenRule.endRowIndex
-                } else {
-                    endRowIndex = visibleRows.length - 1
-                }
-                startRow = rows[startRowIndex]
-                lastRow = rows[endRowIndex]
-                startRowIndex = getters.getVisibleRowIndexBySort(startRow.sort)
-                endRowIndex = getters.getVisibleRowIndexBySort(lastRow.sort)
-                return visibleRows.slice(startRowIndex, endRowIndex + 1)
-            } else {
-                return getters.userViewRowList
-            }
+        viewRows() {
+            return this.$store.getters.rowsByRange(this.start, this.over)
         },
         adjustRowList() {
             let rowList = this.$store.getters.rowList

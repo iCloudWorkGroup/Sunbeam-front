@@ -1,14 +1,13 @@
 <template>
-<div class="col-head-panel"
-     ref="panel"
-     @mousedown="mouseDownHandle"
-     @mousemove="mouseMoveHandle">
-    <col-head-item v-for="col in colList"
-                   :key="col.alias"
-                   :col="col"
-                   :offsetLeft="offsetLeft">
-    </col-head-item>
-    <col-head-item v-if="adjustState"
+<div class="col-head-panel">
+    <!-- @mousedown="mouseDownHandle"
+     @mousemove="mouseMoveHandle" -->
+    <col-head-item
+        v-for="col in viewCols"
+        :key="col.alias"
+        :col="col"
+        :offsetLeft="offsetLeft"/>
+    <!-- <col-head-item v-if="adjustState"
                    ref="adjustColView"
                    class="adjust-col-head-item"
                    :offsetLeft="offsetLeft"
@@ -22,7 +21,7 @@
                        :col="col"
                        :offsetLeft="offsetLeft">
         </col-head-item>
-    </div>
+    </div> -->
 </div>
 </template>
 <script>
@@ -40,59 +39,13 @@ import {
 } from '../tools/constant'
 
 export default {
-    props: ['frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startColIndex
-            endIndex = this.frozenRule.endColIndex
-        }
-        return {
-            startIndex,
-            endIndex,
-            adjustState: false,
-            adjustCol: null,
-            adjustColIndex: null
-        }
-    },
+    props: ['start', 'over', 'offsetLeft'],
     components: {
         ColHeadItem
     },
     computed: {
-        offsetLeft() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetLeft
-            } else {
-                return 0
-            }
-        },
-        colList() {
-            let getters = this.$store.getters
-            let cols = getters.colList
-            let visibleCols = getters.visibleColList
-            let frozenRule = this.frozenRule
-            let startColIndex
-            let endColIndex
-            let lastCol
-            let startCol
-
-            if (frozenRule) {
-                startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex != null) {
-                    endColIndex = frozenRule.endColIndex
-                } else {
-                    endColIndex = visibleCols.length - 1
-                }
-                startCol = cols[startColIndex]
-                lastCol = cols[endColIndex]
-                startColIndex = getters.getVisibleColIndexBySort(startCol.sort)
-                endColIndex = getters.getVisibleColIndexBySort(lastCol.sort)
-                return getters.visibleColList.slice(startColIndex, endColIndex +
-                    1)
-            } else {
-                return getters.userViewColList
-            }
+        viewCols() {
+            return this.$store.getters.colsByRange(this.start, this.over)
         },
         adjustColList() {
             let colList = this.$store.getters.colList

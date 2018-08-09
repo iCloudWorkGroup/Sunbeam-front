@@ -1,10 +1,14 @@
 export default {
     getEidtState(state, getters, rootState) {
-        let currentSheet = rootState.currentSheet
-        return state[currentSheet].editState
+        return function() {
+            let currentSheet = rootState.currentSheet
+            return state[currentSheet].editState
+        }
     },
     getInputState(state, getters, rootState) {
-        let currentSheet = rootState.currentSheet
-        return state[currentSheet]
+        return function() {
+            let currentSheet = rootState.currentSheet
+            return state[currentSheet]
+        }
     }
 }

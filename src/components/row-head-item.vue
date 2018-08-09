@@ -1,31 +1,25 @@
 <template>
 <div class="row-head-item"
-     :class="{active: active}"
-     :style="{
-        top: top + 'px',
-        borderBottom: borderBottom,
-        height: height + 'px'}">
-    <div class="item">{{displayName}}</div>
+     :style="{ top, borderBottom, height }"
+     :class="{active: row.active}">
+    <div class="item">{{ row.displayName }}</div>
 </div>
 </template>
 <script type="text/javascript">
+import {
+    unit
+} from '../filters/unit'
 export default {
     props: ['row', 'offsetTop'],
     computed: {
         top() {
-            return this.row.top - this.offsetTop
+            return unit(this.row.top - this.offsetTop)
         },
         height() {
             if (this.row.bottomAjacentHide) {
                 return this.row.height - 2
             }
-            return this.row.height
-        },
-        displayName() {
-            return this.row.displayName
-        },
-        active() {
-            return this.row.active
+            return unit(this.row.height)
         },
         borderBottom() {
             if (this.row.bottomAjacentHide) {
@@ -33,9 +27,6 @@ export default {
             }
             return
         }
-    },
-    methods: {
-
     }
 }
 </script>

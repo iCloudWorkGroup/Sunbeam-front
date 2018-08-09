@@ -1,8 +1,35 @@
-import * as actionTypes from '../../action-types'
+import {
+    CELLS_INSERT,
+    CELLS_UPDATE,
+    CELLS_UPDATE_PROP,
+    CELLS_UPDATE_BORDER,
+    COLS_OPERCOLS,
+    ROWS_OPERROWS,
+    OCCUPY_UPDATE,
+    CELLS_HANDLEMERGE,
+    CELLS_MERGE,
+    CELLS_SPLIT,
+    CELLS_FORMAT,
+    CELLS_PASTE,
+    CELLS_INNERPASTE,
+    CELLS_OUTERPASTE,
+    CELLS_WORDWRAP,
+    SELECTS_CHANGE,
+    ROWS_EXECADJUSTHEIGHT
+} from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
-import { CLIP } from '../../../tools/constant'
-import { getTextHeight } from '../../../tools/calcbox'
-import { parseExpress, formatText, isNum, isDate } from '../../../tools/format'
+import {
+    CLIP
+} from '../../../tools/constant'
+import {
+    getTextHeight
+} from '../../../tools/calcbox'
+import {
+    parseExpress,
+    formatText,
+    isNum,
+    isDate
+} from '../../../tools/format'
 import extend from '../../../util/extend'
 import template from './template'
 import generator from '../../../tools/generator'
@@ -13,280 +40,142 @@ import parseClipStr from '../../../tools/parseclipstr'
 
 export default {
     /**
-     * 还原单元格, 由occupy生成盒模型信息
+     * 插入单元格
+     * 传入单元初始化属性和占位
+     * 计算出单元格的盒模型，同时维护pointsinfo
      */
-    [actionTypes.CELLS_RESTORECELL]({
+    [CELLS_INSERT]({
         commit,
-        dispatch,
         state,
         rootState,
         getters
-    }, payload) {
-        let cellList = payload
-        if (!Array.isArray(cellList)) {
-            cellList = [cellList]
+    }, props) {
+        let cells = []
+        if (!Array.isArray(props)) {
+            cells.push(props)
+        } else {
+            cells = props
         }
+        cells.forEach(function(cell) {
+            let cols = getters.allCols
+            let rows = getters.allRows
+            let fixedCell = extend(template, cell)
 
-        let sheet = rootState.currentSheet
-        let cols = getters.colList
-        let rows = getters.rowList
-        let cells = getters.cellList
-        let limitRowIndex = rows.length - 1
-        let limitColIndex = cols.length - 1
-        let getPointInfo = getters.getPointInfo
-        let getColIndexByAlias = getters.getColIndexByAlias
-        let getRowIndexByAlias = getters.getRowIndexByAlias
+            // 单元格的occpuy
+            let occupyCols = fixedCell.occupy.col
+            let occupyRows = fixedCell.occupy.row
 
-        for (let i = 0, len = cellList.length; i < len; i++) {
-            let cell = cellList[i]
-            let aliasColList = cell.occupy.col
-            let aliasRowList = cell.occupy.row
-            let startRowIndex
-            let startColIndex
-            let endRowIndex
-            let endColIndex
-            let aliasCol
-            let aliasRow
-            let cellIndex
+            // 单元格在行列中占的索引位置
+            // 从哪行、列开始，结束
+            let startColIndex = getters.getColIndexByAlias(occupyCols[0])
+            let endColIndex = getters.getColIndexByAlias(occupyCols[
+                occupyCols.length - 1])
+            let startRowIndex = getters.getRowIndexByAlias(occupyRows[0])
+            let endRowIndex = getters.getRowIndexByAlias(occupyRows[
+                occupyRows.length - 1])
+
+            // 从occupy转成为单元格的盒模型属性
+            // 用于处理合并单元格的情况
+            let top = rows[startRowIndex].top
+            let left = cols[startColIndex].left
             let width = 0
+            for (let i = endColIndex; i > startColIndex - 1; i--) {
+                let item = cols[i]
+                if (!item.hidden) {
+                    width = item.left + item.width - left
+                    break
+                }
+            }
             let height = 0
-            let physicsBox
-
-            aliasCol = aliasColList[0]
-            aliasRow = aliasRowList[0]
-
-            cellIndex = getPointInfo(aliasCol, aliasRow, 'cellIndex')
-
-            startRowIndex = getRowIndexByAlias(aliasRow)
-            endRowIndex = startRowIndex + aliasRowList.length - 1
-
-            if (endRowIndex > limitRowIndex) {
-                endRowIndex = limitRowIndex
-            }
-            if (startRowIndex === -1) {
-                continue
-            }
-            startColIndex = getColIndexByAlias(aliasCol)
-            endColIndex = startColIndex + aliasColList.length - 1
-
-            if (endColIndex > limitColIndex) {
-                endColIndex = limitColIndex
-            }
-            if (endColIndex === -1) {
-                continue
-            }
-
-            for (let j = startColIndex; j < endColIndex + 1; j++) {
-                let col = cols[j]
-                if (!col.hidden) {
-                    width += col.width + 1
+            for (let i = endRowIndex; i > startRowIndex - 1; i--) {
+                let item = rows[i]
+                if (!item.hidden) {
+                    height = item.top + item.height - top
+                    break
                 }
             }
-            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                let row = rows[j]
-                if (!row.hidden) {
-                    height += row.height + 1
+            fixedCell = extend(fixedCell, {
+                physicsBox: {
+                    top,
+                    left,
+                    width,
+                    height
+                }
+            })
+            if (fixedCell.alias == null) {
+                fixedCell.alias = generator.cellAliasGenerator()
+            }
+            commit(mutationTypes.INSERT_CELL, fixedCell)
+
+            // 更新坐标关系表
+            for (let j = 0; j < occupyCols.length; j++) {
+                for (let k = 0; k < occupyRows.length; k++) {
+                    let colAlias = occupyCols[j]
+                    let rowAlias = occupyRows[k]
+                    commit(mutationTypes.UPDATE_POINTS, {
+                        colAlias,
+                        rowAlias,
+                        cellIdx: state.list.length - 1
+                    })
                 }
             }
-            physicsBox = {
-                top: rows[startRowIndex].top,
-                left: cols[startColIndex].left,
-                width: width - 1,
-                height: height - 1
-            }
-            /**
-             * 更新坐标信息
-             */
-            if (typeof cellIndex !== 'number') {
-                let colAlias
-                let rowAlias
-                for (let j = 0; j < aliasColList.length; j++) {
-                    for (let k = 0; k < aliasRowList.length; k++) {
-                        colAlias = aliasColList[j]
-                        rowAlias = aliasRowList[k]
-                        commit(mutationTypes.UPDATE_POINTINFO, {
-                            currentSheet: sheet,
-                            info: {
-                                colAlias,
-                                rowAlias,
-                                type: 'cellIndex',
-                                value: cells.length
-                            }
-                        })
-                    }
-                }
-                physicsBox.border = cell.border
-                delete cell.border
-                cell.physicsBox = physicsBox
-                cell = extend({}, template, cell)
-                commit(mutationTypes.INSERT_CELL, {
-                    currentSheet: sheet,
-                    cell
-                })
-            } else {
-                commit(mutationTypes.UPDATE_CELL, [{
-                    cell: cells[cellIndex],
-                    props: {
-                        physicsBox: {
-                            height: physicsBox.height,
-                            width: physicsBox.width
-                        }
-                    }
-                }])
-            }
-        }
+        })
     },
-    [actionTypes.CELLS_UPDATE]({
+    async [CELLS_UPDATE]({
         commit,
         dispatch,
         getters
-    }, payload) {
-        let {
-            startColIndex,
-            endColIndex,
-            startRowIndex,
-            endRowIndex,
-            propNames,
-            value
-        } = payload
-
-        // 获取操作区域
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        endColIndex = endColIndex || startColIndex
-        endRowIndex = endRowIndex || startRowIndex
-
-        propNames = propNames.split('.')
-
-        let propValue
-        for (let i = 0; i < propNames.length; i++) {
-            let currentPropName = propNames[i]
-            if (i === 0) {
-                propValue = template[currentPropName]
-            } else {
-                propValue = propValue[currentPropName]
-            }
-        }
-        // 获取更新值
-        if (typeof value === 'undefined' && (typeof propValue === 'boolean' ||
-                propValue === 0 || propValue === 1)) {
-            value = getReverseValue()
-        }
-
-        let props = {}
-        let temp
-
-        for (let i = 0, len = propNames.length; i < len; i++) {
-            let currentPropName = propNames[i]
-            if (i === 0) {
-                temp = props[currentPropName] = {}
-            } else if (i < len - 1) {
-                temp[currentPropName] = temp = {}
-            } else {
-                temp[currentPropName] = value
-            }
-        }
-
-        let cols = getters.colList
-        let rows = getters.rowList
-        let oper = propNames[propNames.length - 1]
-        let url = config.operUrl[oper]
-        let data = {}
-
-        let sendEndColIndex
-        let sendEndRowIndex
-        if (endColIndex === 'MAX') {
-            sendEndColIndex = -1
-        } else {
-            sendEndColIndex = cols[endColIndex].sort
-        }
-        if (endRowIndex === 'MAX') {
-            sendEndRowIndex = -1
-        } else {
-            sendEndRowIndex = rows[endRowIndex].sort
-        }
-        data.coordinate = []
-        data.coordinate.push({
-            startCol: cols[startColIndex].sort,
-            startRow: rows[startRowIndex].sort,
-            endCol: sendEndColIndex,
-            endRow: sendEndRowIndex
+    }, {
+        propName,
+        propStruct
+    }) {
+        let select = getters.allSelects[0]
+        await send({
+            url: config.url[propName],
+            body: JSON.stringify(select.signalSort)
         })
-        if (typeof value !== 'undefined') {
-            let sendPropName = config.operSendPropName[oper] || oper
-            data[sendPropName] = value
-        }
-        send({
-            url,
-            data: JSON.stringify(data)
-        })
-        success()
 
-        function success() {
-            if (endRowIndex === 'MAX') {
-                dispatch(actionTypes.COLS_OPERCOLS, {
-                    startIndex: startColIndex,
-                    endIndex: endColIndex,
-                    props
-                })
-            } else if (endColIndex === 'MAX') {
-                dispatch(actionTypes.ROWS_OPERROWS, {
-                    startIndex: startRowIndex,
-                    endIndex: endRowIndex,
-                    props
-                })
-            } else {
-                dispatch(actionTypes.CELLS_UPDATE_PROP, {
-                    startColIndex,
-                    endColIndex,
-                    startRowIndex,
-                    endRowIndex,
-                    props
-                })
-            }
+        // 修正参数参数
+        let wholePosi = select.wholePosi
+        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+
+        let rows = getters.allRows
+        let cols = getters.allCols
+        if (endRowIndex === -1) {
+            endRowIndex = rows.length - 1
+        }
+        if (endColIndex === -1) {
+            endColIndex = cols.length - 1
         }
 
-        function getReverseValue() {
-            let cell = getters.getCellsByVertical({
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex
-            })[0]
-            let result
-            if (!cell) {
-                if (typeof propValue === 'boolean') {
-                    result = true
+        // 执行业务操作
+        let avoidRepeat = {}
+        for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+            for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                let colAlias = cols[i].alias
+                let rowAlias = rows[j].alias
+                let idx = getters.IdxByRow(colAlias, rowAlias)
+                if (idx !== -1 && !avoidRepeat[idx]) {
+                    avoidRepeat[idx] = true
+                    commit(mutationTypes.UPDATE_CELL, {
+                        idx,
+                        prop: propStruct
+                    })
                 } else {
-                    result = 1
+                    dispatch(CELLS_INSERT, extend(template, propStruct, {
+                        occupy: {
+                            col: colAlias,
+                            row: rowAlias
+                        }
+                    }))
                 }
             }
-            if (cell) {
-                let temp
-                for (let i = 0; i < propNames.length; i++) {
-                    if (i === 0) {
-                        temp = cell[propNames[i]]
-                    } else {
-                        temp = temp[propNames[i]]
-                    }
-                }
-                if (typeof propValue === 'boolean') {
-                    result = !temp
-                } else {
-                    result = 1 ^ temp
-                }
-            }
-            return result
         }
     },
-    [actionTypes.CELLS_UPDATE_PROP]({
+    [CELLS_UPDATE_PROP]({
         commit,
         dispatch,
         getters
@@ -301,8 +190,8 @@ export default {
         let getPointInfo = getters.getPointInfo
         let tempSign = {}
         let cols = getters.colList
-        let rows = getters.rowList
-        let cells = getters.cellList
+        let rows = getters.allRows
+        let cells = getters.cells
         let updateCellInfo = []
         let insertCellList = []
         let colAlias
@@ -340,12 +229,12 @@ export default {
             }
         }
 
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
+        dispatch(CELLS_INSERT, insertCellList)
         if (updateCellInfo.length > 0) {
             commit(mutationTypes.UPDATE_CELL, updateCellInfo)
         }
     },
-    [actionTypes.CELLS_UPDATE_BORDER]({
+    [CELLS_UPDATE_BORDER]({
         commit,
         dispatch,
         getters
@@ -564,17 +453,19 @@ export default {
                 })
             }
         }
-        let url = config.operUrl.border
+        let url = config.url.border
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let data
 
         data = {
             coordinate: [{
                 startCol: cols[startColIndex].sort,
                 startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+                endCol: endColIndex === 'MAX' ? -1 : cols[
+                    endColIndex].sort,
+                endRow: endRowIndex === 'MAX' ? -1 : rows[
+                    endRowIndex].sort
             }],
             direction: value
         }
@@ -590,7 +481,7 @@ export default {
         function success() {
             if (endRowIndex === 'MAX') {
                 operates.forEach((item) => {
-                    dispatch(actionTypes.COLS_OPERCOLS, {
+                    dispatch(COLS_OPERCOLS, {
                         startIndex: item.startColIndex,
                         endIndex: item.endColIndex,
                         props: item.props
@@ -598,7 +489,7 @@ export default {
                 })
             } else if (endColIndex === 'MAX') {
                 operates.forEach((item) => {
-                    dispatch(actionTypes.ROWS_OPERROWS, {
+                    dispatch(ROWS_OPERROWS, {
                         startIndex: item.startRowIndex,
                         endIndex: item.endRowIndex,
                         props: item.props
@@ -606,102 +497,12 @@ export default {
                 })
             } else {
                 operates.forEach((item) => {
-                    dispatch(actionTypes.CELLS_UPDATE_PROP, item)
+                    dispatch(CELLS_UPDATE_PROP, item)
                 })
             }
         }
     },
-    /**
-     * 插入单元格
-     * 传入单元初始化属性和占位
-     * 计算出单元格的盒模型，同时维护pointsinfo
-     */
-    [actionTypes.CELLS_INSERTCELL]({
-        commit,
-        state,
-        rootState,
-        getters
-    }, cellList) {
-        let cols = getters.colList
-        let rows = getters.rowList
-        let indexCounter = getters.cellList.length
-        cellList.forEach(function(item) {
-            let cell = item
-            let aliasColList = cell.occupy.col
-            let aliasRowList = cell.occupy.row
-            let startRowIndex
-            let startColIndex
-            let endColIndex
-            let endRowIndex
-
-            cell = extend({}, template, cell)
-
-            startColIndex = getters.getColIndexByAlias(aliasColList[0])
-            endColIndex = getters.getColIndexByAlias(aliasColList[aliasColList.length - 1])
-            startRowIndex = getters.getRowIndexByAlias(aliasRowList[0])
-            endRowIndex = getters.getRowIndexByAlias(aliasRowList[aliasRowList.length - 1])
-
-            let top = rows[startRowIndex].top
-            let left = cols[startColIndex].left
-            let width
-            let height
-
-            for (let i = endColIndex; i > startColIndex - 1; i--) {
-                if (cols[i].hidden) {
-                    continue
-                } else {
-                    width = cols[i].left + cols[i].width - cols[startColIndex].left
-                    break
-                }
-            }
-            width = width || -1
-
-            for (let i = endRowIndex; i > startRowIndex - 1; i--) {
-                if (rows[i].hidden) {
-                    continue
-                } else {
-                    height = rows[i].top + rows[i].height - rows[startRowIndex].top
-                    break
-                }
-            }
-            height = height || -1
-
-            let physicsBox = {
-                top,
-                left,
-                width,
-                height
-            }
-
-            extend(cell, {
-                physicsBox
-            })
-
-            cell.alias = generator.cellAliasGenerator()
-            commit(mutationTypes.INSERT_CELL, {
-                currentSheet: rootState.currentSheet,
-                cell
-            })
-            for (let j = 0; j < aliasColList.length; j++) {
-                for (let k = 0; k < aliasRowList.length; k++) {
-                    let colAlias = aliasColList[j]
-                    let rowAlias = aliasRowList[k]
-
-                    commit(mutationTypes.UPDATE_POINTINFO, {
-                        currentSheet: rootState.currentSheet,
-                        info: {
-                            colAlias,
-                            rowAlias,
-                            type: 'cellIndex',
-                            value: indexCounter
-                        }
-                    })
-                }
-            }
-            indexCounter++
-        })
-    },
-    [actionTypes.COLS_OPERCOLS]({
+    [COLS_OPERCOLS]({
         getters,
         state,
         rootState,
@@ -737,7 +538,7 @@ export default {
         let insertCellInfo = []
         let editViewOccupy = getters.getEditViewOccupy()
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
 
         for (let key in editViewOccupy) {
             if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
@@ -748,13 +549,15 @@ export default {
                     continue
                 }
                 startRowIndex = getters.getRowIndexByAlias(viewOccupyRow[0])
-                endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[viewOccupyRow.length - 1])
+                endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[
+                    viewOccupyRow.length - 1])
 
                 for (let i = startRowIndex; i < endRowIndex + 1; i++) {
                     for (let j = startIndex; j < endIndex + 1; j++) {
                         let colAlias = cols[j].alias
                         let rowAlias = rows[i].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
+                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
+                            'cellIndex')
                         if (typeof cellIndex !== 'number') {
                             let cell = extend({}, props)
                             cell.occupy = {
@@ -767,9 +570,9 @@ export default {
                 }
             }
         }
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
+        dispatch(CELLS_INSERT, insertCellInfo)
     },
-    [actionTypes.ROWS_OPERROWS]({
+    [ROWS_OPERROWS]({
         getters,
         state,
         rootState,
@@ -806,7 +609,7 @@ export default {
         let insertCellInfo = []
         let editViewOccupy = getters.getEditViewOccupy()
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
 
         for (let key in editViewOccupy) {
             if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
@@ -818,13 +621,15 @@ export default {
                     continue
                 }
                 startColIndex = getters.getColIndexByAlias(viewOccupyCol[0])
-                endColIndex = getters.getColIndexByAlias(viewOccupyCol[viewOccupyCol.length - 1])
+                endColIndex = getters.getColIndexByAlias(viewOccupyCol[
+                    viewOccupyCol.length - 1])
 
                 for (let i = startColIndex; i < endColIndex + 1; i++) {
                     for (let j = startIndex; j < endIndex + 1; j++) {
                         let colAlias = cols[i].alias
                         let rowAlias = rows[j].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias, 'cellIndex')
+                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
+                            'cellIndex')
                         let cell = extend({}, props)
 
                         cell.occupy = {
@@ -838,9 +643,9 @@ export default {
                 }
             }
         }
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellInfo)
+        dispatch(CELLS_INSERT, insertCellInfo)
     },
-    [actionTypes.OCCUPY_UPDATE]({
+    [OCCUPY_UPDATE]({
         commit,
         getters,
         rootState,
@@ -857,7 +662,7 @@ export default {
         let endRowIndex = getters.getRowIndexByAlias(row[row.length - 1])
         let endColIndex = getters.getColIndexByAlias(col[col.length - 1])
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let getPointInfo = getters.getPointInfo
         let temp
 
@@ -874,7 +679,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(actionTypes.CELLS_INSERTCELL, [cell])
+                        dispatch(CELLS_INSERT, [cell])
                     }
                 }
             }
@@ -894,7 +699,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(actionTypes.CELLS_INSERTCELL, [cell])
+                        dispatch(CELLS_INSERT, [cell])
                     }
                 }
             }
@@ -929,7 +734,7 @@ export default {
             return true
         }
     },
-    [actionTypes.CELLS_HANDLEMERGE]({
+    [CELLS_HANDLEMERGE]({
         dispatch,
         getters,
         rootState
@@ -958,20 +763,22 @@ export default {
         }
 
         if (typeof value === 'undefined') {
-            value = !getters.getMergeState()
+            value = !getters.hasMergeCell
         }
         let action = value ? 'merge' : 'split'
-        let url = config.operUrl[action]
+        let url = config.url[action]
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let data
 
         data = {
             coordinate: [{
                 startCol: cols[startColIndex].sort,
                 startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+                endCol: endColIndex === 'MAX' ? -1 : cols[
+                    endColIndex].sort,
+                endRow: endRowIndex === 'MAX' ? -1 : rows[
+                    endRowIndex].sort
             }]
         }
         send({
@@ -980,14 +787,14 @@ export default {
         })
 
         if (value) {
-            dispatch(actionTypes.CELLS_MERGE, {
+            dispatch(CELLS_MERGE, {
                 startColIndex,
                 endColIndex,
                 startRowIndex,
                 endRowIndex
             })
         } else {
-            dispatch(actionTypes.CELLS_SPLIT, {
+            dispatch(CELLS_SPLIT, {
                 startColIndex,
                 endColIndex,
                 startRowIndex,
@@ -995,7 +802,7 @@ export default {
             })
         }
     },
-    [actionTypes.CELLS_MERGE]({
+    [CELLS_MERGE]({
         dispatch,
         getters
     }, {
@@ -1026,7 +833,7 @@ export default {
         cell = extend({}, cell || {})
 
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let rowAliasList = []
         let colAliasList = []
 
@@ -1041,9 +848,9 @@ export default {
             row: rowAliasList,
             col: colAliasList
         }
-        dispatch(actionTypes.CELLS_INSERTCELL, [cell])
+        dispatch(CELLS_INSERT, [cell])
     },
-    [actionTypes.CELLS_SPLIT]({
+    [CELLS_SPLIT]({
         rootState,
         dispatch,
         getters,
@@ -1082,9 +889,9 @@ export default {
                 }
             }
         })
-        dispatch(actionTypes.CELLS_INSERTCELL, insertCellList)
+        dispatch(CELLS_INSERT, insertCellList)
     },
-    [actionTypes.CELLS_FORMAT]({
+    [CELLS_FORMAT]({
         commit,
         getters,
         rootState,
@@ -1097,7 +904,7 @@ export default {
             endRowIndex
         } = getters.getOprRegion
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
@@ -1106,14 +913,16 @@ export default {
             coordinate: [{
                 startCol: cols[startColIndex].sort,
                 startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[endRowIndex].sort
+                endCol: endColIndex === 'MAX' ? -1 : cols[
+                    endColIndex].sort,
+                endRow: endRowIndex === 'MAX' ? -1 : rows[
+                    endRowIndex].sort
             }],
             format,
             express
         }
         send({
-            url: config.operUrl['format'],
+            url: config.url['format'],
             data: JSON.stringify(data)
         })
         let rules = parseExpress(value)
@@ -1124,21 +933,21 @@ export default {
             }
         }
         if (endRowIndex === 'MAX') {
-            dispatch(actionTypes.COLS_OPERCOLS, {
+            dispatch(COLS_OPERCOLS, {
                 startIndex: startColIndex,
                 endIndex: endColIndex,
                 fn: parseText,
                 props
             })
         } else if (endColIndex === 'MAX') {
-            dispatch(actionTypes.ROWS_OPERROWS, {
+            dispatch(ROWS_OPERROWS, {
                 startIndex: startRowIndex,
                 endIndex: endRowIndex,
                 fn: parseText,
                 props
             })
         } else {
-            dispatch(actionTypes.CELLS_UPDATE_PROP, {
+            dispatch(CELLS_UPDATE_PROP, {
                 startColIndex,
                 endColIndex,
                 startRowIndex,
@@ -1147,6 +956,7 @@ export default {
                 fn: parseText
             })
         }
+
         function parseText(cell) {
             let text = cell.content.texts
             if (format === 'date' && isDate(text)) {
@@ -1161,7 +971,7 @@ export default {
             }
         }
     },
-    [actionTypes.CELLS_PASTE]({
+    [CELLS_PASTE]({
         getters,
         dispatch
     }, text) {
@@ -1170,12 +980,12 @@ export default {
             startRowIndex
         } = getters.getOprRegion
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let startRowSort = rows[startRowIndex].sort
         let startColSort = cols[startColIndex].sort
         if (typeof text !== 'undefined') {
             send({
-                url: config.operUrl['outerpaste'],
+                url: config.url['outerpaste'],
                 data: JSON.stringify({
                     oprCol: startColSort,
                     oprRow: startRowSort,
@@ -1183,7 +993,7 @@ export default {
                 }),
                 success(data) {
                     if (data.isLegal) {
-                        dispatch(actionTypes.CELLS_OUTERPASTE, {
+                        dispatch(CELLS_OUTERPASTE, {
                             startRowSort,
                             startColSort,
                             parseDate: parseClipStr(text)
@@ -1209,7 +1019,7 @@ export default {
             let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
             let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
             send({
-                url: config.operUrl[cache.clipState],
+                url: config.url[cache.clipState],
                 data: JSON.stringify({
                     orignal: {
                         startCol: cols[clipStartColIndex].sort,
@@ -1224,20 +1034,24 @@ export default {
                 }),
                 success(data) {
                     if (data.isLegal) {
-                        dispatch(actionTypes.CELLS_INNERPASTE, {
+                        dispatch(CELLS_INNERPASTE, {
                             startRowSort,
                             startColSort,
-                            clipStartColSort: cols[clipStartColIndex].sort,
-                            clipStartRowSort: rows[clipStartRowIndex].sort,
-                            clipEndColSort: cols[clipEndColIndex].sort,
-                            clipEndRowSort: rows[clipEndRowIndex].sort
+                            clipStartColSort: cols[
+                                clipStartColIndex].sort,
+                            clipStartRowSort: rows[
+                                clipStartRowIndex].sort,
+                            clipEndColSort: cols[
+                                clipEndColIndex].sort,
+                            clipEndRowSort: rows[
+                                clipEndRowIndex].sort
                         })
                     }
                 }
             })
         }
     },
-    [actionTypes.CELLS_INNERPASTE]({
+    [CELLS_INNERPASTE]({
         state,
         dispatch,
         getters,
@@ -1254,7 +1068,7 @@ export default {
         } = payload
         let currentSheet = rootState.currentSheet
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let startColIndex = getters.getColIndexBySort(startColSort)
         let startRowIndex = getters.getRowIndexBySort(startRowSort)
         let clipStartColIndex = getters.getColIndexBySort(clipStartColSort)
@@ -1270,7 +1084,8 @@ export default {
             for (let j = clipStartRowIndex; j < clipEndRowIndex + 1; j++) {
                 let aliasCol = cols[i].alias
                 let aliasRow = rows[j].alias
-                let cellIndex = getters.getPointInfo(aliasCol, aliasRow, 'cellIndex')
+                let cellIndex = getters.getPointInfo(aliasCol, aliasRow,
+                    'cellIndex')
                 if (cellIndex != null && !temp[cellIndex]) {
                     temp[cellIndex] = true
                     cacheInfo.push({
@@ -1279,7 +1094,7 @@ export default {
                         cellIndex
                     })
                     if (cache.clipState === 'cut') {
-                        commit(mutationTypes.UPDATE_POINTINFO, {
+                        commit(mutationTypes.UPDATE_POINTS, {
                             currentSheet,
                             info: {
                                 colAlias: aliasCol,
@@ -1296,15 +1111,18 @@ export default {
         }
         let endColIndex = startColIndex + clipEndColIndex - clipStartColIndex
         let endRowIndex = startRowIndex + clipEndRowIndex - clipStartRowIndex
+
         // 过滤超出加载区域部分
-        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
-        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length -
+            1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length -
+            1
 
         for (let i = startColIndex; i < endColIndex + 1; i++) {
             for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
-                commit(mutationTypes.UPDATE_POINTINFO, {
+                commit(mutationTypes.UPDATE_POINTS, {
                     currentSheet,
                     info: {
                         colAlias: aliasCol,
@@ -1315,7 +1133,7 @@ export default {
                 })
             }
         }
-        let cells = getters.cellList
+        let cells = getters.cells
         for (let i = 0, len = cacheInfo.length; i < len; i++) {
             let item = cacheInfo[i]
             let cell = cells[item.cellIndex]
@@ -1339,11 +1157,12 @@ export default {
                     col: occupyCol,
                     row: occupyRow
                 }
-                dispatch(actionTypes.CELLS_INSERTCELL, [insertCell])
+                dispatch(CELLS_INSERT, [insertCell])
             }
         }
         destoryClip()
         adaptSelect()
+
         function destoryClip() {
             let flag = true
             if (cache.clipState !== 'cut' &&
@@ -1371,8 +1190,9 @@ export default {
                 })
             }
         }
+
         function adaptSelect() {
-            dispatch(actionTypes.SELECTS_UPDATESELECT, {
+            dispatch(SELECTS_CHANGE, {
                 startRowIndex,
                 startColIndex,
                 endRowIndex,
@@ -1380,7 +1200,7 @@ export default {
             })
         }
     },
-    [actionTypes.CELLS_OUTERPASTE]({
+    [CELLS_OUTERPASTE]({
         state,
         dispatch,
         getters,
@@ -1394,11 +1214,12 @@ export default {
         } = payload
         let currentSheet = rootState.currentSheet
         let cols = getters.colList
-        let rows = getters.rowList
+        let rows = getters.allRows
         let startColIndex = getters.getColIndexBySort(startColSort)
         let startRowIndex = getters.getRowIndexBySort(startRowSort)
         let colLen = parseDate.colLen
         let rowLen = parseDate.rowLen
+
         // 清除复制选中区
         if (cache.clipState !== '') {
             let clip
@@ -1418,14 +1239,17 @@ export default {
         }
         let endColIndex = startColIndex + colLen - 1
         let endRowIndex = startRowIndex + rowLen - 1
+
         // 过滤超出加载区域部分
-        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length - 1
-        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length - 1
+        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length -
+            1
+        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length -
+            1
         for (let i = startColIndex; i < endColIndex + 1; i++) {
             for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
-                commit(mutationTypes.UPDATE_POINTINFO, {
+                commit(mutationTypes.UPDATE_POINTS, {
                     currentSheet,
                     info: {
                         colAlias: aliasCol,
@@ -1444,7 +1268,7 @@ export default {
             }
             let colAlias = cols[cellData.colRelative + startColIndex].alias
             let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
-            dispatch(actionTypes.CELLS_INSERTCELL, [{
+            dispatch(CELLS_INSERT, [{
                 occupy: {
                     col: [colAlias],
                     row: [rowAlias]
@@ -1455,14 +1279,14 @@ export default {
                 }
             }])
         })
-        dispatch(actionTypes.SELECTS_UPDATESELECT, {
+        dispatch(SELECTS_CHANGE, {
             startRowIndex,
             startColIndex,
             endRowIndex,
             endColIndex
         })
     },
-    [actionTypes.CELLS_WORDWRAP]({
+    [CELLS_WORDWRAP]({
         dispatch,
         getters
     }, payload) {
@@ -1501,13 +1325,13 @@ export default {
             }
         }
         if (endRowIndex === 'MAX') {
-            dispatch(actionTypes.COLS_OPERCOLS, {
+            dispatch(COLS_OPERCOLS, {
                 startIndex: startColIndex,
                 endIndex: endColIndex,
                 props
             })
         } else if (endColIndex === 'MAX') {
-            dispatch(actionTypes.ROWS_OPERROWS, {
+            dispatch(ROWS_OPERROWS, {
                 startIndex: startRowIndex,
                 endIndex: endRowIndex,
                 props
@@ -1516,7 +1340,7 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
-            dispatch(actionTypes.CELLS_UPDATE_PROP, {
+            dispatch(CELLS_UPDATE_PROP, {
                 startColIndex,
                 startRowIndex,
                 endColIndex,
@@ -1525,7 +1349,7 @@ export default {
             })
             if (oprRows) {
                 oprRows.forEach(info => {
-                    dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
+                    dispatch(ROWS_EXECADJUSTHEIGHT, {
                         sort: info.sort,
                         value: info.height
                     })
@@ -1535,8 +1359,8 @@ export default {
 
         function getAdaptRows() {
             let cols = getters.colList
-            let rows = getters.rowList
-            let cells = getters.cellList
+            let rows = getters.allRows
+            let cells = getters.cells
             let getPointInfo = getters.getPointInfo
             let temp = {}
             let oprRows = []
@@ -1545,10 +1369,12 @@ export default {
                 let rowAlias = rows[i].alias
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let colAlias = cols[j].alias
-                    let cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
+                    let cellIndex = getPointInfo(colAlias, rowAlias,
+                        'cellIndex')
                     if (typeof cellIndex === 'number' && !temp[cellIndex]) {
                         let cell = cells[cellIndex]
-                        if (cell.occupy.col.length === 1 && cell.occupy.row.length === 1) {
+                        if (cell.occupy.col.length === 1 && cell.occupy.row.length ===
+                            1) {
                             let height = getTextHeight(cell.content.texts,
                                 cell.content.size,
                                 cell.content.family,

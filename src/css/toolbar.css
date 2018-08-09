@@ -4,14 +4,14 @@ li { list-style: none; }
 .glyphicon-th-list:before { content: "\e012"; }
 .glyphicons { font-family: 'Glyphicons Halflings'; color: #555; font-size: 12px; }
 .topBar { background: #e1e1e1; height: 30px; overflow: hidden;}
-.toolBar { font-size: 9pt; font-family: 'Microsoft Yahei', 'SimSun', 'sans-serif'; background: #fafafa; border-bottom: 1px solid #e1e1e1; height: 130px; min-width: 960px; }
-.file-control, .fui-control-tabs, .download{ float: left; }
+.toolBar { font-size: 9pt; font-family: 'Microsoft Yahei', 'SimSun', 'sans-serif'; background: #fafafa; border-bottom: 1px solid #e1e1e1; height: 130px; position: relative;}
+.file-control, .fui-control-list, .download{ float: left; }
 .file-control span { background: #217346; color: #fff; padding: 7px 20px; height: 16px; display: block; cursor: default; }
-.fui-control-tabs { height: 30px; }
-.fui-control-tabs li { float: left; }
-.fui-control-tabs li span { padding: 7px 12px; color: #000; height: 16px; display: block; cursor: default; }
-.fui-control-tabs .active { background: #fafafa; color: #217346; }
-.fui-control-tabs li span:hover { color: #217346; }
+.fui-control-list { height: 30px; }
+.fui-control-list li { float: left; }
+.fui-control-list li span { padding: 7px 12px; color: #000; height: 16px; display: block; cursor: default; }
+.fui-control-list .active { background: #fafafa; color: #217346; }
+.fui-control-list li span:hover { color: #217346; }
 .download span { padding: 7px 12px; color: #000; height: 16px; display: block; cursor: default; }
 .download span:hover { color: #217346; }
 .excel-name { margin-left: 100px; float: left; }
@@ -101,7 +101,7 @@ span { display: inline-block; }
 .fui-cf-fontsize-extend .caret, .fui-cf-fontfamily-extend .caret { margin-top: -3px; }
 .fui-cf-fontfamily-extend.active, .fui-cf-fontsize-extend.active { background: #9fd5b7; }
 .tab-container { overflow: hidden; padding: 1px 4px 8px; cursor: default; }
-.color-body { width: 13px; height: 13px; border: 1px solid #fff; }
+.color-body { width: 18px; height: 18px; border: 1px solid #fff; margin: 0 1px;}
 .color-body:hover { border-color: #e36c09; }
 .widget { font-family: 'Microsoft Yahei'; font-size: 12px; position: absolute; min-width: 75px; background: #fff; z-index: 100;}
 .widget.active { display: block; }

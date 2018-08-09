@@ -6,31 +6,26 @@ import {
  * 选中区对象默认值
  */
 export default {
+    alias: null,
     /**
-     * 进行选中操作时，缓存操作信息
+     * 选中区域的类型：正常选择，数据源
+     * @type {[type]}
+     */
+    type: SELECT,
+    /**
+     * 是否为整行、整列选中
+     * @type {Boolean}
+     */
+    isWhole: false,
+    /**
+     * 记录选中的sort值，用于后台数据交互
      * @property {object} tempPosi
      */
-    tempPosi: {
-        /**
-         * 点击位置排序码
-         * @property {number} initColSort
-         */
-        initColSort: 0,
-        /**
-         * 点击位置排序码
-         * @property {number} initRowSort
-         */
-        initRowSort: 0,
-        /**
-         * 鼠标当前位置排序码
-         * @property {number} mouseColSort
-         */
-        mouseColSort: 0,
-        /**
-         * 鼠标当前位置排序码
-         * @property {number} mouseRowSort
-         */
-        mouseRowSort: 0
+    signalSort: {
+        startCol: 0,
+        startRow: 0,
+        endCol: 0,
+        endRow: 0
     },
     /**
      * 盒子模型，在渲染时直接使用该值，
@@ -92,7 +87,5 @@ export default {
          * @property {String} endRowAlias
          */
         endRowAlias: '0'
-    },
-    type: SELECT,
-    alias: ''
+    }
 }

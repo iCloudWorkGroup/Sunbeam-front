@@ -8,7 +8,11 @@ import getters from './getters'
  * list为cell对象数组
  * @type {Object}
  */
-const state = {}
+const state = {
+    list: [],
+    rowMap: new Map(),
+    colMap: new Map()
+}
 
 export default {
     state,

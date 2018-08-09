@@ -4,10 +4,10 @@ import cfg from '../../../config'
  */
 export default {
     sort: 0,
-    alias: '0',
+    alias: null,
     left: 0,
     width: cfg.colWidth,
-    displayName: '',
+    displayName: null,
     /**
      * 右为隐藏列（用于效果显示）
      * @type {Boolean}

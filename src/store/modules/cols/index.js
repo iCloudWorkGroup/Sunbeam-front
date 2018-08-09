@@ -8,7 +8,10 @@ import getters from './getters'
  * list为col对象数组
  * @type {Object}
  */
-const state = {}
+const state = {
+    list: [],
+    map: new Map()
+}
 
 export default {
     state,

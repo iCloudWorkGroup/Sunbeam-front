@@ -10,9 +10,18 @@
 </textarea>
 </template>
 <script type="text/javascript">
-import { EDIT_HIDE, SELECTS_INSERT, CELLS_PASTE } from '../store/action-types'
-import { UPDATE_FOCUSSTATE, DELETE_SELECT } from '../store/mutation-types'
-import { CLIP } from '../tools/constant'
+import {
+    EDIT_HIDE,
+    SELECTS_INSERT,
+    CELLS_PASTE
+} from '../store/action-types'
+import {
+    UPDATE_FOCUSSTATE,
+    DELETE_SELECT
+} from '../store/mutation-types'
+import {
+    CLIP
+} from '../tools/constant'
 import cache from '../tools/cache'
 import config from '../config'
 
@@ -22,7 +31,7 @@ export default {
         'scrollTop'
     ],
     mounted() {
-        this.getFocus()
+        // this.getFocus()
     },
     computed: {
         left() {
@@ -86,7 +95,8 @@ export default {
             let select = this.$store.getters.activeSelect
             let selects = this.$store.getters.selectList
             let wholePosi = select.wholePosi
-            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias ===
+                'MAX') {
                 return
             }
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -116,7 +126,8 @@ export default {
             let select = this.$store.getters.activeSelect
             let selects = this.$store.getters.selectList
             let wholePosi = select.wholePosi
-            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias === 'MAX') {
+            if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias ===
+                'MAX') {
                 return
             }
             for (let i = 0, len = selects.length; i < len; i++) {

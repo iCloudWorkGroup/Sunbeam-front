@@ -1,38 +1,33 @@
-import Vue from 'vue'
-import * as types from '../../mutation-types'
-import extend from '../../../util/extend'
-
+import {
+    INSERT_SELECT,
+    UPDATE_SELECT,
+    DELETE_SELECT
+} from '../../mutation-types'
 export default {
-    [types.INSERT_SHEET](state, sheet) {
-        Vue.set(state, sheet.alias, {
-            list: [],
-            state: ''
-        })
-    },
-    [types.INSERT_SELECT](state, payload) {
-        let selects = payload.selects
-        let list = state[payload.currentSheet].list
-
-        for (let i = 0, len = selects.length; i < len; i++) {
-            list.push(selects[i])
+    /**
+     * 允许批量插入多个选择区域
+     */
+    [INSERT_SELECT](state, selects) {
+        let fixSelects = Array.isArray(selects) === true ?
+            selects : [selects]
+        for (let i = 0, len = fixSelects.length; i < len; i++) {
+            state.list.push(fixSelects[i])
         }
     },
-    [types.SWITCH_ACTIVESELECT](state, payload) {
-        state.activeSelect = payload.select
-    },
-    [types.UPDATE_SELECT](state, payload) {
-        let info = payload
-        if (!Array.isArray(info)) {
-            info = [info]
+    /**
+     * 只能进行单个更新
+     */
+    [UPDATE_SELECT](state, select) {
+        for (let i = 0, len = state.list.length; i < len; i++) {
+            let item = state.list[i]
+            for (let name in select) {
+                if (item[name]) {
+                    item[name] = select[name]
+                }
+            }
         }
-        info.forEach(function({
-            select,
-            props
-        }) {
-            extend(select, props)
-        })
     },
-    [types.DELETE_SELECT](state, payload) {
+    [DELETE_SELECT](state, payload) {
         let currentSheet = payload.currentSheet
         let select = payload.select
         let list = state[currentSheet].list

@@ -2,153 +2,111 @@
 <div class="sheet">
     <table class="cui-grid"
            cellspacing="0"
-           cellpadding="0"
-           id="table">
+           cellpadding="0">
         <tbody>
             <tr>
                 <td>
                     <div class="corner"
                          ref="corner"></div>
                 </td>
-                <td v-if="colFrozen">
+                <td>
                     <col-head class="frozen-right-border"
-                              :frozen-rule="leftRule"
-                              :col-head-width="leftRule.width"
-                              :scroll-left="0"></col-head>
+                              :start="colFirst.start"
+                              :over="colFirst.over"/>
                 </td>
                 <td>
-                    <col-head :frozen-rule="mainRule"
-                              :scroll-left="scrollLeft"
-                              :col-head-width="colHeadWidth"></col-head>
-                </td>
-            </tr>
-            <tr v-if="rowFrozen">
-                <td>
-                    <row-head class="frozen-bottom-border"
-                              :frozen-rule="topRule"
-                              :row-head-height="topRule.height">
-                    </row-head>
-                </td>
-                <td v-if="colFrozen">
-                    <edit class="frozen-right-border frozen-bottom-border"
-                          :frozen-rule="cornerRule"
-                          :edit-width="cornerRule.width"
-                          :edit-height="cornerRule.height"></edit>
-                </td>
-                <td>
-                    <edit class="frozen-bottom-border"
-                          :frozen-rule="topRule"
-                          :edit-height="topRule.height"
-                          :edit-width="colHeadWidth"
-                          :scroll-left="scrollLeft">
-                    </edit>
+                    <col-head :start="colLast.start"
+                              :over="colLast.over"
+                              :need-sider="true"/>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <row-head :frozen-rule="mainRule"
-                              :scroll-top="scrollTop"
-                              :row-head-height="rowHeadHeight">
-                    </row-head>
+                    <row-head class="frozen-bottom-border"
+                              :start="rowFirst.start"
+                              :over="rowFirst.over"/>
                 </td>
-                <td v-if="colFrozen">
+                <td>
+                    <edit class="frozen-right-border frozen-bottom-border"
+                          :row-start="rowFirst.start"
+                          :row-over="rowFirst.over"
+                          :col-start="colFirst.start"
+                          :col-over="colFirst.over"/>
+                </td>
+                <td>
+                    <edit class="frozen-bottom-border"
+                          :row-start="rowFirst.start"
+                          :row-over="rowFirst.over"
+                          :col-start="colLast.start"
+                          :col-over="colLast.over"
+                          :need-sider="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <row-head :start="rowLast.start"
+                              :over="rowLast.over"
+                              :need-sider="true"/>
+                </td>
+                <td>
                     <edit class="frozen-right-border"
-                          :frozen-rule="leftRule"
-                          :edit-height="rowHeadHeight"
-                          :edit-width="leftRule.width"
-                          :scroll-top="scrollTop"></edit>
+                          :row-start="rowLast.start"
+                          :row-over="rowLast.over"
+                          :col-start="colFirst.start"
+                          :col-over="colFirst.over"
+                          :need-sider="true"/>
                 </td>
                 <td>
                     <edit class="scroll-box"
-                          :frozen-rule="mainRule"
-                          :edit-width="editWidth"
-                          :edit-height="editHeight"
+                          :row-start="rowLast.start"
+                          :row-over="rowLast.over"
+                          :col-start="colLast.start"
+                          :col-over="colLast.over"
                           @changeScrollTop="changeScrollTop"
-                          @changeScrollLeft="changeScrollLeft">
-                    </edit>
+                          @changeScrollLeft="changeScrollLeft"/>
                 </td>
             </tr>
         </tbody>
     </table>
-    <input-box :scroll-left="scrollLeft"
+<!--     <input-box :scroll-left="scrollLeft"
                :scroll-top="scrollTop">
-    </input-box>
+    </input-box> -->
 </div>
 </template>
 <script type="text/javascript">
 import config from '../config'
-import getScrollbarWidth from '../util/scrollbarWidth'
+import scrollbar from '../util/scrollbar'
 import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import InputBox from './input-box.vue'
 
 export default {
-    props: [
-        'sheetWidth',
-        'sheetHeight'
-    ],
     data() {
         return {
-            scrollbarWidth: getScrollbarWidth(),
+            scrollbarWidth: scrollbar(),
             scrollTop: 0,
-            scrollLeft: 0
+            scrollLeft: 0,
         }
     },
     computed: {
-        rowFrozen() {
-            let frozenState = this.$store.getters.frozenState
-            return frozenState.rowFrozen
+        rowFirst() {
+            let rowRule = this.$store.state.sheets.list[0].frozen.row
+            return rowRule.length > 0 ? rowRule[0] : {}
         },
-        colFrozen() {
-            let frozenState = this.$store.getters.frozenState
-            return frozenState.colFrozen
+        rowLast() {
+            let rowRule = this.$store.state.sheets.list[0].frozen.row
+            let len = rowRule.length
+            return len > 0 ? rowRule[len - 1] : {}
         },
-        cornerRule() {
-            let rules = this.$store.getters.frozenState.rules
-            let rule
-            rules.forEach(function(item) {
-                if (item.type === 'cornerRule') {
-                    rule = item
-                }
-            })
-            return rule
+        colFirst() {
+            let colRule = this.$store.state.sheets.list[0].frozen.col
+            return colRule.length > 0 ? colRule[0] : {}
         },
-        leftRule() {
-            let rules = this.$store.getters.frozenState.rules
-            let rule
-            rules.forEach(function(item) {
-                if (item.type === 'leftRule') {
-                    rule = item
-                }
-            })
-            return rule
-        },
-        topRule() {
-            let rules = this.$store.getters.frozenState.rules
-            let rule
-            rules.forEach(function(item) {
-                if (item.type === 'topRule') {
-                    rule = item
-                }
-            })
-            return rule
-        },
-        mainRule() {
-            let rules = this.$store.getters.frozenState.rules
-            let rule
-            rules.forEach(function(item) {
-                if (item.type === 'mainRule') {
-                    rule = item
-                }
-            })
-            return rule
-        },
-        width() {
-            return this.sheetWidth
-        },
-        height() {
-            return this.sheetHeight
+        colLast() {
+            let colRule = this.$store.state.sheets.list[0].frozen.col
+            let len = colRule.length
+            return len > 0 ? colRule[len - 1] : {}
         },
         colHeadWidth() {
             let frozenState = this.$store.getters.frozenState

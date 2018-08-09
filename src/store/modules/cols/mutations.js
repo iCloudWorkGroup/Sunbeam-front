@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import * as types from '../../mutation-types'
 import {
     indexAttrBinary
@@ -6,24 +5,20 @@ import {
 import extend from '../../../util/extend'
 
 export default {
-    [types.INSERT_SHEET](state, sheet) {
-        Vue.set(state, sheet.alias, {
-            list: [],
-            map: new Map()
-        })
-    },
+    /**
+     * 添加列信息，只在最后面增加
+     */
     [types.ADD_COL](state, payload) {
         let cols = payload.cols
-        let colState = state[payload.currentSheet]
-        let list = colState.list
-        let map = colState.map
-
         for (let i = 0, len = cols.length; i < len; i++) {
             let col = cols[i]
-            list.push(col)
-            map.set(col.alias, col)
+            state.list.push(col)
+            state.map.set(col.alias, col)
         }
     },
+    /**
+     * 插入一些，可以在任何地方
+     */
     [types.INSERT_COL](state, payload) {
         let cols = payload.cols
         let colState = state[payload.currentSheet]
@@ -37,25 +32,18 @@ export default {
             map.set(col.alias, col)
         }
     },
-    [types.CANCEL_ACTIVE_COL](state, {
-        startIndex,
-        endIndex,
-        currentSheet
-    }) {
-        let list = state[currentSheet].list
-
-        for (let i = startIndex; i <= endIndex; i++) {
+    [types.CANCEL_ACTIVE_COL](state) {
+        let list = state.list
+        for (let i = 0, len = list.length; i < len; i++) {
             list[i].active = false
         }
     },
     [types.ACTIVE_COL](state, {
         startIndex,
-        endIndex = startIndex,
-        currentSheet
+        endIndex = startIndex
     }) {
-        let list = state[currentSheet].list
         for (let i = startIndex; i <= endIndex; i++) {
-            list[i].active = true
+            state.list[i].active = true
         }
     },
     [types.UPDATE_COL](state, info) {
@@ -65,7 +53,8 @@ export default {
         }) {
             extend(col, props)
         })
-    }, [types.DELETE_COL](state, {
+    },
+    [types.DELETE_COL](state, {
         currentSheet,
         index
     }) {

@@ -6,7 +6,7 @@ import mutations from './mutations'
  */
 const state = {
     list: [],
-    currentIndex: -1
+    point: -1
 }
 
 export default {

@@ -1,86 +1,71 @@
 <template>
 <div class="col-head-container"
-     :style="{width: width + 'px'}">
+     :style="{width: viewWidth}">
     <div class="col-head-bg col-head-height"
-         :style="{
-        width: totalWidth}">
-        <col-head-panel :frozenRule="frozenRule"></col-head-panel>
-        <div class="col-head-line"
-             v-for="item in selectList"
-             :style="{
-            left: item.physicsBox.left - offsetLeft + 'px',
-            width: item.physicsBox.width - 2 + 'px'}"></div>
+         :style="{width: width}">
+        <col-head-panel
+            :start="start"
+            :over="over"
+            :offsetLeft="offsetLeft"/>
+        <col-head-line
+            v-for="item in selects"
+            key="item.alias"
+            :col="item"
+            :offsetLeft="offsetLeft"
+            />
     </div>
 </div>
-
 </template>
-
 <script type="text/javascript">
 import ColHeadPanel from './col-head-panel.vue'
-
+import ColHeadLine from './col-head-line.vue'
+import cache from '../tools/cache'
+import config from '../config'
+import {
+    unit
+} from '../filters/unit'
+import scrollbar from '../util/scrollbar'
 export default {
-    props: ['colHeadWidth', 'scrollLeft', 'frozenRule'],
-    data() {
-        let startIndex
-        let endIndex
-
-        if (this.frozenRule) {
-            startIndex = this.frozenRule.startColIndex
-            endIndex = this.frozenRule.endColIndex
-        }
-        return {
-            startIndex,
-            endIndex
+    props: ['start', 'over', 'needSider'],
+    computed: {
+        offsetLeft() {
+            return this.$store.getters.offsetLeft(this.start, this.over)
+        },
+        width() {
+            let colMap = this.$store.state.cols.map
+            let startCol = colMap.get(this.start)
+            let overCol = colMap.get(this.over)
+            return unit(overCol.left + overCol.width - startCol.left)
+        },
+        viewWidth() {
+            let cols = this.$store.state.cols
+            let startCol = cols.map.get(this.start)
+            let overCol = cols.map.get(this.over)
+            let lastCol = cols.list[cols.list.length - 1]
+            let limitWidth = 0
+            if (overCol.alias === lastCol.alias) {
+                limitWidth = cache.rootEl.offsetWidth - config.cornerWidth
+                if (this.needSider) {
+                    limitWidth -= scrollbar()
+                }
+            } else {
+                limitWidth = overCol.left + overCol.width
+            }
+            return unit(limitWidth - startCol.left)
+        },
+        selects() {
+            return this.$store.getters.allSelects
         }
     },
     components: {
         ColHeadPanel,
-    },
-    computed: {
-        width() {
-            return this.colHeadWidth
-        },
-        totalWidth() {
-            let visibleCols = this.$store.getters.visibleColList
-            let frozenRule = this.frozenRule
-            let startColIndex
-            let endColIndex
-            let lastCol
-            let startCol
-
-            if (frozenRule) {
-                startColIndex = frozenRule.startColIndex
-                if (typeof frozenRule.endColIndex !== 'undefined') {
-                    endColIndex = frozenRule.endColIndex
-                } else {
-                    endColIndex = visibleCols.length - 1
-                }
-                startCol = visibleCols[startColIndex]
-                lastCol = visibleCols[endColIndex]
-            } else {
-                endColIndex = visibleCols.length - 1
-                startCol = visibleCols[0]
-                lastCol = visibleCols[endColIndex]
-            }
-            return lastCol.left + lastCol.width - startCol.left + 'px'
-        },
-        offsetLeft() {
-            if (this.frozenRule) {
-                return this.frozenRule.offsetLeft
-            } else {
-                return 0
-            }
-        },
-        selectList() {
-            return this.$store.getters.selectList
-        }
+        ColHeadLine
     },
     watch: {
         scrollLeft(val) {
             this.$el.scrollLeft = val
         }
-    },
-    methods: {}
+    }
 }
 </script>
 <style>

@@ -7,7 +7,7 @@ const baseConfig = merge(base, {
   devtool: 'inline-source-map',
   entry: fs.readdirSync(__dirname).reduce((entries, dir) => {
     const fullDir = path.join(__dirname, dir)
-    const entry = path.join(fullDir, 'app.js')
+    const entry = path.join(fullDir, 'enter.js')
     if (fs.statSync(fullDir).isDirectory() &&
       fs.existsSync(entry)) {
       entries[dir] = ['webpack-hot-middleware/client', entry]

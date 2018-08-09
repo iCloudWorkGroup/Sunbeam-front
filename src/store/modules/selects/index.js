@@ -9,16 +9,10 @@ import getters from './getters'
  */
 const state = {
     /**
-     * 当前活动对象
+     * 选中区域表
      * @type {Object}
      */
-    activeSelect: null,
-    currentOprRegion: {
-        startColIndex: null,
-        endColIndex: null,
-        startRowIndex: null,
-        endRowIndex: null
-    }
+    list: []
 }
 export default {
     state,

@@ -1,22 +1,27 @@
 <template>
 <div class="select-group">
-    <select-item v-for="item in selectList"
-                 :key="item.alias"
-                 :select="item"
-                 :frozenRule="frozenRule">
-    </select-item>
+    <select-item
+        v-for="item in selects"
+        :key="item.alias"
+        :select="item"
+        :offsetLeft="offsetLeft"
+        :offsetTop="offsetTop"/>
 </div>
-
 </template>
-
-<script type="text/javascript">
+<script>
 import SelectItem from './select-item.vue'
-
 export default {
-    props: ['frozenRule'],
+    props: [
+        'rowStart',
+        'rowOver',
+        'colStart',
+        'colOver',
+        'offsetLeft',
+        'offsetTop'
+    ],
     computed: {
-        selectList() {
-            return this.$store.getters.selectList
+        selects() {
+            return this.$store.getters.allSelects
         }
     },
     components: {

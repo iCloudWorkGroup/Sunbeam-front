@@ -1,10 +1,23 @@
 export default {
+    /**
+     * 默认行高、列宽
+     * @type {Number}
+     */
     colWidth: 71,
     rowHeight: 19,
+    /**
+     * 初始化行、列数
+     * @type {Number}
+     */
     initRowNum: 100,
     initColNum: 26,
+
+    /**
+     * 最大行数、列数
+     * @type {Number}
+     */
     maxRowNum: 10000,
-    maxColNum: 52,
+    maxColNum: 100,
     /**
      * 页面左侧距离
      * @property {int} outerLeft
@@ -15,6 +28,11 @@ export default {
      * @property {int} outerTop
      */
     cornerHeight: 20,
+    /**
+     * sheet信息栏高度
+     * @type {Number}
+     */
+    sheetSider: 30,
     /**
      * 请求预加载区域宽度,单位px
      */
@@ -31,7 +49,7 @@ export default {
      * @type {Number}
      */
     toolbarHeight: 130,
-    operUrl: {
+    url: {
         'family': 'cell/font-family',
         'size': 'cell/font-size',
         'weight': 'cell/font-weight',

@@ -7,7 +7,7 @@
     <span class="fui-separator"></span>
 </li>
 </template>
-<script type="text/javascript">
+<script>
 export default {
     props: ['title']
 }

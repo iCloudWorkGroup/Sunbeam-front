@@ -1,24 +1,39 @@
 <template>
 <div class="edit-panel"
-     ref="panel"
-     @mousedown="locate"
-     @mousemove="mouseMoveHandle"
-     :style="{width: width, height: height}">
-    <row-grid-group :frozenRule="frozenRule"></row-grid-group>
-    <col-grid-group :frozenRule="frozenRule"></col-grid-group>
-    <cell-group :frozenRule="frozenRule"></cell-group>
-    <select-group :frozenRule="frozenRule"></select-group>
+     @mousedown="locateSelect"
+     @mousemove=""
+     :style="{ width, height }">
+    <row-grid-group
+        :start="rowStart"
+        :over="rowOver"
+        :offsetTop="offsetTop"/>
+    <col-grid-group
+        :start="colStart"
+        :over="colOver"
+        :offsetLeft="offsetLeft"/>
+    <cell-group
+        :row-start="rowStart"
+        :row-over="rowOver"
+        :col-start="colStart"
+        :col-over="colOver"
+        :offsetTop="offsetTop"
+        :offsetLeft="offsetLeft"/>
+    <select-group
+        :row-start="rowStart"
+        :row-over="rowOver"
+        :col-start="colStart"
+        :col-over="colOver"
+        :offsetTop="offsetTop"
+        :offsetLeft="offsetLeft"/>
 </div>
-
 </template>
-
 <script type="text/javascript">
 import {
-    SELECTS_UPDATESELECT
+    SELECTS_CHANGE
 } from '../store/action-types'
-import {
-    UPDATE_MOUSESTATE
-} from '../store/mutation-types'
+// import {
+//     UPDATE_MOUSESTATE
+// } from '../store/mutation-types'
 import ColGridGroup from './col-grid-group.vue'
 import RowGridGroup from './row-grid-group.vue'
 import CellGroup from './cell-group.vue'
@@ -27,8 +42,16 @@ import {
     LOCATE,
     DRAG
 } from '../tools/constant'
+import {
+    unit
+} from '../filters/unit'
 export default {
-    props: ['editPanelWidth', 'editPanelHeight', 'frozenRule'],
+    props: [
+        'rowStart',
+        'rowOver',
+        'colStart',
+        'colOver'
+    ],
     components: {
         ColGridGroup,
         RowGridGroup,
@@ -36,86 +59,40 @@ export default {
         SelectGroup
     },
     computed: {
+        offsetLeft() {
+            return this.$store.getters.offsetLeft(this.colStart, this.colOver)
+        },
+        offsetTop() {
+            return this.$store.getters.offsetTop(this.rowStart, this.rowOver)
+        },
         width() {
-            let cols = this.$store.getters.colList
-            let visibleCols = this.$store.getters.visibleColList
-            let frozenRule = this.frozenRule
-            let startColIndex
-            let endColIndex
-            let lastCol
-            let startCol
-
-            if (frozenRule) {
-                startColIndex = frozenRule.startColIndex
-                if (frozenRule.endColIndex != null) {
-                    endColIndex = frozenRule.endColIndex
-                } else {
-                    endColIndex = cols.length - 1
-                }
-                startCol = cols[startColIndex]
-                lastCol = cols[endColIndex]
-            } else {
-                endColIndex = visibleCols.length - 1
-                startCol = visibleCols[0]
-                lastCol = visibleCols[endColIndex]
-            }
-            return lastCol.left + lastCol.width - startCol.left + 'px'
+            let colMap = this.$store.state.cols.map
+            let startCol = colMap.get(this.colStart)
+            let overCol = colMap.get(this.colOver)
+            return unit(overCol.left + overCol.width - startCol.left)
         },
         height() {
-            let rows = this.$store.getters.rowList
-            let visibleRows = this.$store.getters.visibleRowList
-            let frozenRule = this.frozenRule
-            let startRowIndex
-            let endRowIndex
-            let lastRow
-            let startRow
-
-            if (frozenRule) {
-                startRowIndex = frozenRule.startRowIndex
-                if (frozenRule.endRowIndex != null) {
-                    endRowIndex = frozenRule.endRowIndex
-                } else {
-                    endRowIndex = rows.length - 1
-                }
-                startRow = rows[startRowIndex]
-                lastRow = rows[endRowIndex]
-            } else {
-                endRowIndex = visibleRows.length - 1
-                startRow = visibleRows[0]
-                lastRow = visibleRows[endRowIndex]
-            }
-            return lastRow.top + lastRow.height - startRow.top + 'px'
+            let rowMap = this.$store.state.rows.map
+            let startRow = rowMap.get(this.rowStart)
+            let overRow = rowMap.get(this.rowOver)
+            return unit(overRow.top + overRow.height - startRow.top)
         },
         mouseState() {
             return this.$store.state.mouseState
         }
     },
     methods: {
-        locate(e) {
+        locateSelect(e) {
             let getters = this.$store.getters
-            let elem = this.$refs.panel
-            let frozenRule = this.frozenRule
-            let offsetLeft = 0
-            let offsetTop = 0
-            let box
-
-            if (frozenRule) {
-                offsetLeft = frozenRule.offsetLeft
-                offsetTop = frozenRule.offsetTop
-            }
-            box = elem.getBoundingClientRect()
-
-            let colPosi = e.clientX - box.left + offsetLeft
-            let rowPosi = e.clientY - box.top + offsetTop
-            let colIndex = getters.getColIndexByPosi(colPosi)
-            let rowIndex = getters.getRowIndexByPosi(rowPosi)
-
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
-                startColIndex: colIndex,
-                startRowIndex: rowIndex
-            })
-            this.$store.commit(UPDATE_MOUSESTATE, {
-                state: DRAG
+            let el = e.currentTarget
+            let clientRect = el.getBoundingClientRect()
+            let col = getters.getColByPosi(e.clientX - clientRect.left +
+                this.offsetLeft)
+            let row = getters.getRowByPosi(e.clientY - clientRect.top +
+                this.offsetTop)
+            this.$store.dispatch(SELECTS_CHANGE, {
+                colAlias: col.alias,
+                rowAlias: row.alias
             })
         },
         mouseMoveHandle(e) {
@@ -145,7 +122,7 @@ export default {
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: colIndex,
                 startRowIndex: rowIndex
             })

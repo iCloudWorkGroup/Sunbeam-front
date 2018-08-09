@@ -4,24 +4,92 @@ import {
 } from '../../../util/binary'
 
 export default {
-    colList(state, getters, rootState) {
-        return state[rootState.currentSheet].list
+    /**
+     * 所有列
+     * @param  {[type]} state [description]
+     * @return {[type]}       [description]
+     */
+    allCols(state) {
+        return state.list
     },
+    /**
+     * 可视区域的列
+     * @param  {[type]} state   [description]
+     * @param  {[type]} getters [description]
+     * @return {[type]}         [description]
+     */
     visibleColList(state, getters) {
-        let list = getters.colList
-        let result = []
-
-        list.forEach(function(col) {
-            if (!col.hidden) {
-                result.push(col)
+        return function() {
+            let result = []
+            state.list.forEach(function(col) {
+                if (!col.hidden) {
+                    result.push(col)
+                }
+            })
+            return result
+        }
+    },
+    /**
+     * 因为需要的地方比较多，所以进行抽象提取
+     */
+    offsetLeft(state, getters) {
+        return function(start, over) {
+            let overCol = getters.getColByAlias(over)
+            let cols = state.list
+            let lastCol = cols[cols.length - 1]
+            if (lastCol.alias === overCol.alias) {
+                return getters.getColByAlias(start).left
             }
-        })
-        return result
+            return 0
+        }
+    },
+    /**
+     * 根据alias的范围，查找列对象组
+     * @param  {[type]} state   [description]
+     * @param  {[type]} getters [description]
+     * @return {[type]}         [description]
+     */
+    colsByRange(state, getters) {
+        return function(beginAlias, endAlias) {
+            let beginIdx = getters.getColIndexByAlias(beginAlias)
+            let endIdx = getters.getColIndexByAlias(endAlias)
+            if (beginIdx !== -1 && endIdx !== -1) {
+
+                // 因为索引总是 -1，所以结束要 +1
+                return state.list.slice(beginIdx, endIdx + 1)
+            }
+            return null
+        }
+    },
+    /**
+     * 查找临近的列对象
+     * @param  {[type]} state   [description]
+     * @param  {[type]} getters [description]
+     * @return {[type]}         [description]
+     */
+    neighborColByAlias(state, getters) {
+        return function(alias, toward) {
+            let idx = getters.getColIndexByAlias(alias)
+            switch (toward) {
+                case 'PRE':
+                    if (idx > 0) {
+                        return state.list[--idx]
+                    }
+                    return null
+                case 'NEXT':
+                    if (idx < state.list.length - 1) {
+                        return state.list[++idx]
+                    }
+                    return null
+            }
+        }
     },
     getColMaxPosi(state, getters) {
-        let list = getters.visibleColList
-        let lastCol = list[list.length - 1]
-        return lastCol.left + lastCol.width
+        return function() {
+            let list = getters.visibleColList()
+            let lastCol = list[list.length - 1]
+            return lastCol.left + lastCol.width
+        }
     },
     getColIndexByPosi(state, getters, rootState) {
         return function(posi) {
@@ -29,10 +97,20 @@ export default {
             return getters.getColIndexBySort(col.sort)
         }
     },
+    /**
+     * 根据索引查找对象，为了写法方便
+     * 没有计算的意义
+     * @param  {[type]} state [description]
+     * @return {[type]}       [description]
+     */
+    getColByIndex(state) {
+        return function(idx) {
+            return state.list[idx]
+        }
+    },
     getColByPosi(state, getters) {
-        let visibleList = getters.visibleColList
-
         return function(posi) {
+            let visibleList = getters.visibleColList()
             let lastCol = visibleList[visibleList.length - 1]
             if (lastCol.left + lastCol.width < posi) {
                 return lastCol
@@ -43,22 +121,13 @@ export default {
         }
     },
     getVisibleColIndexBySort(state, getters, rootState) {
-        let list = getters.visibleColList
         return function(sort) {
+            let list = getters.visibleColList()
             return indexAttrBinary(sort, list, 'sort')
         }
     },
-    getColIndexBySort(state, getters, rootState) {
-        let list = getters.colList
-        return function(sort) {
-            return indexAttrBinary(sort, list, 'sort')
-        }
-    },
-    getColIndexByAlias(state, getters, rootState) {
+    getColIndexByAlias(state, getters) {
         return function(alias) {
-            if (alias === 'MAX') {
-                return 'MAX'
-            }
             let col = getters.getColByAlias(alias)
             if (col) {
                 return getters.getColIndexBySort(col.sort)
@@ -68,31 +137,26 @@ export default {
     },
     getColByAlias(state, getters, rootState) {
         return function(alias) {
-            let currentSheet = rootState.currentSheet
-            let map = state[currentSheet].map
-            return map.get(alias)
+            return state.map.get(alias)
+        }
+    },
+    getColIndexBySort(state, getters) {
+        return function(sort) {
+            return indexAttrBinary(sort, getters.allCols, 'sort')
         }
     },
     userViewColList(state, getters, rootState) {
-        let list = getters.colList
-        let visibleList = getters.visibleColList
-        let userView = rootState.userView
-        let start = getters.getColIndexByPosi(userView.left)
-        let end = getters.getColIndexByPosi(userView.right)
+        return function() {
+            let cols = getters.allCols
+            let visibleList = getters.visibleColList()
+            let userView = rootState.userView
+            let start = getters.getColIndexByPosi(userView.left)
+            let end = getters.getColIndexByPosi(userView.right)
 
-        start = indexAttrBinary(list[start].sort, visibleList, 'sort')
-        end = indexAttrBinary(list[end].sort, visibleList, 'sort')
+            start = indexAttrBinary(cols[start].sort, visibleList, 'sort')
+            end = indexAttrBinary(cols[end].sort, visibleList, 'sort')
 
-        return visibleList.slice(start, end + 1)
-    },
-    // getVisibleColList(state, getters) {
-    //  return function(start, end){
-
-    //      let list = getters.visibleColList,
-    //          startIndex = indexAttrBinary(list[start].sort, visibleList, 'sort'),
-    //          endIndex = indexAttrBinary(list[end].sort, visibleList, 'sort')
-
-    //      return visibleList.slice(startIndex, endIndex)
-    //  }
-    // }
+            return visibleList.slice(start, end + 1)
+        }
+    }
 }

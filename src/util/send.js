@@ -1,37 +1,33 @@
-import cfg from '../config'
+import CONFIG from '../config'
 import extend from './extend'
 import cache from '../tools/cache'
-import $ from 'jquery'
 
-export default function(optionsArgs) {
-    let options = optionsArgs
-    if (typeof options.isPublic === 'undefined' ||
-        options.isPublic === true) {
-        cache.sendQueueStep++
+export default function(options, recordStep = true) {
+    if (recordStep === true) {
+        cache.step++
     }
-    options = extend({}, {
-        type: 'POST',
-        async: true,
-        baseURL: cfg.rootPath,
-        contentType: 'application/json; charset=UTF-8',
-        dataType: 'json',
+    let fixOptions = extend({
+        mode: 'cors',
+        method: 'POST',
         headers: {
-            'step': cache.sendQueueStep
+            'content-type': 'application/json; charset=UTF-8',
+            'X-Step': cache.step,
+            'X-Book-Id': cache.AUTHENTIC_KEY
         }
     }, options)
-
-    options.url = cfg.rootPath + options.url
-    options.beforeSend = function(request) {
-        request.setRequestHeader('X-Step', cache.sendQueueStep)
-        request.setRequestHeader('X-Book-Id', window.SPREADSHEET_AUTHENTIC_KEY)
-    }
-    let success = options.success
-    options.success = function(data) {
-        if (data.isLegal === false) {
-            cache.sendQueueStep--
-        }
-        success.apply(this, arguments)
-    }
-
-    return $.ajax(options)
+    fixOptions.url = CONFIG.rootPath + fixOptions.url
+    return fetch(fixOptions.url, fixOptions)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            if (data.isLegal != null &&
+                data.isLegal === false) {
+                cache.step--
+            }
+            return data
+        })
+        .catch(() => {
+            return
+        })
 }

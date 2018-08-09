@@ -184,4 +184,20 @@ export function formatText(rules, text) {
     let ec = new Complier(text)
     return ec.initilize(rules)
 }
-
+// 分解命名空间, 返回合并好的对象
+export function pathToStruct({
+    structName,
+    value
+}) {
+    let namespaces = structName.split('.')
+    let propStruct = {}
+    let item = null // 组建临时对象
+    for (let k = 0, spaceLen = namespaces.length; k < spaceLen; k++) {
+        if (item == null) {
+            item = propStruct
+        }
+        item[namespaces[k]] = k !== spaceLen - 1 ? {} : value
+        item = item[namespaces[k]]
+    }
+    return propStruct
+}

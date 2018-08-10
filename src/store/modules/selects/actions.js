@@ -92,8 +92,10 @@ export default {
         commit,
         dispatch
     }, {
-        colAlias,
-        rowAlias
+        activeColAlias,
+        activeRowAlias,
+        endColAlias = activeColAlias,
+        endRowAlias = activeRowAlias,
     }) {
         let {
             startColIndex,
@@ -101,8 +103,10 @@ export default {
             endColIndex,
             endRowIndex
         } = getters.getFullOprRegion({
-            startColIndex: getters.getColIndexByAlias(colAlias),
-            startRowIndex: getters.getRowIndexByAlias(rowAlias)
+            startColIndex: getters.getColIndexByAlias(activeColAlias),
+            startRowIndex: getters.getRowIndexByAlias(activeRowAlias),
+            endColIndex: getters.getColIndexByAlias(endColAlias),
+            endRowIndex: getters.getRowIndexByAlias(endRowAlias)
         })
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,
@@ -123,8 +127,8 @@ export default {
                 rows[startRowIndex].top
         }
         let activePosi = {
-            rowAlias,
-            colAlias
+            rowAlias: activeRowAlias,
+            colAlias: activeColAlias
         }
         let wholePosi = {
             startColAlias: cols[startColIndex].alias,

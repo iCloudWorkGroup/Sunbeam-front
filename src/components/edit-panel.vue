@@ -1,7 +1,6 @@
 <template>
 <div class="edit-panel"
      @mousedown="locateSelect"
-     @mousemove=""
      :style="{ width, height }">
     <row-grid-group
         :start="rowStart"
@@ -45,6 +44,7 @@ import {
 import {
     unit
 } from '../filters/unit'
+// import cache from '../tools/cache'
 export default {
     props: [
         'rowStart',
@@ -82,27 +82,44 @@ export default {
         }
     },
     methods: {
-        locateSelect(e) {
+        locateSelect(downEvent) {
             let getters = this.$store.getters
-            let el = e.currentTarget
+            let el = downEvent.currentTarget
             let clientRect = el.getBoundingClientRect()
-            let col = getters.getColByPosi(e.clientX - clientRect.left +
-                this.offsetLeft)
-            let row = getters.getRowByPosi(e.clientY - clientRect.top +
-                this.offsetTop)
+            let col = getters.getColByPosi(downEvent.clientX - clientRect.left + this.offsetLeft)
+            let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
             this.$store.dispatch(SELECTS_CHANGE, {
-                colAlias: col.alias,
-                rowAlias: row.alias
+                activeColAlias: col.alias,
+                activeRowAlias: row.alias
             })
-        },
-        mouseMoveHandle(e) {
-            this.currentMouseMoveState(e)
-        },
-        currentMouseMoveState() {
-            console.log('empty function')
-        },
-        routineMoveState(e) {
-            console.log('empty function')
+
+            // 拖动选择区域事件
+            let bindSelectChange = selectChange.bind(this)
+            document.addEventListener('mousemove', bindSelectChange)
+            // cache.eventList.set(el, {
+            //     'mousemove': {
+            //         [bindSelectChange]: true
+            //     }
+            // })
+            document.addEventListener('mouseup', function() {
+                // let elEvents = cache.eventList.get(el)
+                // if (elEvents != null &&
+                //     elEvents['mousemove'] != null &&
+                //     elEvents['mousemove'][bindSelectChange]) {
+                document.removeEventListener('mousemove', bindSelectChange)
+                // cache.eventList.delete(el)
+                // }
+            })
+            function selectChange(moveEvent) {
+                let endCol = getters.getColByPosi(moveEvent.clientX - clientRect.left + this.offsetLeft)
+                let endRow = getters.getRowByPosi(moveEvent.clientY - clientRect.top + this.offsetTop)
+                this.$store.dispatch(SELECTS_CHANGE, {
+                    activeColAlias: col.alias,
+                    activeRowAlias: row.alias,
+                    endColAlias: endCol.alias,
+                    endRowAlias: endRow.alias
+                })
+            }
         },
         dragState(e) {
             let elem = this.$refs.panel

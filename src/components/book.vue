@@ -38,7 +38,6 @@ export default {
         SheetEdit
     },
     mounted() {
-        // let self = this
         // document.addEventListener('mouseup', function() {
         //     self.$store.commit(UPDATE_MOUSESTATE, {
         //         state: LOCATE

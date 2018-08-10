@@ -38,5 +38,5 @@ export const UPDATE_MOUSESTATE = 'UPDATE_MOUSESTATE'
 export const DELETE_COL = 'DELETE_COL'
 export const DELETE_ROW = 'DELETE_ROW'
 export const DELETE_SELECT = 'DELETE_SELECT'
-
+export const DESTORY_CELL = 'DESTORY_CELL'
 export const UPDATE_OCCUPY = 'UPDATE_OCCUPY'

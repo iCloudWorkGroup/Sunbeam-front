@@ -3,14 +3,20 @@
  * 所以没有做target目标的处理，都是空对象的形式
  * 虽然性能不是最佳，但是符合业务要求
  */
-export default function extend(isMerge, ...values) {
+/**
+ * [extend description]
+ * @param  {[type]}    proto  [是否以第一个对象为原型合并]
+ * @param  {...[type]} values [合并属性的所有对象]
+ * @return {[type]}           [合并完成的对象]
+ */
+export default function extend(proto, ...values) {
     let target
     let i = 0
-    if (typeof isMerge === 'boolean' && isMerge) {
+    if (typeof proto === 'boolean' && proto) {
         target = values[0]
         i++
     } else {
-        values.splice(0, 0, isMerge)
+        values.splice(0, 0, proto)
         let dataType = toString.call(values[0]).toLowerCase()
         switch (dataType) {
             case '[object object]':

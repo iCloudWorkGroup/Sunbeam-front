@@ -61,7 +61,13 @@ export default {
      * @type {Object}
      */
     status: {
-        isDestroy: false,
+        // 是否已经被删除
+        // 单元格没有真正的删除、因为在Map关系表中
+        // 所记录的信息是单元格的索引值，
+        // 一旦真正删除单元格，会造成索引值的混乱，
+        // 所以所有的删除单元格行为都是设置destory属性为true
+        destroy: false,
+        // 是否被隐藏
         hidden: false
     }
 }

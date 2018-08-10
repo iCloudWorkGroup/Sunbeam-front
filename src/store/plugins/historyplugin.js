@@ -257,7 +257,7 @@ function isObject(obj) {
 
 let userAction = {
     [actionTypes.EDIT_HIDE]: true,
-    [actionTypes.CELLS_HANDLEMERGE]: true,
+    [actionTypes.CELLS_MERGE]: true,
     [actionTypes.CELLS_UPDATE_BORDER]: true,
     [actionTypes.CELLS_UPDATE]: true,
     [actionTypes.CELLS_PASTE]: true,

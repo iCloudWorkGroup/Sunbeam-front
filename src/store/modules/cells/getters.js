@@ -109,10 +109,32 @@ export default {
             endColIndex = startColIndex,
             endRowIndex = startRowIndex
         }) {
-            let startCol = startColIndex
-            let startRow = startRowIndex
-            let endCol = endColIndex
-            let endRow = endRowIndex
+
+            // 用于接受参数修正
+            let startCol
+            let startRow
+            let endCol
+            let endRow
+
+            // 修正查找位置信息
+            // 因为用户可以自下向上选择，所以开始值
+            // 不一定小于结束值
+            // 但是在查找位置信息的时候，需要按照从小到大
+            // 进行查找，所以需要修正传入坐标
+            if (endColIndex < startColIndex) {
+                startCol = endColIndex
+                endCol = startColIndex
+            } else {
+                startCol = startColIndex
+                endCol = endColIndex
+            }
+            if (endRowIndex < startRowIndex) {
+                startRow = endRowIndex
+                endRow = startRowIndex
+            } else {
+                startRow = startRowIndex
+                endRow = endRowIndex
+            }
             let cells = getters.getCellsByVertical({
                 startColIndex,
                 startRowIndex,
@@ -129,7 +151,6 @@ export default {
                 let localStartCol = getters.getColIndexByAlias(occupyCols[0])
                 let localEndCol = getters.getColIndexByAlias(occupyCols[
                     occupyCols.length - 1])
-
                 startCol = localStartCol < startCol ? localStartCol :
                     startCol
                 startRow = localStartRow < startRow ? localStartRow :

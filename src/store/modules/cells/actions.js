@@ -2,12 +2,11 @@ import {
     CELLS_INSERT,
     CELLS_UPDATE,
     CELLS_UPDATE_PROP,
-    CELLS_UPDATE_BORDER,
     COLS_OPERCOLS,
     ROWS_OPERROWS,
     OCCUPY_UPDATE,
-    CELLS_HANDLEMERGE,
     CELLS_MERGE,
+    CELLS_DESTORY,
     CELLS_SPLIT,
     CELLS_FORMAT,
     CELLS_PASTE,
@@ -40,14 +39,13 @@ import parseClipStr from '../../../tools/parseclipstr'
 
 export default {
     /**
-     * 插入单元格
+     * 插入单元格, 允许批量插入
      * 传入单元初始化属性和占位
      * 计算出单元格的盒模型，同时维护pointsinfo
      */
     [CELLS_INSERT]({
         commit,
         state,
-        rootState,
         getters
     }, props) {
         let cells = []
@@ -108,17 +106,11 @@ export default {
             commit(mutationTypes.INSERT_CELL, fixedCell)
 
             // 更新坐标关系表
-            for (let j = 0; j < occupyCols.length; j++) {
-                for (let k = 0; k < occupyRows.length; k++) {
-                    let colAlias = occupyCols[j]
-                    let rowAlias = occupyRows[k]
-                    commit(mutationTypes.UPDATE_POINTS, {
-                        colAlias,
-                        rowAlias,
-                        cellIdx: state.list.length - 1
-                    })
-                }
-            }
+            commit(mutationTypes.UPDATE_POINTS, {
+                occupyCols,
+                occupyRows,
+                cellIdx: state.list.length - 1
+            })
         })
     },
     async [CELLS_UPDATE]({
@@ -151,7 +143,8 @@ export default {
             endColIndex = cols.length - 1
         }
 
-        // 执行业务操作
+        // 如果有对应的单元格，修改属性
+        // 如果没有对应的单元格，插入单元格
         let avoidRepeat = {}
         for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
             for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
@@ -232,274 +225,6 @@ export default {
         dispatch(CELLS_INSERT, insertCellList)
         if (updateCellInfo.length > 0) {
             commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-        }
-    },
-    [CELLS_UPDATE_BORDER]({
-        commit,
-        dispatch,
-        getters
-    }, payload) {
-        let {
-            startColIndex,
-            endColIndex,
-            startRowIndex,
-            endRowIndex,
-            value
-        } = payload
-
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        let thick = false
-        if (value.indexOf('-thick') !== -1) {
-            thick = true
-            value = value.split('-')[0]
-        }
-
-        let operates = []
-
-        switch (value) {
-            case 'bottom':
-                setBottom()
-                break
-            case 'top':
-                setTop()
-                break
-            case 'left':
-                setLeft()
-                break
-            case 'right':
-                setRight()
-                break
-            case 'none':
-                setNone()
-                break
-            case 'all':
-                setAll()
-                break
-            case 'outer':
-                setOuter()
-                break
-        }
-
-
-        function setBottom() {
-            if (endRowIndex !== 'MAX') {
-                operates.push({
-                    startRowIndex: endRowIndex,
-                    startColIndex,
-                    endRowIndex,
-                    endColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                bottom: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-            }
-        }
-
-        function setTop() {
-            operates.push({
-                startRowIndex,
-                startColIndex,
-                endRowIndex: startRowIndex,
-                endColIndex,
-                props: {
-                    physicsBox: {
-                        border: {
-                            top: thick ? 2 : 1
-                        }
-                    }
-                }
-            })
-        }
-
-        function setLeft() {
-            operates.push({
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex: startColIndex,
-                props: {
-                    physicsBox: {
-                        border: {
-                            left: thick ? 2 : 1
-                        }
-                    }
-                }
-            })
-        }
-
-        function setRight() {
-            if (endColIndex !== 'MAX') {
-                operates.push({
-                    startRowIndex,
-                    startColIndex: endColIndex,
-                    endRowIndex,
-                    endColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                right: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-            }
-        }
-
-        function setNone() {
-            operates.push({
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                props: {
-                    physicsBox: {
-                        border: {
-                            right: 0,
-                            left: 0,
-                            top: 0,
-                            bottom: 0
-                        }
-                    }
-                }
-            })
-        }
-
-        function setAll() {
-            operates.push({
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex,
-                props: {
-                    physicsBox: {
-                        border: {
-                            right: 1,
-                            left: 1,
-                            top: 1,
-                            bottom: 1
-                        }
-                    }
-                }
-            })
-        }
-
-        function setOuter() {
-            if (endRowIndex !== 'MAX') {
-                operates.push({
-                    startRowIndex: endRowIndex,
-                    startColIndex,
-                    endRowIndex,
-                    endColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                bottom: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-                operates.push({
-                    startRowIndex,
-                    startColIndex,
-                    endRowIndex: startRowIndex,
-                    endColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                top: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-            }
-
-            if (endColIndex !== 'MAX') {
-                operates.push({
-                    startRowIndex,
-                    startColIndex: endColIndex,
-                    endRowIndex,
-                    endColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                right: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-                operates.push({
-                    startRowIndex,
-                    startColIndex,
-                    endRowIndex,
-                    endColIndex: startColIndex,
-                    props: {
-                        physicsBox: {
-                            border: {
-                                left: thick ? 2 : 1
-                            }
-                        }
-                    }
-                })
-            }
-        }
-        let url = config.url.border
-        let cols = getters.colList
-        let rows = getters.allRows
-        let data
-
-        data = {
-            coordinate: [{
-                startCol: cols[startColIndex].sort,
-                startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[
-                    endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[
-                    endRowIndex].sort
-            }],
-            direction: value
-        }
-        if (value !== 'none') {
-            data.line = thick ? 2 : 1
-        }
-        send({
-            url,
-            data: JSON.stringify(data),
-        })
-        success()
-
-        function success() {
-            if (endRowIndex === 'MAX') {
-                operates.forEach((item) => {
-                    dispatch(COLS_OPERCOLS, {
-                        startIndex: item.startColIndex,
-                        endIndex: item.endColIndex,
-                        props: item.props
-                    })
-                })
-            } else if (endColIndex === 'MAX') {
-                operates.forEach((item) => {
-                    dispatch(ROWS_OPERROWS, {
-                        startIndex: item.startRowIndex,
-                        endIndex: item.endRowIndex,
-                        props: item.props
-                    })
-                })
-            } else {
-                operates.forEach((item) => {
-                    dispatch(CELLS_UPDATE_PROP, item)
-                })
-            }
         }
     },
     [COLS_OPERCOLS]({
@@ -734,121 +459,47 @@ export default {
             return true
         }
     },
-    [CELLS_HANDLEMERGE]({
-        dispatch,
-        getters,
-        rootState
-    }, payload) {
-        let {
-            startColIndex,
-            startRowIndex,
-            endRowIndex,
-            endColIndex,
-            value
-        } = payload || {}
-
-        if (typeof startColIndex === 'undefined') {
-            let select = getters.activeSelect
-            let wholePosi = select.wholePosi
-
-            startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        }
-        endColIndex = endColIndex || startColIndex
-        endRowIndex = endRowIndex || startRowIndex
-        if (endRowIndex === 'MAX' || endColIndex === 'MAX') {
-            return
-        }
-
-        if (typeof value === 'undefined') {
-            value = !getters.hasMergeCell
-        }
-        let action = value ? 'merge' : 'split'
-        let url = config.url[action]
-        let cols = getters.colList
-        let rows = getters.allRows
-        let data
-
-        data = {
-            coordinate: [{
-                startCol: cols[startColIndex].sort,
-                startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[
-                    endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[
-                    endRowIndex].sort
-            }]
-        }
-        send({
-            url,
-            data: JSON.stringify(data)
-        })
-
-        if (value) {
-            dispatch(CELLS_MERGE, {
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex
-            })
-        } else {
-            dispatch(CELLS_SPLIT, {
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex
-            })
-        }
-    },
-    [CELLS_MERGE]({
+    async [CELLS_MERGE]({
         dispatch,
         getters
-    }, {
-        startColIndex,
-        endColIndex,
-        startRowIndex,
-        endRowIndex
     }) {
-        let cellList = getters.getCellsByTransverse({
+        let select = getters.allSelects[0]
+        await send({
+            url: config.url.merge,
+            body: JSON.stringify(select.signalSort)
+        })
+        let wholePosi = select.wholePosi
+        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+
+        let cells = getters.getCellsByTransverse({
             startColIndex,
             endColIndex,
             startRowIndex,
             endRowIndex
         })
-        let cell
-        for (let i = 0, len = cellList.length; i < len; i++) {
-            if (cellList[i].content.texts) {
-                cell = cellList[i]
-                break
-            }
-        }
-        if (!cell) {
-            cell = getters.getCellsByTransverse({
-                startColIndex,
-                startRowIndex
-            })[0]
-        }
-        cell = extend({}, cell || {})
 
-        let cols = getters.colList
-        let rows = getters.allRows
-        let rowAliasList = []
-        let colAliasList = []
-
+        // 左上角位置的单元格，作为合并单元格的模板原型，
+        // 如果没有单元格，以横向优先，竖向次之查找
+        // 如果所有都没有，就按照template属性合并
+        let templateCell = cells != null ?
+            extend(cells[0]) : extend(template)
+        let cols = []
         for (let i = startColIndex; i < endColIndex + 1; i++) {
-            colAliasList.push(cols[i].alias)
+            cols.push(getters.colList[i].alias)
         }
+        let rows = []
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            rowAliasList.push(rows[i].alias)
+            rows.push(getters.allRows[i].alias)
         }
-
-        cell.occupy = {
-            row: rowAliasList,
-            col: colAliasList
+        templateCell.occupy = {
+            row: rows,
+            col: cols
         }
-        dispatch(CELLS_INSERT, [cell])
+        dispatch(CELLS_DESTORY, cells)
+        dispatch(CELLS_INSERT, templateCell)
     },
     [CELLS_SPLIT]({
         rootState,
@@ -1394,5 +1045,24 @@ export default {
             }
             return oprRows
         }
+    },
+    /**
+     * 销毁单元格，允许批量销毁
+     */
+    [CELLS_DESTORY]({
+        getters,
+        commit
+    }, cells) {
+        cells.forEach((cell) => {
+            commit(mutationTypes.DESTORY_CELL, cell)
+            let occupyCols = cell.occupy.col
+            let occupyRows = cell.occupy.row
+            let cellIdx = getters.IdxByRow(occupyCols[0], occupyRows[0])
+            commit(mutationTypes.UPDATE_POINTS, {
+                occupyCols,
+                occupyRows,
+                cellIdx
+            })
+        })
     }
 }

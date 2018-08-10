@@ -83,7 +83,7 @@ export default {
     },
     mounted() {
         document.getElementsByTagName('body')[0]
-            .addEventListener('click',
+            .addEventListener('mouseup',
                 function(e) {
                     let el = e.target
                     let activeName = el.dataset.initiator

@@ -26,7 +26,12 @@ import {
 } from '../filters/unit'
 import scrollbar from '../util/scrollbar'
 export default {
-    props: ['start', 'over', 'needSider'],
+    props: [
+        'start',
+        'over',
+        'needSider',
+        'scrollLeft'
+    ],
     computed: {
         offsetLeft() {
             return this.$store.getters.offsetLeft(this.start, this.over)
@@ -62,8 +67,15 @@ export default {
         ColHeadLine
     },
     watch: {
-        scrollLeft(val) {
-            this.$el.scrollLeft = val
+        scrollLeft(value) {
+            if (value != null) {
+                this.$el.scrollLeft = value
+            }
+        }
+    },
+    mounted() {
+        if (this.scrollLeft != null) {
+            this.$el.scrollLeft = this.scrollLeft
         }
     }
 }

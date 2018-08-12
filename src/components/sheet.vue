@@ -17,7 +17,8 @@
                 <td>
                     <col-head :start="colLast.start"
                               :over="colLast.over"
-                              :need-sider="true"/>
+                              :need-sider="true"
+                              :scrollLeft="scrollLeft"/>
                 </td>
             </tr>
             <tr>
@@ -39,14 +40,16 @@
                           :row-over="rowFirst.over"
                           :col-start="colLast.start"
                           :col-over="colLast.over"
-                          :need-sider="true"/>
+                          :need-sider="true"
+                          :scrollLeft="scrollLeft"/>
                 </td>
             </tr>
             <tr>
                 <td>
                     <row-head :start="rowLast.start"
                               :over="rowLast.over"
-                              :need-sider="true"/>
+                              :need-sider="true"
+                              :scrollTop="scrollTop"/>
                 </td>
                 <td>
                     <edit class="frozen-right-border"
@@ -54,7 +57,8 @@
                           :row-over="rowLast.over"
                           :col-start="colFirst.start"
                           :col-over="colFirst.over"
-                          :need-sider="true"/>
+                          :need-sider="true"
+                          :scrollTop="scrollTop"/>
                 </td>
                 <td>
                     <edit class="scroll-box"
@@ -62,8 +66,7 @@
                           :row-over="rowLast.over"
                           :col-start="colLast.start"
                           :col-over="colLast.over"
-                          @changeScrollTop="changeScrollTop"
-                          @changeScrollLeft="changeScrollLeft"/>
+                          @scrollPanel="scrollPanel"/>
                 </td>
             </tr>
         </tbody>
@@ -80,16 +83,22 @@ import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import InputBox from './input-box.vue'
-
+import {
+    views
+} from '../store/mutation-types'
 export default {
     data() {
         return {
-            scrollbarWidth: scrollbar(),
-            scrollTop: 0,
-            scrollLeft: 0,
+            scrollbarWidth: scrollbar()
         }
     },
     computed: {
+        scrollLeft() {
+            return this.$store.state.views.share.scrollLeft
+        },
+        scrollTop() {
+            return this.$store.state.views.share.scrollTop
+        },
         rowFirst() {
             let rowRule = this.$store.state.sheets.list[0].frozen.row
             return rowRule.length > 0 ? rowRule[0] : {}
@@ -183,12 +192,15 @@ export default {
         InputBox
     },
     methods: {
-        changeScrollTop(val) {
-            this.scrollTop = val
+        scrollPanel({
+            scrollTop,
+            scrollLeft
+        }) {
+            this.$store.commit(views.UPDATE_SCROLL, {
+                scrollTop,
+                scrollLeft
+            })
 
-        },
-        changeScrollLeft(val) {
-            this.scrollLeft = val
         }
     },
 }

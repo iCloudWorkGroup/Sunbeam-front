@@ -25,7 +25,12 @@ import {
 } from '../filters/unit'
 import scrollbar from '../util/scrollbar'
 export default {
-    props: ['start', 'over', 'needSider'],
+    props: [
+        'start',
+        'over',
+        'needSider',
+        'scrollTop'
+    ],
     computed: {
         offsetTop() {
             return this.$store.getters.offsetTop(this.start, this.over)
@@ -62,11 +67,18 @@ export default {
         RowHeadLine
     },
     watch: {
-        scrollTop(val) {
-            this.$el.scrollTop = val
+        scrollTop(value) {
+            if (value != null) {
+                this.$el.scrollTop = value
+            }
         }
     },
-    methods: {}
+    mounted() {
+        if (this.scrollTop != null) {
+            this.$el.scrollTop = this.scrollTop
+            console.log(this.$el.scrollTop)
+        }
+    }
 }
 </script>
 <style>

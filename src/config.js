@@ -34,16 +34,17 @@ export default {
      */
     sheetSider: 30,
     /**
-     * 请求预加载区域宽度,单位px
+     * 预加载区域宽度, 单位px
      */
     prestrainWidth: 600,
     prestrainHeight: 300,
     /**
-     * 请求区域缓存宽度
-     * @type {Number}
+     * 请求区域宽度, 单位px
+     * 请求区域的数值应该大于等于缓存区域的
+     * 两倍，以减少请求次数，减少渲染次数
      */
-    scrollBufferWidth: 500,
-    scrollBufferHeight: 200,
+    scrollBufferWidth: 1200,
+    scrollBufferHeight: 600,
     /**
      * 工具栏宽度
      * @type {Number}

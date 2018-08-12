@@ -1,12 +1,13 @@
 import actions from './actions'
 import mutations from './mutations'
-import cols from './modules/cols/index'
-import rows from './modules/rows/index'
-import cells from './modules/cells/index'
-import selects from './modules/selects/index'
-import sheets from './modules/sheets/index'
-import input from './modules/input/index'
-import history from './modules/history/index'
+import cols from './modules/cols'
+import rows from './modules/rows'
+import cells from './modules/cells'
+import selects from './modules/selects'
+import sheets from './modules/sheets'
+import input from './modules/input'
+import history from './modules/history'
+import views from './modules/views'
 // import historyPlugin from './plugins/historyplugin'
 // import clipPlugin from './plugins/clipplugin'
 import Vue from 'vue'
@@ -31,7 +32,8 @@ export default new Vuex.Store({
         selects,
         sheets,
         input,
-        history
+        history,
+        views
     },
     // plugins: [historyPlugin, clipPlugin]
 })

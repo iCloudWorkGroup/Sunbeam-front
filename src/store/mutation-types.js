@@ -40,3 +40,7 @@ export const DELETE_ROW = 'DELETE_ROW'
 export const DELETE_SELECT = 'DELETE_SELECT'
 export const DESTORY_CELL = 'DESTORY_CELL'
 export const UPDATE_OCCUPY = 'UPDATE_OCCUPY'
+
+export const views = {
+    UPDATE_SCROLL: 'UPDATE_SCROLL'
+}

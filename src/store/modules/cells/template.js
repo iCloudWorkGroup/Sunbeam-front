@@ -68,6 +68,10 @@ export default {
         // 所以所有的删除单元格行为都是设置destory属性为true
         destroy: false,
         // 是否被隐藏
+        // 隐藏有两种情况，
+        // 1. 所在的行列被隐藏
+        // 2. 不在用户的可视范围和预加载方位内
+        // 只要属性为true，单元格就不显示
         hidden: false
     }
 }

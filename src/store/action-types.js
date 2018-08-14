@@ -38,6 +38,7 @@ export const CELLS_INSERT = 'CELLS_INSERT'
 export const CELLS_UPDATE_BORDER = 'CELLS_UPDATE_BORDER'
 export const CELLS_MERGE = 'CELLS_MERGE'
 export const CELLS_WORDWRAP = 'CELLS_WORDWRAP'
+
 /**
  * 单元格格式类型
  * @type {String}
@@ -63,6 +64,7 @@ export const SHEET_EXECUNFROZEN = 'SHEET_EXECUNFROZEN'
 export const SHEET_POINTFROZEN = 'SHEET_POINTFROZEN'
 export const SHEET_ROWFROZEN = 'SHEET_ROWFROZEN'
 export const SHEET_COLFROZEN = 'SHEET_COLFROZEN'
+export const SHEET_SCROLL = 'SHEET_SCROLL'
 
 export const EDIT_UPDATE = 'EDIT_UPDATE'
 export const EDIT_SHOW = 'EDIT_SHOW'
@@ -77,3 +79,5 @@ export const HISTORY_UNDO = 'HISTORY_UNDO'
 export const HISTORY_ADD = 'HISTORY_ADD'
 
 export const RESTORE = 'RESTORE'
+
+export const VIEWS_INIT = 'VIEWS_INIT'

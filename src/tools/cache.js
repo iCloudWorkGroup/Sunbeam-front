@@ -6,7 +6,7 @@
 export default {
     // 数据表格ID
     AUTHENTIC_KEY: '',
-    // 后台存储行列大小,最大行列数
+    // 后台存储行列大小, 最大行列数
     localRowPosi: 0,
     localColPosi: 0,
 

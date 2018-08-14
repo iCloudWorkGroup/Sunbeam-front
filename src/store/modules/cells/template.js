@@ -71,7 +71,9 @@ export default {
         // 隐藏有两种情况，
         // 1. 所在的行列被隐藏
         // 2. 不在用户的可视范围和预加载方位内
-        // 只要属性为true，单元格就不显示
-        hidden: false
+        // hidden, 表示行、列主动隐藏造成的单元格隐藏
+        hidden: false,
+        // view, 表示根据动态加载原则，造成的隐藏
+        view: true
     }
 }

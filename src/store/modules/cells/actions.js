@@ -160,8 +160,8 @@ export default {
                 } else {
                     dispatch(CELLS_INSERT, extend(template, propStruct, {
                         occupy: {
-                            col: colAlias,
-                            row: rowAlias
+                            col: [colAlias],
+                            row: [rowAlias]
                         }
                     }))
                 }

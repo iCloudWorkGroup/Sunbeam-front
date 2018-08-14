@@ -20,13 +20,9 @@ export default {
      */
     visibleColList(state, getters) {
         return function() {
-            let result = []
-            state.list.forEach(function(col) {
-                if (!col.hidden) {
-                    result.push(col)
-                }
+            return state.list.filter(function(col) {
+                return !col.hidden && col.view
             })
-            return result
         }
     },
     /**

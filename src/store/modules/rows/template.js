@@ -5,17 +5,21 @@ import cfg from '../../../config'
  */
 export default {
     sort: 0,
-    alias: '',
+    alias: null,
     top: 0,
     height: cfg.rowHeight,
-    displayName: '',
+    displayName: null,
+    // 是否被选中
     active: false,
     /**
      * 下方为隐藏列（用于效果显示）
      * @type {Boolean}
      */
-    bottomAjacentHide: false,
+    ajacentHide: false,
+    // 用户主动隐藏
     hidden: false,
+    // 根据动态加载原则，设置否是隐藏
+    view: true,
     /**
      * 正行操作属性
      * @type {Object}

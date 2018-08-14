@@ -5,17 +5,25 @@
             <span class="section"
                   data-initiator="familys"
                   @click="ejectMenu($event, 'familys')">
-                    <span class="fui-transverse-model fui-cf-fontfamily">{{ activeProps.family }}</span>
-                <span class="fui-transverse-model fui-cf-fontfamily-extend active">
-                            <span class="caret"></span>
+                    <span
+                    class="fui-transverse-model fui-cf-fontfamily">
+                {{ activeProps.family }}
+                    </span>
+                <span
+                class="fui-transverse-model fui-cf-fontfamily-extend active">
+                    <span class="caret"></span>
                 </span>
             </span>
             <span class="section"
                   data-initiator="sizes"
                   @click="ejectMenu($event, 'sizes')">
-                    <span class="fui-transverse-model fui-cf-fontsize">{{ activeProps.size }}</span>
-            <span class="fui-transverse-model fui-cf-fontsize-extend active">
-                        <span class="caret"></span>
+                    <span
+                        class="fui-transverse-model fui-cf-fontsize">
+                        {{ activeProps.size }}
+                    </span>
+            <span
+                class="fui-transverse-model fui-cf-fontsize-extend active">
+                <span class="caret"></span>
             </span>
             </span>
         </div>

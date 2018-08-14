@@ -35,16 +35,19 @@ export default {
     sheetSider: 30,
     /**
      * 预加载区域宽度, 单位px
+     * 这个数值应该设置成能被20整除的
+     * 这样利于表格自动扩展
+     * 在自动增加行处，作用很大
      */
-    prestrainWidth: 600,
-    prestrainHeight: 300,
+    prestrainWidth: 1200,
+    prestrainHeight: 600,
     /**
-     * 请求区域宽度, 单位px
-     * 请求区域的数值应该大于等于缓存区域的
-     * 两倍，以减少请求次数，减少渲染次数
+     * 请求区域宽、高度, 单位px
+     * 请求区域的数值应该大于等于预加载区两倍，
+     * 以减少请求次数，减少渲染次数
      */
-    scrollBufferWidth: 1200,
-    scrollBufferHeight: 600,
+    scrollBufferWidth: 600,
+    scrollBufferHeight: 300,
     /**
      * 工具栏宽度
      * @type {Number}
@@ -78,13 +81,14 @@ export default {
         'hidecol': 'col/hide',
         'showrow': 'row/show',
         'showcol': 'col/show',
-        'addrowcol': 'sheet/expand',
+        'createLine': 'sheet/expand',
         'format': 'cell/format',
         'undo': 'sheet/undo',
         'redo': 'sheet/redo',
         'outerpaste': 'sheet/paste',
         'cut': 'sheet/cut',
-        'copy': 'sheet/copy'
+        'copy': 'sheet/copy',
+        'area': 'sheet/area'
     },
     operSendPropName: {
         'alignRow': 'align',

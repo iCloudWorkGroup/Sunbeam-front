@@ -4,7 +4,8 @@ import {
     ROWS_ADD,
     COLS_ADD,
     CELLS_INSERT,
-    SELECTS_INSERT
+    SELECTS_INSERT,
+    VIEWS_INIT
 } from './action-types'
 import cache from '../tools/cache'
 import send from '../util/send'
@@ -24,7 +25,7 @@ export default {
         return send({
             url: 'reload',
             body: JSON.stringify(area),
-        }).then((data) => {
+        }, false).then((data) => {
             let bookItem
             if (data == null || (bookItem = data.sheets[0]) == null) {
                 throw new Error(
@@ -55,19 +56,14 @@ export default {
             cells.forEach(function(cell) {
                 cell.alias = generator.cellAliasGenerator()
             })
-            let colRecord = cache.colRecord
-            let rowRecord = cache.rowRecord
-            colRecord.push(cols[0].alias, cols[cols.length - 1]
-                .alias)
-            rowRecord.push(rows[0].alias, rows[rows.length - 1]
-                .alias)
-
-            cache.regionRecord.set(
-                colRecord[0] + '_' +
-                colRecord[1] + '_' +
-                rowRecord[0] + '_' +
-                rowRecord[1], true)
-
+            dispatch(VIEWS_INIT, {
+                rows,
+                cols,
+                maxColAlias: bookItem.maxColAlias,
+                maxColPixel: bookItem.maxColPixel,
+                maxRowAlias: bookItem.maxRowAlias,
+                maxRowPixel: bookItem.maxRowPixel
+            })
             dispatch(ROWS_ADD, rows)
             dispatch(COLS_ADD, cols)
             dispatch(CELLS_INSERT, cells)
@@ -82,7 +78,6 @@ export default {
                 colAlias: visibleCols[0].alias,
                 rowAlias: visibleRows[0].alias
             })
-            // dispatch(actionTypes.SHEET_RESTOREFROZEN, frozen)
         })
     }
 }

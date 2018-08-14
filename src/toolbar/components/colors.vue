@@ -10,7 +10,7 @@
                             :title="color.name">
                             <div class="color-body"
                                  :data-value="'rgb(' + color.code + ')'"
-                                 :data-struct="'content.color'"
+                                 data-struct="content.color"
                                  :style="'background-color: rgb(' + color.code +');'">
                             </div>
                         </span>

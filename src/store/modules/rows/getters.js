@@ -24,15 +24,9 @@ export default {
     },
     visibleRowList(state, getters) {
         return function() {
-            let list = getters.allRows
-            let result = []
-
-            list.forEach(function(row) {
-                if (!row.hidden) {
-                    result.push(row)
-                }
+            return state.list.filter(function(row) {
+                return !row.hidden && row.view
             })
-            return result
         }
     },
     rowsByRange(state, getters) {

@@ -76,7 +76,6 @@ export default {
     mounted() {
         if (this.scrollTop != null) {
             this.$el.scrollTop = this.scrollTop
-            console.log(this.$el.scrollTop)
         }
     }
 }

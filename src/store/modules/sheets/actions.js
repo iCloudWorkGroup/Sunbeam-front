@@ -65,7 +65,6 @@ export default {
             }]
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
-
     },
     [actionTypes.SHEET_FROZEN]({
         state,
@@ -451,5 +450,89 @@ export default {
                 }
             }
         }
+    },
+    [actionTypes.SHEET_SCROLL]({
+        state,
+        rootGetters
+    }, {
+        limit
+    }) {
+        // 先判断滚动的距离是否需要触发加载行为
+        // 不需要就什么都不做
+        // 需要的话，
+        // 1. 当前记录点，所在的索引是否是最后一个，
+        //  1. 如果是，就把最后一个对象的高端 + preHeight，作为请求的上下范围
+        //  2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
+        //  置成show模式
+        let viewAlias = rootGetters.viewAlias
+        let viewOverRow = rootGetters.getRowByAlias(viewAlias.overRow)
+        let viewOverRowDistance = viewOverRow != null ?
+            viewOverRow.top + viewOverRow.height : 0
+        if (limit >= viewOverRowDistance) {
+            let loaded = rootGetters.loaded
+            let viewOverRowIdx = rootGetters.getRowIndexByAlias(viewAlias.overRow)
+
+            // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
+            let needRequire = loaded.map.get(viewAlias.overCol) != null &&
+                loaded.map.get(viewAlias.overCol)[viewAlias.overRow] &&
+                loaded.row.length - viewOverRowIdx > 1 ? false : true
+            if (needRequire) {
+                let sheetMax = rootGetters.view_max
+
+                // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
+                viewOverRowDistance + 1 === sheetMax.rowPixel ?
+                    expand() : require()
+            } else {
+                // 让已加载渔区再显示
+            }
+        }
+        /**
+         * 增加行
+         * @return {[type]} [description]
+         */
+        function expand() {
+            let num = config.prestrainHeight / (config.rowHeight + 1)
+            send({
+                url: config.url.createLine,
+                body: JSON.stringify({
+                    type: 'row',
+                    num
+                })
+            }).then(() => {
+                console.log('over')
+            })
+        }
+        /**
+         * 请求数据从已经存在的数据表中
+         * @return {[type]} [description]
+         */
+        function require() {
+            let top = viewOverRowDistance + 1
+            let bottom = viewOverRowDistance + config.prestrainHeight
+            let left = rootGetters.getColByAlias(viewAlias.startCol).left
+            let viewOverCol = rootGetters.getColByAlias(viewAlias.overCol)
+            let right = viewOverCol.left + viewOverCol.width
+            send({
+                url: config.url.area,
+                body: JSON.stringify({
+                    top,
+                    bottom,
+                    left,
+                    right
+                })
+            }, false).then(function() {
+                console.log('request over')
+            })
+        }
+
+        // this.scrollToBottom({
+        //     limitTop,
+        //     limitBottom
+        // }).then(function() {
+        // this.$store.commit(mutationTypes.UPDATE_USERVIEW, {
+        //     top: this.recordScrollTop + this.offsetTop,
+        //     bottom: limitBottom
+        // })
+        // })
     }
 }

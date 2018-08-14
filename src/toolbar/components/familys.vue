@@ -1,12 +1,14 @@
 <template>
-<div class="widget"
-     @mousedown.stop="">
+<div class="widget">
     <div class="widget-panel"
          style="max-height:200px;">
-        <ul class="font-list" style="min-width:160px">
+        <ul class="font-list"
+            style="min-width:160px"
+            @click="setFamily">
             <li v-for="(family, idx) in familys"
                 :key="idx"
-                :data-value="family.en">
+                :data-value="family.en"
+                data-struct="content.family">
                 <span :style="{ fontFamily: family.en}">{{ family.cn }}</span>
             </li>
         </ul>
@@ -14,6 +16,12 @@
 </div>
 </template>
 <script>
+import {
+    CELLS_UPDATE,
+} from '../../store/action-types'
+import {
+    pathToStruct
+} from '../../tools/format'
 export default {
     data() {
         return {
@@ -36,6 +44,24 @@ export default {
                 en: 'KaiTi',
                 cn: '楷体'
             }]
+        }
+    },
+    methods: {
+        setFamily(e) {
+            let el = e.target
+            if (el.tagName !== 'LI') {
+                return
+            }
+            let structName = el.dataset.struct
+            let value = el.dataset.value
+            let propStruct = pathToStruct({
+                structName,
+                value
+            })
+            this.$store.dispatch(CELLS_UPDATE, {
+                propName: 'family',
+                propStruct
+            })
         }
     }
 }

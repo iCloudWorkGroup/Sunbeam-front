@@ -3,10 +3,11 @@
     <div class="widget-panel"
          style="max-height:200px;">
         <ul class="font-list"
-            @click="">
+            @click="setSize">
             <li v-for="(size, idx) in sizes"
                 :key="idx"
-                :data-value="size">
+                :data-value="size"
+                data-struct="content.size">
                 <span :style="{ fontSize: size + 'pt' }">
                     {{ size }}
                 </span>
@@ -16,6 +17,12 @@
 </div>
 </template>
 <script>
+import {
+    CELLS_UPDATE,
+} from '../../store/action-types'
+import {
+    pathToStruct
+} from '../../tools/format'
 export default {
     data() {
         return {
@@ -24,10 +31,20 @@ export default {
     },
     methods: {
         setSize(e) {
-            let el = e.target()
-            if (el.dataset.value == null) {
+            let el = e.target
+            if (el.tagName !== 'LI') {
                 return
             }
+            let structName = el.dataset.struct
+            let value = el.dataset.value
+            let propStruct = pathToStruct({
+                structName,
+                value
+            })
+            this.$store.dispatch(CELLS_UPDATE, {
+                propName: 'family',
+                propStruct
+            })
         }
     }
 }

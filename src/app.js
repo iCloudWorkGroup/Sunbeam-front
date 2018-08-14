@@ -8,6 +8,7 @@ import cache from './tools/cache'
 import {
     RESTORE
 } from './store/action-types'
+import config from './config'
 export default function(options) {
     // 用户参数合法性验证
     cache.AUTHENTIC_KEY = document.getElementById('auth_key').value
@@ -30,8 +31,8 @@ export default function(options) {
     store.dispatch(RESTORE, {
         left: 0,
         top: 0,
-        right: $rootEl.offsetWidth,
-        bottom: $rootEl.offsetHeight
+        right: $rootEl.offsetWidth + config.prestrainWidth,
+        bottom: $rootEl.offsetHeight + config.prestrainHeight
     }).then(() => {
         new Vue({
             store,

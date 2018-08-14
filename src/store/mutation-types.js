@@ -41,6 +41,7 @@ export const DELETE_SELECT = 'DELETE_SELECT'
 export const DESTORY_CELL = 'DESTORY_CELL'
 export const UPDATE_OCCUPY = 'UPDATE_OCCUPY'
 
-export const views = {
-    UPDATE_SCROLL: 'UPDATE_SCROLL'
-}
+export const UPDATE_VIEW_SCROLL = 'UPDATE_VIEW_SCROLL'
+export const UPDATE_VIEW_ALIAS = 'UPDATE_VIEW_ALIAS'
+export const ADD_VIEW_LOADED = 'ADD_VIEW_LOADED'
+export const UPDATE_VIEW_MAX = 'UPDATE_VIEW_MAX'

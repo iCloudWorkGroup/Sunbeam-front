@@ -6,7 +6,9 @@
         :row-start="rowStart"
         :row-over="rowOver"
         :col-start="colStart"
-        :col-over="colOver"/>
+        :col-over="colOver"
+        :offsetTop="offsetTop"
+        :offsetLeft="offsetLeft"/>
 </div>
 </template>
 <script type="text/javascript">
@@ -27,8 +29,6 @@ import {
 } from '../filters/unit'
 import scrollbar from '../util/scrollbar'
 
-let timeoutId = -1
-let toward = null
 export default {
     props: [
         'rowStart',
@@ -40,14 +40,14 @@ export default {
         'scrollLeft'
     ],
     data() {
-        let offsetLeft = this.frozenRule ? this.frozenRule.offsetLeft : 0
-        let offsetTop = this.frozenRule ? this.frozenRule.offsetTop : 0
         return {
             recordScrollTop: 0,
             recordScrollLeft: 0,
             currentPromise: null,
-            offsetLeft,
-            offsetTop
+            timeoutId: -1,
+            toward: null,
+            offsetLeft: this.$store.getters.offsetLeft(this.colStart, this.colOver),
+            offsetTop: this.$store.getters.offsetTop(this.rowStart, this.rowOver)
         }
     },
     mounted() {
@@ -103,130 +103,64 @@ export default {
     },
     methods: {
         tabSurface() {
-            // let frozenRule = this.frozenRule
-            // let self = this
             let scrollLeft = this.$el.scrollLeft
             let scrollTop = this.$el.scrollTop
-            this.$emit('scrollPanel', {
-                scrollTop,
-                scrollLeft
-            })
-            if (timeoutId !== -1) {
-                clearTimeout(timeoutId)
+            if (this._events['scrollPanel'] != null) {
+                this.$emit('scrollPanel', {
+                    scrollTop,
+                    scrollLeft
+                })
             }
-            timeoutId = setTimeout(function() {
+            if (this.timeoutId !== -1) {
+                clearTimeout(this.timeoutId)
+            }
+            this.timeoutId = setTimeout(function() {
                 this.handleScroll({
                     scrollLeft,
                     scrollTop,
-                    toward
+                    toward: this.toward
                 })
             }.bind(this), 50)
         },
         handleScroll({
-            currentScrollLeft,
-            currentScrollTop,
-            adjustCol = false,
-            adjustRow = false
+            scrollLeft,
+            scrollTop,
+            toward
         }) {
-            let currentPromise = this.currentPromise
-            let frozenRule = this.frozenRule
-            let endColIndex
-            let endRowIndex
-            let self = this
+            if (toward === 'DOWN' || toward === 'UP') {
+                let limitTop = scrollTop - config.scrollBufferHeight
 
-            if (frozenRule) {
-                endColIndex = frozenRule.endColIndex
-                endRowIndex = frozenRule.endRowIndex
+                // limitTop 小于等于0，就是最顶端
+                limitTop = limitTop > 0 ? limitTop : 0
+                limitTop += this.offsetTop
+                let limitBottom = limitTop + this.$el.clientHeight +
+                    config.scrollBufferHeight + this.offsetTop
+                this.$store.dispatch(actionTypes.SHEET_SCROLL, {
+                    limit: limitBottom
+                })
             }
-
-            currentPromise = currentPromise || Promise.resolve()
-
-            this.currentPromise = currentPromise.then(function() {
-                let transverse = currentScrollLeft - self.recordScrollLeft
-                let vertical = currentScrollTop - self.recordScrollTop
-                let limitTop
-                let limitBottom
-                let limitLeft
-                let limitRight
-                let p1
-                let p2
-
-                self.recordScrollTop = currentScrollTop
-                self.recordScrollLeft = currentScrollLeft
-
-                if ((vertical !== 0 && typeof endRowIndex === 'undefined') || adjustRow) {
-                    limitTop = self.recordScrollTop - config.prestrainHeight
-                    limitTop = limitTop > 0 ? limitTop : 0
-                    limitTop += self.offsetTop
-                    limitBottom = limitTop + self.$el.clientHeight
-                        + config.prestrainHeight
-                        + self.offsetTop
-
-                    if (vertical > 0 || adjustRow) {
-                        p1 = new Promise(function(resolve) {
-                            self.scrollToBottom(limitTop, limitBottom, resolve)
-                        })
-                    } else {
-                        p1 = new Promise(function(resolve) {
-                            self.scrollToTop(limitTop, limitBottom, resolve)
-                        })
-                    }
-                    p1.then(function() {
-                        self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-                            top: self.recordScrollTop + self.offsetTop,
-                            bottom: limitBottom
-                        })
-                    })
-                }
-
-                if ((transverse !== 0 && typeof endColIndex === 'undefined') || adjustCol) {
-                    limitLeft = self.recordScrollLeft - config.prestrainWidth
-                    limitLeft = limitLeft > 0 ? limitLeft : 0
-                    limitLeft += self.offsetLeft
-                    limitRight = limitLeft + self.$el.clientWidth
-                        + config.prestrainWidth
-                        + self.offsetLeft
-
-                    if (transverse > 0 || adjustCol) {
-                        p2 = new Promise(function(resolve) {
-                            self.scrollToRight(limitLeft, limitRight, resolve)
-                        })
-                    } else {
-                        p2 = new Promise(function(resolve) {
-                            self.scrollToLeft(limitLeft, limitRight, resolve)
-                        })
-                    }
-                    p2.then(function() {
-                        self.$store.commit(mutationTypes.UPDATE_USERVIEW, {
-                            left: self.recordScrollLeft + self.offsetLeft,
-                            right: limitRight
-                        })
-                    })
-                }
-                if (!p1) {
-                    p1 = new Promise((resolve) => {
-                        resolve()
-                    })
-                }
-                if (!p2) {
-                    p2 = new Promise((resolve) => {
-                        resolve()
-                    })
-                }
-                return Promise.all([p1, p2])
-            })
         },
-        scrollToBottom(top, bottom, resolve) {
-            let rowList = this.$store.getters.rowList
+        scrollToBottom(top, bottom) {
+
+            // 算出当前视图的上下限制区域
+            let rowList = this.$store.getters.allRows
+
+            // 后台存储最大行数
             let localMaxBottom = cache.localRowPosi
-            let bufferHeight = config.scrollBufferWidth
+            // 一次请求区域高度
+            let bufferHeight = config.scrollBufferHeight
+            // 已数据加载标记值
             let rowRecord = cache.rowRecord
+            let regionRecord = cache.regionRecord
+
             let rowOccupy = this.rowOccupy.slice(0)
             let colOccupy = this.colOccupy.slice(0)
-            let regionRecord = cache.regionRecord
             let occupyEndRowAlias = rowOccupy[rowOccupy.length - 1]
+
             let occupyEndRow = this.$store.getters.getRowByAlias(occupyEndRowAlias)
+
             let occupyBottom = occupyEndRow.top + occupyEndRow.height
+
             let frozenRule = this.frozenRule
             let addRowNum = 0
             let self = this
@@ -250,7 +184,6 @@ export default {
                 addRow()
                 removeOccupyRow()
                 this.updateOccupy(colOccupy, rowOccupy)
-                resolve()
                 return
             }
 
@@ -264,7 +197,6 @@ export default {
                 addRow()
                 removeOccupyRow()
                 self.updateOccupy(colOccupy, rowOccupy)
-                resolve()
             })
             /**
              * 当前视图边界值超过了已加载对象最大值
@@ -952,27 +884,27 @@ export default {
             })
         },
         scrollLeft(now, before) {
-            if (value != null) {
-                this.$el.scrollLeft = value
+            if (now != null) {
+                this.$el.scrollLeft = now
                 if (before !== now) {
                     if (before > now) {
-                        toward = 'LEFT'
+                        this.toward = 'LEFT'
                     }
                     if (before < now) {
-                        toward = 'RIGHT'
+                        this.toward = 'RIGHT'
                     }
                 }
             }
         },
         scrollTop(now, before) {
-            if (value != null) {
-                this.$el.scrollTop = value
+            if (now != null) {
+                this.$el.scrollTop = now
                 if (before !== now) {
                     if (before > now) {
-                        toward = 'UP'
+                        this.toward = 'UP'
                     }
                     if (before < now) {
-                        toward = 'DOWN'
+                        this.toward = 'DOWN'
                     }
                 }
             }

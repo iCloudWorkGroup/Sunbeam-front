@@ -50,7 +50,9 @@ export default {
         'rowStart',
         'rowOver',
         'colStart',
-        'colOver'
+        'colOver',
+        'offsetLeft',
+        'offsetTop'
     ],
     components: {
         ColGridGroup,
@@ -59,12 +61,6 @@ export default {
         SelectGroup
     },
     computed: {
-        offsetLeft() {
-            return this.$store.getters.offsetLeft(this.colStart, this.colOver)
-        },
-        offsetTop() {
-            return this.$store.getters.offsetTop(this.rowStart, this.rowOver)
-        },
         width() {
             let colMap = this.$store.state.cols.map
             let startCol = colMap.get(this.colStart)

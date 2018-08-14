@@ -8,6 +8,11 @@ export default {
     cells(state) {
         return state.list
     },
+    viewCells(state) {
+        return state.list.filter((cell) => {
+            return cell.view && !cell.hidden ? true : false
+        })
+    },
     /**
      * 根据行、列别名去查找单元格
      * 一般用于查抄选择区域的activeCell

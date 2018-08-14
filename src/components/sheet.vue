@@ -11,11 +11,13 @@
                 </td>
                 <td>
                     <col-head class="frozen-right-border"
+                              v-if="frozenMode === 'COL' || frozenMode === 'CUSTOM'"
                               :start="colFirst.start"
                               :over="colFirst.over"/>
                 </td>
                 <td>
                     <col-head :start="colLast.start"
+                              v-if="colLast.start != null"
                               :over="colLast.over"
                               :need-sider="true"
                               :scrollLeft="scrollLeft"/>
@@ -24,11 +26,13 @@
             <tr>
                 <td>
                     <row-head class="frozen-bottom-border"
+                              v-if="frozenMode === 'ROW' || frozenMode === 'CUSTOM'"
                               :start="rowFirst.start"
                               :over="rowFirst.over"/>
                 </td>
                 <td>
                     <edit class="frozen-right-border frozen-bottom-border"
+                          v-if="frozenMode === 'CUSTOM'"
                           :row-start="rowFirst.start"
                           :row-over="rowFirst.over"
                           :col-start="colFirst.start"
@@ -36,6 +40,7 @@
                 </td>
                 <td>
                     <edit class="frozen-bottom-border"
+                          v-if="frozenMode === 'ROW' || frozenMode === 'CUSTOM'"
                           :row-start="rowFirst.start"
                           :row-over="rowFirst.over"
                           :col-start="colLast.start"
@@ -53,6 +58,7 @@
                 </td>
                 <td>
                     <edit class="frozen-right-border"
+                          v-if="frozenMode === 'COL' || frozenMode === 'CUSTOM'"
                           :row-start="rowLast.start"
                           :row-over="rowLast.over"
                           :col-start="colFirst.start"
@@ -66,6 +72,8 @@
                           :row-over="rowLast.over"
                           :col-start="colLast.start"
                           :col-over="colLast.over"
+                          :scrollTop="scrollTop"
+                          :scrollLeft="scrollLeft"
                           @scrollPanel="scrollPanel"/>
                 </td>
             </tr>
@@ -77,112 +85,78 @@
 </div>
 </template>
 <script type="text/javascript">
-import config from '../config'
 import scrollbar from '../util/scrollbar'
 import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import InputBox from './input-box.vue'
 import {
-    views
+    UPDATE_VIEW_SCROLL
 } from '../store/mutation-types'
 export default {
     data() {
         return {
-            scrollbarWidth: scrollbar()
+            scrollbarWidth: scrollbar(),
+            localState: this.$store.state
         }
     },
     computed: {
+        localSheet() {
+            return this.localState.sheets.list[0]
+        },
+        frozenMode() {
+            let colLen = this.localSheet.frozen.col.length
+            let rowLen = this.localSheet.frozen.row.length
+            if (colLen !== 0 && rowLen !== 0) {
+                return 'CUSTOM'
+            }
+            if (colLen !== 0) {
+                return 'COL'
+            }
+            if (rowLen !== 0) {
+                return 'ROW'
+            }
+            return 'NO'
+        },
         scrollLeft() {
-            return this.$store.state.views.share.scrollLeft
+            return this.localState.views.share.scrollLeft
         },
         scrollTop() {
-            return this.$store.state.views.share.scrollTop
+            return this.localState.views.share.scrollTop
         },
         rowFirst() {
-            let rowRule = this.$store.state.sheets.list[0].frozen.row
+            let rowRule = this.localSheet.frozen.row
             return rowRule.length > 0 ? rowRule[0] : {}
         },
         rowLast() {
-            let rowRule = this.$store.state.sheets.list[0].frozen.row
-            let len = rowRule.length
-            return len > 0 ? rowRule[len - 1] : {}
+            if (this.frozenMode === 'NO') {
+                let visibleRows = this.$store.getters.visibleRowList()
+                return {
+                    start: visibleRows[0].alias,
+                    over: visibleRows[visibleRows.length - 1].alias
+                }
+            } else {
+                let rowRule = this.localSheet.frozen.row
+                let len = rowRule.length
+                return len > 0 ? rowRule[len - 1] : {}
+            }
         },
         colFirst() {
-            let colRule = this.$store.state.sheets.list[0].frozen.col
+            let colRule = this.localSheet.frozen.col
             return colRule.length > 0 ? colRule[0] : {}
         },
         colLast() {
-            let colRule = this.$store.state.sheets.list[0].frozen.col
-            let len = colRule.length
-            return len > 0 ? colRule[len - 1] : {}
-        },
-        colHeadWidth() {
-            let frozenState = this.$store.getters.frozenState
-            let offsetLeft = 0
-            let userViewLeft = 0
-
-            if (frozenState.colFrozen) {
-                frozenState.rules.forEach(function(item) {
-                    if (item.type === 'topRule') {
-                        offsetLeft = item.offsetLeft
-                        userViewLeft = item.userViewLeft
-                    }
-                })
+            if (this.frozenMode === 'NO') {
+                let visibleCols = this.$store.getters.visibleColList()
+                return {
+                    start: visibleCols[0].alias,
+                    over: visibleCols[visibleCols.length - 1].alias
+                }
+            } else {
+                let colRule = this.localSheet.frozen.col
+                let len = colRule.length
+                return len > 0 ? colRule[len - 1] : {}
             }
-
-            return this.sheetWidth - config.cornerWidth -
-                this.scrollbarWidth - offsetLeft +
-                userViewLeft
-        },
-        rowHeadHeight() {
-            let frozenState = this.$store.getters.frozenState
-            let offsetTop = 0
-            let userViewTop = 0
-
-            if (frozenState.rowFrozen) {
-                frozenState.rules.forEach(function(item) {
-                    if (item.type === 'leftRule') {
-                        offsetTop = item.offsetTop
-                        userViewTop = item.userViewTop
-                    }
-                })
-            }
-            return this.sheetHeight - config.cornerHeight -
-                this.scrollbarWidth - offsetTop +
-                userViewTop
-        },
-        editWidth() {
-            let frozenState = this.$store.getters.frozenState
-            let offsetLeft = 0
-            let userViewLeft = 0
-
-            if (frozenState.colFrozen) {
-                frozenState.rules.forEach(function(item) {
-                    if (item.type === 'mainRule') {
-                        offsetLeft = item.offsetLeft
-                        userViewLeft = item.userViewLeft
-                    }
-                })
-            }
-            return this.sheetWidth - config.cornerWidth - offsetLeft +
-                userViewLeft
-        },
-        editHeight() {
-            let frozenState = this.$store.getters.frozenState
-            let offsetTop = 0
-            let userViewTop = 0
-
-            if (frozenState.rowFrozen) {
-                frozenState.rules.forEach(function(item) {
-                    if (item.type === 'mainRule') {
-                        offsetTop = item.offsetTop
-                        userViewTop = item.userViewTop
-                    }
-                })
-            }
-            return this.sheetHeight - config.cornerHeight - offsetTop +
-                userViewTop
         }
     },
     components: {
@@ -196,13 +170,13 @@ export default {
             scrollTop,
             scrollLeft
         }) {
-            this.$store.commit(views.UPDATE_SCROLL, {
+            this.$store.commit(UPDATE_VIEW_SCROLL, {
                 scrollTop,
                 scrollLeft
             })
 
         }
-    },
+    }
 }
 </script>
 <style type="text/css">

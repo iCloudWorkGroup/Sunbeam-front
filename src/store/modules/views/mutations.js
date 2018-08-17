@@ -26,12 +26,15 @@ export default {
         overRow,
         overCol
     }) {
-        state.share.viewAlias = {
-            startRow,
-            startCol,
-            overRow,
-            overCol
-        }
+        let viewAlias = state.share.viewAlias
+        state.share.viewAlias.startRow = startRow != null ?
+            startRow : viewAlias.startRow
+        state.share.viewAlias.startCol = startCol != null ?
+            startCol : viewAlias.startCol
+        state.share.viewAlias.overRow = overRow != null ?
+            overRow : viewAlias.overRow
+        state.share.viewAlias.overCol = overCol != null ?
+            overCol : viewAlias.overCol
     },
     [ADD_VIEW_LOADED](state, {
         colAlias,
@@ -50,11 +53,10 @@ export default {
         rowPixel,
         colPixed
     }) {
-        state.max = {
-            rowAlias,
-            colAlias,
-            rowPixel,
-            colPixed
-        }
+        let max = state.max
+        state.max.rowAlias = rowAlias != null ? rowAlias : max.rowAlias
+        state.max.colAlias = colAlias != null ? colAlias : max.colAlias
+        state.max.rowPixel = rowPixel != null ? rowPixel : max.rowPixel
+        state.max.colPixed = colPixed != null ? colPixed : max.colPixed
     }
 }

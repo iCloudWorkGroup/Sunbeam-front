@@ -7,7 +7,6 @@ import selects from './modules/selects'
 import sheets from './modules/sheets'
 import input from './modules/input'
 import history from './modules/history'
-import views from './modules/views'
 // import historyPlugin from './plugins/historyplugin'
 // import clipPlugin from './plugins/clipplugin'
 import Vue from 'vue'
@@ -32,8 +31,7 @@ export default new Vuex.Store({
         selects,
         sheets,
         input,
-        history,
-        views
+        history
     },
     // plugins: [historyPlugin, clipPlugin]
 })

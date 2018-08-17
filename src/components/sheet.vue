@@ -90,9 +90,6 @@ import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import InputBox from './input-box.vue'
-import {
-    UPDATE_VIEW_SCROLL
-} from '../store/mutation-types'
 export default {
     data() {
         return {
@@ -119,10 +116,10 @@ export default {
             return 'NO'
         },
         scrollLeft() {
-            return this.localState.views.share.scrollLeft
+            return this.localState.sheets.scroll.left
         },
         scrollTop() {
-            return this.localState.views.share.scrollTop
+            return this.localState.sheets.scroll.top
         },
         rowFirst() {
             let rowRule = this.localSheet.frozen.row
@@ -170,7 +167,7 @@ export default {
             scrollTop,
             scrollLeft
         }) {
-            this.$store.commit(UPDATE_VIEW_SCROLL, {
+            this.$store.commit('UPDATE_SHEETS_SCROLL', {
                 scrollTop,
                 scrollLeft
             })

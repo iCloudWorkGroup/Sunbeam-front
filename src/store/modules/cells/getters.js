@@ -334,30 +334,32 @@ export default {
         }
     },
     hasMergeCell(state, getters) {
-        let wholePosi = getters.allSelects[0].wholePosi
-        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        return function() {
+            let wholePosi = getters.allSelects[0].wholePosi
+            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+            let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
 
-        if (startColIndex === endColIndex &&
-            startRowIndex === endRowIndex) {
+            if (startColIndex === endColIndex &&
+                startRowIndex === endRowIndex) {
+                return false
+            }
+            let cells = getters.getCellsByVertical({
+                startColIndex,
+                startRowIndex,
+                endColIndex,
+                endRowIndex
+            })
+            for (let i = 0, len = cells.length; i < len; i++) {
+                let cell = cells[i]
+                if (cell.occupy.row.length > 1 ||
+                    cell.occupy.col.length > 1) {
+                    return true
+                }
+            }
             return false
         }
-        let cells = getters.getCellsByVertical({
-            startColIndex,
-            startRowIndex,
-            endColIndex,
-            endRowIndex
-        })
-        for (let i = 0, len = cells.length; i < len; i++) {
-            let cell = cells[i]
-            if (cell.occupy.row.length > 1 ||
-                cell.occupy.col.length > 1) {
-                return true
-            }
-        }
-        return false
     },
     /**
      * 根据行列别名查找单元格的索引，

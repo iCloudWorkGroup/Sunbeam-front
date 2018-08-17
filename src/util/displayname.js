@@ -7,9 +7,6 @@ export function getColDisplayName(indexArgs) {
     let remainder
     let divisible
     let index = indexArgs
-    if (index === 'MAX') {
-        return 'MAX'
-    }
     remainder = index % colName.length
     divisible = Math.floor(index / colName.length)
     displayText = colName[remainder] + displayText

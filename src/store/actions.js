@@ -4,16 +4,11 @@ import {
     ROWS_ADD,
     COLS_ADD,
     CELLS_INSERT,
-    SELECTS_INSERT,
-    VIEWS_INIT
+    SELECTS_INSERT
 } from './action-types'
 import cache from '../tools/cache'
 import send from '../util/send'
 import generator from '../tools/generator'
-import {
-    getColDisplayName,
-    getRowDisplayName
-} from '../util/displayname'
 
 export default {
     [RESTORE]({
@@ -28,8 +23,7 @@ export default {
         }, false).then((data) => {
             let bookItem
             if (data == null || (bookItem = data.sheets[0]) == null) {
-                throw new Error(
-                    'backend data failed from server')
+                throw new Error('backend data failed from server')
             }
 
             let rows = bookItem.gridLineRow
@@ -39,30 +33,22 @@ export default {
             cache.localRowPosi = bookItem.maxRowPixel
             cache.localColPosi = bookItem.maxColPixel
 
+            // 存储行、列别名的最大值，为后面再增加行、列生成列名做准备
             generator.rowAliasGenerator(parseInt(bookItem.maxRowAlias,
                 0))
             generator.colAliasGenerator(parseInt(bookItem.maxColAlias,
                 0))
             generator.cellAliasGenerator(0)
 
-            rows.forEach(function(row) {
-                row.displayName = getRowDisplayName(row
-                    .sort)
+            commit('ADD_SHEETS_LOADED', {
+                colAlias: cols[cols.length - 1].alias,
+                rowAlias: rows[rows.length - 1].alias
             })
-            cols.forEach(function(col) {
-                col.displayName = getColDisplayName(col
-                    .sort)
-            })
-            cells.forEach(function(cell) {
-                cell.alias = generator.cellAliasGenerator()
-            })
-            dispatch(VIEWS_INIT, {
-                rows,
-                cols,
-                maxColAlias: bookItem.maxColAlias,
-                maxColPixel: bookItem.maxColPixel,
-                maxRowAlias: bookItem.maxRowAlias,
-                maxRowPixel: bookItem.maxRowPixel
+            commit('UPDATE_SHEETS_MAX', {
+                colAlias: bookItem.maxColAlias,
+                colPixel: bookItem.maxColPixel,
+                rowAlias: bookItem.maxRowAlias,
+                rowPixel: bookItem.maxRowPixel
             })
             dispatch(ROWS_ADD, rows)
             dispatch(COLS_ADD, cols)

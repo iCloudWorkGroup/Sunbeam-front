@@ -25,7 +25,12 @@ export default {
     }, cols) {
         let ret = []
         for (let i = 0, len = cols.length; i < len; i++) {
-            ret.push(extend(template, cols[i]))
+            let col = cols[i]
+            col.displayName = getColDisplayName(col.sort)
+            if (col.alias == null) {
+                col.alias = generator.colAliasGenerator()
+            }
+            ret.push(extend(template, col))
         }
         commit(mutationTypes.ADD_COL, {
             cols: ret

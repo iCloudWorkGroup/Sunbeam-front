@@ -105,7 +105,5 @@ export default {
      * 请求地址根路径
      * @type {String}
      */
-    // rootPath: 'http://localhost:8080/'
-    // rootPath: 'http://localhost:8087/'
-    rootPath: 'http://excel-inc.acmr.com.cn/'
+    rootPath: 'http://192.168.3.84:8080/sunbeam/'
 }

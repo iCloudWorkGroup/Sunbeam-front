@@ -20,7 +20,7 @@ import {
 export default {
     computed: {
         hasMerge() {
-            return this.$store.getters.hasMergeCell
+            return this.$store.getters.hasMergeCell()
         }
     },
     methods: {

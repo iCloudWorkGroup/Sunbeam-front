@@ -451,11 +451,14 @@ export default {
             }
         }
     },
-    [actionTypes.SHEET_SCROLL]({
+    SHEET_SCROLL({
         state,
+        dispatch,
+        commit,
         rootGetters
     }, {
-        limit
+        limit,
+        viewLoaded
     }) {
         // 先判断滚动的距离是否需要触发加载行为
         // 不需要就什么都不做
@@ -464,26 +467,30 @@ export default {
         //  1. 如果是，就把最后一个对象的高端 + preHeight，作为请求的上下范围
         //  2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
         //  置成show模式
-        let viewAlias = rootGetters.viewAlias
-        let viewOverRow = rootGetters.getRowByAlias(viewAlias.overRow)
-        let viewOverRowDistance = viewOverRow != null ?
-            viewOverRow.top + viewOverRow.height : 0
-        if (limit >= viewOverRowDistance) {
-            let loaded = rootGetters.loaded
-            let viewOverRowIdx = rootGetters.getRowIndexByAlias(viewAlias.overRow)
+        let lastRowAlias = viewLoaded.rows[viewLoaded.rows.length - 1]
+        let lastColAlias = viewLoaded.cols[viewLoaded.cols.length - 1]
+        let overRow = rootGetters.getRowByAlias(lastRowAlias)
+        let overRowDistance = overRow != null ?
+            overRow.top + overRow.height : 0
+        if (limit >= overRowDistance) {
+            let allLoaded = rootGetters['SHEET_LOADED']
+            let overRowIdx = rootGetters.getRowIndexByAlias(lastRowAlias)
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
-            let needRequire = loaded.map.get(viewAlias.overCol) != null &&
-                loaded.map.get(viewAlias.overCol)[viewAlias.overRow] &&
-                loaded.row.length - viewOverRowIdx > 1 ? false : true
+            let needRequire = allLoaded.map.get(lastColAlias) != null &&
+                allLoaded.map.get(lastColAlias)[lastRowAlias] &&
+                allLoaded.rows.length - overRowIdx > 1 ? false : true
             if (needRequire) {
-                let sheetMax = rootGetters.view_max
+                let max = rootGetters['SHEET_MAX']
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
-                viewOverRowDistance + 1 === sheetMax.rowPixel ?
+                // 如果显示的结束行距离大于表格的最大行数，
+                // 就需要改为增加行请求，不然就是请求行
+                overRowDistance += 1
+                return overRowDistance >= max.rowPixel ?
                     expand() : require()
             } else {
-                // 让已加载渔区再显示
+                // 让已加载区域再显示
             }
         }
         /**
@@ -507,24 +514,33 @@ export default {
          * @return {[type]} [description]
          */
         function require() {
-            let top = viewOverRowDistance + 1
-            let bottom = viewOverRowDistance + config.prestrainHeight
-            let left = rootGetters.getColByAlias(viewAlias.startCol).left
-            let viewOverCol = rootGetters.getColByAlias(viewAlias.overCol)
-            let right = viewOverCol.left + viewOverCol.width
-            send({
+            let overCol = rootGetters.getColByAlias(lastColAlias)
+            return send({
                 url: config.url.area,
                 body: JSON.stringify({
-                    top,
-                    bottom,
-                    left,
-                    right
+                    top: overRowDistance + 1,
+                    bottom: overRowDistance + config.prestrainHeight,
+                    left: overCol.left,
+                    right: overCol.left + overCol.width
                 })
-            }, false).then(function() {
-                console.log('request over')
+            }, false).then(function(data) {
+                let rows = data.gridLineRow
+                dispatch(actionTypes.ROWS_ADD, rows)
+                let lastBackRow = rows[rows.length - 1]
+                commit('ADD_SHEETS_LOADED', {
+                    rowAlias: lastBackRow.alias,
+                    colAlias: overCol.alias,
+                    colSupply: false
+                })
+                let cells = data.cells
+                if (cells.length !== 0) {
+                    dispatch(actionTypes.CELLS_INSERT, cells)
+                }
+                viewLoaded.rows.push(lastBackRow.alias)
+                let mapItem = viewLoaded.map.get(overCol.alias)
+                mapItem[lastBackRow.alias] = true
             })
         }
-
         // this.scrollToBottom({
         //     limitTop,
         //     limitBottom

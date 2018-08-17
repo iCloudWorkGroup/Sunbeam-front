@@ -38,5 +38,11 @@ export default {
                 return sheet.editViewOccupy[viewTypes[type]]
             }
         }
+    },
+    SHEET_LOADED(state) {
+        return state.loaded
+    },
+    SHEET_MAX(state) {
+        return state.max
     }
 }

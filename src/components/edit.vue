@@ -41,9 +41,14 @@ export default {
     ],
     data() {
         return {
-            recordScrollTop: 0,
-            recordScrollLeft: 0,
-            currentPromise: null,
+            // 当前可视区域所占用的加载区域
+            viewLoaded: {
+                rows: [this.rowOver],
+                cols: [this.colOver],
+                map: new Map().set(this.colOver, {
+                    [this.rowOver]: true
+                })
+            },
             timeoutId: -1,
             toward: null,
             offsetLeft: this.$store.getters.offsetLeft(this.colStart, this.colOver),
@@ -135,9 +140,14 @@ export default {
                 limitTop += this.offsetTop
                 let limitBottom = limitTop + this.$el.clientHeight +
                     config.scrollBufferHeight + this.offsetTop
-                this.$store.dispatch(actionTypes.SHEET_SCROLL, {
-                    limit: limitBottom
-                })
+                this.$store.dispatch('SHEET_SCROLL', {
+                    limit: limitBottom,
+                    viewLoaded: this.viewLoaded
+                }).then(function(fixedViewLoad) {
+                    if (fixedViewLoad != null) {
+                        this.viewLoaded = fixedViewLoad
+                    }
+                }.bind(this))
             }
         },
         scrollToBottom(top, bottom) {

@@ -25,7 +25,12 @@ export default {
     }, rows) {
         let ret = []
         for (let i = 0, len = rows.length; i < len; i++) {
-            ret.push(extend(template, rows[i]))
+            let row = rows[i]
+            row.displayName = getRowDisplayName(row.sort)
+            if (row.alias == null) {
+                row.alias = generator.rowAliasGenerator()
+            }
+            ret.push(extend(template, row))
         }
         commit(mutationTypes.ADD_ROW, {
             rows: ret

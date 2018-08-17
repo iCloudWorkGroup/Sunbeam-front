@@ -259,7 +259,6 @@ export default {
             })
         })
         commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-        console.log(cellList[0])
         let insertCellInfo = []
         let editViewOccupy = getters.getEditViewOccupy()
         let cols = getters.colList

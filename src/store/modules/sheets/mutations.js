@@ -36,5 +36,49 @@ export default {
         if (payload.row) {
             row.splice(0, row.length, ...payload.row)
         }
+    },
+    // 更新scrollTop, left的共享值
+    UPDATE_SHEETS_SCROLL(state, {
+        scrollTop,
+        scrollLeft
+    }) {
+        let scroll = state.scroll
+        if (scrollLeft != null &&
+            scrollLeft !== scroll.left) {
+            scroll.left = scrollLeft
+        }
+        if (scrollTop != null &&
+            scrollTop !== scroll.top) {
+            scroll.top = scrollTop
+        }
+    },
+    ADD_SHEETS_LOADED(state, {
+        colAlias,
+        colSupply = true,
+        rowAlias,
+        rowSupply = true
+    }) {
+        let loaded = state.loaded
+        if (colSupply) {
+            loaded.cols.push(colAlias)
+        }
+        if (rowSupply) {
+            loaded.rows.push(rowAlias)
+        }
+        loaded.map.set(colAlias, {
+            [rowAlias]: true
+        })
+    },
+    UPDATE_SHEETS_MAX(state, {
+        rowAlias,
+        colAlias,
+        rowPixel,
+        colPixel
+    }) {
+        let max = state.max
+        max.rowAlias = rowAlias != null ? rowAlias : max.rowAlias
+        max.colAlias = colAlias != null ? colAlias : max.colAlias
+        max.rowPixel = rowPixel != null ? rowPixel : max.rowPixel
+        max.colPixel = colPixel != null ? colPixel : max.colPixel
     }
 }

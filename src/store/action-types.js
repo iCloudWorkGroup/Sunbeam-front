@@ -80,4 +80,6 @@ export const HISTORY_ADD = 'HISTORY_ADD'
 
 export const RESTORE = 'RESTORE'
 
-export const VIEWS_INIT = 'VIEWS_INIT'
+export const VIEWS_LOADED = 'VIEWS_LOADED'
+export const VIEW_MAX = 'VIEW_MAX'
+export const VIEW_ALIAS = 'VIEW_ALIAS'

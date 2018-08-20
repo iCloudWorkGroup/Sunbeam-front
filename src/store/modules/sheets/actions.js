@@ -451,29 +451,74 @@ export default {
             }
         }
     },
+    /**
+     * [SHEET_SCROLL 滚动视图]
+     * @param {[number]} options.limit       [当前方向的触发值]
+     * @param {[object]} options.viewLoaded  [当前视图的Map]
+     */
     SHEET_SCROLL({
         state,
         dispatch,
         commit,
         rootGetters
     }, {
-        limit,
+        limitMin,
+        limitMax,
         viewLoaded
     }) {
-        // 先判断滚动的距离是否需要触发加载行为
-        // 不需要就什么都不做
-        // 需要的话，
-        // 1. 当前记录点，所在的索引是否是最后一个，
-        //  1. 如果是，就把最后一个对象的高端 + preHeight，作为请求的上下范围
-        //  2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
-        //  置成show模式
-        let lastRowAlias = viewLoaded.rows[viewLoaded.rows.length - 1]
-        let lastColAlias = viewLoaded.cols[viewLoaded.cols.length - 1]
+        let rowLen = viewLoaded.rows.length
+        let colLen = viewLoaded.cols.length
+        let lastRowAlias = viewLoaded.rows[rowLen - 1]
+        let lastColAlias = viewLoaded.cols[colLen - 1]
+
         let overRow = rootGetters.getRowByAlias(lastRowAlias)
         let overRowDistance = overRow != null ?
             overRow.top + overRow.height : 0
-        if (limit >= overRowDistance) {
-            let allLoaded = rootGetters['SHEET_LOADED']
+        let allLoaded = rootGetters['loaded']
+
+        // 如果loaded区域已经占用多多余一个记录点
+        // 就需要判断是否回收冗余DOM
+        // 在一个方向上，最多占用两个记录点
+        if (rowLen > 2) {
+            let firstRowAlias = viewLoaded.rows[0]
+            let startRow = rootGetters.getRowByAlias(firstRowAlias)
+
+            // 判断是否触发
+            if (limitMin > startRow.top) {
+                // 从map中查找记录点，删除记录点
+                // 记录最大的列值，
+                // 划定范围
+                let startRowIndex = rootGetters.getRowIndexByAlias(
+                    firstRowAlias)
+                let endRowIndex = rootGetters.getRowIndexByAlias(viewLoaded.rows[
+                    1])
+                let startColIndex = rootGetters.getRowIndexByAlias(viewLoaded.cols[
+                    0])
+                let endColIndex = rootGetters.getRowIndexByAlias(lastColAlias)
+                commit('M_ROWS_UPDATE_VIEW', {
+                    isView: false,
+                    startIdx: startRowIndex,
+                    overIdx: endRowIndex
+                })
+                let cells = rootGetters.getCellsByVertical({
+                    startColIndex,
+                    startRowIndex,
+                    endColIndex,
+                    endRowIndex
+                })
+                commit('M_CELLS_UPDATE_VIEW', cells)
+            }
+        }
+
+
+        // 判断滚动的距离是否需要触发加载行为
+        // 1. 不需要就什么都不做
+        // 2. 需要的话，
+        //  2.1. 当前记录点，所在的索引是否是最后一个，
+        //   2.1.1. 如果是，就把最后一个对象的高端 + preHeight，作为请求的上下范围
+        //   2.1.2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
+        //          置成show模式
+        if (limitMax > overRowDistance) {
             let overRowIdx = rootGetters.getRowIndexByAlias(lastRowAlias)
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
@@ -527,7 +572,7 @@ export default {
                 let rows = data.gridLineRow
                 dispatch(actionTypes.ROWS_ADD, rows)
                 let lastBackRow = rows[rows.length - 1]
-                commit('ADD_SHEETS_LOADED', {
+                commit('M_SHEETS_ADD_LOADED', {
                     rowAlias: lastBackRow.alias,
                     colAlias: overCol.alias,
                     colSupply: false
@@ -536,6 +581,8 @@ export default {
                 if (cells.length !== 0) {
                     dispatch(actionTypes.CELLS_INSERT, cells)
                 }
+
+                // 修正可视区域的loaded信息
                 viewLoaded.rows.push(lastBackRow.alias)
                 let mapItem = viewLoaded.map.get(overCol.alias)
                 mapItem[lastBackRow.alias] = true

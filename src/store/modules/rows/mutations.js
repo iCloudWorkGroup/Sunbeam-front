@@ -57,9 +57,9 @@ export default {
             clearDefaultValue(rowOprProp, cellTemplate)
 
             function clearDefaultValue(object, template) {
+                let hasOwnProp = Object.prototype.hasOwnProperty
                 for (let name in object) {
-                    if (Object.prototype.hasOwnProperty.call(object,
-                        name)) {
+                    if (hasOwnProp.call(object, name)) {
                         let currentProp = object[name]
                         let defaultValue = template[name]
                         if (typeof currentProp === 'object') {
@@ -96,5 +96,14 @@ export default {
     }) {
         let list = state[currentSheet].list
         list.splice(index, 1)
+    },
+    M_ROWS_UPDATE_VIEW(state, {
+        isView,
+        startIdx,
+        overIdx
+    }) {
+        for (let i = startIdx; i < overIdx; i++) {
+            state.list[i].view = isView
+        }
     }
 }

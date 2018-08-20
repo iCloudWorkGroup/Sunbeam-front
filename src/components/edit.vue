@@ -141,7 +141,8 @@ export default {
                 let limitBottom = limitTop + this.$el.clientHeight +
                     config.scrollBufferHeight + this.offsetTop
                 this.$store.dispatch('SHEET_SCROLL', {
-                    limit: limitBottom,
+                    limitMin: limitTop,
+                    limitMax: limitBottom,
                     viewLoaded: this.viewLoaded
                 }).then(function(fixedViewLoad) {
                     if (fixedViewLoad != null) {

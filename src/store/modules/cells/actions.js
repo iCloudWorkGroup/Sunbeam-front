@@ -127,7 +127,7 @@ export default {
             body: JSON.stringify(select.signalSort)
         })
 
-        // 修正参数参数
+        // 修正参数
         let wholePosi = select.wholePosi
         let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)

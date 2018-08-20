@@ -40,7 +40,7 @@ export default {
                 0))
             generator.cellAliasGenerator(0)
 
-            commit('ADD_SHEETS_LOADED', {
+            commit('M_SHEETS_ADD_LOADED', {
                 colAlias: cols[cols.length - 1].alias,
                 rowAlias: rows[rows.length - 1].alias
             })

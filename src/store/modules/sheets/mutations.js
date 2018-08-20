@@ -52,7 +52,15 @@ export default {
             scroll.top = scrollTop
         }
     },
-    ADD_SHEETS_LOADED(state, {
+    /**
+     * [M_SHEETS_ADD_LOADED description]
+     * @param {[type]}  state             [description]
+     * @param {[type]}  options.colAlias  [description]
+     * @param {Boolean} options.colSupply [是否添加到数组中，避免数组重复]
+     * @param {[type]}  options.rowAlias  [description]
+     * @param {Boolean} options.rowSupply [description]
+     */
+    M_SHEETS_ADD_LOADED(state, {
         colAlias,
         colSupply = true,
         rowAlias,

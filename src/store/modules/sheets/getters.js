@@ -39,8 +39,20 @@ export default {
             }
         }
     },
-    SHEET_LOADED(state) {
+    loaded(state) {
         return state.loaded
+    },
+    loadedIdxByAlias(state) {
+        return function(alias) {
+            let loads = state.loaded
+            for (let i = 0, len = loads.length; i < len; i++) {
+                let item = loads[i]
+                if (alias === item) {
+                    return i
+                }
+            }
+            return -1
+        }
     },
     SHEET_MAX(state) {
         return state.max

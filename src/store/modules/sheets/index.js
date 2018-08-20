@@ -16,8 +16,8 @@ const state = {
     // 已经被加过的所有点坐标
     // 用于动态加载数据
     loaded: {
-        cols: [],
-        rows: [],
+        cols: ['0'],
+        rows: ['0'],
         map: new Map()
     },
     // 当前sheet滚动的距离

@@ -138,7 +138,7 @@ export default function(store) {
                 })
                 actionItem.mutations.push(mutationInfo)
             }
-            if (mutationType === mutationTypes.INSERT_CELL) {
+            if (mutationType === mutationTypes.M_INSERT_CELL) {
                 let mutationInfo = {
                     type: mutationType,
                     updateCells: []
@@ -204,7 +204,7 @@ export default function(store) {
                 })
                 actionItem.mutations.push(mutationInfo)
             }
-            if (mutationType === mutationTypes.UPDATE_POINTS) {
+            if (mutationType === mutationTypes.M_UPDATE_POINTS) {
                 let { colAlias, rowAlias, type } = payload.info
                 let originalValue = store.getters.getPointInfo(colAlias, rowAlias, type)
                 let reversePayload = extend(payload)
@@ -257,7 +257,7 @@ function isObject(obj) {
 
 let userAction = {
     [actionTypes.EDIT_HIDE]: true,
-    [actionTypes.M_CELLS_MERGE]: true,
+    [actionTypes.A_CELLS_MERGE]: true,
     [actionTypes.CELLS_UPDATE_BORDER]: true,
     [actionTypes.CELLS_UPDATE]: true,
     [actionTypes.CELLS_PASTE]: true,
@@ -277,8 +277,8 @@ let userAction = {
 }
 let recordAction = {
     [actionTypes.CELLS_UPDATE_PROP]: true,
-    [actionTypes.M_CELLS_MERGE]: true,
-    [actionTypes.CELLS_SPLIT]: true,
+    [actionTypes.A_CELLS_MERGE]: true,
+    [actionTypes.A_CELLS_SPLIT]: true,
     [actionTypes.ROWS_OPERROWS]: true,
     [actionTypes.COLS_OPERCOLS]: true,
     [actionTypes.ROWS_EXECADJUSTHEIGHT]: true,
@@ -301,36 +301,36 @@ let recordAction = {
 let recordMutations = {
     [actionTypes.CELLS_UPDATE_PROP]: {
         [mutationTypes.UPDATE_CELL]: true,
-        [mutationTypes.INSERT_CELL]: true,
+        [mutationTypes.M_INSERT_CELL]: true,
     },
     [actionTypes.ROWS_OPERROWS]: {
         [mutationTypes.UPDATE_CELL]: true,
         [mutationTypes.UPDATE_ROW]: true,
-        [mutationTypes.INSERT_CELL]: true,
+        [mutationTypes.M_INSERT_CELL]: true,
     },
     [actionTypes.COLS_OPERCOLS]: {
         [mutationTypes.UPDATE_CELL]: true,
-        [mutationTypes.INSERT_CELL]: true,
+        [mutationTypes.M_INSERT_CELL]: true,
         [mutationTypes.UPDATE_COL]: true
     },
-    [actionTypes.M_CELLS_MERGE]: {
-        [mutationTypes.UPDATE_POINTS]: true
+    [actionTypes.A_CELLS_MERGE]: {
+        [mutationTypes.M_UPDATE_POINTS]: true
     },
-    [actionTypes.CELLS_SPLIT]: {
-        [mutationTypes.UPDATE_POINTS]: true
+    [actionTypes.A_CELLS_SPLIT]: {
+        [mutationTypes.M_UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_INNERPASTE]: {
-        [mutationTypes.UPDATE_POINTS]: true
+        [mutationTypes.M_UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_OUTERPASTE]: {
-        [mutationTypes.UPDATE_POINTS]: true
+        [mutationTypes.M_UPDATE_POINTS]: true
     },
     [actionTypes.COLS_EXECDELETECOL]: {
-        [mutationTypes.UPDATE_POINTS]: true,
+        [mutationTypes.M_UPDATE_POINTS]: true,
         [mutationTypes.UPDATE_CELL]: true
     },
     [actionTypes.ROWS_EXECDELETEROW]: {
-        [mutationTypes.UPDATE_POINTS]: true,
+        [mutationTypes.M_UPDATE_POINTS]: true,
         [mutationTypes.UPDATE_CELL]: true
     }
 }

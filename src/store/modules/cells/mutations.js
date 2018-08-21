@@ -1,13 +1,13 @@
 import {
-    INSERT_CELL,
+    M_INSERT_CELL,
     UPDATE_CELL,
-    UPDATE_POINTS,
-    DESTORY_CELL
+    M_UPDATE_POINTS,
+    M_DESTORY_CELL
 } from '../../mutation-types'
 import extend from '../../../util/extend'
 
 export default {
-    [INSERT_CELL](state, cell) {
+    [M_INSERT_CELL](state, cell) {
         state.list.push(cell)
     },
     [UPDATE_CELL](state, {
@@ -20,7 +20,7 @@ export default {
     /**
      * 更新单元格对应关系表
      */
-    [UPDATE_POINTS](state, {
+    [M_UPDATE_POINTS](state, {
         occupyCols,
         occupyRows,
         cellIdx
@@ -56,7 +56,7 @@ export default {
     /**
      * 根据索引销毁单元格
      */
-    [DESTORY_CELL](state, cell) {
+    [M_DESTORY_CELL](state, cell) {
         cell.status.destory = true
     }
 }

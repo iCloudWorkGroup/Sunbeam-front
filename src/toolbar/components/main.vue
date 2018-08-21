@@ -42,9 +42,9 @@
                 <tool-panel title="隐藏">
                     <hide/>
                 </tool-panel>  -->
-    <!--                 <tool-panel  title="行列">
-                    <rowcol/>
-                </tool-panel> -->
+                 <panel  title="行列">
+                    <!--<rowcol/>-->
+                </panel>
             </ul>
         </div>
     </div>
@@ -57,7 +57,7 @@ import Font from './font.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
 // import Format from './format.vue'
-// import Rowcol from './rowcol.vue'
+import Rowcol from './rowcol.vue'
 // import Hide from './hide.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
@@ -74,7 +74,7 @@ export default {
         // Frozen,
         Align,
         Merge,
-        // Rowcol,
+        Rowcol,
         // Hide,
         // Undo,
         // Clip,

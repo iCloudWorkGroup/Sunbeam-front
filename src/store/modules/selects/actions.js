@@ -38,8 +38,8 @@ export default {
             endColIndex,
             endRowIndex
         } = getters.getFullOprRegion({
-            startColIndex: getters.getColIndexByAlias(colAlias),
-            startRowIndex: getters.getRowIndexByAlias(rowAlias)
+            startColIndex: getters.colIndexByAlias(colAlias),
+            startRowIndex: getters.rowIndexByAlias(rowAlias)
         })
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,
@@ -103,10 +103,10 @@ export default {
             endColIndex,
             endRowIndex
         } = getters.getFullOprRegion({
-            startColIndex: getters.getColIndexByAlias(activeColAlias),
-            startRowIndex: getters.getRowIndexByAlias(activeRowAlias),
-            endColIndex: getters.getColIndexByAlias(endColAlias),
-            endRowIndex: getters.getRowIndexByAlias(endRowAlias)
+            startColIndex: getters.colIndexByAlias(activeColAlias),
+            startRowIndex: getters.rowIndexByAlias(activeRowAlias),
+            endColIndex: getters.colIndexByAlias(endColAlias),
+            endRowIndex: getters.rowIndexByAlias(endRowAlias)
         })
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,

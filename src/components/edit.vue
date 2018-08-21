@@ -689,7 +689,7 @@ export default {
                         let firstCol = colData[0]
 
                         if (firstCol.hidden) {
-                            let index = this.$store.getters.getColIndexByAlias(firstCol.alias)
+                            let index = this.$store.getters.colIndexByAlias(firstCol.alias)
                             if (index > 0) {
                                 let cols = this.$store.getters.colList
                                 this.$store.commit(mutationTypes.UPDATE_COL, {

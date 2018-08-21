@@ -1,13 +1,13 @@
 import {
-    CELLS_INSERT,
+    A_CELLS_ADD,
     CELLS_UPDATE,
     CELLS_UPDATE_PROP,
     COLS_OPERCOLS,
     ROWS_OPERROWS,
     OCCUPY_UPDATE,
-    M_CELLS_MERGE,
-    CELLS_DESTORY,
-    CELLS_SPLIT,
+    A_CELLS_MERGE,
+    A_CELLS_DESTORY,
+    A_CELLS_SPLIT,
     CELLS_FORMAT,
     CELLS_PASTE,
     CELLS_INNERPASTE,
@@ -43,7 +43,7 @@ export default {
      * 传入单元初始化属性和占位
      * 计算出单元格的盒模型，同时维护pointsinfo
      */
-    [CELLS_INSERT]({
+    [A_CELLS_ADD]({
         commit,
         state,
         getters
@@ -64,11 +64,11 @@ export default {
 
             // 单元格在行列中占的索引位置
             // 从哪行、列开始，结束
-            let startColIndex = getters.getColIndexByAlias(occupyCols[0])
-            let endColIndex = getters.getColIndexByAlias(occupyCols[
+            let startColIndex = getters.colIndexByAlias(occupyCols[0])
+            let endColIndex = getters.colIndexByAlias(occupyCols[
                 occupyCols.length - 1])
-            let startRowIndex = getters.getRowIndexByAlias(occupyRows[0])
-            let endRowIndex = getters.getRowIndexByAlias(occupyRows[
+            let startRowIndex = getters.rowIndexByAlias(occupyRows[0])
+            let endRowIndex = getters.rowIndexByAlias(occupyRows[
                 occupyRows.length - 1])
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
@@ -101,9 +101,9 @@ export default {
             if (fixedCell.alias == null) {
                 fixedCell.alias = generator.cellAliasGenerator()
             }
-            commit(mutationTypes.INSERT_CELL, fixedCell)
+            commit(mutationTypes.M_INSERT_CELL, fixedCell)
             // 更新坐标关系表
-            commit(mutationTypes.UPDATE_POINTS, {
+            commit(mutationTypes.M_UPDATE_POINTS, {
                 occupyCols,
                 occupyRows,
                 cellIdx: state.list.length - 1
@@ -111,6 +111,7 @@ export default {
         })
     },
     async [CELLS_UPDATE]({
+        state,
         commit,
         dispatch,
         getters
@@ -126,10 +127,10 @@ export default {
 
         // 修正参数
         let wholePosi = select.wholePosi
-        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
         let rows = getters.allRows
         let cols = getters.allCols
@@ -148,14 +149,16 @@ export default {
                 let colAlias = cols[i].alias
                 let rowAlias = rows[j].alias
                 let idx = getters.IdxByRow(colAlias, rowAlias)
-                if (idx !== -1 && !avoidRepeat[idx]) {
-                    avoidRepeat[idx] = true
-                    commit(mutationTypes.UPDATE_CELL, {
-                        idx,
-                        prop: propStruct
-                    })
+                if (idx !== -1) {
+                    if (!avoidRepeat[idx]) {
+                        avoidRepeat[idx] = true
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx,
+                            prop: propStruct
+                        })
+                    }
                 } else {
-                    dispatch(CELLS_INSERT, extend(template, propStruct, {
+                    dispatch(A_CELLS_ADD, extend(template, propStruct, {
                         occupy: {
                             col: [colAlias],
                             row: [rowAlias]
@@ -219,7 +222,7 @@ export default {
             }
         }
 
-        dispatch(CELLS_INSERT, insertCellList)
+        dispatch(A_CELLS_ADD, insertCellList)
         if (updateCellInfo.length > 0) {
             commit(mutationTypes.UPDATE_CELL, updateCellInfo)
         }
@@ -237,7 +240,7 @@ export default {
         fn
     }) {
         let updateCellInfo = []
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startRowIndex: 0,
             endRowIndex: 'MAX',
             startColIndex: startIndex,
@@ -269,8 +272,8 @@ export default {
                 if (viewOccupyRow.length === 0) {
                     continue
                 }
-                startRowIndex = getters.getRowIndexByAlias(viewOccupyRow[0])
-                endRowIndex = getters.getRowIndexByAlias(viewOccupyRow[
+                startRowIndex = getters.rowIndexByAlias(viewOccupyRow[0])
+                endRowIndex = getters.rowIndexByAlias(viewOccupyRow[
                     viewOccupyRow.length - 1])
 
                 for (let i = startRowIndex; i < endRowIndex + 1; i++) {
@@ -291,7 +294,7 @@ export default {
                 }
             }
         }
-        dispatch(CELLS_INSERT, insertCellInfo)
+        dispatch(A_CELLS_ADD, insertCellInfo)
     },
     [ROWS_OPERROWS]({
         getters,
@@ -307,7 +310,7 @@ export default {
     }) {
         let updateCellInfo = []
 
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startRowIndex: startIndex,
             endRowIndex: endIndex,
             startColIndex: 0,
@@ -341,8 +344,8 @@ export default {
                 if (viewOccupyCol.length === 0) {
                     continue
                 }
-                startColIndex = getters.getColIndexByAlias(viewOccupyCol[0])
-                endColIndex = getters.getColIndexByAlias(viewOccupyCol[
+                startColIndex = getters.colIndexByAlias(viewOccupyCol[0])
+                endColIndex = getters.colIndexByAlias(viewOccupyCol[
                     viewOccupyCol.length - 1])
 
                 for (let i = startColIndex; i < endColIndex + 1; i++) {
@@ -364,7 +367,7 @@ export default {
                 }
             }
         }
-        dispatch(CELLS_INSERT, insertCellInfo)
+        dispatch(A_CELLS_ADD, insertCellInfo)
     },
     [OCCUPY_UPDATE]({
         commit,
@@ -378,10 +381,10 @@ export default {
         if (col.length === 0 || row.length === 0) {
             return
         }
-        let startRowIndex = getters.getRowIndexByAlias(row[0])
-        let startColIndex = getters.getColIndexByAlias(col[0])
-        let endRowIndex = getters.getRowIndexByAlias(row[row.length - 1])
-        let endColIndex = getters.getColIndexByAlias(col[col.length - 1])
+        let startRowIndex = getters.rowIndexByAlias(row[0])
+        let startColIndex = getters.colIndexByAlias(col[0])
+        let endRowIndex = getters.rowIndexByAlias(row[row.length - 1])
+        let endColIndex = getters.colIndexByAlias(col[col.length - 1])
         let cols = getters.colList
         let rows = getters.allRows
         let getPointInfo = getters.getPointInfo
@@ -400,7 +403,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(CELLS_INSERT, [cell])
+                        dispatch(A_CELLS_ADD, [cell])
                     }
                 }
             }
@@ -420,7 +423,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(CELLS_INSERT, [cell])
+                        dispatch(A_CELLS_ADD, [cell])
                     }
                 }
             }
@@ -455,7 +458,7 @@ export default {
             return true
         }
     },
-    async [M_CELLS_MERGE]({
+    async [A_CELLS_MERGE]({
         dispatch,
         getters
     }) {
@@ -465,12 +468,14 @@ export default {
             body: JSON.stringify(select.signalSort)
         })
         let wholePosi = select.wholePosi
-        let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-
-        let cells = getters.getCellsByTransverse({
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        if (endRowIndex === -1 || endColIndex === -1) {
+            return
+        }
+        let cells = getters.cellsByTransverse({
             startColIndex,
             endColIndex,
             startRowIndex,
@@ -493,10 +498,10 @@ export default {
             row: rows,
             col: cols
         }
-        dispatch(CELLS_DESTORY, cells)
-        dispatch(CELLS_INSERT, templateCell)
+        dispatch(A_CELLS_DESTORY, cells)
+        dispatch(A_CELLS_ADD, templateCell)
     },
-    [CELLS_SPLIT]({
+    [A_CELLS_SPLIT]({
         rootState,
         dispatch,
         getters,
@@ -509,11 +514,11 @@ export default {
             endRowIndex
         } = payload
         let wholePosi = getters.allSelects[0].wholePosi
-        startColIndex = startColIndex || getters.getColIndexByAlias(wholePosi.startColAlias)
-        endColIndex = endColIndex || getters.getColIndexByAlias(wholePosi.endColAlias)
-        startRowIndex = startRowIndex || getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        endRowIndex = endRowIndex || getters.getRowIndexByAlias(wholePosi.endRowAlias)
-        let cells = getters.getCellsByTransverse({
+        startColIndex = startColIndex || getters.colIndexByAlias(wholePosi.startColAlias)
+        endColIndex = endColIndex || getters.colIndexByAlias(wholePosi.endColAlias)
+        startRowIndex = startRowIndex || getters.rowIndexByAlias(wholePosi.startRowAlias)
+        endRowIndex = endRowIndex || getters.colIndexByAlias(wholePosi.endRowAlias)
+        let cells = getters.cellsByTransverse({
             startColIndex,
             endColIndex,
             startRowIndex,
@@ -542,7 +547,7 @@ export default {
                 }
             }
         })
-        dispatch(CELLS_INSERT, insertCells)
+        dispatch(A_CELLS_ADD, insertCells)
     },
     [CELLS_FORMAT]({
         commit,
@@ -667,10 +672,10 @@ export default {
                 return
             }
             let wholePosi = clip.wholePosi
-            let clipStartColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            let clipStartRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let clipEndColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            let clipEndRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let clipStartColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let clipStartRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let clipEndColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            let clipEndRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             send({
                 url: config.url[cache.clipState],
                 data: JSON.stringify({
@@ -747,7 +752,7 @@ export default {
                         cellIndex
                     })
                     if (cache.clipState === 'cut') {
-                        commit(mutationTypes.UPDATE_POINTS, {
+                        commit(mutationTypes.M_UPDATE_POINTS, {
                             currentSheet,
                             info: {
                                 colAlias: aliasCol,
@@ -775,7 +780,7 @@ export default {
             for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
-                commit(mutationTypes.UPDATE_POINTS, {
+                commit(mutationTypes.M_UPDATE_POINTS, {
                     currentSheet,
                     info: {
                         colAlias: aliasCol,
@@ -810,7 +815,7 @@ export default {
                     col: occupyCol,
                     row: occupyRow
                 }
-                dispatch(CELLS_INSERT, [insertCell])
+                dispatch(A_CELLS_ADD, [insertCell])
             }
         }
         destoryClip()
@@ -902,7 +907,7 @@ export default {
             for (let j = startRowIndex; j < endRowIndex + 1; j++) {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
-                commit(mutationTypes.UPDATE_POINTS, {
+                commit(mutationTypes.M_UPDATE_POINTS, {
                     currentSheet,
                     info: {
                         colAlias: aliasCol,
@@ -921,7 +926,7 @@ export default {
             }
             let colAlias = cols[cellData.colRelative + startColIndex].alias
             let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
-            dispatch(CELLS_INSERT, [{
+            dispatch(A_CELLS_ADD, [{
                 occupy: {
                     col: [colAlias],
                     row: [rowAlias]
@@ -960,7 +965,7 @@ export default {
             endColIndex = region.endColIndex
         }
         let value
-        let cell = getters.getCellsByVertical({
+        let cell = getters.cellsByVertical({
             startColIndex,
             endColIndex,
             startRowIndex,
@@ -1051,16 +1056,16 @@ export default {
     /**
      * 销毁单元格，允许批量销毁
      */
-    [CELLS_DESTORY]({
+    [A_CELLS_DESTORY]({
         getters,
         commit
     }, cells) {
         cells.forEach((cell) => {
-            commit(mutationTypes.DESTORY_CELL, cell)
+            commit(mutationTypes.M_DESTORY_CELL, cell)
             let occupyCols = cell.occupy.col
             let occupyRows = cell.occupy.row
             let cellIdx = getters.IdxByRow(occupyCols[0], occupyRows[0])
-            commit(mutationTypes.UPDATE_POINTS, {
+            commit(mutationTypes.M_UPDATE_POINTS, {
                 occupyCols,
                 occupyRows,
                 cellIdx

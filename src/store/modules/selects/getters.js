@@ -10,17 +10,17 @@ export default {
     getOprRegion(state, getters) {
         return function() {
             let wholePosi = state.activeSelect.wholePosi
-            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
 
             // 暂时不考虑整个表格全选中的情况
             let endColIndex
             if (wholePosi.endColAlias !== 'MAX') {
-                endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+                endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
             }
             let endRowIndex
             if ((endRowIndex = wholePosi.endColAlias) !== 'MAX') {
-                endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+                endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             }
             if (endRowIndex === 'MAX' || endColIndex === 'MAX') {
                 let fullRegion = getters.getFullOprRegion({

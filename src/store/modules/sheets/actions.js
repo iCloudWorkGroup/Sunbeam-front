@@ -89,8 +89,8 @@ export default {
         let select = getters.activeSelect
         let frozenRowAlias = select.wholePosi.startRowAlias
         let frozenColAlias = select.wholePosi.startColAlias
-        let frozenRowIndex = getters.getRowIndexByAlias(frozenRowAlias)
-        let frozenColIndex = getters.getColIndexByAlias(frozenColAlias)
+        let frozenRowIndex = getters.rowIndexByAlias(frozenRowAlias)
+        let frozenColIndex = getters.colIndexByAlias(frozenColAlias)
 
         let userView = rootState.userView
         let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
@@ -488,19 +488,19 @@ export default {
                 // 从map中查找记录点，删除记录点
                 // 记录最大的列值，
                 // 划定范围
-                let startRowIndex = rootGetters.getRowIndexByAlias(
+                let startRowIndex = rootGetters.rowIndexByAlias(
                     firstRowAlias)
-                let endRowIndex = rootGetters.getRowIndexByAlias(viewLoaded.rows[
+                let endRowIndex = rootGetters.rowIndexByAlias(viewLoaded.rows[
                     1])
-                let startColIndex = rootGetters.getRowIndexByAlias(viewLoaded.cols[
+                let startColIndex = rootGetters.rowIndexByAlias(viewLoaded.cols[
                     0])
-                let endColIndex = rootGetters.getRowIndexByAlias(lastColAlias)
+                let endColIndex = rootGetters.rowIndexByAlias(lastColAlias)
                 commit('M_ROWS_UPDATE_VIEW', {
                     isView: false,
                     startIdx: startRowIndex,
                     overIdx: endRowIndex
                 })
-                let cells = rootGetters.getCellsByVertical({
+                let cells = rootGetters.cellsByVertical({
                     startColIndex,
                     startRowIndex,
                     endColIndex,
@@ -519,7 +519,7 @@ export default {
         //   2.1.2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
         //          置成show模式
         if (limitMax > overRowDistance) {
-            let overRowIdx = rootGetters.getRowIndexByAlias(lastRowAlias)
+            let overRowIdx = rootGetters.rowIndexByAlias(lastRowAlias)
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let needRequire = allLoaded.map.get(lastColAlias) != null &&
@@ -579,7 +579,7 @@ export default {
                 })
                 let cells = data.cells
                 if (cells.length !== 0) {
-                    dispatch(actionTypes.CELLS_INSERT, cells)
+                    dispatch(actionTypes.A_CELLS_ADD, cells)
                 }
 
                 // 修正可视区域的loaded信息

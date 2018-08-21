@@ -24,7 +24,7 @@ let unDestoryClipAction = {
     'ROWS_UPDATEACTIVEROWS': true,
     'COLS_UPDATEACTIVECOLS': true,
     'CELLS_INNERPASTE': true,
-    'CELLS_INSERT': true,
+    'A_CELLS_ADD': true,
     'CELLS_PASTE': true,
     'SELECTS_INSERT': true,
     'HISTORY_ADD': true

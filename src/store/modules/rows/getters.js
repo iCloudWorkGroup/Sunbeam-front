@@ -31,8 +31,8 @@ export default {
     },
     rowsByRange(state, getters) {
         return function(beginAlias, endAlias) {
-            let beginIdx = getters.getRowIndexByAlias(beginAlias)
-            let endIdx = getters.getRowIndexByAlias(endAlias)
+            let beginIdx = getters.rowIndexByAlias(beginAlias)
+            let endIdx = getters.rowIndexByAlias(endAlias)
             if (beginIdx !== -1 && endIdx !== -1) {
 
                 // 因为索引总是 -1，所以结束要 +1
@@ -49,7 +49,7 @@ export default {
      */
     neighborRowByAlias(state, getters) {
         return function(alias, toward) {
-            let idx = getters.getRowIndexByAlias(alias)
+            let idx = getters.rowIndexByAlias(alias)
             switch (toward) {
                 case 'PRE':
                     if (idx > 0) {
@@ -117,7 +117,7 @@ export default {
             return state.map.get(alias)
         }
     },
-    getRowIndexByAlias(state, getters, rootState) {
+    rowIndexByAlias(state, getters, rootState) {
         return function(alias) {
             let row = getters.getRowByAlias(alias)
             if (row) {

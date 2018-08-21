@@ -45,8 +45,8 @@ export default {
                 propUpdateUndo(mutations, commit)
             }
             let coverActions = {
-                [actionTypes.M_CELLS_MERGE]: true,
-                [actionTypes.CELLS_SPLIT]: true,
+                [actionTypes.A_CELLS_MERGE]: true,
+                [actionTypes.A_CELLS_SPLIT]: true,
                 [actionTypes.CELLS_INNERPASTE]: true,
                 [actionTypes.CELLS_OUTERPASTE]: true
             }
@@ -107,19 +107,19 @@ export default {
 function propUpdateUndo(mutations, commit) {
     mutations.forEach(mutationInfo => {
         if (mutationInfo.type === mutationTypes.UPDATE_CELL ||
-            mutationInfo.type === mutationTypes.INSERT_CELL) {
+            mutationInfo.type === mutationTypes.M_INSERT_CELL) {
             commit(mutationTypes.UPDATE_CELL, mutationInfo.updateCells)
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
-            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.M_UPDATE_POINTS) {
+            commit(mutationTypes.M_UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
 // 单元格覆盖回退操作
 function coverCellUndo(mutations, commit) {
     mutations.forEach(mutationInfo => {
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
-            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.M_UPDATE_POINTS) {
+            commit(mutationTypes.M_UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
@@ -127,7 +127,7 @@ function coverCellUndo(mutations, commit) {
 function colRowOprUndo(mutations, commit) {
     mutations.forEach(mutationInfo => {
         if (mutationInfo.type === mutationTypes.UPDATE_CELL ||
-            mutationInfo.type === mutationTypes.INSERT_CELL) {
+            mutationInfo.type === mutationTypes.M_INSERT_CELL) {
             commit(mutationTypes.UPDATE_CELL, mutationInfo.updateCells)
         } else if (mutationInfo.type === mutationTypes.UPDATE_ROW ||
             mutationInfo.type === mutationTypes.UPDATE_COL) {
@@ -183,8 +183,8 @@ function deleteColUndo(action, dispatch, commit) {
                 }
             })
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
-            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.M_UPDATE_POINTS) {
+            commit(mutationTypes.M_UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }
@@ -218,8 +218,8 @@ function deleteRowUndo(action, dispatch, commit) {
                 }
             })
         }
-        if (mutationInfo.type === mutationTypes.UPDATE_POINTS) {
-            commit(mutationTypes.UPDATE_POINTS, mutationInfo.payload)
+        if (mutationInfo.type === mutationTypes.M_UPDATE_POINTS) {
+            commit(mutationTypes.M_UPDATE_POINTS, mutationInfo.payload)
         }
     })
 }

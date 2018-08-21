@@ -140,13 +140,13 @@ export default {
         },
         nextThickBorder() {
             let getters = this.$store.getters
-            let getCells = getters.getCellsByVertical
+            let getCells = getters.cellsByVertical
             let occupyCol = this.item.occupy.col
             let occupyRow = this.item.occupy.row
-            let startColIndex = getters.getColIndexByAlias(occupyCol[0])
-            let startRowIndex = getters.getRowIndexByAlias(occupyRow[0])
-            let endColIndex = getters.getColIndexByAlias(occupyCol[occupyCol.length - 1])
-            let endRowIndex = getters.getRowIndexByAlias(occupyRow[occupyRow.length - 1])
+            let startColIndex = getters.colIndexByAlias(occupyCol[0])
+            let startRowIndex = getters.rowIndexByAlias(occupyRow[0])
+            let endColIndex = getters.colIndexByAlias(occupyCol[occupyCol.length - 1])
+            let endRowIndex = getters.rowIndexByAlias(occupyRow[occupyRow.length - 1])
             let result = {
                 left: false,
                 right: false,

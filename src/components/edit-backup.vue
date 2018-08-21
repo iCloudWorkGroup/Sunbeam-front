@@ -746,7 +746,7 @@ export default {
                         let firstCol = colData[0]
 
                         if (firstCol.hidden) {
-                            let index = this.$store.getters.getColIndexByAlias(firstCol.alias)
+                            let index = this.$store.getters.colIndexByAlias(firstCol.alias)
                             if (index > 0) {
                                 let cols = this.$store.getters.colList
                                 this.$store.commit(mutationTypes.UPDATE_COL, {
@@ -799,7 +799,7 @@ export default {
                         let firstRow = rowData[0]
 
                         if (firstRow.hidden) {
-                            let index = this.$store.getters.getRowIndexByAlias(firstRow.alias)
+                            let index = this.$store.getters.rowIndexByAlias(firstRow.alias)
                             if (index > 0) {
                                 let rows = this.$store.getters.rowList
                                 this.$store.commit(mutationTypes.UPDATE_ROW, {

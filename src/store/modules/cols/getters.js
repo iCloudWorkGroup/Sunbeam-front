@@ -47,8 +47,8 @@ export default {
      */
     colsByRange(state, getters) {
         return function(beginAlias, endAlias) {
-            let beginIdx = getters.getColIndexByAlias(beginAlias)
-            let endIdx = getters.getColIndexByAlias(endAlias)
+            let beginIdx = getters.colIndexByAlias(beginAlias)
+            let endIdx = getters.colIndexByAlias(endAlias)
             if (beginIdx !== -1 && endIdx !== -1) {
 
                 // 因为索引总是 -1，所以结束要 +1
@@ -65,7 +65,7 @@ export default {
      */
     neighborColByAlias(state, getters) {
         return function(alias, toward) {
-            let idx = getters.getColIndexByAlias(alias)
+            let idx = getters.colIndexByAlias(alias)
             switch (toward) {
                 case 'PRE':
                     if (idx > 0) {
@@ -122,7 +122,7 @@ export default {
             return indexAttrBinary(sort, list, 'sort')
         }
     },
-    getColIndexByAlias(state, getters) {
+    colIndexByAlias(state, getters) {
         return function(alias) {
             let col = getters.getColByAlias(alias)
             if (col) {

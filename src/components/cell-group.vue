@@ -23,11 +23,11 @@ export default {
     computed: {
         cells() {
             let getters = this.$store.getters
-            let startColIndex = getters.getColIndexByAlias(this.colStart)
-            let endColIndex = getters.getColIndexByAlias(this.colOver)
-            let startRowIndex = getters.getRowIndexByAlias(this.rowStart)
-            let endRowIndex = getters.getRowIndexByAlias(this.rowOver)
-            return this.$store.getters.getCellsByVertical({
+            let startColIndex = getters.colIndexByAlias(this.colStart)
+            let endColIndex = getters.colIndexByAlias(this.colOver)
+            let startRowIndex = getters.rowIndexByAlias(this.rowStart)
+            let endRowIndex = getters.rowIndexByAlias(this.rowOver)
+            return this.$store.getters.cellsByVertical({
                 startColIndex,
                 endColIndex,
                 startRowIndex,

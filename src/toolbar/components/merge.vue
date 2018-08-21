@@ -14,8 +14,8 @@
 </template>
 <script>
 import {
-    M_CELLS_MERGE,
-    CELLS_SPLIT
+    A_CELLS_MERGE,
+    A_CELLS_SPLIT
 } from '../../store/action-types'
 export default {
     computed: {
@@ -26,9 +26,9 @@ export default {
     methods: {
         setMerge() {
             if (this.hasMerge) {
-                this.$store.dispatch(CELLS_SPLIT, {})
+                this.$store.dispatch(A_CELLS_SPLIT, {})
             } else {
-                this.$store.dispatch(M_CELLS_MERGE)
+                this.$store.dispatch(A_CELLS_MERGE)
             }
         }
     }

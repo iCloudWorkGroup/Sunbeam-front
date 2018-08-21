@@ -8,10 +8,10 @@ export default function(label, store, fn) {
     let endColIndex
 
     if (!label) {
-        startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-        endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-        startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-        endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
     } else {
         let {
             startColSort,

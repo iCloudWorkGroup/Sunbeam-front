@@ -65,7 +65,7 @@ export default {
             })
         }).then(() => {
             let cellIdx = getters.getRowIndexBySort(row.sort)
-            let cells = getters.getCellsByTransverse({
+            let cells = getters.cellsByTransverse({
                 startColIndex: 0,
                 startRowIndex: cellIdx,
                 endColIndex: -1
@@ -95,7 +95,7 @@ export default {
         let updateCellInfo = []
         let rowHeight = row.height
         let rowAlias = row.alias
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -266,8 +266,8 @@ export default {
                 visibleEndRow !== rows[rows.length - 1]) {
                 index = rows.length - 1
             } else {
-                startIndex = getters.getColIndexByAlias(startRowAlias)
-                endIndex = getters.getColIndexByAlias(endRowAlias)
+                startIndex = getters.colIndexByAlias(startRowAlias)
+                endIndex = getters.colIndexByAlias(endRowAlias)
 
                 for (let i = startIndex; i < endIndex + 1; i++) {
                     if (rows[i].hidden) {
@@ -303,7 +303,7 @@ export default {
         let rowHeight = row.height
         let rowAlias = row.alias
 
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -341,8 +341,8 @@ export default {
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
 
-            let startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
             if (startIndex > index) {
                 updateSelectInfo.push({
@@ -421,7 +421,7 @@ export default {
             if (select.wholePosi.endRowAlias === 'MAX') {
                 return
             }
-            index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
+            index = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
         }
         let sort = getters.rowList[index].sort
         send({
@@ -463,7 +463,7 @@ export default {
         let cellList
         let currentSheet = rootState.currentSheet
 
-        cellList = getters.getCellsByVertical({
+        cellList = getters.cellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -505,7 +505,7 @@ export default {
                     }
                 })
                 occupyCol.forEach(function(colAlias) {
-                    commit(mutationTypes.UPDATE_POINTS, {
+                    commit(mutationTypes.M_UPDATE_POINTS, {
                         currentSheet,
                         info: {
                             colAlias,
@@ -525,8 +525,8 @@ export default {
             let wholePosi = select.wholePosi
             let startIndex
             let endIndex
-            startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
             if (startIndex >= index) {
                 updateSelectInfo.push({
@@ -579,7 +579,7 @@ export default {
          * 回退操作不需要进行前一列上单元格的复制操作
          */
         if (!rowModel && index > 0) {
-            cellList = getters.getCellsByVertical({
+            cellList = getters.cellsByVertical({
                 startRowIndex: index - 1,
                 startColIndex: 0,
                 endRowIndex: index - 1,
@@ -603,7 +603,7 @@ export default {
                     })
                 }
             })
-            dispatch(actionTypes.CELLS_INSERT, insertCellList)
+            dispatch(actionTypes.A_CELLS_ADD, insertCellList)
         }
     },
     [actionTypes.ROWS_ADJUSTHEIGHT]({
@@ -643,7 +643,7 @@ export default {
         let rowAlias = row.alias
         let adjustHeight = value - row.height
         let updateCellInfo = []
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: 'MAX',
@@ -681,8 +681,8 @@ export default {
 
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
-            let startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             if (startIndex <= index && endIndex >= index) {
                 updateSelectInfo.push({
                     select,
@@ -752,7 +752,7 @@ export default {
             if (select.wholePosi.endRowAlias === 'MAX') {
                 return
             }
-            index = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
+            index = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
         }
         let rows = getters.rowList
         let row = rows[index]
@@ -773,7 +773,7 @@ export default {
     }, sort) {
         let currentSheet = rootState.currentSheet
         let index = getters.getRowIndexBySort(sort)
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startRowIndex: index,
             startColIndex: 0,
             endColIndex: 'MAX',
@@ -827,7 +827,7 @@ export default {
             }
         })
         updateOccupys.forEach(info => {
-            commit(mutationTypes.UPDATE_POINTS, {
+            commit(mutationTypes.M_UPDATE_POINTS, {
                 currentSheet,
                 info
             })
@@ -838,8 +838,8 @@ export default {
         let selects = getters.selectList
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
-            let startIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
             if (startIndex === index) {
                 if (startIndex === endIndex) {
@@ -1056,8 +1056,8 @@ export default {
         newEndAlias
     }) {
         let currentSheet = rootState.currentSheet
-        let startIndex = getters.getRowIndexByAlias(oldStartAlias)
-        let endIndex = getters.getRowIndexByAlias(oldEndAlias)
+        let startIndex = getters.rowIndexByAlias(oldStartAlias)
+        let endIndex = getters.rowIndexByAlias(oldEndAlias)
         endIndex = endIndex === 'MAX' ? getters.rowList.length - 1 : endIndex
 
         commit(mutationTypes.CANCEL_ACTIVE_ROW, {
@@ -1066,8 +1066,8 @@ export default {
             endIndex
         })
 
-        startIndex = getters.getRowIndexByAlias(newStartAlias)
-        endIndex = getters.getRowIndexByAlias(newEndAlias)
+        startIndex = getters.rowIndexByAlias(newStartAlias)
+        endIndex = getters.rowIndexByAlias(newEndAlias)
         endIndex = endIndex === 'MAX' ? getters.rowList.length - 1 : endIndex
 
         commit(mutationTypes.ACTIVE_ROW, {
@@ -1096,8 +1096,8 @@ export default {
                     break
                 }
             }
-            startIndex = getters.getRowIndexByAlias(select.wholePosi.startRowAlias)
-            endIndex = getters.getRowIndexByAlias(select.wholePosi.endRowAlias)
+            startIndex = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
+            endIndex = getters.rowIndexByAlias(select.wholePosi.endRowAlias)
         }
         endIndex = endIndex == null ? startIndex : endIndex
 

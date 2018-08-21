@@ -35,13 +35,17 @@ export default {
      * 如果没有就返回为单元格默认属性
      *
      * 以后增加：还没有涉及选中的类型
+     *
+     * 监听所有单元格(state.list)的变化
+     * 实现选择区域不变时 computed的触发
      */
     activeCell(state, getters) {
         return function() {
+            let cells = state.list
             let selects = getters.allSelects
             let activePosi = selects[0].activePosi
             let idx = this.IdxByRow(activePosi.colAlias, activePosi.rowAlias)
-            if (idx !== -1) {
+            if (idx !== -1 || cells) {
                 return this.cells[idx]
             }
             return null
@@ -58,10 +62,10 @@ export default {
         return function() {
             let select = getters.activeSelect()
             let wholePosi = select.wholePosi
-            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-            let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+            let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
             let temp = {}
             let result = ''
             let cells = getters.cells
@@ -91,10 +95,10 @@ export default {
         return function() {
             let select = getters.activeSelect()
             let wholePosi = select.wholePosi
-            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             return {
                 startColIndex,
                 endColIndex,
@@ -140,7 +144,7 @@ export default {
                 startRow = startRowIndex
                 endRow = endRowIndex
             }
-            let cells = getters.getCellsByVertical({
+            let cells = getters.cellsByVertical({
                 startColIndex,
                 startRowIndex,
                 endColIndex,
@@ -150,11 +154,11 @@ export default {
                 let cell = cells[i]
                 let occupyCols = cell.occupy.col
                 let occupyRows = cell.occupy.row
-                let localStartRow = getters.getRowIndexByAlias(occupyRows[0])
-                let localEndRow = getters.getRowIndexByAlias(occupyRows[
+                let localStartRow = getters.rowIndexByAlias(occupyRows[0])
+                let localEndRow = getters.rowIndexByAlias(occupyRows[
                     occupyRows.length - 1])
-                let localStartCol = getters.getColIndexByAlias(occupyCols[0])
-                let localEndCol = getters.getColIndexByAlias(occupyCols[
+                let localStartCol = getters.colIndexByAlias(occupyCols[0])
+                let localEndCol = getters.colIndexByAlias(occupyCols[
                     occupyCols.length - 1])
                 startCol = localStartCol < startCol ? localStartCol :
                     startCol
@@ -174,7 +178,7 @@ export default {
     /**
      * 查选区域内所有单元格(垂直方向)
      */
-    getCellsByVertical(state, getters) {
+    cellsByVertical(state, getters) {
         return function({
             startColIndex,
             startRowIndex,
@@ -207,7 +211,7 @@ export default {
             return result
         }
     },
-    getCellsByTransverse(state, getters, rootState) {
+    cellsByTransverse(state, getters, rootState) {
         return function({
             startColIndex,
             startRowIndex,
@@ -261,7 +265,7 @@ export default {
             startColIndex = getters.getColIndexByPosi(userView.left)
             endColIndex = getters.getColIndexByPosi(userView.right)
 
-            return getters.getCellsByVertical({
+            return getters.cellsByVertical({
                 startRowIndex,
                 endRowIndex,
                 startColIndex,
@@ -293,7 +297,7 @@ export default {
             startColIndex = rule.startColIndex
             endColIndex = rule.endColIndex
 
-            return getters.getCellsByVertical({
+            return getters.cellsByVertical({
                 startRowIndex,
                 endRowIndex,
                 startColIndex,
@@ -323,7 +327,7 @@ export default {
             endColIndex = indexAttrBinary(cols[endColIndex].sort,
                 visibleColList,
                 'sort')
-            return getters.getCellsByVertical({
+            return getters.cellsByVertical({
                 startRowIndex,
                 endRowIndex,
                 startColIndex,
@@ -335,26 +339,26 @@ export default {
     },
     hasMergeCell(state, getters) {
         return function() {
-            let list = state.list
+            let allCells = state.list
             let wholePosi = getters.allSelects[0].wholePosi
-            let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
-            let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
-            let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
-            let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             if (startColIndex === endColIndex &&
                 startRowIndex === endRowIndex) {
                 return false
             }
-            let verticalCells = getters.getCellsByVertical({
+            let verticalCells = getters.cellsByVertical({
                 startColIndex,
                 startRowIndex,
                 endColIndex,
                 endRowIndex
             })
             for (let i = 0, len = verticalCells.length; i < len; i++) {
-                let cell = verticalCells[i]
-                if ((cell.occupy.row.length > 1 ||
-                    cell.occupy.col.length > 1) && list) {
+                let cell = verticalCells[i] || allCells
+                if (cell.occupy.row.length > 1 ||
+                    cell.occupy.col.length > 1) {
                     return true
                 }
             }

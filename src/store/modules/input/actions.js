@@ -22,10 +22,10 @@ export default {
         let colAlias = wholePosi.startColAlias
         let rowAlias = wholePosi.startRowAlias
 
-        let colIndex = getters.getColIndexByAlias(colAlias)
-        let rowIndex = getters.getRowIndexByAlias(rowAlias)
+        let colIndex = getters.colIndexByAlias(colAlias)
+        let rowIndex = getters.rowIndexByAlias(rowAlias)
 
-        let cellList = getters.getCellsByVertical({
+        let cellList = getters.cellsByVertical({
             startColIndex: colIndex,
             startRowIndex: rowIndex
         })
@@ -88,8 +88,8 @@ export default {
         dispatch
     }, texts) {
         let inputState = getters.getInputState
-        let startColIndex = getters.getColIndexByAlias(inputState.colAlias)
-        let startRowIndex = getters.getRowIndexByAlias(inputState.rowAlias)
+        let startColIndex = getters.colIndexByAlias(inputState.colAlias)
+        let startRowIndex = getters.rowIndexByAlias(inputState.rowAlias)
         let cols = getters.colList
         let rows = getters.rowList
 
@@ -104,7 +104,7 @@ export default {
                 texts: ''
             }
         })
-        let cell = getters.getCellsByVertical({
+        let cell = getters.cellsByVertical({
             startColIndex,
             startRowIndex
         })[0]
@@ -155,7 +155,7 @@ export default {
             }
         })
         if (!cell) {
-            cell = getters.getCellsByVertical({
+            cell = getters.cellsByVertical({
                 startColIndex,
                 startRowIndex
             })[0]

@@ -45,7 +45,7 @@ export default {
                 propUpdateUndo(mutations, commit)
             }
             let coverActions = {
-                [actionTypes.CELLS_MERGE]: true,
+                [actionTypes.M_CELLS_MERGE]: true,
                 [actionTypes.CELLS_SPLIT]: true,
                 [actionTypes.CELLS_INNERPASTE]: true,
                 [actionTypes.CELLS_OUTERPASTE]: true

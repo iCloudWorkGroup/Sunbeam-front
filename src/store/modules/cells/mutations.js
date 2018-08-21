@@ -54,7 +54,7 @@ export default {
         }
     },
     /**
-     * 根据索引删除单元格
+     * 根据索引销毁单元格
      */
     [DESTORY_CELL](state, cell) {
         cell.status.destory = true

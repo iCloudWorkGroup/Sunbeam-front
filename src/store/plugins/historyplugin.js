@@ -257,7 +257,7 @@ function isObject(obj) {
 
 let userAction = {
     [actionTypes.EDIT_HIDE]: true,
-    [actionTypes.CELLS_MERGE]: true,
+    [actionTypes.M_CELLS_MERGE]: true,
     [actionTypes.CELLS_UPDATE_BORDER]: true,
     [actionTypes.CELLS_UPDATE]: true,
     [actionTypes.CELLS_PASTE]: true,
@@ -277,7 +277,7 @@ let userAction = {
 }
 let recordAction = {
     [actionTypes.CELLS_UPDATE_PROP]: true,
-    [actionTypes.CELLS_MERGE]: true,
+    [actionTypes.M_CELLS_MERGE]: true,
     [actionTypes.CELLS_SPLIT]: true,
     [actionTypes.ROWS_OPERROWS]: true,
     [actionTypes.COLS_OPERCOLS]: true,
@@ -313,7 +313,7 @@ let recordMutations = {
         [mutationTypes.INSERT_CELL]: true,
         [mutationTypes.UPDATE_COL]: true
     },
-    [actionTypes.CELLS_MERGE]: {
+    [actionTypes.M_CELLS_MERGE]: {
         [mutationTypes.UPDATE_POINTS]: true
     },
     [actionTypes.CELLS_SPLIT]: {

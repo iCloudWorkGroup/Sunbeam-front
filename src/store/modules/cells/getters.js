@@ -214,8 +214,8 @@ export default {
             endColIndex = startColIndex,
             endRowIndex = startRowIndex
         }) {
-            let rows = getters.rowList()
-            let cols = getters.colList()
+            let rows = getters.allRows
+            let cols = getters.allCols
             let startCol = startColIndex
             let startRow = startRowIndex
             let endCol = endColIndex === -1 ? cols.length - 1 : endColIndex
@@ -224,8 +224,8 @@ export default {
             let avoidRepeat = {}
             for (let i = startRow, rowLen = endRow + 1; i < rowLen; i++) {
                 for (let j = startCol, colLen = endCol + 1; j < colLen; j++) {
-                    let colAlias = cols[i].alias
-                    let rowAlias = rows[j].alias
+                    let rowAlias = rows[i].alias
+                    let colAlias = cols[j].alias
                     let idx = getters.IdxByCol(colAlias, rowAlias)
                     if (idx !== -1 && !avoidRepeat[idx]) {
                         avoidRepeat[idx] = true
@@ -335,26 +335,26 @@ export default {
     },
     hasMergeCell(state, getters) {
         return function() {
+            let list = state.list
             let wholePosi = getters.allSelects[0].wholePosi
             let startColIndex = getters.getColIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.getRowIndexByAlias(wholePosi.startRowAlias)
             let endColIndex = getters.getColIndexByAlias(wholePosi.endColAlias)
             let endRowIndex = getters.getRowIndexByAlias(wholePosi.endRowAlias)
-
             if (startColIndex === endColIndex &&
                 startRowIndex === endRowIndex) {
                 return false
             }
-            let cells = getters.getCellsByVertical({
+            let verticalCells = getters.getCellsByVertical({
                 startColIndex,
                 startRowIndex,
                 endColIndex,
                 endRowIndex
             })
-            for (let i = 0, len = cells.length; i < len; i++) {
-                let cell = cells[i]
-                if (cell.occupy.row.length > 1 ||
-                    cell.occupy.col.length > 1) {
+            for (let i = 0, len = verticalCells.length; i < len; i++) {
+                let cell = verticalCells[i]
+                if ((cell.occupy.row.length > 1 ||
+                    cell.occupy.col.length > 1) && list) {
                     return true
                 }
             }
@@ -376,14 +376,12 @@ export default {
     },
     /**
      * 根据行列别名查找单元格的索引，
-     * 以行为查找方向
+     * 以为查找方向
      */
     IdxByCol: function(state) {
         return function(colAlias, rowAlias) {
             let map = state.colMap
-            return map.get(colAlias).get(rowAlias) != null ?
-                map.get(colAlias).get(rowAlias) :
-                -1
+            return map.get(colAlias) != null ? (map.get(colAlias).get(rowAlias) != null ? map.get(colAlias).get(rowAlias) : -1) : -1
         }
     }
 }

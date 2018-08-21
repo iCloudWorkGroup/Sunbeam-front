@@ -5,7 +5,7 @@ import {
     COLS_OPERCOLS,
     ROWS_OPERROWS,
     OCCUPY_UPDATE,
-    CELLS_MERGE,
+    M_CELLS_MERGE,
     CELLS_DESTORY,
     CELLS_SPLIT,
     CELLS_FORMAT,
@@ -58,7 +58,6 @@ export default {
             let cols = getters.allCols
             let rows = getters.allRows
             let fixedCell = extend(template, cell)
-
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
@@ -71,7 +70,6 @@ export default {
             let startRowIndex = getters.getRowIndexByAlias(occupyRows[0])
             let endRowIndex = getters.getRowIndexByAlias(occupyRows[
                 occupyRows.length - 1])
-
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
             let top = rows[startRowIndex].top
@@ -104,7 +102,6 @@ export default {
                 fixedCell.alias = generator.cellAliasGenerator()
             }
             commit(mutationTypes.INSERT_CELL, fixedCell)
-
             // 更新坐标关系表
             commit(mutationTypes.UPDATE_POINTS, {
                 occupyCols,
@@ -458,7 +455,7 @@ export default {
             return true
         }
     },
-    async [CELLS_MERGE]({
+    async [M_CELLS_MERGE]({
         dispatch,
         getters
     }) {
@@ -479,15 +476,14 @@ export default {
             startRowIndex,
             endRowIndex
         })
-
         // 左上角位置的单元格，作为合并单元格的模板原型，
         // 如果没有单元格，以横向优先，竖向次之查找
         // 如果所有都没有，就按照template属性合并
-        let templateCell = cells != null ?
+        let templateCell = cells.length !== 0 ?
             extend(cells[0]) : extend(template)
         let cols = []
         for (let i = startColIndex; i < endColIndex + 1; i++) {
-            cols.push(getters.colList[i].alias)
+            cols.push(getters.allCols[i].alias)
         }
         let rows = []
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
@@ -505,22 +501,27 @@ export default {
         dispatch,
         getters,
         commit
-    }, {
-        startColIndex,
-        endColIndex,
-        startRowIndex,
-        endRowIndex
-    }) {
-        let cellList = getters.getCellsByTransverse({
+    }, payload) {
+        let {
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        } = payload
+        let wholePosi = getters.allSelects[0].wholePosi
+        startColIndex = startColIndex || getters.getColIndexByAlias(wholePosi.startColAlias)
+        endColIndex = endColIndex || getters.getColIndexByAlias(wholePosi.endColAlias)
+        startRowIndex = startRowIndex || getters.getRowIndexByAlias(wholePosi.startRowAlias)
+        endRowIndex = endRowIndex || getters.getRowIndexByAlias(wholePosi.endRowAlias)
+        let cells = getters.getCellsByTransverse({
             startColIndex,
             endColIndex,
             startRowIndex,
             endRowIndex
         })
+        let insertCells = []
 
-        let insertCellList = []
-
-        cellList.forEach(cell => {
+        cells.forEach(cell => {
             let occupyCol = cell.occupy.col
             let occupyRow = cell.occupy.row
             if (occupyRow.length > 1 || occupyCol.length > 1) {
@@ -529,17 +530,19 @@ export default {
                         let insertCell = extend(cell)
                         if (i !== 0 || j !== 0) {
                             insertCell.content.texts = ''
+                            insertCell.content.displayTexts = ''
+                            insertCell.alias = generator.cellAliasGenerator()
                         }
                         insertCell.occupy = {
                             col: [occupyCol[i]],
                             row: [occupyRow[j]]
                         }
-                        insertCellList.push(insertCell)
+                        insertCells.push(insertCell)
                     }
                 }
             }
         })
-        dispatch(CELLS_INSERT, insertCellList)
+        dispatch(CELLS_INSERT, insertCells)
     },
     [CELLS_FORMAT]({
         commit,

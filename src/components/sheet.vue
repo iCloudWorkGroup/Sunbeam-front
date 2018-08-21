@@ -17,7 +17,6 @@
                 </td>
                 <td>
                     <col-head :start="colLast.start"
-                              v-if="colLast.start != null"
                               :over="colLast.over"
                               :need-sider="true"
                               :scrollLeft="scrollLeft"/>

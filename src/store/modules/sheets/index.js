@@ -18,7 +18,8 @@ const state = {
     loaded: {
         cols: ['0'],
         rows: ['0'],
-        map: new Map()
+        colMap: new Map(),
+        rowMap: new Map()
     },
     // 当前sheet滚动的距离
     scroll: {

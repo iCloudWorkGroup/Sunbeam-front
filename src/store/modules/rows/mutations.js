@@ -102,8 +102,8 @@ export default {
         startIdx,
         overIdx
     }) {
-        for (let i = startIdx; i < overIdx; i++) {
-            state.list[i].view = isView
+        for (let i = startIdx; i < overIdx + 1; i++) {
+            state.list[i].visible = isView
         }
     }
 }

@@ -29,6 +29,7 @@ export default {
             for (let k = 0; k < occupyRows.length; k++) {
                 let col = occupyCols[j]
                 let row = occupyRows[k]
+
                 // 列Map填充
                 let colItemMap
                 let colMap = state.colMap
@@ -58,5 +59,11 @@ export default {
      */
     [M_DESTORY_CELL](state, cell) {
         cell.status.destory = true
+    },
+    M_CELLS_UPDATE_VIEW(state, {
+        cell,
+        isView
+    }) {
+        cell.view = isView
     }
 }

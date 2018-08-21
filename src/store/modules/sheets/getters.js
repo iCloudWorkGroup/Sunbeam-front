@@ -43,8 +43,11 @@ export default {
         return state.loaded
     },
     loadedIdxByAlias(state) {
-        return function(alias) {
-            let loads = state.loaded
+        return function({
+            alias,
+            type
+        }) {
+            let loads = state.loaded[type]
             for (let i = 0, len = loads.length; i < len; i++) {
                 let item = loads[i]
                 if (alias === item) {

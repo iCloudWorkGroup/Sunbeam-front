@@ -8,7 +8,7 @@ export default {
     cells(state) {
         return state.list
     },
-    viewCells(state) {
+    visibleCells(state) {
         return state.list.filter((cell) => {
             return cell.view && !cell.hidden ? true : false
         })
@@ -183,12 +183,13 @@ export default {
             startColIndex,
             startRowIndex,
             endColIndex = startColIndex,
-            endRowIndex = startRowIndex
+            endRowIndex = startRowIndex,
+
         }) {
-            let rows = getters.allRows
-            let cols = getters.allCols
-            let startCol = startColIndex
-            let startRow = startRowIndex
+            let rows = getters.visibleRowList()
+            let cols = getters.visibleColList()
+            let allRows = getters.allRows
+            let allCols = getters.allCols
             let endCol = endColIndex === -1 ?
                 cols.length - 1 :
                 endColIndex
@@ -197,10 +198,15 @@ export default {
                 endRowIndex
             let result = []
             let avoidRepeat = {}
-            for (let i = startCol, colLen = endCol + 1; i < colLen; i++) {
-                for (let j = startRow, rowLen = endRow + 1; j < rowLen; j++) {
-                    let colAlias = cols[i].alias
-                    let rowAlias = rows[j].alias
+
+            let startCol = Math.max(startColIndex, cols[0].sort)
+            let startRow = Math.max(startRowIndex, rows[0].sort)
+            let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
+            let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
+            for (let i = startCol; i < endColLen; i++) {
+                for (let j = startRow; j < endRowLen; j++) {
+                    let colAlias = allCols[i].alias
+                    let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
                     if (idx !== -1 && !avoidRepeat[idx]) {
                         avoidRepeat[idx] = true
@@ -337,6 +343,12 @@ export default {
             })
         }
     },
+    /**
+     * 是否包含合并单元格
+     * @param  {[type]}  state   [description]
+     * @param  {[type]}  getters [description]
+     * @return {Boolean}         [description]
+     */
     hasMergeCell(state, getters) {
         return function() {
             let allCells = state.list

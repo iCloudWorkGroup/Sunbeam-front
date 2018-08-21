@@ -3,33 +3,22 @@
   <component name="ChangeListManager">
     <list default="true" id="e2133ca2-6401-42de-b064-cd5444ac9f98" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/cell-group.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cell-group.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/cell-item.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cell-item.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/edit-backup.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/edit-backup.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/edit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/edit.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/action-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/action-types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/actions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/cells/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cells/actions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sheet.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sheet.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/store/modules/cells/getters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cells/getters.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/store/modules/cells/mutations.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cells/mutations.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/cols/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cols/actions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/cells/template.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cells/template.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/store/modules/cols/getters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cols/getters.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/history/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/history/actions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/input/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/input/actions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/rows/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/rows/actions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/cols/template.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/cols/template.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/store/modules/rows/getters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/rows/getters.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/selects/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/selects/actions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/modules/selects/getters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/selects/getters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/rows/mutations.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/rows/mutations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/rows/template.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/rows/template.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/store/modules/sheets/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/sheets/actions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/mutation-types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/plugins/clipplugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/plugins/clipplugin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store/plugins/historyplugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/plugins/historyplugin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/toolbar/components/main.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/toolbar/components/main.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/toolbar/components/merge.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/toolbar/components/merge.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/toolbar/components/rowcol.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/toolbar/components/rowcol.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/toolbar/store/mutations.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/toolbar/store/mutations.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tools/parselabel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/tools/parselabel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/sheets/getters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/sheets/getters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/sheets/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/sheets/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/modules/sheets/mutations.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/modules/sheets/mutations.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -43,11 +32,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.vue" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.vue" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/toolbar/components/main.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="46" column="24" lean-forward="true" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
+            <state relative-caret-position="286">
+              <caret line="44" column="36" lean-forward="true" selection-start-line="44" selection-start-column="36" selection-end-line="44" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/app.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -55,8 +55,29 @@
       <file leaf-file-name="config.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/config.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1919">
-              <caret line="107" column="43" selection-start-line="107" selection-start-column="43" selection-end-line="107" selection-end-column="43" />
+            <state relative-caret-position="269">
+              <caret line="107" column="4" selection-start-line="107" selection-start-column="4" selection-end-line="107" selection-end-column="45" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="getters.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/store/modules/rows/getters.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="660">
+              <caret line="33" column="46" lean-forward="true" selection-start-line="33" selection-start-column="46" selection-end-line="33" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="actions.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/store/modules/sheets/actions.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="481" column="25" lean-forward="true" selection-start-line="481" selection-start-column="25" selection-end-line="481" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -200,7 +221,6 @@
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/src/store/action-types.js" />
         <option value="$PROJECT_DIR$/src/store/mutation-types.js" />
-        <option value="$PROJECT_DIR$/src/store/modules/sheets/actions.js" />
         <option value="$PROJECT_DIR$/src/api/Sunbeam.js" />
         <option value="$PROJECT_DIR$/src/components/row-head-panel.vue" />
         <option value="$PROJECT_DIR$/src/components/edit-panel.vue" />
@@ -225,6 +245,7 @@
         <option value="$PROJECT_DIR$/src/toolbar/components/font.vue" />
         <option value="$PROJECT_DIR$/src/toolbar/components/rowcol.vue" />
         <option value="$PROJECT_DIR$/src/toolbar/components/main.vue" />
+        <option value="$PROJECT_DIR$/src/store/modules/sheets/actions.js" />
       </list>
     </option>
   </component>
@@ -244,7 +265,7 @@
       <path value="$PROJECT_DIR$/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1616" />
@@ -281,14 +302,30 @@
               <item name="Sunbeam-front" type="b2602c69:ProjectViewProjectNode" />
               <item name="Sunbeam-front" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="toolbar" type="462c0819:PsiDirectoryNode" />
+              <item name="store" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunbeam-front" type="b2602c69:ProjectViewProjectNode" />
               <item name="Sunbeam-front" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="toolbar" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="store" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunbeam-front" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Sunbeam-front" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="store" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="rows" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunbeam-front" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Sunbeam-front" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="store" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="sheets" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunbeam-front" type="b2602c69:ProjectViewProjectNode" />
@@ -366,12 +403,12 @@
       <updated>1534400223100</updated>
       <workItem from="1534400227138" duration="33558000" />
       <workItem from="1534729070295" duration="11795000" />
-      <workItem from="1534752114886" duration="40863000" />
+      <workItem from="1534752114886" duration="41786000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="86216000" />
+    <option name="totallyTimeSpent" value="87139000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
@@ -410,20 +447,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/store/modules/sheets/getters.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-30" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/store/modules/sheets/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-30">
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/store/modules/sheets/mutations.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-30">
@@ -631,13 +654,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/store/modules/rows/getters.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="124" column="13" lean-forward="true" selection-start-line="124" selection-start-column="13" selection-end-line="124" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/store/modules/cells/actions.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
@@ -744,13 +760,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/config.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1919">
-          <caret line="107" column="43" selection-start-line="107" selection-start-column="43" selection-end-line="107" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/toolbar/components/font.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1496">
@@ -763,8 +772,41 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/toolbar/components/main.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="46" column="24" lean-forward="true" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
+        <state relative-caret-position="286">
+          <caret line="44" column="36" lean-forward="true" selection-start-line="44" selection-start-column="36" selection-end-line="44" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="107" column="4" selection-start-line="107" selection-start-column="4" selection-end-line="107" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/modules/sheets/actions.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="481" column="25" lean-forward="true" selection-start-line="481" selection-start-column="25" selection-end-line="481" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/modules/rows/getters.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="33" column="46" lean-forward="true" selection-start-line="33" selection-start-column="46" selection-end-line="33" selection-end-column="46" />
         </state>
       </provider>
     </entry>

@@ -73,9 +73,21 @@ export default {
         if (rowSupply) {
             loaded.rows.push(rowAlias)
         }
-        loaded.map.set(colAlias, {
-            [rowAlias]: true
-        })
+        let colMap = loaded.colMap
+        let rowItem = colMap.get(colAlias)
+        if (rowItem == null) {
+            colMap.set(colAlias, new Map().set(rowAlias, true))
+        } else {
+            rowItem.set(rowAlias, true)
+        }
+
+        let rowMap = loaded.rowMap
+        let colItem = rowMap.get(rowAlias)
+        if (colItem == null) {
+            rowMap.set(rowAlias, new Map().set(colAlias, true))
+        } else {
+            colItem.set(colAlias, true)
+        }
     },
     UPDATE_SHEETS_MAX(state, {
         rowAlias,

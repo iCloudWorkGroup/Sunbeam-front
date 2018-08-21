@@ -73,7 +73,7 @@ export default {
         // 2. 不在用户的可视范围和预加载方位内
         // hidden, 表示行、列主动隐藏造成的单元格隐藏
         hidden: false,
-        // view, 表示根据动态加载原则，造成的隐藏
-        view: true
+        // visible, 表示根据动态加载原则，造成的隐藏
+        visible: true
     }
 }

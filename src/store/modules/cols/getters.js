@@ -21,7 +21,7 @@ export default {
     visibleColList(state, getters) {
         return function() {
             return state.list.filter(function(col) {
-                return !col.hidden && col.view
+                return !col.hidden && col.visible
             })
         }
     },
@@ -52,7 +52,7 @@ export default {
             if (beginIdx !== -1 && endIdx !== -1) {
 
                 // 因为索引总是 -1，所以结束要 +1
-                return state.list.slice(beginIdx, endIdx + 1)
+                return this.visibleColList().slice(beginIdx, endIdx + 1)
             }
             return null
         }

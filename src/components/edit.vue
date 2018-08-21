@@ -43,11 +43,12 @@ export default {
         return {
             // 当前可视区域所占用的加载区域
             viewLoaded: {
-                rows: [this.rowOver],
-                cols: [this.colOver],
-                map: new Map().set(this.colOver, {
-                    [this.rowOver]: true
-                })
+                rows: [this.rowStart, this.rowOver],
+                cols: [this.colStart, this.colOver],
+                rowMap: new Map().set(this.rowOver,
+                    new Map().set(this.colOver, true)),
+                colMap: new Map().set(this.colOver,
+                    new Map().set(this.rowOver, true))
             },
             timeoutId: -1,
             toward: null,
@@ -62,6 +63,7 @@ export default {
         if (this.scrollLeft != null) {
             this.$el.scrollLeft = this.scrollLeft
         }
+        console.log(this.viewLoaded)
         // this.setOccupy()
         // this.updateUserView()
     },

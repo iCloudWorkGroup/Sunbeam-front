@@ -18,7 +18,7 @@ export default {
     // 用户主动隐藏
     hidden: false,
     // 根据动态加载原则，设置否是隐藏
-    view: true,
+    visible: true,
     /**
      * 记录整列操作
      * @type {Object}

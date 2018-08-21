@@ -7,6 +7,13 @@ export default {
     allRows(state) {
         return state.list
     },
+    visibleRowList(state, getters) {
+        return function() {
+            return state.list.filter(function(row) {
+                return !row.hidden && row.visible
+            })
+        }
+    },
     /**
      * 很多地方都需要进行offsetTop计算，
      * 所以方法进行提取
@@ -22,18 +29,14 @@ export default {
             return 0
         }
     },
-    visibleRowList(state, getters) {
-        return function() {
-            return state.list.filter(function(row) {
-                return !row.hidden && row.view
-            })
-        }
-    },
     rowsByRange(state, getters) {
         return function(beginAlias, endAlias) {
             let beginIdx = getters.getRowIndexByAlias(beginAlias)
             let endIdx = getters.getRowIndexByAlias(endAlias)
             if (beginIdx !== -1 && endIdx !== -1) {
+                let visibleRows = this.visibleRowList()
+                beginIdx = Math.max(visibleRows[0].sort, beginIdx)
+                endIdx = Math.min(visibleRows[visibleRows.length - 1].sort, endIdx)
 
                 // 因为索引总是 -1，所以结束要 +1
                 return state.list.slice(beginIdx, endIdx + 1)

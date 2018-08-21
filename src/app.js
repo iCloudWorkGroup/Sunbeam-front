@@ -34,16 +34,20 @@ export default function(options) {
         right: $rootEl.offsetWidth + config.prestrainWidth,
         bottom: $rootEl.offsetHeight + config.prestrainHeight
     }).then(() => {
-        new Vue({
+        let main = new Vue({
             store,
+            el: rootSelector,
             render: h => h(Book)
-        }).$mount(rootSelector)
+        })
         if (toolSelector != null) {
             store.registerModule('toolbar', toolbar)
             new Vue({
                 store,
                 render: h => h(Main)
             }).$mount(toolSelector)
+        }
+        return {
+            main
         }
     }).then(() => {
         // console.log('open api')

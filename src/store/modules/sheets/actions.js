@@ -479,7 +479,7 @@ export default {
         // 如果loaded区域已经占用多多余一个记录点
         // 就需要判断是否回收冗余DOM
         // 在一个方向上，最多占用两个记录点
-        if (rowLen > 2) {
+        if (rowLen > 3) {
             let firstRowAlias = viewLoaded.rows[0]
             let startRow = rootGetters.getRowByAlias(firstRowAlias)
 
@@ -495,22 +495,39 @@ export default {
                 let startColIndex = rootGetters.getRowIndexByAlias(viewLoaded.cols[
                     0])
                 let endColIndex = rootGetters.getRowIndexByAlias(lastColAlias)
-                commit('M_ROWS_UPDATE_VIEW', {
-                    isView: false,
-                    startIdx: startRowIndex,
-                    overIdx: endRowIndex
-                })
+
                 let cells = rootGetters.getCellsByVertical({
                     startColIndex,
                     startRowIndex,
                     endColIndex,
                     endRowIndex
                 })
-                commit('M_CELLS_UPDATE_VIEW', cells)
+                for (let i = 0, len = cells.length; i < len; i++) {
+                    commit('M_CELLS_UPDATE_VIEW', {
+                        cell: cells[i],
+                        isView: false
+                    })
+                }
+                commit('M_ROWS_UPDATE_VIEW', {
+                    isView: false,
+                    startIdx: startRowIndex,
+                    overIdx: endRowIndex
+                })
+                console.log('startRowIndex: ' + startRowIndex)
+                console.log('endRowIndex: ' + endRowIndex)
+                console.log('endColIndex:' + endColIndex)
+                console.log('startColIndex:' + startColIndex)
+                // viewLoaded.rows.splice(0,1)
+                // let map = viewLoaded.map
+                // let obj = map.get(firstRowAlias)
+                // for(name in obj){
+                //     if(name != null){
+                //         map.get(name)[firstRowAlias]
+                //     }
+                // }
+                // map.delete(firstRowAlias)
             }
         }
-
-
         // 判断滚动的距离是否需要触发加载行为
         // 1. 不需要就什么都不做
         // 2. 需要的话，
@@ -522,8 +539,9 @@ export default {
             let overRowIdx = rootGetters.getRowIndexByAlias(lastRowAlias)
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
-            let needRequire = allLoaded.map.get(lastColAlias) != null &&
-                allLoaded.map.get(lastColAlias)[lastRowAlias] &&
+            let colMap = allLoaded.colMap.get(lastColAlias)
+            let needRequire = colMap != null &&
+                colMap.get(lastRowAlias) &&
                 allLoaded.rows.length - overRowIdx > 1 ? false : true
             if (needRequire) {
                 let max = rootGetters['SHEET_MAX']
@@ -571,9 +589,9 @@ export default {
             }, false).then(function(data) {
                 let rows = data.gridLineRow
                 dispatch(actionTypes.ROWS_ADD, rows)
-                let lastBackRow = rows[rows.length - 1]
+                let backRowAlias = rows[rows.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {
-                    rowAlias: lastBackRow.alias,
+                    rowAlias: backRowAlias,
                     colAlias: overCol.alias,
                     colSupply: false
                 })
@@ -583,9 +601,15 @@ export default {
                 }
 
                 // 修正可视区域的loaded信息
-                viewLoaded.rows.push(lastBackRow.alias)
-                let mapItem = viewLoaded.map.get(overCol.alias)
-                mapItem[lastBackRow.alias] = true
+                viewLoaded.rows.push(backRowAlias)
+                for (let i = 1; i < colLen; i++) {
+                    let item = viewLoaded.cols[i]
+                    viewLoaded.rowMap.set(backRowAlias,
+                        new Map().set(item, true))
+                    viewLoaded.colMap.get(item)
+                        .set(backRowAlias, true)
+                }
+                console.log(viewLoaded)
             })
         }
         // this.scrollToBottom({

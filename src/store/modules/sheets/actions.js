@@ -452,11 +452,11 @@ export default {
         }
     },
     /**
-     * [SHEET_SCROLL 滚动视图]
+     * [SHEET_SCROLL_DOWN 滚动视图]
      * @param {[number]} options.limit       [当前方向的触发值]
      * @param {[object]} options.viewLoaded  [当前视图的Map]
      */
-    SHEET_SCROLL({
+    SHEET_SCROLL_DOWN({
         state,
         dispatch,
         commit,
@@ -464,72 +464,144 @@ export default {
     }, {
         limitMin,
         limitMax,
-        viewLoaded
+        viewLoaded,
+        maintainView
     }) {
+        // 所有视图， 记录对象
+        let allLoaded = rootGetters['loaded']
+        let max = rootGetters['max']
+
+        // 当前视图，记录点，行、列长度
         let rowLen = viewLoaded.rows.length
         let colLen = viewLoaded.cols.length
-        let lastRowAlias = viewLoaded.rows[rowLen - 1]
-        let lastColAlias = viewLoaded.cols[colLen - 1]
 
-        let overRow = rootGetters.getRowByAlias(lastRowAlias)
-        let overRowDistance = overRow != null ?
-            overRow.top + overRow.height : 0
-        let allLoaded = rootGetters['loaded']
+        // 当前视图，数组，行，第一个元素
+        let firstRowAlias = viewLoaded.rows[0]
+        let firstRow = rootGetters.getRowByAlias(firstRowAlias)
+        let firstRowIndex = rootGetters.rowIndexByAlias(firstRowAlias)
+        let firstRowDistance = firstRow.top + firstRow.height
+
+        // 当前视图，数组， 列， 第一个元素
+        let firstColAlias = viewLoaded.cols[0]
+        let firstColIndex = rootGetters.rowIndexByAlias(firstColAlias)
+
+        // 当前视图，数组，行， 最后一个元素
+        let lastRowAlias = viewLoaded.rows[rowLen - 1]
+        let lastRow = rootGetters.getRowByAlias(lastRowAlias)
+        let lastRowIndex = rootGetters.rowIndexByAlias(lastRowAlias)
+        let lastRowDistance = lastRow != null ?
+            lastRow.top + lastRow.height : 0
+
+        // 当前视图， 数组， 列， 最后一个元素
+        let lastColAlias = viewLoaded.cols[colLen - 1]
+        let lastCol = rootGetters.getColByAlias(lastColAlias)
+        let lastColIndex = rootGetters.rowIndexByAlias(lastColAlias)
+
+        // 当前视图， map，行 ， 第一个元素
+        // 行上面的第二个元素
+        let cordRowAlias = viewLoaded.rows[1]
+        let cordRow = rootGetters.getRowByAlias(cordRowAlias)
+        let cordRowIndex = rootGetters.rowIndexByAlias(cordRowAlias)
+        let cordRowDistance = cordRow.top + cordRow.height
 
         // 如果loaded区域已经占用多多余一个记录点
         // 就需要判断是否回收冗余DOM
         // 在一个方向上，最多占用两个记录点
-        if (rowLen > 3) {
-            let firstRowAlias = viewLoaded.rows[0]
-            let startRow = rootGetters.getRowByAlias(firstRowAlias)
-
+        // ------------------
+        // 如果可以保证每次加载的高度大于用户limit高度，就可以改为2
+        if (rowLen > 2) {
+            // 滚动方向： DOWN
+            // 判断当前视图的触发点是否大于当前视图的第一个map点
+            //   1. 如果大于，向下滚动时，清除上的DOM
             // 判断是否触发
-            if (limitMin > startRow.top) {
+            if (limitMin > cordRowDistance) {
                 // 从map中查找记录点，删除记录点
                 // 记录最大的列值，
                 // 划定范围
-                let startRowIndex = rootGetters.rowIndexByAlias(
-                    firstRowAlias)
-                let endRowIndex = rootGetters.rowIndexByAlias(viewLoaded.rows[
-                    1])
-                let startColIndex = rootGetters.rowIndexByAlias(viewLoaded.cols[
-                    0])
-                let endColIndex = rootGetters.rowIndexByAlias(lastColAlias)
-                commit('M_ROWS_UPDATE_VIEW', {
-                    isView: false,
-                    startIdx: startRowIndex,
-                    overIdx: endRowIndex
-                })
                 let cells = rootGetters.cellsByVertical({
-                    startColIndex,
-                    startRowIndex,
-                    endColIndex,
-                    endRowIndex
+                    startColIndex: firstColIndex,
+                    endColIndex: lastColIndex,
+                    startRowIndex: firstRowIndex,
+                    endRowIndex: cordRowIndex
                 })
-                for (let i = 0, len = cells.length; i < len; i++) {
+                if (cells != null) {
                     commit('M_CELLS_UPDATE_VIEW', {
-                        cell: cells[i],
+                        cells,
                         isView: false
                     })
                 }
                 commit('M_ROWS_UPDATE_VIEW', {
                     isView: false,
-                    startIdx: startRowIndex,
-                    overIdx: endRowIndex
+                    startIdx: firstRowIndex,
+                    overIdx: cordRowIndex
                 })
-                console.log('startRowIndex: ' + startRowIndex)
-                console.log('endRowIndex: ' + endRowIndex)
-                console.log('endColIndex:' + endColIndex)
-                console.log('startColIndex:' + startColIndex)
-                // viewLoaded.rows.splice(0,1)
-                // let map = viewLoaded.map
-                // let obj = map.get(firstRowAlias)
-                // for(name in obj){
-                //     if(name != null){
-                //         map.get(name)[firstRowAlias]
-                //     }
-                // }
-                // map.delete(firstRowAlias)
+                delView({
+                    alias: cordRowAlias
+                })
+            }
+            // 滚动方向： UP
+            // 向上滚动时，判断视图底部的触发值
+            // 是否小于cord坐标的top
+            //   1. 如果小于cord坐标，就清除下面的map和DOM结构
+            if (limitMax < cordRow.top) {
+                let cells = rootGetters.cellsByVertical({
+                    startColIndex: firstColIndex,
+                    endColIndex: lastColIndex,
+                    startRowIndex: cordRowIndex,
+                    endRowIndex: lastRowIndex
+                })
+                if (cells != null) {
+                    commit('M_CELLS_UPDATE_VIEW', {
+                        cells,
+                        isView: false
+                    })
+                }
+                commit('M_ROWS_UPDATE_VIEW', {
+                    isView: false,
+                    startIdx: cordRowIndex,
+                    overIdx: lastRowIndex
+                })
+                delView({
+                    alias: lastRowAlias,
+                    final: true
+                })
+            }
+        }
+        // 滚动方向： UP
+        // 向上滚动时，加载被隐藏的DOM结构
+        // 没有考虑向上滚动时，没有数据的情况
+        // 基于目前的功能，不存在这种情况
+        if (limitMin < firstRowDistance) {
+            let loadedIdx = rootGetters.loadedIdxByAlias({
+                alias: firstRowAlias,
+                type: 'ROWS'
+            })
+            if (loadedIdx !== 0 && loadedIdx !== -1) {
+                let preRow = allLoaded.rows[loadedIdx - 1]
+                let preRowIdx = rootGetters.rowIndexByAlias(preRow)
+                commit('M_ROWS_UPDATE_VIEW', {
+                    isView: true,
+                    startIdx: preRowIdx,
+                    overIdx: firstRowIndex
+                })
+                let cells = rootGetters.cellsByVertical({
+                    startRowIndex: preRowIdx,
+                    endRowIndex: firstRowIndex,
+                    startColIndex: firstColIndex,
+                    endColIndex: lastColIndex
+                })
+                if (cells != null) {
+                    commit('M_CELLS_UPDATE_VIEW', {
+                        cells,
+                        isView: true
+                    })
+                }
+                console.log('up ------ insert')
+                insertView({
+                    firstAlias: firstRowAlias,
+                    neighborAlias: preRow
+                })
+                console.log('up ------ insert --- end')
             }
         }
         // 判断滚动的距离是否需要触发加载行为
@@ -539,27 +611,55 @@ export default {
         //   2.1.1. 如果是，就把最后一个对象的高端 + preHeight，作为请求的上下范围
         //   2.1.2. 如果不是，把下一个索引和这个索引之间的所有对象，row，col，cell全部
         //          置成show模式
-        if (limitMax > overRowDistance) {
-            let overRowIdx = rootGetters.rowIndexByAlias(lastRowAlias)
+        // 滚动方向： 向下
+        if (limitMax > lastRowDistance) {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
-            let colMap = allLoaded.colMap.get(lastColAlias)
-            let needRequire = colMap != null &&
-                colMap.get(lastRowAlias) &&
-                allLoaded.rows.length - overRowIdx > 1 ? false : true
+            let allColMap = allLoaded.rowMap.get(lastRowAlias)
+            let needRequire = allColMap != null &&
+                allColMap.get(lastColAlias) &&
+                allLoaded.rows.length - lastRowIndex > 1 ? false : true
             if (needRequire) {
-                let max = rootGetters['SHEET_MAX']
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
                 // 如果显示的结束行距离大于表格的最大行数，
                 // 就需要改为增加行请求，不然就是请求行
-                overRowDistance += 1
-                return overRowDistance >= max.rowPixel ?
+                lastRowDistance += 1
+                return lastRowDistance >= max.rowPixel ?
                     expand() : require()
             } else {
-                // 让已加载区域再显示
+                let loadedIdx = rootGetters.loadedIdxByAlias({
+                    alias: lastRowAlias,
+                    type: 'ROWS'
+                })
+                let nextRow = allLoaded.rows[loadedIdx + 1]
+                let nextRowIdx = rootGetters.rowIndexByAlias(nextRow)
+                commit('M_ROWS_UPDATE_VIEW', {
+                    isView: true,
+                    startIdx: lastRowIndex,
+                    overIdx: nextRowIdx
+                })
+                let cells = rootGetters.cellsByVertical({
+                    startRowIndex: lastRowIndex,
+                    endRowIndex: nextRowIdx,
+                    startColIndex: firstColIndex,
+                    endColIndex: lastColIndex
+                })
+                if (cells != null) {
+                    commit('M_CELLS_UPDATE_VIEW', {
+                        cells,
+                        isView: true
+                    })
+                }
+                addView(nextRow)
             }
         }
+        // ---------------
+        // 由于涉及到传入的viewload参数修改问题
+        // 理应放到回到函数中处理，但是涉及的内容跟
+        // 业务结合紧密且不会立即返回，所以
+        // 暂时用内部函数代替
+        // ---------------
         /**
          * 增加行
          * @return {[type]} [description]
@@ -573,7 +673,23 @@ export default {
                     num
                 })
             }).then(() => {
-                console.log('over')
+                let last = lastRow()
+                for (let i = 0; i < num; i++) {
+                    dispatch(actionTypes.ROWS_ADD, [{
+                        sort: last.sort + i + 1,
+                        top: last.top + last.height + 1 +
+                            config.rowHeight * i
+                    }])
+                    if (i === num - 1) {
+                        last = lastRow()
+                        addView(last.alias)
+                    }
+                }
+
+                function lastRow() {
+                    let rows = rootGetters.allRows
+                    return rows[rows.length - 1]
+                }
             })
         }
         /**
@@ -581,40 +697,103 @@ export default {
          * @return {[type]} [description]
          */
         function require() {
-            let overCol = rootGetters.getColByAlias(lastColAlias)
+            let bottom = Math.min(lastRowDistance + config.prestrainHeight, max
+                .rowPixel)
             return send({
                 url: config.url.area,
                 body: JSON.stringify({
-                    top: overRowDistance + 1,
-                    bottom: overRowDistance + config.prestrainHeight,
-                    left: overCol.left,
-                    right: overCol.left + overCol.width
+                    top: lastRowDistance + 1,
+                    bottom,
+                    left: lastCol.left,
+                    right: lastCol.left + lastCol.width
                 })
             }, false).then(function(data) {
                 let rows = data.gridLineRow
                 dispatch(actionTypes.ROWS_ADD, rows)
                 let backRowAlias = rows[rows.length - 1].alias
-                commit('M_SHEETS_ADD_LOADED', {
-                    rowAlias: backRowAlias,
-                    colAlias: overCol.alias,
-                    colSupply: false
-                })
                 let cells = data.cells
                 if (cells.length !== 0) {
                     dispatch(actionTypes.A_CELLS_ADD, cells)
                 }
-
-                // 修正可视区域的loaded信息
-                viewLoaded.rows.push(backRowAlias)
-                for (let i = 1; i < colLen; i++) {
-                    let item = viewLoaded.cols[i]
-                    viewLoaded.rowMap.set(backRowAlias,
-                        new Map().set(item, true))
-                    viewLoaded.colMap.get(item)
-                        .set(backRowAlias, true)
-                }
-                console.log(viewLoaded)
+                commit('M_SHEETS_ADD_LOADED', {
+                    rowAlias: backRowAlias,
+                    colAlias: lastCol.alias,
+                    colSupply: false
+                })
+                addView(backRowAlias)
             })
+        }
+        /**
+         * 添加map信息，最后面
+         * @param {[type]} alias [description]
+         */
+        function addView(alias) {
+            for (let i = 1; i < colLen; i++) {
+                let item = viewLoaded.cols[i]
+                viewLoaded.rowMap.set(alias,
+                    new Map().set(item, true))
+                viewLoaded.colMap.get(item)
+                    .set(alias, true)
+            }
+            viewLoaded.rows.push(alias)
+            console.log(viewLoaded.rows)
+            console.log(viewLoaded.rowMap)
+        }
+        /**
+         * 在最前面插入map信息
+         * @param  {[type]} options.firstAlias    [description]
+         * @param  {[type]} options.neighborAlias [description]
+         * @return {[type]}                       [description]
+         */
+        function insertView({
+            firstAlias,
+            neighborAlias
+        }) {
+            let rowItem = new Map()
+            let colMap = viewLoaded.colMap
+            viewLoaded.rowMap.set(firstAlias, rowItem)
+
+            // 因为map中，需要过滤掉左上角的坐标
+            // 所以，i = 0是，不计入map里
+            for (let i = 1; i < colLen; i++) {
+                let item = viewLoaded.cols[i]
+                rowItem.set(item, true)
+                colMap.get(item).set(firstAlias, true)
+            }
+            viewLoaded.rows.splice(0, 0, neighborAlias)
+            console.log(viewLoaded.rows)
+            console.log(viewLoaded.rowMap)
+        }
+        /**
+         * 删除map信息
+         * @param  {[boolean]} final [是否在最后删除]
+         * @return {[type]}       [description]
+         */
+        function delView({
+            alias,
+            final = false
+        }) {
+            let rowMap = viewLoaded.rowMap
+            rowMap.forEach((rowValue, rowKey) => {
+                if (rowKey === alias) {
+                    let colMap = viewLoaded.colMap
+                    rowValue.forEach((colValue, colKey) => {
+                        colMap.get(colKey).delete(rowKey)
+                    })
+                    return
+                }
+            })
+            rowMap.delete(alias)
+            let rows = viewLoaded.rows
+            if (final) {
+                rows.splice(rows.length - 1, 1)
+            } else {
+                rows.splice(0, 1)
+            }
+            console.log('delView -------------- START')
+            console.log(viewLoaded.rows)
+            console.log(viewLoaded.rowMap)
+            console.log('delView -------------- OVER')
         }
         // this.scrollToBottom({
         //     limitTop,

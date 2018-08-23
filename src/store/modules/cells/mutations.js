@@ -17,6 +17,16 @@ export default {
         let cell = state.list[idx]
         state.list[idx] = extend(true, cell, prop)
     },
+    M_CELLS_UPDATE_VIEW(state, {
+        cells,
+        propValue
+    }) {
+        let len = cells.length
+        for (let i = 0; i < len; i++) {
+            let item = cells[i]
+            item.visible = propValue
+        }
+    },
     /**
      * 更新单元格对应关系表
      */
@@ -59,11 +69,5 @@ export default {
      */
     [M_DESTORY_CELL](state, cell) {
         cell.status.destory = true
-    },
-    M_CELLS_UPDATE_VIEW(state, {
-        cell,
-        isView
-    }) {
-        cell.view = isView
     }
 }

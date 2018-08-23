@@ -39,15 +39,15 @@ export default {
      * 这样利于表格自动扩展
      * 在自动增加行处，作用很大
      */
-    prestrainWidth: 1200,
-    prestrainHeight: 600,
+    prestrainWidth: 600,
+    prestrainHeight: 1200,
     /**
      * 请求区域宽、高度, 单位px
      * 请求区域的数值应该大于等于预加载区两倍，
      * 以减少请求次数，减少渲染次数
      */
-    scrollBufferWidth: 600,
-    scrollBufferHeight: 300,
+    scrollBufferWidth: 300,
+    scrollBufferHeight: 600,
     /**
      * 工具栏宽度
      * @type {Number}

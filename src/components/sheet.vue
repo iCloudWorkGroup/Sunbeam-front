@@ -126,10 +126,10 @@ export default {
         },
         rowLast() {
             if (this.frozenMode === 'NO') {
-                let visibleRows = this.$store.getters.visibleRowList()
+                let rows = this.$store.getters.allRows
                 return {
-                    start: visibleRows[0].alias,
-                    over: visibleRows[visibleRows.length - 1].alias
+                    start: rows[0].alias,
+                    over: rows[rows.length - 1].alias
                 }
             } else {
                 let rowRule = this.localSheet.frozen.row
@@ -143,10 +143,10 @@ export default {
         },
         colLast() {
             if (this.frozenMode === 'NO') {
-                let visibleCols = this.$store.getters.visibleColList()
+                let cols = this.$store.getters.allCols
                 return {
-                    start: visibleCols[0].alias,
-                    over: visibleCols[visibleCols.length - 1].alias
+                    start: cols[0].alias,
+                    over: cols[cols.length - 1].alias
                 }
             } else {
                 let colRule = this.localSheet.frozen.col

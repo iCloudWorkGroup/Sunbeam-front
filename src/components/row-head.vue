@@ -72,11 +72,6 @@ export default {
                 this.$el.scrollTop = value
             }
         }
-    },
-    mounted() {
-        if (this.scrollTop != null) {
-            this.$el.scrollTop = this.scrollTop
-        }
     }
 }
 </script>

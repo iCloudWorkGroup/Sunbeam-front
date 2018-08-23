@@ -4,7 +4,7 @@ import cache from '../tools/cache'
 
 export default function(options, recordStep = true) {
     if (recordStep === true) {
-        cache.step++
+        // cache.step++
     }
     let fixOptions = extend({
         mode: 'cors',

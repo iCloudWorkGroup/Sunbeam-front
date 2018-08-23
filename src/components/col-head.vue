@@ -72,11 +72,6 @@ export default {
                 this.$el.scrollLeft = value
             }
         }
-    },
-    mounted() {
-        if (this.scrollLeft != null) {
-            this.$el.scrollLeft = this.scrollLeft
-        }
     }
 }
 </script>

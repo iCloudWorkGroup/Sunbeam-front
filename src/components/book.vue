@@ -26,7 +26,7 @@ import {
 export default {
     data() {
         return {
-            // 暂时使用scroll，需要看实验的边线效果
+            // BUG: 暂时使用scroll，需要看实验的边线效果
             height: unit(cache.rootEl.scrollHeight),
             width: unit(cache.rootEl.scrollWidth)
             // height: unit(cache.rootEl.offsetHeight),

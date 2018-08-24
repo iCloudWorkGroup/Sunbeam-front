@@ -710,11 +710,10 @@ export default {
             }, false).then(function(data) {
                 let rows = data.gridLineRow
                 dispatch(actionTypes.ROWS_ADD, rows)
-                let backRowAlias = rows[rows.length - 1].alias
-                let cells = data.cells
-                if (cells.length !== 0) {
-                    dispatch(actionTypes.A_CELLS_ADD, cells)
+                if (data.cells.length !== 0) {
+                    dispatch(actionTypes.A_CELLS_ADD, data.cells)
                 }
+                let backRowAlias = rows[rows.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {
                     rowAlias: backRowAlias,
                     colAlias: lastCol.alias,

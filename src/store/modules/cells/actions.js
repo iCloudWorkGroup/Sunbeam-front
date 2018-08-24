@@ -58,6 +58,7 @@ export default {
             let cols = getters.allCols
             let rows = getters.allRows
             let fixedCell = extend(template, cell)
+
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
@@ -70,24 +71,31 @@ export default {
             let startRowIndex = getters.rowIndexByAlias(occupyRows[0])
             let endRowIndex = getters.rowIndexByAlias(occupyRows[
                 occupyRows.length - 1])
+
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
             let top = rows[startRowIndex].top
             let left = cols[startColIndex].left
-            let width = 0
-            for (let i = endColIndex; i > startColIndex - 1; i--) {
-                let item = cols[i]
-                if (!item.hidden) {
-                    width = item.left + item.width - left
-                    break
+
+            // 当结束列为hidden是，寻找前一个，直到最前面
+            let width = endColIndex === -1 ? 'inhert' : caclWidth()
+
+            function caclWidth() {
+                for (let i = endColIndex; i > startColIndex - 1; i--) {
+                    let item = cols[i]
+                    if (!item.hidden) {
+                        return item.left + item.width - left
+                    }
                 }
             }
-            let height = 0
-            for (let i = endRowIndex; i > startRowIndex - 1; i--) {
-                let item = rows[i]
-                if (!item.hidden) {
-                    height = item.top + item.height - top
-                    break
+            let height = endRowIndex === -1 ? 'inhert' : caclHeight()
+
+            function caclHeight() {
+                for (let i = endRowIndex; i > startRowIndex - 1; i--) {
+                    let item = rows[i]
+                    if (!item.hidden) {
+                        return item.top + item.height - top
+                    }
                 }
             }
             fixedCell = extend(fixedCell, {
@@ -102,6 +110,7 @@ export default {
                 fixedCell.alias = generator.cellAliasGenerator()
             }
             commit(mutationTypes.M_INSERT_CELL, fixedCell)
+
             // 更新坐标关系表
             commit(mutationTypes.M_UPDATE_POINTS, {
                 occupyCols,
@@ -481,6 +490,7 @@ export default {
             startRowIndex,
             endRowIndex
         })
+
         // 左上角位置的单元格，作为合并单元格的模板原型，
         // 如果没有单元格，以横向优先，竖向次之查找
         // 如果所有都没有，就按照template属性合并

@@ -248,6 +248,8 @@ textarea {
     font-family: inherit;
     padding: 1px;
     margin: 1px;
+    width: inherit;
+    height: inherit;
 }
 
 .cell-content {

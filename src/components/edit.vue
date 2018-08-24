@@ -86,6 +86,8 @@ export default {
             let overRow = rows.map.get(this.rowOver)
             let lastRow = rows.list[rows.list.length - 1]
             let limitHeight = 0
+            // 如果视图的最后元素和已经加载元素一致
+            // 说明不是冻结视图 需要考虑上下边框的距离
             if (overRow.alias === lastRow.alias) {
                 limitHeight = cache.rootEl.offsetHeight -
                 config.cornerHeight - config.sheetSider

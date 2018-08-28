@@ -129,6 +129,9 @@ export default {
             scrollTop,
             toward
         }) {
+            let limitMin
+            let limitMax
+            let actionsName
             if (toward === 'DOWN' || toward === 'UP') {
                 let limitTop = scrollTop - config.scrollBufferHeight
 
@@ -137,21 +140,25 @@ export default {
                 limitTop += this.offsetTop
                 let limitBottom = limitTop + this.$el.clientHeight +
                     config.scrollBufferHeight + this.offsetTop
-                let actionsName
-                switch (toward) {
-                    case 'DOWN':
-                        actionsName = 'SHEET_SCROLL_DOWN'
-                        break
-                    case 'UP':
-                        actionsName = 'SHEET_SCROLL_DOWN'
-                        break
-                }
-                this.$store.dispatch(actionsName, {
-                    limitMin: limitTop,
-                    limitMax: limitBottom,
-                    viewLoaded: this.viewLoaded
-                })
+                actionsName = 'SHEET_SCROLL_VERTICAL'
+                limitMin = limitTop
+                limitMax = limitBottom
             }
+            if (toward === 'LEFT' || toward === 'RIGHT') {
+                let limitLeft = scrollLeft - config.scrollBufferWidth
+                limitLeft = limitLeft > 0 ? limitLeft : 0
+                limitLeft += this.offsetLeft
+                let limitRight = limitLeft + this.$el.clientWidth +
+                    config.scrollBufferWidth + this.offsetLeft
+                actionsName = 'SHEET_SCROLL_TRANSVERSE'
+                limitMin = limitLeft
+                limitMax = limitRight
+            }
+            this.$store.dispatch(actionsName, {
+                limitMin,
+                limitMax,
+                viewLoaded: this.viewLoaded
+            })
         },
         transverseRequest(left, right, resolve, fn) {
             let startRowAlias = this.rowOccupy[0]

@@ -208,9 +208,6 @@ export default {
                     let colAlias = allCols[i].alias
                     let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
-                    if (avoidRepeat[idx]) {
-                        console.log(idx)
-                    }
                     if (idx !== -1 && !avoidRepeat[idx]) {
                         avoidRepeat[idx] = true
                         result.push(state.list[idx])

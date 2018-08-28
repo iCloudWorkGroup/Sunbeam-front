@@ -62,5 +62,14 @@ export default {
         let map = state[currentSheet].map
         map.delete(list[index].alias)
         list.splice(index, 1)
+    },
+    M_COLS_UPDATE_VIEW(state, {
+        isView,
+        startIdx,
+        overIdx
+    }) {
+        for (let i = startIdx; i < overIdx + 1; i++) {
+            state.list[i].visible = isView
+        }
     }
 }

@@ -3,7 +3,7 @@
         :style="viewPosi">
         <div class="cell-content"
              :style="viewProps">
-            {{cell.content.displayTexts}}
+            {{cell.content.displayTexts}} / {{cell.alias}}
         </div>
     </div>
 </template>
@@ -120,7 +120,7 @@ export default {
             }
             if (attrs.wordWrap) {
                 props.wordBreak = 'break-word'
-                props.whiteSpace = 'pre-line'
+                // props.whiteSpace = 'pre-line'
             } else {
                 props.whiteSpace = 'nowrap'
             }

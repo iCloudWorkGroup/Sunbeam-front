@@ -22,19 +22,18 @@ export default {
     ],
     computed: {
         cells() {
-            let getters = this.$store.getters
-            let startColIndex = getters.colIndexByAlias(this.colStart)
-            let endColIndex = getters.colIndexByAlias(this.colOver)
-            let startRowIndex = getters.rowIndexByAlias(this.rowStart)
-            let endRowIndex = getters.rowIndexByAlias(this.rowOver)
-            let count = this.$store.getters.cellsByVertical({
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex
-            })
-            console.log('count: ' + count.length)
-            return count
+            // let getters = this.$store.getters
+            // let startColIndex = getters.colIndexByAlias(this.colStart)
+            // let endColIndex = getters.colIndexByAlias(this.colOver)
+            // let startRowIndex = getters.rowIndexByAlias(this.rowStart)
+            // let endRowIndex = getters.rowIndexByAlias(this.rowOver)
+            return this.$store.getters.visibleCells
+            // return this.$store.getters.cellsByVertical({
+            //     startColIndex,
+            //     endColIndex,
+            //     startRowIndex,
+            //     endRowIndex
+            // })
         }
     },
     components: {

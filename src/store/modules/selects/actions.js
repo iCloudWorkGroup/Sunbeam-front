@@ -67,12 +67,19 @@ export default {
             endColAlias: cols[endColIndex].alias,
             endRowAlias: rows[endRowIndex].alias
         }
+        let type
+        if (getters.selectState === 'select') {
+            type = 'SELECT'
+        } else {
+            type = 'DATESOURCE'
+        }
         let fixedSelect = extend(template, {
             alias,
             wholePosi,
             activePosi,
             physicsBox,
-            signalSort
+            signalSort,
+            type
         })
         commit(mutationTypes.INSERT_SELECT, fixedSelect)
         dispatch(COLS_ACTIVE, {

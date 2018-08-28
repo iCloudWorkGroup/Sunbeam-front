@@ -1,7 +1,7 @@
 <template>
     <div class="fui-body">
         <span class="fui-layout">
-            <div class="fui-section fui-transverse" data-widget="hide" @click="activeWidget">
+            <div class="fui-section fui-transverse" data-initiator="hide" @click="ejectMenu($event,'hide')">
                 <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
                 <div class="fui-cf-desc">
                     <div class="fui-cf-text">隐藏</div>
@@ -9,7 +9,7 @@
             </div>
         </span>
         <span class="fui-layout">
-            <div class="fui-section fui-transverse" data-widget="show" @click="activeWidget">
+            <div class="fui-section fui-transverse" data-initiator="show" @click="ejectMenu($event,'show')">
                 <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
                 <div class="fui-cf-desc">
                     <div class="fui-cf-text">取消隐藏</div>
@@ -17,7 +17,7 @@
             </div>
         </span>
         <div class="widget" ref="hide"
-            v-show="activeWidgetId === 'hide'">
+            v-show="tool === 'hide'">
             <div class="widget-panel">
                 <ul class="widget-menu frozenBox" style="min-width:220px">
                     <li @mousedown.stop="hideRow">
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="widget" ref="show"
-            v-show="activeWidgetId === 'show'">
+            v-show="tool === 'show'">
             <div class="widget-panel">
                 <ul class="widget-menu frozenBox" style="min-width:220px">
                     <li @mousedown.stop="showRow">
@@ -63,43 +63,40 @@ import {
     COLS_CANCELHIDE,
     ROWS_CANCELHIDE
 } from '../../store/action-types'
-
+import {
+    SWITCH_NAME
+} from '../store/mutation-type'
+import {
+    unit
+} from '../../filters/unit'
 export default {
-    props: [
-        'activeWidgetId'
-    ],
+    computed: {
+        tool() {
+            return this.$store.getters.activeTool
+        }
+    },
     methods: {
-        activeWidget(e) {
-            let elem = e.currentTarget
-            let widgetId = elem.dataset.widget
-            let widget
-            let box
-
-            if (!widgetId) {
-                return
+        ejectMenu(e, menuName) {
+            let el = e.currentTarget
+            let menu = this.$refs[menuName]
+            let menuEl
+            if (menu != null && (menuEl = menu.$el) != null) {
+                menuEl.style.top = unit(el.offsetHeight + el.offsetTop - 1)
+                menuEl.style.left = unit(el.offsetLeft)
+                this.$store.commit(SWITCH_NAME, menuName)
             }
-
-            box = elem.getBoundingClientRect()
-            widget = this.$refs[widgetId]
-            widget.style.top = box.top + box.height + 'px'
-            widget.style.left = box.left + 'px'
-            this.$emit('updateActiveWidgetId', widgetId)
         },
         hideCol() {
             this.$store.dispatch(COLS_HIDE)
-            this.$emit('updateActiveWidgetId', '')
         },
         hideRow() {
             this.$store.dispatch(ROWS_HIDE)
-            this.$emit('updateActiveWidgetId', '')
         },
         showCol() {
             this.$store.dispatch(COLS_CANCELHIDE)
-            this.$emit('updateActiveWidgetId', '')
         },
         showRow() {
             this.$store.dispatch(ROWS_CANCELHIDE)
-            this.$emit('updateActiveWidgetId', '')
         }
     }
 }

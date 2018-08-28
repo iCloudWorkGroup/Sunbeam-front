@@ -53,7 +53,7 @@ export default {
         }
     },
     /**
-     * [M_SHEETS_ADD_LOADED 添加loaded数据]
+     * [M_SHEETS_ADD_LOADED description]
      * @param {[type]}  state             [description]
      * @param {[type]}  options.colAlias  [description]
      * @param {Boolean} options.colSupply [是否添加到数组中，避免数组重复]
@@ -88,7 +88,6 @@ export default {
         } else {
             colItem.set(colAlias, true)
         }
-        console.log(loaded)
     },
     UPDATE_SHEETS_MAX(state, {
         rowAlias,

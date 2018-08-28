@@ -16,7 +16,7 @@ export function parseExpress(str) {
         reg: /^@$/g,
         handle: 'article'
     }, {
-        reg: /^(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|^(y{4})[-/年]?(m{1,2})[-/月]?/g,
+        reg: /(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|(y{4})[-/年]?(m{1,2})[-/月]?/g,
         handle: 'whole',
         match: true
     }, {
@@ -83,7 +83,6 @@ export function isDate(value) {
     if (day !== null && day.indexOf('日') !== -1) {
         day = day.substring(0, day.length - 1)
     }
-
     date = new Date(year + '/' + (month || '01') + '/' + (day || '01'))
     if (parseInt(year, 10) !== date.getFullYear()) {
         return false
@@ -166,6 +165,10 @@ export function formatText(rules, text) {
             return this.manifest + rule.match
         },
         whole: function(rule) {
+            let reg = /^\d{4}\u5e74\d{1,2}\u6708(\d{1,2}\u65e5)?$/
+            if (reg.test(this.origin)) {
+                this.origin = this.origin.replace(/\u5e74|\u6708|\u65e5/g, '/')
+            }
             let localDate = new Date(this.origin)
             let dateMap = {
                 y: localDate.getFullYear(),

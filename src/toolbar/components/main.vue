@@ -30,20 +30,20 @@
                 <panel title="对齐方式">
                     <align/>
                 </panel>
-                <!-- <tool-panel title="文本格式">
+                <<panel title="文本格式">
                     <format/>
-                </tool-panel> -->
+                </panel>
                 <panel title="合并拆分">
                     <merge/>
                 </panel>
                 <!-- <tool-panel title="视图">
                     <frozen/>
-                </tool-panel>
-                <tool-panel title="隐藏">
+                </tool-panel> -->
+                <panel title="隐藏">
                     <hide/>
-                </tool-panel>  -->
+                </panel>
                  <panel  title="行列">
-                    <!--<rowcol/>-->
+                    <rowcol/>
                 </panel>
             </ul>
         </div>
@@ -56,9 +56,9 @@ import Font from './font.vue'
 // import Frozen from './frozen.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
-// import Format from './format.vue'
+import Format from './format.vue'
 import Rowcol from './rowcol.vue'
-// import Hide from './hide.vue'
+import Hide from './hide.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
 // import WordWrap from './wordwrap.vue'
@@ -75,10 +75,10 @@ export default {
         Align,
         Merge,
         Rowcol,
-        // Hide,
+        Hide,
         // Undo,
         // Clip,
-        // Format,
+        Format,
         // WordWrap
     },
     mounted() {

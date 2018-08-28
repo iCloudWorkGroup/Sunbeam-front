@@ -248,8 +248,6 @@ textarea {
     font-family: inherit;
     padding: 1px;
     margin: 1px;
-    width: inherit;
-    height: inherit;
 }
 
 .cell-content {
@@ -626,4 +624,4 @@ textarea {
  */
 
 
-/*.loadmark { position: absolute; height: 100%; width: 100%; background-color: #ffffff; background: url(../img/loading.gif) 50% 50% no-repeat #ffffff; z-index: 100; }*/
+.loadmark { position: absolute; height: 100%; width: 100%;top:0; background: url(../img/loading.gif) 50% 50% no-repeat rgba(255,255,255,0.5); z-index: 100; }

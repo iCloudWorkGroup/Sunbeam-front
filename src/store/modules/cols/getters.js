@@ -52,7 +52,8 @@ export default {
             if (beginIdx !== -1 && endIdx !== -1) {
 
                 // 因为索引总是 -1，所以结束要 +1
-                return this.visibleColList().slice(beginIdx, endIdx + 1)
+                // return this.visibleColList().slice(beginIdx, endIdx + 1)
+                return this.visibleColList()
             }
             return null
         }

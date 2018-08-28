@@ -7,9 +7,12 @@ export default {
     allSelects(state) {
         return state.list
     },
+    selectState(state) {
+        return state.selectState
+    },
     getOprRegion(state, getters) {
         return function() {
-            let wholePosi = state.activeSelect.wholePosi
+            let wholePosi = state.list[0].wholePosi
             let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
 

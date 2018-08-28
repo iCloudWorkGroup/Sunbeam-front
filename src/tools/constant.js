@@ -6,6 +6,7 @@
  */
 export const SELECT = 'SELECT'
 export const CLIP = 'CLIP'
+export const DATESOURCE = 'DATESOURCE'
 /**
  * 鼠标操作状态
  */

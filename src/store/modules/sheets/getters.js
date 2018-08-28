@@ -47,7 +47,7 @@ export default {
             alias,
             type
         }) {
-            let loads = state.loaded[type.toLowerCase()]
+            let loads = state.loaded[type]
             for (let i = 0, len = loads.length; i < len; i++) {
                 let item = loads[i]
                 if (alias === item) {
@@ -57,7 +57,7 @@ export default {
             return -1
         }
     },
-    max(state) {
+    SHEET_MAX(state) {
         return state.max
     }
 }

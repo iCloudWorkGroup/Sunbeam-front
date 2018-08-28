@@ -18,7 +18,7 @@ import {
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import {
-    CLIP
+    CLIP, SELECT
 } from '../../../tools/constant'
 import {
     getTextHeight
@@ -58,7 +58,6 @@ export default {
             let cols = getters.allCols
             let rows = getters.allRows
             let fixedCell = extend(template, cell)
-
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
@@ -71,31 +70,24 @@ export default {
             let startRowIndex = getters.rowIndexByAlias(occupyRows[0])
             let endRowIndex = getters.rowIndexByAlias(occupyRows[
                 occupyRows.length - 1])
-
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
             let top = rows[startRowIndex].top
             let left = cols[startColIndex].left
-
-            // 当结束列为hidden是，寻找前一个，直到最前面
-            let width = endColIndex === -1 ? 'inhert' : caclWidth()
-
-            function caclWidth() {
-                for (let i = endColIndex; i > startColIndex - 1; i--) {
-                    let item = cols[i]
-                    if (!item.hidden) {
-                        return item.left + item.width - left
-                    }
+            let width = 0
+            for (let i = endColIndex; i > startColIndex - 1; i--) {
+                let item = cols[i]
+                if (!item.hidden) {
+                    width = item.left + item.width - left
+                    break
                 }
             }
-            let height = endRowIndex === -1 ? 'inhert' : caclHeight()
-
-            function caclHeight() {
-                for (let i = endRowIndex; i > startRowIndex - 1; i--) {
-                    let item = rows[i]
-                    if (!item.hidden) {
-                        return item.top + item.height - top
-                    }
+            let height = 0
+            for (let i = endRowIndex; i > startRowIndex - 1; i--) {
+                let item = rows[i]
+                if (!item.hidden) {
+                    height = item.top + item.height - top
+                    break
                 }
             }
             fixedCell = extend(fixedCell, {
@@ -110,7 +102,6 @@ export default {
                 fixedCell.alias = generator.cellAliasGenerator()
             }
             commit(mutationTypes.M_INSERT_CELL, fixedCell)
-
             // 更新坐标关系表
             commit(mutationTypes.M_UPDATE_POINTS, {
                 occupyCols,
@@ -124,23 +115,35 @@ export default {
         commit,
         dispatch,
         getters
-    }, {
-        propName,
-        propStruct
-    }) {
-        let select = getters.allSelects[0]
+    }, payload) {
+        let {
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex,
+            propName,
+            propStruct
+        } = payload
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
         await send({
             url: config.url[propName],
             body: JSON.stringify(select.signalSort)
         })
-
-        // 修正参数
-        let wholePosi = select.wholePosi
-        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-
+        if (typeof startColIndex === 'undefined') {
+            // 修正参数
+            let wholePosi = select.wholePosi
+            startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        }
         let rows = getters.allRows
         let cols = getters.allCols
         if (endRowIndex === -1) {
@@ -149,7 +152,6 @@ export default {
         if (endColIndex === -1) {
             endColIndex = cols.length - 1
         }
-
         // 如果有对应的单元格，修改属性
         // 如果没有对应的单元格，插入单元格
         let avoidRepeat = {}
@@ -189,25 +191,24 @@ export default {
         props,
         fn
     }) {
-        let getPointInfo = getters.getPointInfo
+        // let getPointInfo = getters.IdxByRow
         let tempSign = {}
-        let cols = getters.colList
+        let cols = getters.allCols
         let rows = getters.allRows
         let cells = getters.cells
         let updateCellInfo = []
         let insertCellList = []
         let colAlias
         let rowAlias
-        let cellIndex
-
+        let cellIdx
         for (let i = startColIndex; i <= endColIndex; i++) {
             for (let j = startRowIndex; j <= endRowIndex; j++) {
                 colAlias = cols[i].alias
                 rowAlias = rows[j].alias
-                cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                if (typeof cellIndex === 'number') {
+                cellIdx = getters.IdxByRow(colAlias, rowAlias)
+                if (cellIdx !== -1) {
                     let cell
-                    if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
+                    if ((cell = cells[cellIdx]) && !tempSign[cell.alias]) {
                         let updateProp
                         if (fn) {
                             updateProp = extend({}, props, fn(cell))
@@ -230,11 +231,13 @@ export default {
                 }
             }
         }
-
         dispatch(A_CELLS_ADD, insertCellList)
-        if (updateCellInfo.length > 0) {
-            commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-        }
+        updateCellInfo.forEach((item, index) => {
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                prop: item.props
+            })
+        })
     },
     [COLS_OPERCOLS]({
         getters,
@@ -470,17 +473,32 @@ export default {
     async [A_CELLS_MERGE]({
         dispatch,
         getters
-    }) {
-        let select = getters.allSelects[0]
+    }, payload) {
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
+        let {
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        } = payload
         await send({
             url: config.url.merge,
             body: JSON.stringify(select.signalSort)
         })
-        let wholePosi = select.wholePosi
-        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        if (typeof startColIndex === 'undefined') {
+            let wholePosi = select.wholePosi
+            startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        }
         if (endRowIndex === -1 || endColIndex === -1) {
             return
         }
@@ -490,7 +508,6 @@ export default {
             startRowIndex,
             endRowIndex
         })
-
         // 左上角位置的单元格，作为合并单元格的模板原型，
         // 如果没有单元格，以横向优先，竖向次之查找
         // 如果所有都没有，就按照template属性合并
@@ -523,11 +540,19 @@ export default {
             startRowIndex,
             endRowIndex
         } = payload
-        let wholePosi = getters.allSelects[0].wholePosi
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
+        let wholePosi = select.wholePosi
         startColIndex = startColIndex || getters.colIndexByAlias(wholePosi.startColAlias)
         endColIndex = endColIndex || getters.colIndexByAlias(wholePosi.endColAlias)
         startRowIndex = startRowIndex || getters.rowIndexByAlias(wholePosi.startRowAlias)
-        endRowIndex = endRowIndex || getters.colIndexByAlias(wholePosi.endRowAlias)
+        endRowIndex = endRowIndex || getters.rowIndexByAlias(wholePosi.endRowAlias)
         let cells = getters.cellsByTransverse({
             startColIndex,
             endColIndex,
@@ -564,35 +589,58 @@ export default {
         getters,
         rootState,
         dispatch
-    }, value) {
+    }, payload) {
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
         let {
             startColIndex,
             startRowIndex,
             endColIndex,
-            endRowIndex
-        } = getters.getOprRegion
-        let cols = getters.colList
-        let rows = getters.allRows
+            endRowIndex,
+            value
+        } = payload
+        // 修正参数
+        if (typeof startColIndex === 'undefined') {
+            let wholePosi = select.wholePosi
+            startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        }
+        // let {
+        //     startColIndex,
+        //     startRowIndex,
+        //     endColIndex,
+        //     endRowIndex
+        // } = getters.getOprRegion()
+
+        // let cols = getters.allCols
+        // let rows = getters.allRows
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
-
-        let data = {
-            coordinate: [{
-                startCol: cols[startColIndex].sort,
-                startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[
-                    endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[
-                    endRowIndex].sort
-            }],
-            format,
-            express
-        }
-        send({
-            url: config.url['format'],
-            data: JSON.stringify(data)
-        })
+        // let data = {
+        //     coordinate: [{
+        //         startCol: cols[startColIndex].sort,
+        //         startRow: rows[startRowIndex].sort,
+        //         endCol: endColIndex === 'MAX' ? -1 : cols[
+        //             endColIndex].sort,
+        //         endRow: endRowIndex === 'MAX' ? -1 : rows[
+        //             endRowIndex].sort
+        //     }],
+        //     format,
+        //     express
+        // }
+        // send({
+        //     url: config.url['format'],
+        //     data: JSON.stringify(data)
+        // })
         let rules = parseExpress(value)
         let props = {
             content: {

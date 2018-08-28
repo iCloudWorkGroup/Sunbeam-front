@@ -31,7 +31,7 @@ export default {
         alignCol: 'middle',
         wordWrap: false,
         underline: 0,
-        background: '#fff'
+        background: 'rgba(255, 255, 255, 1)'
     },
     border: {
         top: 0,

@@ -5,6 +5,7 @@ import Book from './components/book.vue'
 import Main from './toolbar/components/main.vue'
 import toolbar from './toolbar/store'
 import cache from './tools/cache'
+import Sunbeam from  './api/Sunbeam'
 import {
     RESTORE
 } from './store/action-types'
@@ -28,33 +29,33 @@ export default function(options) {
         cache.toolEl = $toolEl
     }
     // 发送restore请求
-    let bottom = $rootEl.offsetHeight + config.scrollBufferHeight
-    let right = $rootEl.offsetWidth + config.scrollBufferWidth
     store.dispatch(RESTORE, {
         left: 0,
         top: 0,
-        right,
-        bottom
+        right: $rootEl.offsetWidth + config.prestrainWidth,
+        bottom: $rootEl.offsetHeight + config.prestrainHeight
     }).then(() => {
-        // 修正每次滚动加载的距离，让每次加载的距离大于触发加载值 100
-        // 这样可以保证，每次加完成后，每个加载宽肯定会大于用户的触发limit值
-        cache.prestrainHeight = Math.max(cache.prestrainHeight, bottom +
-            100)
-        cache.prestrainWidth = Math.max(cache.prestrainWidth, right +
-            100)
-        new Vue({
+        let toolBarVm
+        let main = new Vue({
             store,
+            el: rootSelector,
             render: h => h(Book)
-        }).$mount(rootSelector)
-
+        })
         if (toolSelector != null) {
             store.registerModule('toolbar', toolbar)
-            new Vue({
+            toolBarVm = new Vue({
                 store,
                 render: h => h(Main)
             }).$mount(toolSelector)
         }
+        let ss = new Sunbeam(main, toolBarVm)
+        window.ss = ss
+        // ss.reload()
+        return {
+            main
+        }
     }).then(() => {
         // console.log('open api')
     })
+
 }

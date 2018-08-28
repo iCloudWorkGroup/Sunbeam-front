@@ -6,6 +6,7 @@
             <sheet></sheet>
             <sheet-edit></sheet-edit>
         </div>
+        <!--<div class="loadmark"></div>-->
     </div>
 </template>
 <script type="text/javascript">
@@ -26,7 +27,7 @@ import {
 export default {
     data() {
         return {
-            // BUG: 暂时使用scroll，需要看实验的边线效果
+            // 暂时使用scroll，需要看实验的边线效果
             height: unit(cache.rootEl.scrollHeight),
             width: unit(cache.rootEl.scrollWidth)
             // height: unit(cache.rootEl.offsetHeight),

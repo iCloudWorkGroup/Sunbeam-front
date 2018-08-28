@@ -12,7 +12,8 @@ const state = {
      * 选中区域表
      * @type {Object}
      */
-    list: []
+    list: [],
+    selectState: 'select'
 }
 export default {
     state,

@@ -2,7 +2,8 @@ import {
     M_INSERT_CELL,
     UPDATE_CELL,
     M_UPDATE_POINTS,
-    M_DESTORY_CELL
+    M_DESTORY_CELL,
+    M_DELETE_POINTS
 } from '../../mutation-types'
 import extend from '../../../util/extend'
 
@@ -17,16 +18,6 @@ export default {
         let cell = state.list[idx]
         state.list[idx] = extend(true, cell, prop)
     },
-    M_CELLS_UPDATE_VIEW(state, {
-        cells,
-        propValue
-    }) {
-        let len = cells.length
-        for (let i = 0; i < len; i++) {
-            let item = cells[i]
-            item.visible = propValue
-        }
-    },
     /**
      * 更新单元格对应关系表
      */
@@ -39,7 +30,6 @@ export default {
             for (let k = 0; k < occupyRows.length; k++) {
                 let col = occupyCols[j]
                 let row = occupyRows[k]
-
                 // 列Map填充
                 let colItemMap
                 let colMap = state.colMap
@@ -65,9 +55,47 @@ export default {
         }
     },
     /**
+     * 删除单元格对应关系
+     */
+    [M_DELETE_POINTS](state, {
+        delOccupyCols,
+        delOccupyRows
+    }) {
+        for (let j = 0; j < delOccupyCols.length; j++) {
+            for (let k = 0; k < delOccupyRows.length; k++) {
+                let col = delOccupyCols[j]
+                let row = delOccupyRows[k]
+                // 列Map删除
+                let colMap = state.colMap
+
+                if (colMap.get(col).get(row) !== null) {
+                    colMap.get(col).delete(row)
+                }
+                if (colMap.get(col).size === 0) {
+                    colMap.delete(col)
+                }
+                // 行Map删除
+                let rowMap = state.rowMap
+
+                if (rowMap.get(row).get(col) !== null) {
+                    rowMap.get(row).delete(col)
+                }
+                if (rowMap.get(row).size === 0) {
+                    rowMap.delete(row)
+                }
+            }
+        }
+    },
+    /**
      * 根据索引销毁单元格
      */
     [M_DESTORY_CELL](state, cell) {
-        cell.status.destory = true
+        cell.status.destroy = true
+    },
+    M_CELLS_UPDATE_VIEW(state, {
+        cell,
+        isView
+    }) {
+        cell.view = isView
     }
 }

@@ -3,6 +3,7 @@ import {
 } from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
+import { SELECT } from '../../../tools/constant'
 
 export default {
     cells(state) {
@@ -10,12 +11,12 @@ export default {
     },
     visibleCells(state) {
         return state.list.filter((cell) => {
-            return cell.view && !cell.hidden ? true : false
+            return !cell.status.hidden && !cell.status.destroy && cell.status.visible
         })
     },
     /**
      * 根据行、列别名去查找单元格
-     * 一般用于查抄选择区域的activeCell
+     * 一般用于查找选择区域的activeCell
      * 如果没有单元格，就返回 null
      */
     getCellByAlias(state, getters) {
@@ -35,15 +36,19 @@ export default {
      * 如果没有就返回为单元格默认属性
      *
      * 以后增加：还没有涉及选中的类型
-     *
-     * 监听所有单元格(state.list)的变化
-     * 实现选择区域不变时 computed的触发
      */
     activeCell(state, getters) {
         return function() {
             let cells = state.list
             let selects = getters.allSelects
-            let activePosi = selects[0].activePosi
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let activePosi = select.activePosi
             let idx = this.IdxByRow(activePosi.colAlias, activePosi.rowAlias)
             if (idx !== -1 || cells) {
                 return this.cells[idx]
@@ -118,7 +123,6 @@ export default {
             endColIndex = startColIndex,
             endRowIndex = startRowIndex
         }) {
-
             // 用于接受参数修正
             let startCol
             let startRow
@@ -145,10 +149,10 @@ export default {
                 endRow = endRowIndex
             }
             let cells = getters.cellsByVertical({
-                startColIndex,
-                startRowIndex,
-                endColIndex,
-                endRowIndex
+                startColIndex: startCol,
+                startRowIndex: startRow,
+                endColIndex: endCol,
+                endRowIndex: endRow
             })
             for (let i = 0, len = cells.length; i < len; i++) {
                 let cell = cells[i]
@@ -198,13 +202,14 @@ export default {
                 endRowIndex
             let result = []
             let avoidRepeat = {}
-
-            let startCol = Math.max(startColIndex, cols[0].sort)
-            let startRow = Math.max(startRowIndex, rows[0].sort)
+            let startCol = Math.max(startColIndex)
+            let startRow = Math.max(startRowIndex)
+            // let startCol = Math.max(startColIndex, cols[0].sort)
+            // let startRow = Math.max(startRowIndex, rows[0].sort)
             let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
             let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
-            for (let i = startCol; i < endColLen; i++) {
-                for (let j = startRow; j < endRowLen; j++) {
+            for (let i = startCol; i <= endColLen; i++) {
+                for (let j = startRow; j <= endRowLen; j++) {
                     let colAlias = allCols[i].alias
                     let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
@@ -352,7 +357,15 @@ export default {
     hasMergeCell(state, getters) {
         return function() {
             let allCells = state.list
-            let wholePosi = getters.allSelects[0].wholePosi
+            let selects = getters.allSelects
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let wholePosi = select.wholePosi
             let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
             let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)

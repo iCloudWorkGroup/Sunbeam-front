@@ -9,7 +9,7 @@
             :offsetLeft="offsetLeft"/>
         <col-head-line
             v-for="item in selects"
-            key="item.alias"
+            :key="item.alias"
             :col="item"
             :offsetLeft="offsetLeft"
             />
@@ -71,6 +71,11 @@ export default {
             if (value != null) {
                 this.$el.scrollLeft = value
             }
+        }
+    },
+    mounted() {
+        if (this.scrollLeft != null) {
+            this.$el.scrollLeft = this.scrollLeft
         }
     }
 }

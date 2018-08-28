@@ -9,7 +9,7 @@
             :offsetTop="offsetTop" />
         <row-head-line
             v-for="item in selects"
-            key="item.alias"
+            :key="item.alias"
             :row="item"
             :offsetTop="offsetTop"/>
     </div>
@@ -71,6 +71,11 @@ export default {
             if (value != null) {
                 this.$el.scrollTop = value
             }
+        }
+    },
+    mounted() {
+        if (this.scrollTop != null) {
+            this.$el.scrollTop = this.scrollTop
         }
     }
 }

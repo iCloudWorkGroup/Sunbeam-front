@@ -3,7 +3,7 @@
         :style="viewPosi">
         <div class="cell-content"
              :style="viewProps">
-            {{cell.content.displayTexts}} / {{cell.alias}}
+            {{cell.content.displayTexts}}
         </div>
     </div>
 </template>
@@ -97,6 +97,7 @@ export default {
                 paddingName: 'paddingLeft',
                 marginName: 'marginLeft'
             })
+            let hidden
             return extend({
                 // 因为现实的效果，需要共享单元格的边框
                 // 所以在左、上两面都 -2，这样可以对齐效果
@@ -104,7 +105,7 @@ export default {
                 left: unit(left - 2),
                 width: unit(width - 2),
                 height: unit(height - 2)
-            }, topBorder, rightBorder, bottomBorder, leftBorder)
+            }, topBorder, rightBorder, bottomBorder, leftBorder, hidden)
         },
         viewProps() {
             let attrs = this.cell.content
@@ -120,7 +121,7 @@ export default {
             }
             if (attrs.wordWrap) {
                 props.wordBreak = 'break-word'
-                // props.whiteSpace = 'pre-line'
+                props.whiteSpace = 'pre-line'
             } else {
                 props.whiteSpace = 'nowrap'
             }

@@ -79,8 +79,10 @@
         </div>
     </div>
 </template>
- <script>
-import { CELLS_FORMAT } from '../../store/action-types'
+<script>
+import {
+    CELLS_FORMAT
+} from '../../store/action-types'
 export default {
     methods: {
         setFormat(e) {
@@ -88,11 +90,13 @@ export default {
             let currentTarget = e.currentTarget
             let target = e.target
             let value
-             value = this.getValue(target, currentTarget)
+            value = this.getValue(target, currentTarget)
             if (value == null) {
                 return
             }
-            this.$store.dispatch(CELLS_FORMAT, { value })
+            this.$store.dispatch(CELLS_FORMAT, {
+                value
+            })
         },
         getValue(elem, currentTarget) {
             let value = elem.dataset.value

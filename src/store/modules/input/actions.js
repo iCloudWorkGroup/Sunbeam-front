@@ -21,7 +21,6 @@ export default {
         // 获取当前选中的单元格
         // 算出选中个的位置、宽高信息
         // 设置该模型覆盖其位置
-        // 
         let wholePosi = getters.activeSelect.wholePosi
         let colAlias = wholePosi.startColAlias
         let rowAlias = wholePosi.startRowAlias

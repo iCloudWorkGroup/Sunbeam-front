@@ -137,8 +137,9 @@ export default {
             }
         })
         updateCellInfo.forEach((item, index) => {
-             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -281,7 +282,7 @@ export default {
                     })
                 })
                 if (occupyCol.length === 1) {
-                     dispatch(actionTypes.A_CELLS_DESTORY, [cell])
+                    dispatch(actionTypes.A_CELLS_DESTORY, [cell])
                 } else {
                     let newOccupyCol = [...occupyCol]
                     newOccupyCol.splice(aliasIndex, 1)
@@ -312,10 +313,12 @@ export default {
         })
         updateCellInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
+
         // delete
         updateOccupys.forEach((item, index) => {
             commit(mutationTypes.M_DELETE_POINTS, {
@@ -542,173 +545,189 @@ export default {
         getters,
         dispatch
     }, sort) {
-        let cols = getters.allCols
-        let index = getters.getColIndexBySort(sort)
-        let col = cols[index]
-        let visibleCols = getters.visibleColList()
-        let updateCellInfo = []
-        let colWidth = col.width
-        let colAlias = col.alias
+        // let cols = getters.allCols
+        // let index = getters.getColIndexBySort(sort)
+        // let col = cols[index]
+        // let visibleCols = getters.visibleColList()
+        // let updateCellInfo = []
+        // let colWidth = col.width
+        // let colAlias = col.alias
 
-        let cells = getters.cellsByVertical({
-            startColIndex: index,
-            startRowIndex: 0,
-            endColIndex: -1,
-            endRowIndex: -1,
-        })
+        // let cells = getters.cellsByVertical({
+        //     startColIndex: index,
+        //     startRowIndex: 0,
+        //     endColIndex: -1,
+        //     endRowIndex: -1,
+        // })
 
-        cells.forEach(function(cell) {
-            let occupy = cell.occupy.col
+        // cells.forEach(function(cell) {
+        //     let occupy = cell.occupy.col
 
-            if (occupy.indexOf(colAlias) !== -1) {
-                if (occupy.length === 1) {
-                    updateCellInfo.push({
-                        cell,
-                        props: {
-                            physicsBox: {
-                                width: cell.physicsBox.width -
-                                colWidth - 1
-                            },
-                            status: {
-                                hidden: true
-                            }
-                        }
-                    })
-                } else {
-                    updateCellInfo.push({
-                        cell,
-                        props: {
-                            physicsBox: {
-                                width: cell.physicsBox.width -
-                                colWidth - 1
-                            }
-                        }
-                    }）
-            } else {
-                updateCellInfo.push({
-                    cell,
-                    props: {
-                        physicsBox: {
-                            left: cell.physicsBox.left -
-                                colWidth - 1
-                        }
-                    }
-                })
-            }
-        })
-        updateCellInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
-                prop: item.props
-            })
-        })
+        //     if (occupy.indexOf(colAlias) !== -1) {
+        //         if (occupy.length === 1) {
+        //             updateCellInfo.push({
+        //                 cell,
+        //                 props: {
+        //                     physicsBox: {
+        //                         width: cell.physicsBox.width -
+        //                             colWidth - 1
+        //                     },
+        //                     status: {
+        //                         hidden: true
+        //                     }
+        //                 }
+        //             })
+        //         } else {
+        //             updateCellInfo.push({
+        //                     cell,
+        //                     props: {
+        //                         physicsBox: {
+        //                             width: cell.physicsBox.width -
+        //                                 colWidth - 1
+        //                         }
+        //                     }
+        //                 }）
+        //             }
+        //         }
+        //     } else {
+        //         updateCellInfo.push({
+        //             cell,
+        //             props: {
+        //                 physicsBox: {
+        //                     left: cell.physicsBox.left -
+        //                         colWidth - 1
+        //                 }
+        //             }
+        //         })
+        //     }
+        // })
+        // updateCellInfo.forEach((item, index) => {
+        //     commit(mutationTypes.UPDATE_CELL, {
+        //         idx: getters.IdxByRow(item.cell.occupy
+        //             .col[0], item.cell.occupy.row[
+        //                 0]),
+        //         prop: item.props
+        //     })
+        // })
 
-        let updateSelectInfo = []
-        let colLeft = col.left
-        let selects = getters.allSelects
+        // let updateSelectInfo = []
+        // let colLeft = col.left
+        // let selects = getters.allSelects
 
-        selects.forEach(function(select) {
-            let wholePosi = select.wholePosi
-            let startSort
-            let endSort
-            let colSort = col.sort
-            let endVisibleSort = visibleCols[visibleCols.length - 1].sort
+        // selects.forEach(function(select) {
+        //     let wholePosi = select.wholePosi
+        //     let startSort
+        //     let endSort
+        //     let colSort = col.sort
+        //     let endVisibleSort = visibleCols[visibleCols.length -
+        //         1].sort
 
-            startSort = getters.getColByAlias(wholePosi.startColAlias).sort
-            endSort = getters.getColByAlias(wholePosi.endColAlias).sort
+        //     startSort = getters.getColByAlias(wholePosi.startColAlias)
+        //         .sort
+        //     endSort = getters.getColByAlias(wholePosi.endColAlias)
+        //         .sort
 
-            if (startSort >= colSort) {
-                if (startSort === endVisibleSort) {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                left: cols[index - 1].left,
-                                width: cols[index - 1].width
-                            },
-                            wholePosi: {
-                                startColAlias: cols[index - 1].alias,
-                                endColAlias: cols[index - 1].alias
-                            }
-                        }
-                    })
-                    commit(mutationTypes.ACTIVE_COL, {
-                        startIndex: index - 1
-                    })
-                } else if (startSort === endSort) {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                width: cols[index + 1].width
-                            },
-                            wholePosi: {
-                                startColAlias: cols[index + 1].alias,
-                                endColAlias: cols[index + 1].alias
-                            }
-                        }
-                    })
-                    commit(mutationTypes.ACTIVE_COL, {
-                        startIndex: index + 1
-                    })
-                } else {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                width: select.physicsBox.width -
-                                    colWidth - 1
-                            }
-                        }
-                    })
-                }
+        //     if (startSort >= colSort) {
+        //         if (startSort === endVisibleSort) {
+        //             updateSelectInfo.push({
+        //                 select,
+        //                 props: {
+        //                     physicsBox: {
+        //                         left: cols[index -
+        //                             1].left,
+        //                         width: cols[index -
+        //                             1].width
+        //                     },
+        //                     wholePosi: {
+        //                         startColAlias: cols[
+        //                             index - 1].alias,
+        //                         endColAlias: cols[
+        //                             index - 1].alias
+        //                     }
+        //                 }
+        //             })
+        //             commit(mutationTypes.ACTIVE_COL, {
+        //                 startIndex: index - 1
+        //             })
+        //         } else if (startSort === endSort) {
+        //             updateSelectInfo.push({
+        //                 select,
+        //                 props: {
+        //                     physicsBox: {
+        //                         width: cols[index +
+        //                             1].width
+        //                     },
+        //                     wholePosi: {
+        //                         startColAlias: cols[
+        //                             index + 1].alias,
+        //                         endColAlias: cols[
+        //                             index + 1].alias
+        //                     }
+        //                 }
+        //             })
+        //             commit(mutationTypes.ACTIVE_COL, {
+        //                 startIndex: index + 1
+        //             })
+        //         } else {
+        //             updateSelectInfo.push({
+        //                 select,
+        //                 props: {
+        //                     physicsBox: {
+        //                         width: select.physicsBox
+        //                             .width -
+        //                             colWidth - 1
+        //                     }
+        //                 }
+        //             })
+        //         }
 
-            } else if (endSort > colLeft) {
-                updateSelectInfo.push({
-                    select,
-                    props: {
-                        physicsBox: {
-                            left: select.physicsBox.left -
-                                colWidth - 1
-                        }
-                    }
-                })
-            }
-        })
-        updateSelectInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_SELECT, item.props)
-        })
+        //     } else if (endSort > colLeft) {
+        //         updateSelectInfo.push({
+        //             select,
+        //             props: {
+        //                 physicsBox: {
+        //                     left: select.physicsBox
+        //                         .left -
+        //                         colWidth - 1
+        //                 }
+        //             }
+        //         })
+        //     }
+        // })
+        // updateSelectInfo.forEach((item, index) => {
+        //     commit(mutationTypes.UPDATE_SELECT, item.props)
+        // })
 
-        let updateColInfo = [{
-            col: cols[index],
-            props: {
-                hidden: true,
-                active: false
-            }
-        }]
+        // let updateColInfo = [{
+        //     col: cols[index],
+        //     props: {
+        //         hidden: true,
+        //         active: false
+        //     }
+        // }]
 
-        if (index > 0) {
-            updateColInfo.push({
-                col: cols[index - 1],
-                props: {
-                    rightAjacentHide: true
-                }
-            })
-        }
-        for (let i = index + 1, len = cols.length; i < len; i++) {
-            let col = cols[i]
-            updateColInfo.push({
-                col,
-                props: {
-                    left: col.left - colWidth - 1
-                }
-            })
-        }
-        commit(mutationTypes.UPDATE_COL, updateColInfo)
+        // if (index > 0) {
+        //     updateColInfo.push({
+        //         col: cols[index - 1],
+        //         props: {
+        //             rightAjacentHide: true
+        //         }
+        //     })
+        // }
+        // for (let i = index + 1, len = cols.length; i < len; i++) {
+        //     let col = cols[i]
+        //     updateColInfo.push({
+        //         col,
+        //         props: {
+        //             left: col.left - colWidth - 1
+        //         }
+        //     })
+        // }
+        // commit(mutationTypes.UPDATE_COL, updateColInfo)
 
-        if (cache.localColPosi > 0) {
-            cache.localColPosi -= colWidth + 1
-        }
+        // if (cache.localColPosi > 0) {
+        //     cache.localColPosi -= colWidth + 1
+        // }
     },
     [actionTypes.COLS_CANCELHIDE]({
         getters,
@@ -794,9 +813,10 @@ export default {
                     updateCellInfo.push({
                         cell,
                         props: {
-                             physicsBox: {
-                                width: cell.physicsBox.width +
-                                colWidth + 1
+                            physicsBox: {
+                                width: cell.physicsBox
+                                    .width +
+                                    colWidth + 1
                             },
                             status: {
                                 hidden: false
@@ -808,8 +828,9 @@ export default {
                         cell,
                         props: {
                             physicsBox: {
-                                width: cell.physicsBox.width +
-                                colWidth + 1
+                                width: cell.physicsBox
+                                    .width +
+                                    colWidth + 1
                             }
                         }
                     })
@@ -828,7 +849,8 @@ export default {
         })
         updateCellInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                idx: getters.IdxByRow(item.cell.occupy
+                    .col[0], item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -848,7 +870,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            left: select.physicsBox.left +
+                            left: select.physicsBox
+                                .left +
                                 colWidth + 1
                         }
                     }
@@ -858,7 +881,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width +
+                            width: select.physicsBox
+                                .width +
                                 colWidth + 1
                         }
                     }
@@ -985,13 +1009,16 @@ export default {
                     }
                 })
             } else {
-                let aliasIndex = occupyCol.indexOf(currentColAlias)
+                let aliasIndex = occupyCol.indexOf(
+                    currentColAlias)
                 let newOccupy = [...occupyCol]
                 let occupyRow = cell.occupy.row
                 let cellIndex
 
-                newOccupy.splice(aliasIndex, 0, insertColAlias)
-                cellIndex = getters.IdxByCol(occupyCol[0], occupyRow[0])
+                newOccupy.splice(aliasIndex, 0,
+                    insertColAlias)
+                cellIndex = getters.IdxByCol(occupyCol[0],
+                    occupyRow[0])
                 updateCellInfo.push({
                     cell,
                     props: {
@@ -1014,8 +1041,9 @@ export default {
             }
         })
         updateCellInfo.forEach((item, index) => {
-             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(item.cell.occupy
+                    .col[0], item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -1034,7 +1062,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            left: select.physicsBox.left +
+                            left: select.physicsBox
+                                .left +
                                 colWidth + 1
                         }
                     }
@@ -1044,7 +1073,8 @@ export default {
                     select,
                     props: {
                         physicsBox: {
-                            width: select.physicsBox.width +
+                            width: select.physicsBox
+                                .width +
                                 colWidth + 1
                         }
                     }
@@ -1063,7 +1093,8 @@ export default {
                 props: {
                     left: col.left + colWidth + 1,
                     sort: col.sort + 1,
-                    displayName: getColDisplayName(col.sort + 1)
+                    displayName: getColDisplayName(col.sort +
+                        1)
                 }
             })
         }
@@ -1091,16 +1122,22 @@ export default {
             cells.forEach(cell => {
                 let occupyCol = cell.occupy.col
                 let occupyRow = cell.occupy.row
-                if (occupyCol.indexOf(previousAlias) === occupyCol.length -
+                if (occupyCol.indexOf(previousAlias) ===
+                    occupyCol.length -
                     1) {
                     occupyRow.forEach(alias => {
-                        let insertCell = extend(cell)
+                        let insertCell = extend(
+                            cell)
                         insertCell.occupy = {
-                            col: [insertColAlias],
+                            col: [
+                                insertColAlias
+                            ],
                             row: [alias]
                         }
-                        insertCell.content.texts = ''
-                        insertCellList.push(insertCell)
+                        insertCell.content.texts =
+                            ''
+                        insertCellList.push(
+                            insertCell)
                     })
                 }
             })
@@ -1125,7 +1162,8 @@ export default {
                 alias: generator.colAliasGenerator(),
                 left: currentLeft + (initWidth + 1) * i,
                 sort: currentSort + i,
-                displayName: getColDisplayName(currentSort + i)
+                displayName: getColDisplayName(
+                    currentSort + i)
             }, template))
         }
         commit(mutationTypes.ADD_COL, {
@@ -1147,7 +1185,8 @@ export default {
 
         let startIndex = getters.colIndexByAlias(oldStartAlias)
         let endIndex = getters.colIndexByAlias(oldEndAlias)
-        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 : endIndex
+        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 :
+            endIndex
 
         commit(mutationTypes.CANCEL_ACTIVE_COL, {
             currentSheet,
@@ -1157,7 +1196,8 @@ export default {
 
         startIndex = getters.colIndexByAlias(newStartAlias)
         endIndex = getters.colIndexByAlias(newEndAlias)
-        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 : endIndex
+        endIndex = endIndex === 'MAX' ? getters.colList.length - 1 :
+            endIndex
 
         commit(mutationTypes.ACTIVE_COL, {
             currentSheet,

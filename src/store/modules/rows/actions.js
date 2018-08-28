@@ -53,7 +53,7 @@ export default {
         commit,
         getters,
         dispatch
-    }) {
+    }, payload) {
         if (getters.visibleRowList().length < 2) {
             return
         }
@@ -128,7 +128,7 @@ export default {
                         props: {
                             physicsBox: {
                                 height: cell.physicsBox.height -
-                                rowHeight - 1
+                                    rowHeight - 1
                             },
                             status: {
                                 hidden: true
@@ -160,7 +160,8 @@ export default {
         })
         updateCellInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -235,7 +236,7 @@ export default {
 
         updateSelectInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_SELECT, item.props)
-         })
+        })
 
         let updateRowInfo = [{
             row: rows[index],
@@ -355,13 +356,13 @@ export default {
                         props: {
                             physicsBox: {
                                 height: cell.physicsBox.height +
-                                rowHeight + 1
+                                    rowHeight + 1
                             },
                             status: {
                                 hidden: false
                             }
                         }
-                    
+
                     })
                 } else {
                     updateCellInfo.push({
@@ -389,7 +390,8 @@ export default {
         updateCellInfo.forEach((item, index) => {
             updateCellInfo.forEach((item, index) => {
                 commit(mutationTypes.UPDATE_CELL, {
-                    idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                    idx: getters.IdxByRow(item.cell.occupy
+                        .col[0], item.cell.occupy.row[0]),
                     prop: item.props
                 })
             })
@@ -572,8 +574,9 @@ export default {
             }
         })
         updateCellInfo.forEach((item, index) => {
-             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -733,8 +736,9 @@ export default {
             }
         })
         updateCellInfo.forEach((item, index) => {
-             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
@@ -856,8 +860,8 @@ export default {
             if ((aliasIndex = occupyRow.indexOf(deleteRowAlias)) !== -1) {
                 cell.occupy.col.forEach(alias => {
                     updateOccupys.push({
-                         occupyCols: [alias],
-                         occupyRows: [deleteRowAlias]
+                        occupyCols: [alias],
+                        occupyRows: [deleteRowAlias]
                     })
                 })
                 if (occupyRow.length === 1) {
@@ -892,10 +896,12 @@ export default {
         })
         updateCellInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
+                idx: getters.IdxByRow(item.cell.occupy.col[0],
+                    item.cell.occupy.row[0]),
                 prop: item.props
             })
         })
+
         // delete
         updateOccupys.forEach((item, index) => {
             commit(mutationTypes.M_DELETE_POINTS, {

@@ -139,7 +139,7 @@ export default {
                     break
                 }
             }
-        }else {
+        } else {
             select = coordinate
         }
         await send({
@@ -391,7 +391,7 @@ export default {
         getters,
         rootState,
         dispatch
-    }, value) {
+    }, payload) {
         let {
             startColIndex,
             startRowIndex,
@@ -399,14 +399,14 @@ export default {
             endRowIndex,
             value
         } = payload
-        let selects = getters.allSelects
-        let select
-        for (let i = 0, len = selects.length; i < len; i++) {
-            if (selects[i].type === SELECT) {
-                select = selects[i]
-                break
-            }
-        }
+        // let selects = getters.allSelects
+        // let select
+        // for (let i = 0, len = selects.length; i < len; i++) {
+        //     if (selects[i].type === SELECT) {
+        //         select = selects[i]
+        //         break
+        //     }
+        // }
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
@@ -423,6 +423,7 @@ export default {
         //     format,
         //     express
         // }
+
         // send({
         //     url: config.url['format'],
         //     data: JSON.stringify(data)

@@ -417,9 +417,10 @@ export default {
     IdxByCol: function(state) {
         return function(colAlias, rowAlias) {
             let map = state.colMap
-            return map.get(colAlias) != null ? (map.get(colAlias).get(
-                rowAlias) != null ? map.get(colAlias).get(
-                rowAlias) : -1) : -1
+            return map.get(colAlias) != null &&
+                map.get(colAlias).get(rowAlias) != null ?
+                map.get(colAlias).get(rowAlias) :
+                -1
         }
     }
 }

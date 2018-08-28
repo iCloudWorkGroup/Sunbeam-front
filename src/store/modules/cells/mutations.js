@@ -82,9 +82,10 @@ export default {
             for (let k = 0; k < delOccupyRows.length; k++) {
                 let col = delOccupyCols[j]
                 let row = delOccupyRows[k]
+
                 // 列Map删除
                 let colMap = state.colMap
-                 if (colMap.get(col).get(row) !== null) {
+                if (colMap.get(col).get(row) !== null) {
                     colMap.get(col).delete(row)
                 }
                 if (colMap.get(col).size === 0) {
@@ -92,7 +93,7 @@ export default {
                 }
                 // 行Map删除
                 let rowMap = state.rowMap
-                 if (rowMap.get(row).get(col) !== null) {
+                if (rowMap.get(row).get(col) !== null) {
                     rowMap.get(row).delete(col)
                 }
                 if (rowMap.get(row).size === 0) {

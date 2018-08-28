@@ -44,13 +44,5 @@ export default {
                 endRowIndex
             }
         }
-    },
-    /**
-     * 获取active的单元格信息
-     * @return {[type]} [description]
-     */
-    activeCell(state){
-        let activePosi = state.list[0].activePosi
-
     }
 }

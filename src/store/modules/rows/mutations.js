@@ -10,7 +10,6 @@ import {
     indexAttrBinary
 } from '../../../util/binary'
 import extend from '../../../util/extend'
-import cellTemplate from '../cells/template'
 
 export default {
     [ADD_ROW](state, payload) {

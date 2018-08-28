@@ -15,7 +15,6 @@ SpreadSheet.fn = SpreadSheet.prototype = {
     init(vm) {
         this.handlers = {}
     },
-
     createSpreadSheet(sheetID, toolBarID) {
         if (!document.getElementById(sheetID)) {
             throw new Error('未找到sheet的容器')
@@ -49,7 +48,8 @@ SpreadSheet.fn = SpreadSheet.prototype = {
         let endRow = -1
         let startCol = 0
         let endCol = -1
-            // 判断传入单行单列或单点
+
+        // 判断传入单行单列或单点
         if (typeof point === 'string') {
             let regNumber = /^\d*$/
 

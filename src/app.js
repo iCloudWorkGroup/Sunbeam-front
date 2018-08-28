@@ -42,18 +42,20 @@ export default function(options) {
             100)
         cache.prestrainWidth = Math.max(cache.prestrainWidth, right +
             100)
-        new Vue({
+        let toolBarVm
+        let bookVm = new Vue({
             store,
             render: h => h(Book)
         }).$mount(rootSelector)
 
         if (toolSelector != null) {
             store.registerModule('toolbar', toolbar)
-            new Vue({
+            toolBarVm = new Vue({
                 store,
                 render: h => h(Main)
             }).$mount(toolSelector)
         }
+        window.spreadsheet = new Sunbeam(bookVm, toolBarVm)
     }).then(() => {
         // console.log('open api')
     })

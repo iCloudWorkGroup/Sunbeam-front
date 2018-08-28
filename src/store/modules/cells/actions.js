@@ -18,7 +18,8 @@ import {
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import {
-    CLIP
+    CLIP,
+    SELECT
 } from '../../../tools/constant'
 import {
     getTextHeight
@@ -126,9 +127,21 @@ export default {
         getters
     }, {
         propName,
-        propStruct
+        propStruct,
+        coordinate = false
     }) {
-        let select = getters.allSelects[0]
+        let select
+        if (coordinate === false) {
+            let selects = getters.allSelects
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+        }else {
+            select = coordinate
+        }
         await send({
             url: config.url[propName],
             body: JSON.stringify(select.signalSort)
@@ -176,207 +189,6 @@ export default {
                 }
             }
         }
-    },
-    [CELLS_UPDATE_PROP]({
-        commit,
-        dispatch,
-        getters
-    }, {
-        startColIndex,
-        endColIndex,
-        startRowIndex,
-        endRowIndex,
-        props,
-        fn
-    }) {
-        let getPointInfo = getters.getPointInfo
-        let tempSign = {}
-        let cols = getters.colList
-        let rows = getters.allRows
-        let cells = getters.cells
-        let updateCellInfo = []
-        let insertCellList = []
-        let colAlias
-        let rowAlias
-        let cellIndex
-
-        for (let i = startColIndex; i <= endColIndex; i++) {
-            for (let j = startRowIndex; j <= endRowIndex; j++) {
-                colAlias = cols[i].alias
-                rowAlias = rows[j].alias
-                cellIndex = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                if (typeof cellIndex === 'number') {
-                    let cell
-                    if ((cell = cells[cellIndex]) && !tempSign[cell.alias]) {
-                        let updateProp
-                        if (fn) {
-                            updateProp = extend({}, props, fn(cell))
-                        } else {
-                            updateProp = props
-                        }
-                        updateCellInfo.push({
-                            cell,
-                            props: updateProp
-                        })
-                    }
-                } else {
-                    let cell = extend({
-                        occupy: {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                    }, props)
-                    insertCellList.push(cell)
-                }
-            }
-        }
-
-        dispatch(A_CELLS_ADD, insertCellList)
-        if (updateCellInfo.length > 0) {
-            commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-        }
-    },
-    [COLS_OPERCOLS]({
-        getters,
-        state,
-        rootState,
-        commit,
-        dispatch
-    }, {
-        startIndex,
-        endIndex,
-        props,
-        fn
-    }) {
-        let updateCellInfo = []
-        let cellList = getters.cellsByVertical({
-            startRowIndex: 0,
-            endRowIndex: 'MAX',
-            startColIndex: startIndex,
-            endColIndex: endIndex
-        })
-        cellList.forEach(function(cell) {
-            let updateProp
-            if (fn) {
-                updateProp = extend({}, props, fn(cell))
-            } else {
-                updateProp = props
-            }
-            updateCellInfo.push({
-                cell,
-                props: updateProp
-            })
-        })
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-        let insertCellInfo = []
-        let editViewOccupy = getters.getEditViewOccupy()
-        let cols = getters.colList
-        let rows = getters.allRows
-
-        for (let key in editViewOccupy) {
-            if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
-                let viewOccupyRow = editViewOccupy[key].row
-                let startRowIndex
-                let endRowIndex
-                if (viewOccupyRow.length === 0) {
-                    continue
-                }
-                startRowIndex = getters.rowIndexByAlias(viewOccupyRow[0])
-                endRowIndex = getters.rowIndexByAlias(viewOccupyRow[
-                    viewOccupyRow.length - 1])
-
-                for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-                    for (let j = startIndex; j < endIndex + 1; j++) {
-                        let colAlias = cols[j].alias
-                        let rowAlias = rows[i].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
-                            'cellIndex')
-                        if (typeof cellIndex !== 'number') {
-                            let cell = extend({}, props)
-                            cell.occupy = {
-                                col: [colAlias],
-                                row: [rowAlias]
-                            }
-                            insertCellInfo.push(cell)
-                        }
-                    }
-                }
-            }
-        }
-        dispatch(A_CELLS_ADD, insertCellInfo)
-    },
-    [ROWS_OPERROWS]({
-        getters,
-        state,
-        rootState,
-        commit,
-        dispatch
-    }, {
-        startIndex,
-        endIndex,
-        props,
-        fn
-    }) {
-        let updateCellInfo = []
-
-        let cellList = getters.cellsByVertical({
-            startRowIndex: startIndex,
-            endRowIndex: endIndex,
-            startColIndex: 0,
-            endColIndex: 'MAX'
-        })
-        cellList.forEach(function(cell) {
-            let updateProp
-            if (fn) {
-                updateProp = extend({}, props, fn(cell))
-            } else {
-                updateProp = props
-            }
-            updateCellInfo.push({
-                cell,
-                props: updateProp
-            })
-        })
-        commit(mutationTypes.UPDATE_CELL, updateCellInfo)
-
-        let insertCellInfo = []
-        let editViewOccupy = getters.getEditViewOccupy()
-        let cols = getters.colList
-        let rows = getters.allRows
-
-        for (let key in editViewOccupy) {
-            if (Object.prototype.hasOwnProperty.call(editViewOccupy, key)) {
-                let viewOccupyCol = editViewOccupy[key].col
-                let startColIndex
-                let endColIndex
-
-                if (viewOccupyCol.length === 0) {
-                    continue
-                }
-                startColIndex = getters.colIndexByAlias(viewOccupyCol[0])
-                endColIndex = getters.colIndexByAlias(viewOccupyCol[
-                    viewOccupyCol.length - 1])
-
-                for (let i = startColIndex; i < endColIndex + 1; i++) {
-                    for (let j = startIndex; j < endIndex + 1; j++) {
-                        let colAlias = cols[i].alias
-                        let rowAlias = rows[j].alias
-                        let cellIndex = getters.getPointInfo(colAlias, rowAlias,
-                            'cellIndex')
-                        let cell = extend({}, props)
-
-                        cell.occupy = {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                        if (typeof cellIndex !== 'number') {
-                            insertCellInfo.push(cell)
-                        }
-                    }
-                }
-            }
-        }
-        dispatch(A_CELLS_ADD, insertCellInfo)
     },
     [OCCUPY_UPDATE]({
         commit,
@@ -471,7 +283,14 @@ export default {
         dispatch,
         getters
     }) {
-        let select = getters.allSelects[0]
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
         await send({
             url: config.url.merge,
             body: JSON.stringify(select.signalSort)
@@ -523,11 +342,19 @@ export default {
             startRowIndex,
             endRowIndex
         } = payload
-        let wholePosi = getters.allSelects[0].wholePosi
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
+        let wholePosi = select.wholePosi
         startColIndex = startColIndex || getters.colIndexByAlias(wholePosi.startColAlias)
         endColIndex = endColIndex || getters.colIndexByAlias(wholePosi.endColAlias)
         startRowIndex = startRowIndex || getters.rowIndexByAlias(wholePosi.startRowAlias)
-        endRowIndex = endRowIndex || getters.colIndexByAlias(wholePosi.endRowAlias)
+        endRowIndex = endRowIndex || getters.rowIndexByAlias(wholePosi.endRowAlias)
         let cells = getters.cellsByTransverse({
             startColIndex,
             endColIndex,
@@ -569,30 +396,37 @@ export default {
             startColIndex,
             startRowIndex,
             endColIndex,
-            endRowIndex
-        } = getters.getOprRegion
-        let cols = getters.colList
-        let rows = getters.allRows
+            endRowIndex,
+            value
+        } = payload
+        let selects = getters.allSelects
+        let select
+        for (let i = 0, len = selects.length; i < len; i++) {
+            if (selects[i].type === SELECT) {
+                select = selects[i]
+                break
+            }
+        }
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
 
-        let data = {
-            coordinate: [{
-                startCol: cols[startColIndex].sort,
-                startRow: rows[startRowIndex].sort,
-                endCol: endColIndex === 'MAX' ? -1 : cols[
-                    endColIndex].sort,
-                endRow: endRowIndex === 'MAX' ? -1 : rows[
-                    endRowIndex].sort
-            }],
-            format,
-            express
-        }
-        send({
-            url: config.url['format'],
-            data: JSON.stringify(data)
-        })
+        // let data = {
+        //     coordinate: [{
+        //         startCol: cols[startColIndex].sort,
+        //         startRow: rows[startRowIndex].sort,
+        //         endCol: endColIndex === 'MAX' ? -1 : cols[
+        //             endColIndex].sort,
+        //         endRow: endRowIndex === 'MAX' ? -1 : rows[
+        //             endRowIndex].sort
+        //     }],
+        //     format,
+        //     express
+        // }
+        // send({
+        //     url: config.url['format'],
+        //     data: JSON.stringify(data)
+        // })
         let rules = parseExpress(value)
         let props = {
             content: {

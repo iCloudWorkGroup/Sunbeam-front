@@ -27,14 +27,12 @@ export default {
             let endColIndex = getters.colIndexByAlias(this.colOver)
             let startRowIndex = getters.rowIndexByAlias(this.rowStart)
             let endRowIndex = getters.rowIndexByAlias(this.rowOver)
-            let count = this.$store.getters.cellsByVertical({
+            return this.$store.getters.cellsByVertical({
                 startColIndex,
                 endColIndex,
                 startRowIndex,
                 endRowIndex
             })
-            console.log('count: ' + count.length)
-            return count
         }
     },
     components: {

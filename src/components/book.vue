@@ -4,13 +4,13 @@
              @mouseup=""
              :style="{ width, height}">
             <sheet></sheet>
-            <sheet-edit></sheet-edit>
+            <sheet-sider/>
         </div>
     </div>
 </template>
 <script type="text/javascript">
 import Sheet from './sheet.vue'
-import SheetEdit from './sheet-edit.vue'
+import SheetSider from './sheet-sider.vue'
 import cache from '../tools/cache'
 import {
     unit
@@ -35,7 +35,7 @@ export default {
     },
     components: {
         Sheet,
-        SheetEdit
+        SheetSider
     },
     mounted() {
         // document.addEventListener('mouseup', function() {

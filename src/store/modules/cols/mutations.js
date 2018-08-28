@@ -21,9 +21,8 @@ export default {
      */
     [types.INSERT_COL](state, payload) {
         let cols = payload.cols
-        let colState = state[payload.currentSheet]
-        let list = colState.list
-        let map = colState.map
+        let list = state.list
+        let map = state.map
 
         for (let i = 0, len = cols.length; i < len; i++) {
             let col = cols[i]
@@ -51,15 +50,15 @@ export default {
             col,
             props
         }) {
-            extend(col, props)
+            extend(true, col, props)
         })
     },
     [types.DELETE_COL](state, {
         currentSheet,
         index
     }) {
-        let list = state[currentSheet].list
-        let map = state[currentSheet].map
+        let list = state.list
+        let map = state.map
         map.delete(list[index].alias)
         list.splice(index, 1)
     },

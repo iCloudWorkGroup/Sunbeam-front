@@ -19,7 +19,7 @@
                     <col-head :start="colLast.start"
                               :over="colLast.over"
                               :need-sider="true"
-                              :scrollLeft="scrollLeft"/>
+                              :scroll-left="scrollLeft"/>
                 </td>
             </tr>
             <tr>
@@ -45,7 +45,7 @@
                           :col-start="colLast.start"
                           :col-over="colLast.over"
                           :need-sider="true"
-                          :scrollLeft="scrollLeft"/>
+                          :scroll-left="scrollLeft"/>
                 </td>
             </tr>
             <tr>
@@ -53,7 +53,7 @@
                     <row-head :start="rowLast.start"
                               :over="rowLast.over"
                               :need-sider="true"
-                              :scrollTop="scrollTop"/>
+                              :scroll-top="scrollTop"/>
                 </td>
                 <td>
                     <edit class="frozen-right-border"
@@ -63,7 +63,7 @@
                           :col-start="colFirst.start"
                           :col-over="colFirst.over"
                           :need-sider="true"
-                          :scrollTop="scrollTop"/>
+                          :scroll-top="scrollTop"/>
                 </td>
                 <td>
                     <edit class="scroll-box"
@@ -71,16 +71,15 @@
                           :row-over="rowLast.over"
                           :col-start="colLast.start"
                           :col-over="colLast.over"
-                          :scrollTop="scrollTop"
-                          :scrollLeft="scrollLeft"
+                          :scroll-top="scrollTop"
+                          :scroll-left="scrollLeft"
                           @scrollPanel="scrollPanel"/>
                 </td>
             </tr>
         </tbody>
     </table>
-<!--     <input-box :scroll-left="scrollLeft"
-               :scroll-top="scrollTop">
-    </input-box> -->
+    <box :scroll-left="scrollLeft"
+         :scroll-top="scrollTop"/>
 </div>
 </template>
 <script type="text/javascript">
@@ -88,7 +87,7 @@ import scrollbar from '../util/scrollbar'
 import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
-import InputBox from './input-box.vue'
+import Box from './box.vue'
 export default {
     data() {
         return {
@@ -126,10 +125,10 @@ export default {
         },
         rowLast() {
             if (this.frozenMode === 'NO') {
-                let rows = this.$store.getters.allRows
+                let visibleRows = this.$store.getters.visibleRowList()
                 return {
-                    start: rows[0].alias,
-                    over: rows[rows.length - 1].alias
+                    start: visibleRows[0].alias,
+                    over: visibleRows[visibleRows.length - 1].alias
                 }
             } else {
                 let rowRule = this.localSheet.frozen.row
@@ -143,10 +142,10 @@ export default {
         },
         colLast() {
             if (this.frozenMode === 'NO') {
-                let cols = this.$store.getters.allCols
+                let visibleCols = this.$store.getters.visibleColList()
                 return {
-                    start: cols[0].alias,
-                    over: cols[cols.length - 1].alias
+                    start: visibleCols[0].alias,
+                    over: visibleCols[visibleCols.length - 1].alias
                 }
             } else {
                 let colRule = this.localSheet.frozen.col
@@ -159,9 +158,12 @@ export default {
         ColHead,
         RowHead,
         Edit,
-        InputBox
+        Box
     },
     methods: {
+        /**
+         * 为了让各个视图同步滚动，用方法改变state，保持同步
+         */
         scrollPanel({
             scrollTop,
             scrollLeft

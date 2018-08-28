@@ -39,6 +39,7 @@ textarea {
 }
 
 
+
 /**
  * selected effect
  */
@@ -58,6 +59,7 @@ textarea {
 }
 
 
+
 /**
  * adjust row or col effect
  */
@@ -71,6 +73,7 @@ textarea {
     -webkit-transition: .3s;
     -o-transition: .3s;
 }
+
 
 
 /**
@@ -253,7 +256,7 @@ textarea {
 }
 
 .cell-content {
-	display: table-cell;
+    display: table-cell;
     height: inherit;
     width: inherit;
 }
@@ -316,6 +319,7 @@ textarea {
     z-index: 1000;
     background: #fff;
 }
+
 
 
 /**
@@ -393,6 +397,7 @@ textarea {
 }
 
 
+
 /**
  * end
  */
@@ -425,6 +430,7 @@ textarea {
 }
 
 
+
 /**
  * adjust row, col module
  */
@@ -454,6 +460,7 @@ textarea {
 }
 
 
+
 /**
  * end
  */
@@ -475,6 +482,7 @@ textarea {
     position: relative;
     overflow: hidden;
 }
+
 
 
 /**
@@ -511,6 +519,7 @@ textarea {
     border-width: 3px;
     border-color: red red transparent transparent;
 }
+
 
 
 /**
@@ -587,6 +596,7 @@ textarea {
 
 
 
+
 /**
  * end
  */
@@ -621,9 +631,16 @@ textarea {
 }
 
 
+
 /**
  * end
  */
 
-
-/*.loadmark { position: absolute; height: 100%; width: 100%; background-color: #ffffff; background: url(../img/loading.gif) 50% 50% no-repeat #ffffff; z-index: 100; }*/
+.loadmark {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: url(../img/loading.gif) 50% 50% no-repeat rgba(255,255,255,0.5);
+    z-index: 100;
+}

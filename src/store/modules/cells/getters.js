@@ -3,14 +3,19 @@ import {
 } from '../../../util/binary'
 import extend from '../../../util/extend'
 import template from './template'
-
+import {
+    SELECT
+} from '../../../tools/constant'
 export default {
     cells(state) {
         return state.list
     },
     visibleCells(state) {
         return state.list.filter((cell) => {
-            return cell.view && !cell.hidden ? true : false
+            let status = cell.status
+            return !status.hidden &&
+                !status.destroy &&
+                status.visible
         })
     },
     /**
@@ -43,7 +48,14 @@ export default {
         return function() {
             let cells = state.list
             let selects = getters.allSelects
-            let activePosi = selects[0].activePosi
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let activePosi = select.activePosi
             let idx = this.IdxByRow(activePosi.colAlias, activePosi.rowAlias)
             if (idx !== -1 || cells) {
                 return this.cells[idx]
@@ -145,10 +157,10 @@ export default {
                 endRow = endRowIndex
             }
             let cells = getters.cellsByVertical({
-                startColIndex,
-                startRowIndex,
-                endColIndex,
-                endRowIndex
+                startColIndex: startCol,
+                startRowIndex: startRow,
+                endColIndex: endCol,
+                endRowIndex: endRow
             })
             for (let i = 0, len = cells.length; i < len; i++) {
                 let cell = cells[i]
@@ -203,8 +215,8 @@ export default {
             let startRow = Math.max(startRowIndex, rows[0].sort)
             let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
             let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
-            for (let i = startCol; i < endColLen; i++) {
-                for (let j = startRow; j < endRowLen; j++) {
+            for (let i = startCol; i <= endColLen; i++) {
+                for (let j = startRow; j <= endRowLen; j++) {
                     let colAlias = allCols[i].alias
                     let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
@@ -352,7 +364,15 @@ export default {
     hasMergeCell(state, getters) {
         return function() {
             let allCells = state.list
-            let wholePosi = getters.allSelects[0].wholePosi
+            let selects = getters.allSelects
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let wholePosi = select.wholePosi
             let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
             let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
@@ -397,7 +417,9 @@ export default {
     IdxByCol: function(state) {
         return function(colAlias, rowAlias) {
             let map = state.colMap
-            return map.get(colAlias) != null ? (map.get(colAlias).get(rowAlias) != null ? map.get(colAlias).get(rowAlias) : -1) : -1
+            return map.get(colAlias) != null ? (map.get(colAlias).get(
+                rowAlias) != null ? map.get(colAlias).get(
+                rowAlias) : -1) : -1
         }
     }
 }

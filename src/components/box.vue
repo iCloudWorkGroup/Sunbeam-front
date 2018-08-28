@@ -1,12 +1,12 @@
 <template>
 <textarea class="edit-frame"
         :value="texts"
+        :style="styleObject"
         @keydown="keydownHandle"
         @blur="completeEdit"
         @copy="copyData"
         @cut="cutData"
-        @paste="pasteData"
-        :style="styleObject">
+        @paste="pasteData">
 </textarea>
 </template>
 <script type="text/javascript">

@@ -1,6 +1,6 @@
 <template>
 <div :class="classStr"
-     @dblclick="edit"
+     @dblclick="editing"
      :style="styleObject">
     <div class="box">
         <div class="bg"></div>
@@ -12,7 +12,8 @@
 import * as types from '../store/action-types'
 import {
     SELECT,
-    CLIP
+    CLIP,
+    DATESOURCE
 } from '../tools/constant'
 import {
     unit
@@ -64,12 +65,15 @@ export default {
                 case CLIP:
                     result = 'clip-item'
                     break
+                case DATESOURCE:
+                    result = 'datesource-item'
+                    break
             }
             return result
         }
     },
     methods: {
-        edit() {
+        editing() {
             this.$store.dispatch(types.EDIT_SHOW)
         }
     },
@@ -96,7 +100,7 @@ export default {
 }
 </script>
 <style type="text/css">
-.clip-item, .select-item {
+.clip-item, .select-item, .datesource-item {
     position: absolute;
     margin: -1px;
     overflow: hidden;
@@ -105,7 +109,7 @@ export default {
     border: 2px solid #217346;
     z-index: 1;
 }
-.clip-item {
+.clip-item, .datesource-item {
     border: 2px dashed #217346;
     z-index: 0;
 }
@@ -113,10 +117,16 @@ export default {
     position: relative;
     height: inherit;
 }
-.clip-item .box {
+.clip-item .box, .datesource-item .box {
     background: #ddd;
     height: inherit;
     opacity: 0.35;
+}
+.select-item, .datesource-item {
+    transition: .2s;
+    -moz-transition: .2s;
+    -webkit-transition: .2s;
+    -o-transition: .2s;
 }
 .select-item .box .expand {
     position: absolute;
@@ -134,10 +144,5 @@ export default {
     opacity: .24;
     height: 100%;
 }
-.select-item {
-    transition: .2s;
-    -moz-transition: .2s;
-    -webkit-transition: .2s;
-    -o-transition: .2s;
-}
+
 </style>

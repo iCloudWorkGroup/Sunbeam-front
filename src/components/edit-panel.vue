@@ -28,7 +28,8 @@
 </template>
 <script type="text/javascript">
 import {
-    SELECTS_CHANGE
+    SELECTS_CHANGE,
+    SELECTS_INSERT
 } from '../store/action-types'
 // import {
 //     UPDATE_MOUSESTATE
@@ -75,6 +76,9 @@ export default {
         },
         mouseState() {
             return this.$store.state.mouseState
+        },
+        selectState() {
+            return this.$store.getters.selectState
         }
     },
     methods: {
@@ -84,6 +88,12 @@ export default {
             let clientRect = el.getBoundingClientRect()
             let col = getters.getColByPosi(downEvent.clientX - clientRect.left + this.offsetLeft)
             let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
+            if (this.selectState === 'dateSource' && this.$store.state.selects.list.length < 2) {
+                this.$store.dispatch(SELECTS_INSERT, {
+                    colAlias: col.alias,
+                    rowAlias: row.alias
+                })
+            }
             this.$store.dispatch(SELECTS_CHANGE, {
                 activeColAlias: col.alias,
                 activeRowAlias: row.alias
@@ -115,7 +125,32 @@ export default {
                     endColAlias: endCol.alias,
                     endRowAlias: endRow.alias
                 })
+                if (window.ss.handlers['regionChange']) {
+                    for (let i = 0; i < window.ss.handlers['regionChange'].length; i++) {
+                        let selects = this.$store.state.selects.list
+                        let select
+                        let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
+                        selects.forEach((item, index) => {
+                            if (item.type === state) {
+                                select = item
+                            }
+                        })
+                        let startCol = this.$store.getters.getColByAlias(select.wholePosi.startColAlias).displayName
+                        let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
+                        let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
+                        let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
+                        window.ss.handlers['regionChange'][i].apply(this, [{
+                            point: {
+                                startCol: startCol,
+                                endCol: endCol,
+                                startRow: startRow,
+                                endRow: endRow
+                            }
+                        }])
+                    }
+                }
             }
+
         },
         dragState(e) {
             let elem = this.$refs.panel

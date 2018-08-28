@@ -1,6 +1,6 @@
 export default {
-    colAlias: '-1',
-    rowAlias: '-1',
+    colAlias: null,
+    rowAlias: null,
     left: -9999,
     top: -9999,
     width: 0,
@@ -9,7 +9,7 @@ export default {
     maxHeight: 0,
     texts: '',
     type: '',
-    size: '11',
+    size: 11,
     family: 'SimSun',
     color: 'rgb(0, 0, 0)',
     weight: false,

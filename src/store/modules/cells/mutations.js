@@ -2,7 +2,8 @@ import {
     M_INSERT_CELL,
     UPDATE_CELL,
     M_UPDATE_POINTS,
-    M_DESTORY_CELL
+    M_DESTORY_CELL,
+    M_DELETE_POINTS
 } from '../../mutation-types'
 import extend from '../../../util/extend'
 
@@ -69,5 +70,35 @@ export default {
      */
     [M_DESTORY_CELL](state, cell) {
         cell.status.destory = true
+    },
+    /**
+     * 删除单元格对应关系
+     */
+    [M_DELETE_POINTS](state, {
+        delOccupyCols,
+        delOccupyRows
+    }) {
+        for (let j = 0; j < delOccupyCols.length; j++) {
+            for (let k = 0; k < delOccupyRows.length; k++) {
+                let col = delOccupyCols[j]
+                let row = delOccupyRows[k]
+                // 列Map删除
+                let colMap = state.colMap
+                 if (colMap.get(col).get(row) !== null) {
+                    colMap.get(col).delete(row)
+                }
+                if (colMap.get(col).size === 0) {
+                    colMap.delete(col)
+                }
+                // 行Map删除
+                let rowMap = state.rowMap
+                 if (rowMap.get(row).get(col) !== null) {
+                    rowMap.get(row).delete(col)
+                }
+                if (rowMap.get(row).size === 0) {
+                    rowMap.delete(row)
+                }
+            }
+        }
     }
 }

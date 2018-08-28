@@ -23,9 +23,8 @@ export default {
     },
     [INSERT_ROW](state, payload) {
         let rows = payload.rows
-        let rowsState = state[payload.currentSheet]
-        let list = rowsState.list
-        let map = rowsState.map
+        let list = state.list
+        let map = state.map
         for (let i = 0, len = rows.length; i < len; i++) {
             let row = rows[i]
             let index = indexAttrBinary(row.sort, list, 'sort')
@@ -52,49 +51,48 @@ export default {
             row,
             props
         }) {
-            extend(row, props)
-            let rowOprProp = row.props
-            clearDefaultValue(rowOprProp, cellTemplate)
+            state.list[row.sort] = extend(true, row, props)
+            // let rowOprProp = row.props
+            // clearDefaultValue(rowOprProp, cellTemplate)
 
-            function clearDefaultValue(object, template) {
-                let hasOwnProp = Object.prototype.hasOwnProperty
-                for (let name in object) {
-                    if (hasOwnProp.call(object, name)) {
-                        let currentProp = object[name]
-                        let defaultValue = template[name]
-                        if (typeof currentProp === 'object') {
-                            if (isEmptyObj(currentProp)) {
-                                delete object[name]
-                            } else {
-                                let result = clearDefaultValue(
-                                    currentProp, defaultValue)
-                                if (result) {
-                                    delete object[name]
-                                }
-                            }
-                        } else if (currentProp === defaultValue) {
-                            delete object[name]
-                        }
-                    }
-                }
-                return isEmptyObj(object)
-            }
+            // function clearDefaultValue(object, template) {
+            //     let hasOwnProp = Object.prototype.hasOwnProperty
+            //     for (let name in object) {
+            //         if (hasOwnProp.call(object, name)) {
+            //             let currentProp = object[name]
+            //             let defaultValue = template[name]
+            //             if (typeof currentProp === 'object') {
+            //                 if (isEmptyObj(currentProp)) {
+            //                     delete object[name]
+            //                 } else {
+            //                     let result = clearDefaultValue(
+            //                         currentProp, defaultValue)
+            //                     if (result) {
+            //                         delete object[name]
+            //                     }
+            //                 }
+            //             } else if (currentProp === defaultValue) {
+            //                 delete object[name]
+            //             }
+            //         }
+            //     }
+            //     return isEmptyObj(object)
+            // }
 
-            function isEmptyObj(obj) {
-                for (let name in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, name)) {
-                        return false
-                    }
-                }
-                return true
-            }
+            // function isEmptyObj(obj) {
+            //     for (let name in obj) {
+            //         if (Object.prototype.hasOwnProperty.call(obj, name)) {
+            //             return false
+            //         }
+            //     }
+            //     return true
+            // }
         })
     },
     [DELETE_ROW](state, {
-        currentSheet,
         index
     }) {
-        let list = state[currentSheet].list
+        let list = state.list
         list.splice(index, 1)
     },
     M_ROWS_UPDATE_VIEW(state, {

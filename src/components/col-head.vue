@@ -9,7 +9,7 @@
             :offsetLeft="offsetLeft"/>
         <col-head-line
             v-for="item in selects"
-            key="item.alias"
+            :key="item.alias"
             :col="item"
             :offsetLeft="offsetLeft"
             />

@@ -9,7 +9,7 @@
             :offsetTop="offsetTop" />
         <row-head-line
             v-for="item in selects"
-            key="item.alias"
+            :key="item.alias"
             :row="item"
             :offsetTop="offsetTop"/>
     </div>

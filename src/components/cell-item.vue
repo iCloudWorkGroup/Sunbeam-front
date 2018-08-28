@@ -3,7 +3,7 @@
         :style="viewPosi">
         <div class="cell-content"
              :style="viewProps">
-            {{cell.content.displayTexts}} / {{cell.alias}}
+            {{cell.content.displayTexts}}
         </div>
     </div>
 </template>

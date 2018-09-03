@@ -524,7 +524,7 @@ export default {
                     startRowIndex: firstRowIndex,
                     endRowIndex: cordRowIndex
                 })
-                if (cells != null) {
+                if (cells.length !== 0) {
                     commit('M_CELLS_UPDATE_VIEW', {
                         cells,
                         isView: false
@@ -550,7 +550,7 @@ export default {
                     startRowIndex: cordRowIndex,
                     endRowIndex: lastRowIndex
                 })
-                if (cells != null) {
+                if (cells.length !== 0) {
                     commit('M_CELLS_UPDATE_VIEW', {
                         cells,
                         isView: false
@@ -770,7 +770,6 @@ export default {
             let colMap = viewLoaded.colMap
             rowMap.forEach((rowValue, rowKey) => {
                 if (rowKey === alias) {
-
                     rowValue.forEach((colValue, colKey) => {
                         colMap.get(colKey).delete(rowKey)
                     })

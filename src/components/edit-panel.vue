@@ -125,10 +125,6 @@ export default {
                     endColAlias: endCol.alias,
                     endRowAlias: endRow.alias
                 })
-                // eventlist = {
-                //     regionchange: ['']
-                // }
-                // if(cache.eventlist.regchange.length)
                 if (cache.evenetList['regionChange']) {
                     for (let i = 0; i < cache.evenetList['regionChange'].length; i++) {
                         let selects = this.$store.state.selects.list

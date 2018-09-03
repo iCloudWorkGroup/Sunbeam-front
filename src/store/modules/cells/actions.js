@@ -1,6 +1,4 @@
 import {
-    A_CELLS_ADD,
-    CELLS_UPDATE,
     CELLS_UPDATE_PROP,
     COLS_OPERCOLS,
     ROWS_OPERROWS,
@@ -44,7 +42,7 @@ export default {
      * 传入单元初始化属性和占位
      * 计算出单元格的盒模型，同时维护pointsinfo
      */
-    [A_CELLS_ADD]({
+    A_CELLS_ADD({
         commit,
         state,
         getters
@@ -120,7 +118,18 @@ export default {
             })
         })
     },
-    async [CELLS_UPDATE]({
+    /**
+     * 修改单元格属性
+     * @param {[type]}  options.state      [description]
+     * @param {[type]}  options.commit     [description]
+     * @param {[type]}  options.dispatch   [description]
+     * @param {[type]}  options.getters    [description]
+     * @param {[type]}  options.propName   [属性名，发送到后台，根据命令的不同]
+     * @param {[type]}  options.propStruct [属性结构，直接覆盖独享的结构]
+     * @param {Boolean} options.coordinate [修改的范围，如果是boolean值，就按照给定的方位
+     * 如果是boolean值，根据视图的选中区域执行操作]
+     */
+    async A_CELLS_UPDATE({
         state,
         commit,
         dispatch,
@@ -133,6 +142,8 @@ export default {
         line = '0'
     }) {
         let select
+        let wholePosi
+        let signalSort
         if (coordinate === false) {
             let selects = getters.allSelects
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -141,9 +152,12 @@ export default {
                     break
                 }
             }
+            wholePosi = select.wholePosi
         } else {
-            select = coordinate
+            wholePosi = coordinate
         }
+        let rows = getters.allRows
+        let cols = getters.allCols
         let data = {}
         let cellsPosi = {
             coordinate: [{
@@ -185,8 +199,23 @@ export default {
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
         let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-        let rows = getters.allRows
-        let cols = getters.allCols
+
+        if (coordinate === false) {
+            signalSort = select.signalSort
+        } else {
+            signalSort = {
+                startCol: cols[startColIndex].sort,
+                startRow: rows[startRowIndex].sort,
+                endCol: cols[startColIndex].sort,
+                endRow: rows[endRowIndex].sort
+            }
+        }
+        await send({
+            url: config.url[propName],
+            body: JSON.stringify(signalSort)
+        })
+
+        // 修正参数
         if (endRowIndex === -1) {
             endRowIndex = rows.length - 1
         }
@@ -211,7 +240,7 @@ export default {
                         })
                     }
                 } else {
-                    dispatch(A_CELLS_ADD, extend(template, propStruct, {
+                    dispatch('A_CELLS_ADD', extend(template, propStruct, {
                         occupy: {
                             col: [colAlias],
                             row: [rowAlias]
@@ -255,7 +284,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(A_CELLS_ADD, [cell])
+                        dispatch('A_CELLS_ADD', [cell])
                     }
                 }
             }
@@ -275,7 +304,7 @@ export default {
                         row: [rowAlias]
                     }
                     if (typeof index !== 'number') {
-                        dispatch(A_CELLS_ADD, [cell])
+                        dispatch('A_CELLS_ADD', [cell])
                     }
                 }
             }
@@ -373,7 +402,7 @@ export default {
             col: cols
         }
         dispatch(A_CELLS_DESTORY, cells)
-        dispatch(A_CELLS_ADD, templateCell)
+        dispatch('A_CELLS_ADD', templateCell)
     },
     async [A_CELLS_SPLIT]({
         rootState,
@@ -445,7 +474,7 @@ export default {
             }
             dispatch(A_CELLS_DESTORY, [cell])
         })
-        dispatch(A_CELLS_ADD, insertCells)
+        dispatch('A_CELLS_ADD', insertCells)
     },
     [CELLS_FORMAT]({
         commit,
@@ -539,6 +568,13 @@ export default {
                 }
             }
         }
+    },
+    A_CELLS_INNERPASTE({
+        getters
+    }) {
+
+        // pause
+        console.log()
     },
     [CELLS_PASTE]({
         getters,
@@ -786,7 +822,7 @@ export default {
                     col: occupyCol,
                     row: occupyRow
                 }
-                dispatch(A_CELLS_ADD, [insertCell])
+                dispatch('A_CELLS_ADD', [insertCell])
             }
         }
         destoryClip()
@@ -829,90 +865,80 @@ export default {
             })
         }
     },
-    [CELLS_OUTERPASTE]({
+    async A_CELLS_OUTERPASTE({
         state,
         dispatch,
         getters,
         commit,
         rootState
-    }, payload) {
-        let {
-            startRowSort,
-            startColSort,
-            parseDate
-        } = payload
-        let currentSheet = rootState.currentSheet
-        let cols = getters.colList
+    }, texts) {
+        let activeCell = getters.activeCell()
+        let colAlias = activeCell.occupy.col[0]
+        let rowAlias = activeCell.occupy.row[0]
+        let oprCol = getters.getColByAlias(colAlias)
+        let oprRow = getters.getRowByAlias(rowAlias)
+        await send({
+            url: config.url['outerpaste'],
+            body: JSON.stringify({
+                oprCol: oprCol.sort,
+                oprRow: oprRow.sort,
+                content: texts
+            })
+        }).then(function(data) {
+            if (!data.isLegal) {
+                return
+            }
+        })
+
+        let parseData = parseClipStr(texts)
+        let startColIndex = getters.getColIndexBySort(oprCol.sort)
+        let startRowIndex = getters.getRowIndexBySort(oprRow.sort)
+        let parseColLen = parseData.colLen
+        let parseRowLen = parseData.rowLen
+        let cols = getters.allCols
         let rows = getters.allRows
-        let startColIndex = getters.getColIndexBySort(startColSort)
-        let startRowIndex = getters.getRowIndexBySort(startRowSort)
-        let colLen = parseDate.colLen
-        let rowLen = parseDate.rowLen
+        let endColIndex = startColIndex + parseColLen - 1
+        let endRowIndex = startRowIndex + parseRowLen - 1
+        if (endColIndex > cols.length - 1 || endRowIndex > rows.length - 1) {
+            throw new Error('opration area has outter of loaded area')
+        }
 
         // 清除复制选中区
-        if (cache.clipState !== '') {
-            let clip
-            let selects = getters.selectList
-            for (let i = 0, len = selects.length; i < len; i++) {
-                let select = selects[i]
-                if (select.type === CLIP) {
-                    clip = select
-                    break
-                }
-            }
-            cache.clipState = ''
-            commit(mutationTypes.DELETE_SELECT, {
-                currentSheet,
-                select: clip
-            })
-        }
-        let endColIndex = startColIndex + colLen - 1
-        let endRowIndex = startRowIndex + rowLen - 1
-
-        // 过滤超出加载区域部分
-        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length -
-            1
-        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length -
-            1
-        for (let i = startColIndex; i < endColIndex + 1; i++) {
-            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                let aliasCol = cols[i]
-                let aliasRow = rows[j]
-                commit(mutationTypes.M_UPDATE_POINTS, {
-                    currentSheet,
-                    info: {
-                        colAlias: aliasCol,
-                        rowAlias: aliasRow,
-                        type: 'cellIndex',
-                        value: null
+        // 这部分还没做，需要些函数来确定
+        let parseCells = parseData.data
+        parseCells.forEach(cell => {
+            let colAlias = cols[cell.colRelative + startColIndex].alias
+            let rowAlias = rows[cell.rowRelative + startRowIndex].alias
+            let idx = getters.IdxByRow(colAlias, rowAlias)
+            if (idx === -1) {
+                dispatch('A_CELLS_ADD', {
+                    occupy: {
+                        col: [colAlias],
+                        row: [rowAlias]
+                    },
+                    content: {
+                        texts: cell.text,
+                        displayTexts: cell.text
+                    }
+                })
+            } else {
+                dispatch('A_CELLS_UPDATE', {
+                    propName: 'texts',
+                    propStruct: {
+                        content: {
+                            texts: cell.text,
+                            displayTexts: cell.text
+                        }
+                    },
+                    coordinate: {
+                        startRowAlias: rowAlias,
+                        endRowAlias: rowAlias,
+                        startColAlias: colAlias,
+                        endColAlias: colAlias
                     }
                 })
             }
-        }
-        let parseCellData = parseDate.data
-        parseCellData.forEach(cellData => {
-            if (cellData.colRelative + startColIndex > cols.length - 1 ||
-                cellData.rowRelative + startRowIndex > rows.length - 1) {
-                return
-            }
-            let colAlias = cols[cellData.colRelative + startColIndex].alias
-            let rowAlias = rows[cellData.rowRelative + startRowIndex].alias
-            dispatch(A_CELLS_ADD, [{
-                occupy: {
-                    col: [colAlias],
-                    row: [rowAlias]
-                },
-                content: {
-                    texts: cellData.text,
-                    displayTexts: cellData.text
-                }
-            }])
-        })
-        dispatch(SELECTS_CHANGE, {
-            startRowIndex,
-            startColIndex,
-            endRowIndex,
-            endColIndex
+
         })
     },
     [CELLS_WORDWRAP]({

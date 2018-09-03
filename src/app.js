@@ -9,7 +9,8 @@ import {
     RESTORE
 } from './store/action-types'
 import config from './config'
-// import Sunbeam from './api/sunbeam'
+import Sunbeam from './api/sunbeam'
+import './directors/focus'
 export default async function(options) {
     // 用户参数合法性验证
     cache.AUTHENTIC_KEY = document.getElementById('auth_key').value

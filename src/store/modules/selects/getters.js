@@ -10,6 +10,21 @@ export default {
     selectState(state) {
         return state.selectState
     },
+    selectByType(state) {
+        return function(type) {
+            if (type !== 'SELECT' && type !== 'DATASOUCE') {
+                return
+            }
+            let selects = state.list
+            let len = selects.length
+            for (let i = 0; i < len; i++) {
+                let item = selects[i]
+                if (item.type === type) {
+                    return item
+                }
+            }
+        }
+    },
     getOprRegion(state, getters) {
         return function() {
             let wholePosi = state.list[0].wholePosi

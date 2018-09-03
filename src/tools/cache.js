@@ -29,7 +29,7 @@ export default {
     // 工具栏element元素
     toolEl: '',
     // 剪切板缓存数据
-    clipData: '',
+    clipData: null,
     // 剪切板状态
     clipState: '',
     // 存储绑定的全局事件，方便进行销毁

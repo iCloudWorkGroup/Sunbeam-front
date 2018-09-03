@@ -52,7 +52,7 @@ export default {
             })
             dispatch(ROWS_ADD, rows)
             dispatch(COLS_ADD, cols)
-            dispatch(A_CELLS_ADD, cells)
+            dispatch('A_CELLS_ADD', cells)
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
@@ -64,6 +64,7 @@ export default {
                 colAlias: visibleCols[0].alias,
                 rowAlias: visibleRows[0].alias
             })
+            commit('M_INPUT_CREATE')
             commit('M_UPDATE_LOAD', false)
         })
     },

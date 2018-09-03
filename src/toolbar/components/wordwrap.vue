@@ -11,7 +11,9 @@
 </div>
 </template>
 <script type="text/javascript">
-import { CELLS_WORDWRAP } from '../../store/action-types'
+import {
+    CELLS_WORDWRAP
+} from '../../store/action-types'
 
 export default {
     computed: {

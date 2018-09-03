@@ -95,9 +95,6 @@
 </template>
 <script type="text/javascript">
 import {
-    CELLS_UPDATE,
-} from '../../store/action-types'
-import {
     mapGetters
 } from '../../lib/vuex.esm'
 import Sizes from './sizes.vue'
@@ -166,7 +163,7 @@ export default {
                 structName: 'content.weight',
                 value: !cell.content.weight
             })
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'weight',
                 propStruct
             })
@@ -177,7 +174,7 @@ export default {
                 structName: 'content.italic',
                 value: !cell.content.italic
             })
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'italic',
                 propStruct
             })
@@ -188,7 +185,7 @@ export default {
                 structName: 'content.underline',
                 value: Number(!cell.content.underline)
             })
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'underline',
                 propStruct
             })

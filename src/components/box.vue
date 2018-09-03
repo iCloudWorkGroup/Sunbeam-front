@@ -3,20 +3,18 @@
         :value="texts"
         :style="styleObject"
         @keydown="keydownHandle"
-        @blur="completeEdit"
+        @blur="doneEdit"
         @copy="copyData"
         @cut="cutData"
-        @paste="pasteData">
+        @paste="pasteData"
+        v-focus="isEditing">
 </textarea>
 </template>
 <script type="text/javascript">
 import {
-    EDIT_HIDE,
     SELECTS_INSERT,
-    CELLS_PASTE
 } from '../store/action-types'
 import {
-    UPDATE_FOCUSSTATE,
     DELETE_SELECT
 } from '../store/mutation-types'
 import {
@@ -24,72 +22,60 @@ import {
 } from '../tools/constant'
 import cache from '../tools/cache'
 import config from '../config'
-
+import {
+    unit
+} from '../filters/unit'
 export default {
     props: [
-        'scrollLeft',
-        'scrollTop'
+        'scrollTop',
+        'scrollLeft'
     ],
-    mounted() {
-        // this.getFocus()
-    },
     computed: {
-        left() {
-            let getters = this.$store.getters
-            let getInputState = getters.getInputState
-            let left = getters.getInputState.left
-
-            if (getInputState.transverseScroll) {
-                left += this.scrollLeft
-            }
-            left += config.cornerWidth
-            return left
-        },
-        top() {
-            let inputState = this.$store.getters.getInputState
-            let top = inputState.top
-            if (inputState.verticalScroll) {
-                top += this.scrollTop
-            }
-            top += config.cornerHeight
-            return top
-        },
         styleObject() {
-            let state = this.$store.getters.getInputState
+            let props = this.$store.getters.inputProps
+            let physical = props.physical
+
+            /**
+             * 1. 因为单元格相对于内容区域定位，
+             * 而编辑框是相对于所以编辑区，所以需要考虑corner的大小
+             * 2. 这里的 -1 是为了覆盖单元格的边框
+             * 3. 下面的 -8 ,pading距离是3px, 再加上上面的 1px
+             * 8 = 3*2 + 1*2
+             */
+            let top = physical.top - this.scrollTop + config.cornerHeight - 1
+            let left = physical.left - this.scrollLeft + config.cornerWidth - 1
+            let width = physical.width - 8 < 0 ? 0 : physical.width - 8
+            let height = physical.height - 8 < 0 ? 0 : physical.height - 8
             return {
-                top: this.top + 1 + 'px',
-                left: this.left + 1 + 'px',
-                width: state.width + 'px',
-                height: state.height + 'px',
-                fontFamily: state.family,
-                fontSize: state.size + 'pt',
-                fontStyle: state.italic,
-                color: state.color,
-                textDecoration: state.underline,
+                top: unit(top),
+                left: unit(left),
+                width: unit(width),
+                height: unit(height),
+                fontFamily: physical.family,
+                fontSize: physical.size + 'pt',
+                fontStyle: physical.italic,
+                color: physical.color,
+                textDecoration: physical.underline,
             }
         },
         texts() {
-            let state = this.$store.getters.getInputState
-            return state.texts
+            let props = this.$store.getters.inputProps
+            return props.physical.texts
         },
-        editState() {
-            return this.$store.getters.getEidtState
-        },
-        focusState() {
-            return this.$store.state.focusState
+        isEditing() {
+            let props = this.$store.getters.inputProps
+            let status = props.assist.status
+            // 这是一个特殊情况，不论值等于多少都要返回true
+            // 同时，这个值还需要随时变化
+            if (status === true || status === false) {
+                return true
+            }
         }
     },
     methods: {
-        completeEdit() {
-            if (this.editState) {
-                this.$store.dispatch(EDIT_HIDE, this.$el.value)
-            }
-        },
-        getFocus() {
-            if (!this.$store.state.focusState) {
-                this.$el.focus()
-                this.$store.commit(UPDATE_FOCUSSTATE, true)
-            }
+        doneEdit(e) {
+            const texts = e.target.value.trim()
+            this.$store.dispatch('A_INPUT_EDITDONE', texts)
         },
         copyData(e) {
             let select = this.$store.getters.activeSelect
@@ -154,20 +140,18 @@ export default {
             clipboardData.setData('Text', text)
         },
         pasteData(e) {
-            if (this.$store.getters.getEidtState) {
-                return
-            }
-            e.preventDefault()
-            let text
-            if (window.clipboardData && window.clipboardData.getData) {
-                text = window.clipboardData.getData('Text')
-            } else {
-                text = e.clipboardData.getData('Text')
-            }
-            if (cache.clipState !== '' && text === cache.clipData) {
-                this.$store.dispatch(CELLS_PASTE)
-            } else {
-                this.$store.dispatch(CELLS_PASTE, text)
+            let clipboardData = window.clipboardData != null ?
+                window.clipboardData :
+                e.clipboardData
+            let texts = clipboardData.getData('Text')
+            let assist = this.$store.getters.inputProps.assist
+            if (assist.rowAlias == null || assist.colAlias == null) {
+                e.preventDefault()
+                if (texts === cache.clipData) {
+                    this.$store.dispatch('A_CELLS_INNERPASTE')
+                } else {
+                    this.$store.dispatch('A_CELLS_OUTERPASTE', texts)
+                }
             }
         },
         keydownHandle(e) {
@@ -200,13 +184,6 @@ export default {
             } else {
                 elem.value += insertChar
                 elem.focus()
-            }
-        }
-    },
-    watch: {
-        focusState(val) {
-            if (!val) {
-                this.getFocus()
             }
         }
     }

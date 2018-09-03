@@ -1,7 +1,7 @@
 <template>
     <div :class="name" :id="name">
         <div class="book"
-             @mouseup=""
+             @mouseup="offStatus"
              :style="{ width, height}">
             <sheet></sheet>
             <sheet-sider/>
@@ -74,8 +74,9 @@ export default {
         // }, false)
     },
     methods: {
-        getFocus() {
-            this.$store.commit(UPDATE_FOCUSSTATE, false)
+        offStatus() {
+            let props = this.$store.getters.inputProps
+            this.$store.commit('M_INPUT_UPDATE_STATUS', !props.assist.status)
         }
     }
 }

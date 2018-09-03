@@ -8,7 +8,9 @@
                 :key="idx"
                 :data-value="size"
                 data-struct="content.size">
-                <span :style="{ fontSize: size + 'pt' }">
+                <span :style="{ fontSize: size + 'pt' }"
+                      :data-value="size"
+                      data-struct="content.size">
                     {{ size }}
                 </span>
             </li>
@@ -32,9 +34,10 @@ export default {
     methods: {
         setSize(e) {
             let el = e.target
-            if (el.tagName !== 'LI') {
-                return
-            }
+            // if (el.tagName !== 'LI') {
+            //     console.log(e)
+            //     return
+            // }
             let structName = el.dataset.struct
             let value = el.dataset.value
             let propStruct = pathToStruct({
@@ -42,7 +45,7 @@ export default {
                 value
             })
             this.$store.dispatch(CELLS_UPDATE, {
-                propName: 'family',
+                propName: 'size',
                 propStruct
             })
         }

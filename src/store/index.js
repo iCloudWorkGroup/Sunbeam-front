@@ -18,7 +18,9 @@ const state = {
      * 当前选中sheet的alias
      * @type {String}
      */
-    active: null
+    active: null,
+    loading: false,
+    name: ''
 }
 export default new Vuex.Store({
     state,

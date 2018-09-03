@@ -1,43 +1,72 @@
 <template>
-    <div class="table">
+    <div :class="name" :id="name">
         <div class="book"
              @mouseup=""
              :style="{ width, height}">
             <sheet></sheet>
             <sheet-sider/>
         </div>
+        <div class="loadmark" v-show="show"></div>
     </div>
 </template>
 <script type="text/javascript">
 import Sheet from './sheet.vue'
 import SheetSider from './sheet-sider.vue'
-import cache from '../tools/cache'
 import {
     unit
 } from '../filters/unit'
 import {
-    // UPDATE_MOUSESTATE,
+    M_UPDATE_LOAD,
     UPDATE_FOCUSSTATE
 } from '../store/mutation-types'
-// import {
-//     LOCATE
-// } from '../tools/constant'
 
 export default {
     data() {
         return {
             // BUG: 暂时使用scroll，需要看实验的边线效果
-            height: unit(cache.rootEl.scrollHeight),
-            width: unit(cache.rootEl.scrollWidth)
-            // height: unit(cache.rootEl.offsetHeight),
-            // width: unit(cache.rootEl.offsetWidth)
+            // height: unit(document.getElementsByClassName('table')[0].scrollHeight)
+            // width: unit(document.getElementsByClassName('table')[0].scrollWidth)
+            // height: unit(cache.rootEl.scrollHeight),
+            // width: unit(cache.rootEl.scrollWidth)
         }
     },
     components: {
         Sheet,
         SheetSider
     },
+    computed: {
+        name() {
+            return this.$store.state.name.replace(/\.|\#/, '')
+        },
+        show() {
+            return this.$store.state.loading
+        },
+        width() {
+            return unit(this.$store.getters.offsetWidth)
+        },
+        height() {
+            return unit(this.$store.getters.offsetHeight)
+        }
+    },
+    beforeDestroy() {
+        this.$store.commit(M_UPDATE_LOAD, true)
+    },
     mounted() {
+        let _this = this
+        let timeOutId = -1
+        window.onresize = () => {
+            if (timeOutId) {
+                clearTimeout(timeOutId)
+            }
+            timeOutId = setTimeout(function () {
+                let name = _this.$store.state.name
+                let offsetWidth = document.querySelector(name).offsetWidth
+                let offsetHeight = document.querySelector(name).offsetHeight
+                _this.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
+                _this.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
+            }, 100)
+
+        }
         // document.addEventListener('mouseup', function() {
         //     self.$store.commit(UPDATE_MOUSESTATE, {
         //         state: LOCATE

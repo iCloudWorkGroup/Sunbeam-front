@@ -14,7 +14,7 @@ export default {
      * 右为隐藏列（用于效果显示）
      * @type {Boolean}
      */
-    ajacentHide: false,
+    rightAjacentHide: false,
     // 用户主动隐藏
     hidden: false,
     // 根据动态加载原则，设置否是隐藏

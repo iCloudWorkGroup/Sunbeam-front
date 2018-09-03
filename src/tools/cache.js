@@ -9,7 +9,9 @@ export default {
     // 后台存储行列大小, 最大行列数
     localRowPosi: 0,
     localColPosi: 0,
+    evenetList: {
 
+    },
     // 校验规则列表
     validate: [],
     // 校验规则计数器

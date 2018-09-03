@@ -186,7 +186,7 @@ export default {
             let cell = activeStatus(this)
             let propStruct = pathToStruct({
                 structName: 'content.underline',
-                value: !cell.content.underline
+                value: Number(!cell.content.underline)
             })
             this.$store.dispatch(CELLS_UPDATE, {
                 propName: 'underline',

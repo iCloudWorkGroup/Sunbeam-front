@@ -4,11 +4,13 @@ import {
     ROWS_ADD,
     COLS_ADD,
     A_CELLS_ADD,
-    SELECTS_INSERT
+    SELECTS_INSERT,
+    A_CLEAR_QUEUE
 } from './action-types'
 import cache from '../tools/cache'
 import send from '../util/send'
 import generator from '../tools/generator'
+import config from '../config'
 
 export default {
     [RESTORE]({
@@ -25,14 +27,12 @@ export default {
             if (data == null || (bookItem = data.sheets[0]) == null) {
                 throw new Error('backend data failed from server')
             }
-
             let rows = bookItem.gridLineRow
             let cols = bookItem.gridLineCol
             let cells = bookItem.cells
-
             cache.localRowPosi = bookItem.maxRowPixel
             cache.localColPosi = bookItem.maxColPixel
-
+            console.log(cols)
             // 存储行、列别名的最大值，为后面再增加行、列生成列名做准备
             generator.rowAliasGenerator(parseInt(bookItem.maxRowAlias,
                 0))
@@ -64,6 +64,18 @@ export default {
                 colAlias: visibleCols[0].alias,
                 rowAlias: visibleRows[0].alias
             })
+            commit('M_UPDATE_LOAD', false)
+        })
+    },
+    [A_CLEAR_QUEUE]({
+        rootState,
+        dispatch,
+        commit,
+        getters
+    }) {
+        // 整理数据
+        send({
+            url: config.url.clearqueue
         })
     }
 }

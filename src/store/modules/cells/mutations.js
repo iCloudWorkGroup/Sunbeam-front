@@ -69,7 +69,7 @@ export default {
      * 根据索引销毁单元格
      */
     [M_DESTORY_CELL](state, cell) {
-        cell.status.destory = true
+        cell.status.destroy = true
     },
     /**
      * 删除单元格对应关系
@@ -101,5 +101,10 @@ export default {
                 }
             }
         }
+    },
+    M_CLEAR_CELLS(state) {
+        state.list = []
+        state.rowMap = new Map()
+        state.colMap = new Map()
     }
 }

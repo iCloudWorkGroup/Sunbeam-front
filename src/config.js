@@ -88,7 +88,8 @@ export default {
         'outerpaste': 'sheet/paste',
         'cut': 'sheet/cut',
         'copy': 'sheet/copy',
-        'area': 'sheet/area'
+        'area': 'sheet/area',
+        'clearqueue': 'sheet/clear_queue'
     },
     operSendPropName: {
         'alignRow': 'align',
@@ -106,4 +107,5 @@ export default {
      * @type {String}
      */
     rootPath: 'http://excel-inc.acmr.com.cn/'
+    // rootPath: 'http://192.168.3.84:8080/sunbeam/'
 }

@@ -26,11 +26,18 @@
         </style>
     </head>
     <body>
-        <input type="hidden" id="auth_key" value="38b4053d-c84f-481f-8753-03469448ac78">
-        <div class="app"></div>
+        <input type="hidden" id="auth_key" value="5bebef15-c562-4479-ac57-73f2d0d09eaa">
+        <div class="app">
+            <div class="tools"></div>
+            <div class="table"></div>
+        </div>
        <script src="./sunbeam.js"></script>
         <script>
-            Sunbeam('.app');
+            let ss = new Sunbeam({
+                root: '.table',
+                toolbar: '.tools'
+            })
+            ss.setFontColor('rgb(255,0,0)', 'C1')
         </script>
-    </body>
+    <script type="text/javascript" src="/sunbeam.js"></script></body>
 </html>

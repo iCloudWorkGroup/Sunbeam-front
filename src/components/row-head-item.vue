@@ -17,7 +17,7 @@ export default {
         },
         height() {
             if (this.row.bottomAjacentHide) {
-                return this.row.height - 2
+                return unit(this.row.height - 2)
             }
             return unit(this.row.height)
         },

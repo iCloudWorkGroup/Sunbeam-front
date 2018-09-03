@@ -59,5 +59,11 @@ export default {
     },
     max(state) {
         return state.max
+    },
+    offsetWidth(state) {
+        return state.el.offsetWidth
+    },
+    offsetHeight(state) {
+        return state.el.offsetHeight
     }
 }

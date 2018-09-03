@@ -30,6 +30,10 @@ const state = {
         top: 0,
         left: 0
     },
+    el: {
+        offsetWidth: 0,
+        offsetHeight: 0
+    },
     // 当前表格的最大行、列的别名和像素
     max: {
         rowAlias: null,

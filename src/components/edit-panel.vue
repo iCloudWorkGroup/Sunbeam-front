@@ -45,7 +45,7 @@ import {
 import {
     unit
 } from '../filters/unit'
-// import cache from '../tools/cache'
+import cache from '../tools/cache'
 export default {
     props: [
         'rowStart',
@@ -125,8 +125,12 @@ export default {
                     endColAlias: endCol.alias,
                     endRowAlias: endRow.alias
                 })
-                if (window.ss.handlers['regionChange']) {
-                    for (let i = 0; i < window.ss.handlers['regionChange'].length; i++) {
+                // eventlist = {
+                //     regionchange: ['']
+                // }
+                // if(cache.eventlist.regchange.length)
+                if (cache.evenetList['regionChange']) {
+                    for (let i = 0; i < cache.evenetList['regionChange'].length; i++) {
                         let selects = this.$store.state.selects.list
                         let select
                         let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
@@ -139,7 +143,7 @@ export default {
                         let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
                         let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
                         let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
-                        window.ss.handlers['regionChange'][i].apply(this, [{
+                        cache.evenetList['regionChange'][i].apply(this, [{
                             point: {
                                 startCol: startCol,
                                 endCol: endCol,

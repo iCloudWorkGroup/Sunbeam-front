@@ -19,7 +19,7 @@
 <script type="text/javascript">
 import ColHeadPanel from './col-head-panel.vue'
 import ColHeadLine from './col-head-line.vue'
-import cache from '../tools/cache'
+// import cache from '../tools/cache'
 import config from '../config'
 import {
     unit
@@ -49,7 +49,7 @@ export default {
             let lastCol = cols.list[cols.list.length - 1]
             let limitWidth = 0
             if (overCol.alias === lastCol.alias) {
-                limitWidth = cache.rootEl.offsetWidth - config.cornerWidth
+                limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
                 if (this.needSider) {
                     limitWidth -= scrollbar()
                 }

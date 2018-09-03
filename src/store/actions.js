@@ -3,7 +3,6 @@ import {
     SHEET_INSERT,
     ROWS_ADD,
     COLS_ADD,
-    A_CELLS_ADD,
     SELECTS_INSERT
 } from './action-types'
 import cache from '../tools/cache'
@@ -52,7 +51,7 @@ export default {
             })
             dispatch(ROWS_ADD, rows)
             dispatch(COLS_ADD, cols)
-            dispatch(A_CELLS_ADD, cells)
+            dispatch('A_CELLS_ADD', cells)
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
@@ -64,6 +63,7 @@ export default {
                 colAlias: visibleCols[0].alias,
                 rowAlias: visibleRows[0].alias
             })
+            commit('M_INPUT_CREATE')
         })
     }
 }

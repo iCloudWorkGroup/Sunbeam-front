@@ -196,7 +196,6 @@ export default {
             startRowIndex,
             endColIndex = startColIndex,
             endRowIndex = startRowIndex,
-
         }) {
             let rows = getters.visibleRowList()
             let cols = getters.visibleColList()

@@ -19,9 +19,6 @@
 </template>
 <script>
 import {
-    CELLS_UPDATE,
-} from '../../store/action-types'
-import {
     pathToStruct
 } from '../../tools/format'
 import extend from '../../util/extend'
@@ -102,7 +99,7 @@ export default {
                     value
                 })
             }
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'border',
                 propStruct
             })

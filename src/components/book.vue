@@ -1,7 +1,7 @@
 <template>
     <div class="table">
         <div class="book"
-             @mouseup=""
+             @mouseup="offStatus"
              :style="{ width, height}">
             <sheet></sheet>
             <sheet-sider/>
@@ -15,10 +15,6 @@ import cache from '../tools/cache'
 import {
     unit
 } from '../filters/unit'
-import {
-    // UPDATE_MOUSESTATE,
-    UPDATE_FOCUSSTATE
-} from '../store/mutation-types'
 // import {
 //     LOCATE
 // } from '../tools/constant'
@@ -45,8 +41,9 @@ export default {
         // }, false)
     },
     methods: {
-        getFocus() {
-            this.$store.commit(UPDATE_FOCUSSTATE, false)
+        offStatus() {
+            let props = this.$store.getters.inputProps
+            this.$store.commit('M_INPUT_UPDATE_STATUS', !props.assist.status)
         }
     }
 }

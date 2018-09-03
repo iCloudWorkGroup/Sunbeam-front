@@ -18,9 +18,6 @@
 </template>
 <script>
 import {
-    CELLS_UPDATE,
-} from '../../store/action-types'
-import {
     pathToStruct
 } from '../../tools/format'
 export default {
@@ -41,7 +38,7 @@ export default {
                 structName,
                 value
             })
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'family',
                 propStruct
             })

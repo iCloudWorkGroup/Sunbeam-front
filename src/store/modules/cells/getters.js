@@ -228,6 +228,90 @@ export default {
             return result
         }
     },
+    /**
+     * 查选操作区域下侧/右侧所有单元格
+     */
+    cellsByOpr(state, getters) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex = startColIndex,
+            endRowIndex = startRowIndex,
+
+        }) {
+            let rows = getters.visibleRowList()
+            let cols = getters.visibleColList()
+            let allRows = getters.allRows
+            let allCols = getters.allCols
+            let endCol = endColIndex === -1 ?
+                cols.length - 1 :
+                endColIndex
+            let endRow = endRowIndex === -1 ?
+                rows.length - 1 :
+                endRowIndex
+            let result = []
+            let avoidRepeat = {}
+
+            let startCol = startColIndex
+            let startRow = startRowIndex
+            let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
+            let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
+            for (let i = startCol; i <= endColLen; i++) {
+                for (let j = startRow; j <= endRowLen; j++) {
+                    let colAlias = allCols[i].alias
+                    let rowAlias = allRows[j].alias
+                    let idx = getters.IdxByRow(colAlias, rowAlias)
+                    if (idx !== -1 && !avoidRepeat[idx]) {
+                        avoidRepeat[idx] = true
+                        result.push(state.list[idx])
+                    }
+                }
+            }
+            return result
+        }
+    },
+    /**
+     * 查选区域内所有可视单元格(垂直方向)
+     */
+    cellsByVerticalShouldShow(state, getters) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex = startColIndex,
+            endRowIndex = startRowIndex,
+
+        }) {
+            let rows = getters.visibleRowList()
+            let cols = getters.visibleColList()
+            let allRows = getters.allRows
+            let allCols = getters.allCols
+            let endCol = endColIndex === -1 ?
+                cols.length - 1 :
+                endColIndex
+            let endRow = endRowIndex === -1 ?
+                rows.length - 1 :
+                endRowIndex
+            let result = []
+            let avoidRepeat = {}
+
+            let startCol = Math.max(startColIndex, cols[0].sort)
+            let startRow = Math.max(startRowIndex, rows[0].sort)
+            let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
+            let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
+            for (let i = startCol; i <= endColLen; i++) {
+                for (let j = startRow; j <= endRowLen; j++) {
+                    let colAlias = allCols[i].alias
+                    let rowAlias = allRows[j].alias
+                    let idx = getters.IdxByRow(colAlias, rowAlias)
+                    if (idx !== -1 && !avoidRepeat[idx] && !state.list[idx].status.hidden && !state.list[idx].status.destroy) {
+                        avoidRepeat[idx] = true
+                        result.push(state.list[idx])
+                    }
+                }
+            }
+            return result
+        }
+    },
     cellsByTransverse(state, getters, rootState) {
         return function({
             startColIndex,

@@ -20,11 +20,12 @@ export default {
      * 只能进行单个更新
      */
     [UPDATE_SELECT](state, select) {
-        if (state.selectState === 'select') {
-            extend(true, state.list[0], select)
-        } else {
-            extend(true, state.list[1], select)
-        }
+        let selects = state.list
+        selects.forEach((item, index) => {
+            if (item === select.select) {
+                extend(true, state.list[index], select.props)
+            }
+        })
         // for (let i = 0, len = state.list.length; i < len; i++) {
         //     let item = state.list[i]
         //     for (let name in select) {
@@ -49,5 +50,9 @@ export default {
                 break
             }
         }
+    },
+    M_CLEAR_SELECT(state) {
+        state.list = []
+        state.selectState = 'select'
     }
 }

@@ -48,8 +48,8 @@ export default {
             return this.$store.getters.colsByRange(this.start, this.over)
         },
         adjustColList() {
-            let colList = this.$store.getters.colList
-            return colList.slice(this.adjustColIndex + 1)
+            let cols = this.$store.getters.allCols
+            return cols.slice(this.adjustColIndex + 1)
         },
         mouseState() {
             return this.$store.state.mouseState

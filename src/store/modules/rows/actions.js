@@ -75,26 +75,27 @@ export default {
         let rows = getters.allRows
         let row = rows[index]
         send({
-            url: config.url['hiderow'],
-            data: JSON.stringify({
+            url: config.url.hiderow,
+            body: JSON.stringify({
                 row: row.sort
             })
-        }).then(() => {
-            let cellIdx = getters.getRowIndexBySort(row.sort)
-            let cells = getters.cellsByTransverse({
-                startColIndex: 0,
-                startRowIndex: cellIdx,
-                endColIndex: -1
-            })
-            for (let i = 0, len = cells.length; i < len; i++) {
-                commit(mutationTypes.UPDATE_CELL, {
-                    cell: cells[i],
-                    status: {
-                        hidden: true
-                    }
-                })
-            }
         })
+        // .then(() => {
+        //     let cellIdx = getters.getRowIndexBySort(row.sort)
+        //     let cells = getters.cellsByTransverse({
+        //         startColIndex: 0,
+        //         startRowIndex: cellIdx,
+        //         endColIndex: -1
+        //     })
+        //     for (let i = 0, len = cells.length; i < len; i++) {
+        //         commit(mutationTypes.UPDATE_CELL, {
+        //             cell: cells[i],
+        //             status: {
+        //                 hidden: true
+        //             }
+        //         })
+        //     }
+        // })
         dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
     },
     [actionTypes.ROWS_EXECHIDE]({
@@ -107,136 +108,12 @@ export default {
         let index = getters.getRowIndexBySort(sort)
         let rows = getters.allRows
         let visibleRows = getters.visibleRowList()
+        // 将被隐藏行
         let row = rows[index]
         let updateCellInfo = []
         let rowHeight = row.height
         let rowAlias = row.alias
-        let cells = getters.cellsByVertical({
-            startColIndex: 0,
-            startRowIndex: index,
-            endColIndex: -1,
-            endRowIndex: -1,
-        })
 
-        cells.forEach(function(cell) {
-            let occupy = cell.occupy.row
-
-            if (occupy.indexOf(rowAlias) !== -1) {
-                if (occupy.length === 1) {
-                    updateCellInfo.push({
-                        cell,
-                        props: {
-                            physicsBox: {
-                                height: cell.physicsBox.height -
-                                    rowHeight - 1
-                            },
-                            status: {
-                                hidden: true
-                            }
-                        }
-                    })
-                } else {
-                    updateCellInfo.push({
-                        cell,
-                        props: {
-                            physicsBox: {
-                                height: cell.physicsBox.height -
-                                    rowHeight - 1
-                            }
-                        }
-                    })
-                }
-            } else {
-                updateCellInfo.push({
-                    cell,
-                    props: {
-                        physicsBox: {
-                            top: cell.physicsBox.top -
-                                rowHeight - 1
-                        }
-                    }
-                })
-            }
-        })
-        updateCellInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0],
-                    item.cell.occupy.row[0]),
-                prop: item.props
-            })
-        })
-        let updateSelectInfo = []
-        let rowTop = row.top
-        let selects = getters.allSelects
-        selects.forEach(function(select) {
-            let wholePosi = select.wholePosi
-            let rowSort = row.sort
-            let endVisibleSort = visibleRows[visibleRows.length - 1].sort
-            let startSort = getters.getRowByAlias(wholePosi.startRowAlias)
-                .sort
-            let endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort
-            if (startSort >= rowSort) {
-                if (startSort === endVisibleSort) {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                top: rows[index - 1].top,
-                                height: rows[index - 1].height
-                            },
-                            wholePosi: {
-                                startRowAlias: rows[index - 1].alias,
-                                endRowAlias: rows[index - 1].alias
-                            }
-                        }
-                    })
-                    commit(mutationTypes.ACTIVE_ROW, {
-                        startIndex: index - 1
-                    })
-                } else if (startSort === endSort) {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                height: rows[index + 1].height
-                            },
-                            wholePosi: {
-                                startRowAlias: rows[index + 1].alias,
-                                endRowAlias: rows[index + 1].alias
-                            }
-                        }
-                    })
-                    commit(mutationTypes.ACTIVE_ROW, {
-                        startIndex: index + 1
-                    })
-                } else {
-                    updateSelectInfo.push({
-                        select,
-                        props: {
-                            physicsBox: {
-                                height: select.physicsBox.height -
-                                    rowHeight - 1
-                            }
-                        }
-                    })
-                }
-
-            } else if (endSort > rowTop) {
-                updateSelectInfo.push({
-                    select,
-                    props: {
-                        physicsBox: {
-                            top: select.physicsBox.top -
-                                rowHeight - 1
-                        }
-                    }
-                })
-            }
-        })
-
-        updateSelectInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_SELECT, item.props)
-        })
 
         let updateRowInfo = [{
             row: rows[index],
@@ -267,6 +144,177 @@ export default {
         if (cache.localRowPosi > 0) {
             cache.localRowPosi -= rowHeight + 1
         }
+
+        let cells = getters.cellsByOpr({
+            startColIndex: 0,
+            startRowIndex: index,
+            endColIndex: -1,
+            endRowIndex: -1,
+        })
+        cells.forEach(function(cell) {
+            let occupy = cell.occupy.row
+            if (occupy.indexOf(rowAlias) !== -1) {
+                if (occupy.length === 1) {
+                    updateCellInfo.push({
+                        cell,
+                        props: {
+                            status: {
+                                hidden: true
+                            },
+                            physicsBox: {
+                                height: 0
+                            }
+                        }
+                    })
+                } else {
+                    cell.physicsBox.height -
+                    rowHeight - 1 > 0 ?
+                        updateCellInfo.push({
+                            cell,
+                            props: {
+                                physicsBox: {
+                                    height: cell.physicsBox.height -
+                                        rowHeight - 1
+                                }
+                            }
+                        }) :
+                        updateCellInfo.push({
+                            cell,
+                            props: {
+                                physicsBox: {
+                                    height: 0
+                                },
+                                status: {
+                                    hidden: true
+                                }
+                            }
+                        })
+                }
+            } else {
+                updateCellInfo.push({
+                    cell,
+                    props: {
+                        physicsBox: {
+                            top: cell.physicsBox.top -
+                                rowHeight - 1
+                        }
+                    }
+                })
+            }
+        })
+        updateCellInfo.forEach((item, index) => {
+            let occupyCol = item.cell.occupy.col[0]
+            let occupyRow = item.cell.occupy.row[0]
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(occupyCol, occupyRow),
+                prop: item.props
+            })
+        })
+
+        let updateSelectInfo = []
+        // let rowTop = row.top
+        let selects = getters.allSelects
+        selects.forEach(function(select) {
+            let wholePosi = select.wholePosi
+            let rowSort = row.sort
+            let endVisibleSort = visibleRows[visibleRows.length - 1].sort
+            let startSort = getters.getRowByAlias(wholePosi.startRowAlias).sort
+            let endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort
+            // 第一种情况 选择单行
+            if (startSort === endSort) {
+                // 隐藏行为选择行
+                if (startSort === rowSort) {
+                    // 隐藏行不为最后一列可视行
+                    if (startSort !== endVisibleSort) {
+                        updateSelectInfo.push({
+                            select,
+                            props: {
+                                physicsBox: {
+                                    height: rows[index + 1].height
+                                },
+                                wholePosi: {
+                                    startRowAlias: rows[index + 1].alias,
+                                    endRowAlias: rows[index + 1].alias
+                                },
+                                signalSort: {
+                                    startRow: index + 1,
+                                    endRow: index + 1
+                                },
+                                active: {
+                                    startRowAlias: rows[index + 1].alias,
+                                }
+                            }
+                        })
+                        commit(mutationTypes.ACTIVE_ROW, {
+                            startIndex: index + 1
+                        })
+                    }
+                    // 隐藏行为最后一列可视行
+                    if (startSort === endVisibleSort) {
+                        updateSelectInfo.push({
+                            select,
+                            props: {
+                                physicsBox: {
+                                    top: rows[index - 1].top,
+                                    height: rows[index - 1].height
+                                },
+                                wholePosi: {
+                                    startRowAlias: rows[index - 1].alias,
+                                    endRowAlias: rows[index - 1].alias
+                                },
+                                signalSort: {
+                                    startRow: rows[index - 1].sort,
+                                    endRow: rows[index - 1].sort
+                                },
+                                active: {
+                                    startRowAlias: rows[index - 1].alias,
+                                }
+                            }
+                        })
+                        commit(mutationTypes.ACTIVE_ROW, {
+                            startIndex: index - 1
+                        })
+                    }
+                }
+                // 隐藏行在选择行上方
+                if (startSort < rowSort) {
+                    updateSelectInfo.push({
+                        select,
+                        props: {
+                            physicsBox: {
+                                top: rows[index - 1].top,
+                            }
+                        }
+                    })
+                }
+            }
+            // 第二种情况 选择多行
+            if (startSort < endSort) {
+                updateSelectInfo.push({
+                    select,
+                    props: {
+                        physicsBox: {
+                            height: select.physicsBox.height -
+                            rowHeight - 1
+                        },
+                        wholePosi: {
+                            startRowAlias: rows[index + 1].alias
+                        },
+                        signalSort: {
+                            startRow: index + 1
+                        },
+                        active: {
+                            startRowAlias: rows[index + 1].alias,
+                        }
+                    }
+                })
+            }
+        })
+
+        updateSelectInfo.forEach((item, index) => {
+            commit(mutationTypes.UPDATE_SELECT, item)
+        })
+
     },
     [actionTypes.ROWS_CANCELHIDE]({
         getters,
@@ -283,7 +331,6 @@ export default {
             let endIndex
             let visibleStartRow = visibleRows[0]
             let visibleEndRow = visibleRows[visibleRows.length - 1]
-
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
                     select = selects[i]
@@ -317,8 +364,8 @@ export default {
             return
         }
         send({
-            url: config.url['showrow'],
-            data: JSON.stringify({
+            url: config.url.showrow,
+            body: JSON.stringify({
                 row: rows[index].sort
             }),
         })
@@ -339,41 +386,79 @@ export default {
         let rowHeight = row.height
         let rowAlias = row.alias
 
-        let cells = getters.cellsByVertical({
+        let updateRowInfo = [{
+            row: rows[index],
+            props: {
+                hidden: false
+            }
+        }]
+
+        if (index > 0) {
+            updateRowInfo.push({
+                row: rows[index - 1],
+                props: {
+                    bottomAjacentHide: false
+                }
+            })
+        }
+        for (let i = index + 1, len = rows.length; i < len; i++) {
+            let row = rows[i]
+            updateRowInfo.push({
+                row,
+                props: {
+                    top: row.top + rowHeight + 1
+                }
+            })
+        }
+        commit(mutationTypes.UPDATE_ROW, updateRowInfo)
+        let cells = getters.cellsByOpr({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: -1,
             endRowIndex: -1,
         })
-
         cells.forEach(function(cell) {
             let occupy = cell.occupy.row
-
             if (occupy.indexOf(rowAlias) !== -1) {
                 if (occupy.length === 1) {
+                    console.log(cell.physicsBox.height +
+                        rowHeight + 1)
                     updateCellInfo.push({
                         cell,
                         props: {
-                            physicsBox: {
-                                height: cell.physicsBox.height +
-                                    rowHeight + 1
-                            },
                             status: {
                                 hidden: false
                             }
+                        },
+                        physicsBox: {
+                            height: cell.physicsBox.height +
+                            rowHeight + 2
                         }
 
                     })
                 } else {
-                    updateCellInfo.push({
-                        cell,
-                        props: {
-                            physicsBox: {
-                                height: cell.physicsBox.height +
-                                    rowHeight + 1
+                    cell.physicsBox.height > 0 ?
+                        updateCellInfo.push({
+                            cell,
+                            props: {
+                                physicsBox: {
+                                    height: cell.physicsBox.height +
+                                        rowHeight + 1
+                                }
                             }
-                        }
-                    })
+                        }) :
+                        updateCellInfo.push({
+                            cell,
+                            props: {
+                                status: {
+                                    hidden: false
+                                },
+                                physicsBox: {
+                                    height: cell.physicsBox.height +
+                                    rowHeight + 1
+                                }
+                            }
+                        })
                 }
             } else {
                 updateCellInfo.push({
@@ -388,12 +473,11 @@ export default {
             }
         })
         updateCellInfo.forEach((item, index) => {
-            updateCellInfo.forEach((item, index) => {
-                commit(mutationTypes.UPDATE_CELL, {
-                    idx: getters.IdxByRow(item.cell.occupy
-                        .col[0], item.cell.occupy.row[0]),
-                    prop: item.props
-                })
+            let occupyRow = item.cell.occupy.row[0]
+            let occupyCol = item.cell.occupy.col[0]
+            commit(mutationTypes.UPDATE_CELL, {
+                idx: getters.IdxByRow(occupyCol, occupyRow),
+                prop: item.props
             })
         })
         let updateSelectInfo = []
@@ -437,34 +521,8 @@ export default {
         })
 
         updateSelectInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_SELECT, item.props)
+            commit(mutationTypes.UPDATE_SELECT, item)
         })
-
-        let updateRowInfo = [{
-            row: rows[index],
-            props: {
-                hidden: false
-            }
-        }]
-
-        if (index > 0) {
-            updateRowInfo.push({
-                row: rows[index - 1],
-                props: {
-                    bottomAjacentHide: false
-                }
-            })
-        }
-        for (let i = index + 1, len = rows.length; i < len; i++) {
-            let row = rows[i]
-            updateRowInfo.push({
-                row,
-                props: {
-                    top: row.top + rowHeight + 1
-                }
-            })
-        }
-        commit(mutationTypes.UPDATE_ROW, updateRowInfo)
     },
     [actionTypes.ROWS_INSERTROW]({
         getters,
@@ -613,7 +671,10 @@ export default {
                 insertRow.active = true
             }
         })
-        commit(mutationTypes.UPDATE_SELECT, updateSelectInfo[0].props)
+
+        updateSelectInfo.forEach((item, index) => {
+            commit(mutationTypes.UPDATE_SELECT, item)
+        })
 
         insertRow.top = rows[index].top
         let updateRowInfo = []
@@ -775,7 +836,7 @@ export default {
         })
 
         updateSelectInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_SELECT, item.props)
+            commit(mutationTypes.UPDATE_SELECT, item)
         })
 
         let updateRowInfo = []
@@ -1005,7 +1066,9 @@ export default {
             }
         })
 
-        commit(mutationTypes.UPDATE_SELECT, updateSelectInfo[0].props)
+        updateSelectInfo.forEach((item, index) => {
+            commit(mutationTypes.UPDATE_SELECT, item)
+        })
 
         let updateRowInfo = []
         for (let i = index + 1, len = rows.length; i < len; i++) {

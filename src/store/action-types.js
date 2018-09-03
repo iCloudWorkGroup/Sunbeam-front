@@ -79,6 +79,7 @@ export const HISTORY_UNDO = 'HISTORY_UNDO'
 export const HISTORY_ADD = 'HISTORY_ADD'
 
 export const RESTORE = 'RESTORE'
+export const A_CLEAR_QUEUE = 'A_CLEAR_QUEUE'
 
 export const VIEWS_LOADED = 'VIEWS_LOADED'
 export const VIEW_MAX = 'VIEW_MAX'

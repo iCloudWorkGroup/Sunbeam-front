@@ -1,6 +1,12 @@
 export const ADD_ROW = 'ADD_ROW'
 export const ADD_COL = 'ADD_COL'
 
+export const M_CLEAR_SHEET = 'M_CLEAR_SHEET'
+export const M_CLEAR_SELECT = 'M_CLEAR_SELECT'
+export const M_CLEAR_COLS = 'M_CLEAR_COLS'
+export const M_CLEAR_ROWS = 'M_CLEAR_ROWS'
+export const M_CLEAR_CELLS = 'M_CLEAR_CELLS'
+
 export const INSERT_ROW = 'INSERT_ROW'
 export const INSERT_COL = 'INSERT_COL'
 export const M_INSERT_CELL = 'M_INSERT_CELL'
@@ -14,6 +20,7 @@ export const M_DELETE_POINTS = 'M_DELETE_POINTS'
 export const UPDATE_CELL = 'UPDATE_CELL'
 
 export const UPDATE_ACTIVESHEET = 'UPDATE_ACTIVESHEET'
+export const M_UPDATE_LOAD = 'M_UPDATE_LOAD'
 
 export const UPDATE_SELECT = 'UPDATE_SELECT'
 export const UPDATE_CELL_TEXTS = 'UPDATE_CELL_TEXTS'

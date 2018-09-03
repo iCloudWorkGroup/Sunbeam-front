@@ -27,7 +27,7 @@ export default {
             let endColIndex = getters.colIndexByAlias(this.colOver)
             let startRowIndex = getters.rowIndexByAlias(this.rowStart)
             let endRowIndex = getters.rowIndexByAlias(this.rowOver)
-            return this.$store.getters.cellsByVertical({
+            return this.$store.getters.cellsByVerticalShouldShow({
                 startColIndex,
                 endColIndex,
                 startRowIndex,

@@ -9,7 +9,9 @@
                 :key="idx"
                 :data-value="family.en"
                 data-struct="content.family">
-                <span :style="{ fontFamily: family.en}">{{ family.cn }}</span>
+                <span :style="{ fontFamily: family.en}"
+                      :data-value="family.en"
+                      data-struct="content.family">{{ family.cn }}</span>
             </li>
         </ul>
     </div>
@@ -46,9 +48,9 @@ export default {
     methods: {
         setFamily(e) {
             let el = e.target
-            if (el.tagName !== 'LI') {
-                return
-            }
+            // if (el.tagName !== 'LI') {
+            //     return
+            // }
             let structName = el.dataset.struct
             let value = el.dataset.value
             let propStruct = pathToStruct({

@@ -1,20 +1,20 @@
 <template>
-<div class="edit"
-     @scroll="tabSurface"
-     :style="{ width, height }">
-    <edit-panel
-        :row-start="rowStart"
-        :row-over="rowOver"
-        :col-start="colStart"
-        :col-over="colOver"
-        :offsetTop="offsetTop"
-        :offsetLeft="offsetLeft"/>
-</div>
+    <div class="edit"
+         @scroll="tabSurface"
+         :style="{ width, height }">
+        <edit-panel
+                :row-start="rowStart"
+                :row-over="rowOver"
+                :col-start="colStart"
+                :col-over="colOver"
+                :offsetTop="offsetTop"
+                :offsetLeft="offsetLeft"/>
+    </div>
 </template>
 <script type="text/javascript">
 import EditPanel from './edit-panel.vue'
 import config from '../config'
-import cache from '../tools/cache'
+// import cache from '../tools/cache'
 import send from '../util/send'
 import * as actionTypes from '../store/action-types'
 import * as mutationTypes from '../store/mutation-types'
@@ -56,12 +56,11 @@ export default {
         }
     },
     mounted() {
-        console.log(this.viewLoaded)
         // this.setOccupy()
         // this.updateUserView()
     },
     beforeDestroy() {
-        this.updateOccupy([], [])
+        // this.updateOccupy([], [])
     },
     computed: {
         width() {
@@ -71,7 +70,7 @@ export default {
             let lastCol = cols.list[cols.list.length - 1]
             let limitWidth = 0
             if (overCol.alias === lastCol.alias) {
-                limitWidth = cache.rootEl.offsetWidth - config.cornerWidth
+                limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
                 if (this.needSider) {
                     limitWidth -= scrollbar()
                 }
@@ -89,8 +88,7 @@ export default {
             // 如果视图的最后元素和已经加载元素一致
             // 说明不是冻结视图 需要考虑上下边框的距离
             if (overRow.alias === lastRow.alias) {
-                limitHeight = cache.rootEl.offsetHeight -
-                config.cornerHeight - config.sheetSider
+                limitHeight = this.$store.getters.offsetHeight - config.cornerHeight - config.sheetSider
                 if (this.needSider) {
                     limitHeight -= scrollbar()
                 }
@@ -107,6 +105,7 @@ export default {
         tabSurface() {
             let scrollLeft = this.$el.scrollLeft
             let scrollTop = this.$el.scrollTop
+
             if (this._events['scrollPanel'] != null) {
                 this.$emit('scrollPanel', {
                     scrollTop,
@@ -321,12 +320,12 @@ export default {
 
 </script>
 <style type="text/css">
-.edit {
-    overflow: hidden;
-    background: white;
-}
+    .edit {
+        overflow: hidden;
+        background: white;
+    }
 
-.scroll-box {
-    overflow: auto;
-}
+    .scroll-box {
+        overflow: auto;
+    }
 </style>

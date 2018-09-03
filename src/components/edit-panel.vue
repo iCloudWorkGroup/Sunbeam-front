@@ -31,9 +31,6 @@ import {
     SELECTS_CHANGE,
     SELECTS_INSERT
 } from '../store/action-types'
-// import {
-//     UPDATE_MOUSESTATE
-// } from '../store/mutation-types'
 import ColGridGroup from './col-grid-group.vue'
 import RowGridGroup from './row-grid-group.vue'
 import CellGroup from './cell-group.vue'

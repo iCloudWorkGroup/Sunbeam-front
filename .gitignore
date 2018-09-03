@@ -1,8 +1,8 @@
 # Custom
 
 mock/
-.idea/
-package-lock.json
+.idea
+
 # Logs
 logs
 *.log

@@ -13,7 +13,7 @@ import * as types from '../store/action-types'
 import {
     SELECT,
     CLIP,
-    DATESOURCE
+    DATASOURCE
 } from '../tools/constant'
 import {
     unit
@@ -65,7 +65,7 @@ export default {
                 case CLIP:
                     result = 'clip-item'
                     break
-                case DATESOURCE:
+                case DATASOURCE:
                     result = 'datesource-item'
                     break
             }

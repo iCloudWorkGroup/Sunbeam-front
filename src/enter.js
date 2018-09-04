@@ -4,9 +4,10 @@ let ss = new Sunbeam({
     toolbar: '.tools'
 })
 ss.load().then(() => {
-    ss.setColWidth('A', 0)
-    ss.setRowHeight('1', 0)
-    ss.setRowHeight('2', 0)
+    // ss.setColWidth('A', 70)
+    // ss.setRowHeight('1', 20)
+    // ss.setRowHeight('2', 20)
+    ss.splitCell('1', ['F2', 'H3'])
 })
 
 ss.addEventListener('regionChange', function (e) {

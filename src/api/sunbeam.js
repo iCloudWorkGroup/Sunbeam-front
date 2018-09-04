@@ -95,21 +95,11 @@ SpreadSheet.prototype = {
         let endRow = this.vm.$store.getters.allRows[endRowIndex]
         let startCol = this.vm.$store.getters.allCols[startColIndex]
         let endCol = this.vm.$store.getters.allCols[endColIndex]
-        select.wholePosi = {
+        select = {
             startColAlias: startCol.alias,
             startRowAlias: startRow.alias,
             endColAlias: endCol.alias,
             endRowAlias: endRow.alias
-        }
-        select.activePosi = {
-            rowAlias: startRow.alias,
-            colAlias: startCol.alias
-        }
-        select.signalSort = {
-            startCol: startCol.sort,
-            startRow: startRow.sort,
-            endCol: endCol.sort,
-            endRow: endRow.sort
         }
         return select
     },
@@ -503,6 +493,7 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
+        console.log(select)
         this.vm.$store.dispatch(A_types.A_CELLS_MERGE, select)
     },
 

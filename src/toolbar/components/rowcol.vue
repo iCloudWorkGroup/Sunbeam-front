@@ -7,7 +7,7 @@
                         <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
                         <div class="fui-cf-desc">
                             <div class="fui-cf-text">&nbsp;&nbsp;插入&nbsp;&nbsp;</div>
-                            <div class="fui-cf-extend caret"></div>
+                            <div class="fui-cf-extend spreadSheetCaret"></div>
                         </div>
                     </div>
                 </span>
@@ -16,7 +16,7 @@
                         <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
                         <div class="fui-cf-desc">
                             <div class="fui-cf-text">&nbsp;&nbsp;删除&nbsp;</div>
-                            <div class="fui-cf-extend caret"></div>
+                            <div class="fui-cf-extend spreadSheetCaret"></div>
                         </div>
                     </div>
                 </span>

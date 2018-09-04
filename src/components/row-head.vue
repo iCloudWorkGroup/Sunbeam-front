@@ -18,7 +18,7 @@
 <script type="text/javascript">
 import RowHeadPanel from './row-head-panel.vue'
 import RowHeadLine from './row-head-line.vue'
-import cache from '../tools/cache'
+// import cache from '../tools/cache'
 import config from '../config'
 import {
     unit
@@ -48,8 +48,8 @@ export default {
             let lastRow = rows.list[rows.list.length - 1]
             let limitHeight = 0
             if (overRow.alias === lastRow.alias) {
-                limitHeight = cache.rootEl.offsetHeight -
-                config.cornerHeight - config.sheetSider
+                limitHeight = this.$store.getters.offsetHeight -
+                    config.cornerHeight - config.sheetSider
                 if (this.needSider) {
                     limitHeight -= scrollbar()
                 }

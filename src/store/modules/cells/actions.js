@@ -10,7 +10,6 @@ import {
     CELLS_INNERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
-    // ROWS_EXECADJUSTHEIGHT,
     ROWS_ADJUSTHEIGHT
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
@@ -161,6 +160,11 @@ export default {
         }
         let fixPropName = propName
         switch (propName) {
+            case 'wordWrap':
+                sendArgs = extend(sendArgs, {
+                    auto: propStruct.content[propName]
+                })
+                break
             case 'texts':
                 sendArgs = extend({
                     coordinate: signalSort
@@ -333,35 +337,30 @@ export default {
         dispatch,
         getters
     }, coordinate = false) {
-        let select
-        if (coordinate === false) {
-            let selects = getters.allSelects
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-        } else {
-            select = coordinate
+        let select = coordinate === false ?
+            getters.selectByType(SELECT) : {}
+        let wholePosi = coordinate === false ?
+            select.wholePosi :
+            coordinate
+        let allCols = getters.allCols
+        let allRows = getters.allRows
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        let signalSort = coordinate === false ? select.signalSort : {
+            startCol: allCols[startColIndex].sort,
+            startRow: allRows[startRowIndex].sort,
+            endCol: allCols[startColIndex].sort,
+            endRow: allRows[endRowIndex].sort
         }
         let data = {
-            coordinate: [{
-                startCol: select.signalSort.startCol,
-                startRow: select.signalSort.startRow,
-                endCol: select.signalSort.endCol,
-                endRow: select.signalSort.endRow
-            }]
+            coordinate: [signalSort]
         }
         await send({
             url: config.url.merge,
             body: JSON.stringify(data)
         })
-        let wholePosi = select.wholePosi
-        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
         if (endRowIndex === -1 || endColIndex === -1) {
             return
         }
@@ -398,36 +397,30 @@ export default {
         getters,
         commit
     }, coordinate = false) {
-        let select
-        if (coordinate === false) {
-            let selects = getters.allSelects
-
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-        } else {
-            select = coordinate
+        let select = coordinate === false ?
+            getters.selectByType(SELECT) : {}
+        let wholePosi = coordinate === false ?
+            select.wholePosi :
+            coordinate
+        let allCols = getters.allCols
+        let allRows = getters.allRows
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        let signalSort = coordinate === false ? select.signalSort : {
+            startCol: allCols[startColIndex].sort,
+            startRow: allRows[startRowIndex].sort,
+            endCol: allCols[startColIndex].sort,
+            endRow: allRows[endRowIndex].sort
         }
         let data = {
-            coordinate: [{
-                startCol: select.signalSort.startCol,
-                startRow: select.signalSort.startRow,
-                endCol: select.signalSort.endCol,
-                endRow: select.signalSort.endRow
-            }]
+            coordinate: [signalSort]
         }
         await send({
             url: config.url.split,
             body: JSON.stringify(data)
         })
-        let wholePosi = select.wholePosi
-        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
         let cells = getters.cellsByTransverse({
             startColIndex,
             endColIndex,
@@ -469,24 +462,16 @@ export default {
         value,
         coordinate = false
     }) {
-        let select
-        if (coordinate === false) {
-            let selects = getters.allSelects
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-        } else {
-            select = coordinate
-        }
+        let select = coordinate === false ?
+            getters.selectByType(SELECT) : {}
+        let wholePosi = coordinate === false ?
+            select.wholePosi :
+            coordinate
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
 
         // 修正参数
-        let wholePosi = select.wholePosi
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
@@ -837,27 +822,13 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
-            let data = {
-                coordinate: [
-                    {
-                        startCol: startColIndex,
-                        startRow: startRowIndex,
-                        endCol: endColIndex,
-                        endRow: endRowIndex
-                    }
-                ],
-                auto: props.content.wordWrap,
-            }
-            await send({
-                url: config.url.wordWrap,
-                body: JSON.stringify(data)
-            })
-            dispatch(CELLS_UPDATE_PROP, {
-                startColIndex,
-                startRowIndex,
-                endColIndex,
-                endRowIndex,
-                props
+            // await send({
+            //     url: config.url.wordWrap,
+            //     body: JSON.stringify(data)
+            // })
+            dispatch('A_CELLS_UPDATE', {
+                propName: 'wordWrap',
+                propStruct: props
             })
             if (oprRows) {
                 oprRows.forEach(info => {

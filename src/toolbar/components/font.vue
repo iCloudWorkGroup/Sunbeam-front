@@ -11,7 +11,7 @@
                     </span>
                 <span
                 class="fui-transverse-model fui-cf-fontfamily-extend active">
-                    <span class="caret"></span>
+                    <span class="spreadSheetCaret"></span>
                 </span>
             </span>
             <span class="section"
@@ -23,7 +23,7 @@
                     </span>
             <span
                 class="fui-transverse-model fui-cf-fontsize-extend active">
-                <span class="caret"></span>
+                <span class="spreadSheetCaret"></span>
             </span>
             </span>
         </div>
@@ -52,7 +52,7 @@
                   @click="ejectMenu($event, 'borders')">
                 <span class="fui-cf-ico ico-borderbottom ico-section-ico"></span>
                 <span class="ico-section-rightarrow">
-                    <span class="caret"></span>
+                    <span class="spreadSheetCaret"></span>
                 </span>
             </span>
             <span class="ico-section"
@@ -61,7 +61,7 @@
                   @click="ejectMenu($event, 'backgrounds')">
                 <span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
                 <span class="ico-section-rightarrow">
-                    <span class="caret"></span>
+                    <span class="spreadSheetCaret"></span>
                 </span>
             </span>
             <span class="ico-section"
@@ -70,7 +70,7 @@
                   @click="ejectMenu($event, 'colors')">
                 <span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
                 <span class="ico-section-rightarrow">
-                    <span class="caret"></span>
+                    <span class="spreadSheetCaret"></span>
                 </span>
             </span>
         </div>

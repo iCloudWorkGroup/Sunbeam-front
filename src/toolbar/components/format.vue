@@ -8,7 +8,7 @@
                     <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">文本格式</div>
-                        <div class="fui-cf-extend caret"></div>
+                        <div class="fui-cf-extend spreadSheetCaret"></div>
                     </div>
                 </div>
             </div>

@@ -23,7 +23,6 @@ export default {
         rootState,
         commit
     }, cols) {
-        console.log(cols)
         let ret = []
         for (let i = 0, len = cols.length; i < len; i++) {
             let col = cols[i]
@@ -33,7 +32,6 @@ export default {
             }
             ret.push(extend(template, col))
         }
-        console.log(ret)
         commit(mutationTypes.ADD_COL, {
             cols: ret
         })

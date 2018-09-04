@@ -22,7 +22,7 @@ li { list-style: none; }
 .fui-cf-comment-ico { background: url('../img/comment.png'); }
 .fui-cf-bg-extend2-ico { background: url('../img/funcBgExtend2.png'); }
 .fui-section { border: 1px solid #fafafa; }
-.caret { display: inline-block; width: 0; height: 0; vertical-align: middle; border-top: 3px dashed; border-right: 3px solid transparent; border-left: 3px solid transparent; }
+.spreadSheetCaret { display: inline-block; width: 0; height: 0; vertical-align: middle; border-top: 3px dashed; border-right: 3px solid transparent; border-left: 3px solid transparent; }
 .fui-group { display: inline-block; }
 .fui-separator, .fui-container { display: inline-block; }
 .fui-separator { height: 80px; border-right: 1px dashed #c6c6c6; margin: 0 6px; display: inline-block; }
@@ -98,7 +98,7 @@ span { display: inline-block; }
 .fui-cf-fontfamily { width: 120px; }
 .fui-cf-fontsize { width: 30px; }
 .fui-cf-fontfamily-extend, .fui-cf-fontsize-extend { width: 6px; }
-.fui-cf-fontsize-extend .caret, .fui-cf-fontfamily-extend .caret { margin-top: -3px; }
+.fui-cf-fontsize-extend .spreadSheetCaret, .fui-cf-fontfamily-extend .spreadSheetCaret { margin-top: -3px; }
 .fui-cf-fontfamily-extend.active, .fui-cf-fontsize-extend.active { background: #9fd5b7; }
 .tab-container { overflow: hidden; padding: 1px 4px 8px; cursor: default; }
 .color-body { width: 18px; height: 18px; border: 1px solid #fff; margin: 0 1px;}

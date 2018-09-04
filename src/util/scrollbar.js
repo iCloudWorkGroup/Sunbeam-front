@@ -13,7 +13,6 @@ export default (function() {
         let scrollNone = getWidth()
         virtualEl.style.overflowY = 'auto'
         let scrollExist = getWidth()
-
         document.body.removeChild(virtualEl)
 
         function getWidth() {

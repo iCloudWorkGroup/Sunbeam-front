@@ -88,7 +88,6 @@ export default {
         } else {
             colItem.set(colAlias, true)
         }
-        console.log(loaded)
     },
     UPDATE_SHEETS_MAX(state, {
         rowAlias,
@@ -101,5 +100,35 @@ export default {
         max.colAlias = colAlias != null ? colAlias : max.colAlias
         max.rowPixel = rowPixel != null ? rowPixel : max.rowPixel
         max.colPixel = colPixel != null ? colPixel : max.colPixel
+    },
+    M_UPDATE_OFFSETWIDTH(state, width) {
+        state.el.offsetWidth = width
+    },
+    M_UPDATE_OFFSETHEIGHT(state, height) {
+        state.el.offsetHeight = height
+    },
+    M_CLEAR_SHEET(state) {
+        state.list = []
+        state.events = []
+        state.loaded = {
+            cols: ['1'],
+            rows: ['1'],
+            colMap: new Map(),
+            rowMap: new Map()
+        }
+        state.scroll = {
+            top: 0,
+            left: 0
+        }
+        state.el = {
+            offsetWidth: 0
+        }
+        // 当前表格的最大行、列的别名和像素
+        state.max = {
+            rowAlias: null,
+            colAlias: null,
+            rowPixel: 0,
+            colPixel: 0
+        }
     }
 }

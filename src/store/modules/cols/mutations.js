@@ -70,5 +70,9 @@ export default {
         for (let i = startIdx; i < overIdx + 1; i++) {
             state.list[i].visible = isView
         }
+    },
+    M_CLEAR_COLS(state) {
+        state.list = []
+        state.map = new Map()
     }
 }

@@ -596,12 +596,10 @@ export default {
                         isView: true
                     })
                 }
-                console.log('up ------ insert')
                 insertView({
                     firstAlias: firstRowAlias,
                     neighborAlias: preRow
                 })
-                console.log('up ------ insert --- end')
             }
         }
         // 判断滚动的距离是否需要触发加载行为
@@ -735,8 +733,6 @@ export default {
                     .set(alias, true)
             }
             viewLoaded.rows.push(alias)
-            console.log(viewLoaded.rows)
-            console.log(viewLoaded.rowMap)
         }
         /**
          * 在最前面插入map信息
@@ -760,8 +756,6 @@ export default {
                 colMap.get(item).set(firstAlias, true)
             }
             viewLoaded.rows.splice(0, 0, neighborAlias)
-            console.log(viewLoaded.rows)
-            console.log(viewLoaded.rowMap)
         }
         /**
          * 删除map信息
@@ -789,10 +783,6 @@ export default {
             } else {
                 rows.splice(0, 1)
             }
-            console.log('delView -------------- START')
-            console.log(viewLoaded.rows)
-            console.log(viewLoaded.rowMap)
-            console.log('delView -------------- OVER')
         }
         // this.scrollToBottom({
         //     limitTop,
@@ -943,12 +933,10 @@ export default {
                         isView: true
                     })
                 }
-                console.log('up ------ insert')
                 insertView({
                     firstAlias: firstColAlias,
                     neighborAlias: preCol
                 })
-                console.log('up ------ insert --- end')
             }
         }
         // 判断滚动的距离是否需要触发加载行为
@@ -1082,8 +1070,6 @@ export default {
                     .set(alias, true)
             }
             viewLoaded.cols.push(alias)
-            console.log(viewLoaded.cols)
-            console.log(viewLoaded.colMap)
         }
         /**
          * 在最前面插入map信息
@@ -1130,10 +1116,6 @@ export default {
             } else {
                 cols.splice(0, 1)
             }
-            console.log('delView -------------- START')
-            console.log(viewLoaded.cols)
-            console.log(viewLoaded.colMap)
-            console.log('delView -------------- OVER')
         }
         // this.scrollToBottom({
         //     limitTop,

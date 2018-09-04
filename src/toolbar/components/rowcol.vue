@@ -49,7 +49,6 @@ export default {
         //     tool: 'activeTool'
         // }),
         tool() {
-            console.log(this.$store.getters.activeTool)
             return this.$store.getters.activeTool
         }
     },

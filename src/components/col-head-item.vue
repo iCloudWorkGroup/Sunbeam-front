@@ -9,6 +9,7 @@
 import {
     unit
 } from '../filters/unit'
+// import extend from '../util/extend'
 export default {
     props: ['col', 'offsetLeft'],
     computed: {
@@ -17,7 +18,7 @@ export default {
         },
         width() {
             if (this.col.rightAjacentHide) {
-                return this.col.width - 2
+                return unit(this.col.width - 2)
             }
             return unit(this.col.width)
         },

@@ -101,7 +101,9 @@ export default {
             }
             this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'border',
-                propStruct
+                propStruct,
+                border: structName.split('.')[1],
+                line: value
             })
         }
     }

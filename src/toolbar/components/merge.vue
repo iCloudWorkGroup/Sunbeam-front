@@ -26,9 +26,9 @@ export default {
     methods: {
         setMerge() {
             if (this.hasMerge) {
-                this.$store.dispatch(A_CELLS_SPLIT, {})
+                this.$store.dispatch(A_CELLS_SPLIT)
             } else {
-                this.$store.dispatch(A_CELLS_MERGE, {})
+                this.$store.dispatch(A_CELLS_MERGE)
             }
         }
     }

@@ -540,15 +540,19 @@ export default {
             }
             index = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
         }
-        let sort = getters.allRows[index].sort
+        let rowModel = getters.allRows[index - 1]
+        let row = getters.allRows[index]
+        let sort = row.sort
         send({
-            url: config.url['insertrow'],
+            url: config.url.insertrow,
             body: JSON.stringify({
                 row: sort,
             }),
         })
+        console.log(sort)
         dispatch(actionTypes.ROWS_EXECINSERTROW, {
-            sort
+            sort,
+            rowModel
         })
     },
     [actionTypes.ROWS_EXECINSERTROW]({
@@ -565,13 +569,14 @@ export default {
         let index = getters.getRowIndexBySort(sort)
         if (!rowModel) {
             insertRow = extend(template)
-            insertRow.alias = generator.rowAliasGenerator()
-            insertRow.sort = sort
-            insertRow.displayName = getRowDisplayName(sort)
-            insertRow.top = rows[index].top
         } else {
-            insertRow = rowModel
+            insertRow = extend(rowModel)
         }
+        insertRow.alias = generator.rowAliasGenerator()
+        insertRow.sort = sort
+        insertRow.displayName = getRowDisplayName(sort)
+        insertRow.top = rows[index].top
+
 
         let rowHeight = insertRow.height
         let insertRowAlias = insertRow.alias

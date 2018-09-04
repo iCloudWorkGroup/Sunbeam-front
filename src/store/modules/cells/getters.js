@@ -47,18 +47,11 @@ export default {
     activeCell(state, getters) {
         return function() {
             let cells = state.list
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType('SELECT')
             let activePosi = select.activePosi
             let idx = this.IdxByRow(activePosi.colAlias, activePosi.rowAlias)
-            if (idx !== -1 || cells) {
-                return this.cells[idx]
+            if (idx !== -1) {
+                return cells[idx]
             }
             return null
         }

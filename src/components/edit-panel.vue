@@ -75,7 +75,7 @@ export default {
             return this.$store.state.mouseState
         },
         selectState() {
-            return this.$store.getters.selectState
+            return this.$store.getters.activeType
         }
     },
     methods: {
@@ -85,7 +85,10 @@ export default {
             let clientRect = el.getBoundingClientRect()
             let col = getters.getColByPosi(downEvent.clientX - clientRect.left + this.offsetLeft)
             let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
-            if (this.selectState === 'dateSource' && this.$store.state.selects.list.length < 2) {
+
+            // 如果是选择数据源，需要判断数据源是否存在
+            if (this.selectState === 'DATESOURCE' &&
+                getters.selectByType(this.selectState) == null) {
                 this.$store.dispatch(SELECTS_INSERT, {
                     colAlias: col.alias,
                     rowAlias: row.alias
@@ -95,22 +98,16 @@ export default {
                 activeColAlias: col.alias,
                 activeRowAlias: row.alias
             })
-            if (cache.evenetList['mousedown']) {
-                for (let i = 0; i < cache.evenetList['mousedown'].length; i++) {
-                    let selects = this.$store.state.selects.list
-                    let select
-                    let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
-                    selects.forEach((item, index) => {
-                        if (item.type === state) {
-                            select = item
-                        }
-                    })
+            let mousedownEvents = cache.evenetList['mousedown']
+            if (mousedownEvents != null) {
+                let cols = this.$store.getters.allCols
+                let rows = this.$store.getters.allRows
+                for (let i = 0, len = mousedownEvents.length; i < len; i++) {
+                    let select = getters.selectByType(this.selectState)
                     let startColIdx = select.signalSort.startCol
                     let endColIdx = select.signalSort.endCol
                     let startRowIdx = select.signalSort.startRow
                     let endRowIdx = select.signalSort.endRow
-                    let cols = this.$store.getters.allCols
-                    let rows = this.$store.getters.allRows
                     let arrCol = []
                     for (let i = startColIdx; i <= endColIdx; i++) {
                         let col = cols[i]
@@ -155,22 +152,17 @@ export default {
                     endColAlias: endCol.alias,
                     endRowAlias: endRow.alias
                 })
-                if (cache.evenetList['regionChange']) {
-                    for (let i = 0; i < cache.evenetList['regionChange'].length; i++) {
-                        let selects = this.$store.state.selects.list
-                        let select
-                        let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
-                        selects.forEach((item, index) => {
-                            if (item.type === state) {
-                                select = item
-                            }
-                        })
+                let regionChangeEvents = cache.evenetList['regionChange']
+
+                if (regionChangeEvents != null) {
+                    let cols = this.$store.getters.allCols
+                    let rows = this.$store.getters.allRows
+                    for (let i = 0, len = regionChangeEvents.length; i < len; i++) {
+                        let select = getters.selectByType(this.selectState)
                         let startColIdx = select.signalSort.startCol
                         let endColIdx = select.signalSort.endCol
                         let startRowIdx = select.signalSort.startRow
                         let endRowIdx = select.signalSort.endRow
-                        let cols = this.$store.getters.allCols
-                        let rows = this.$store.getters.allRows
                         let arrCol = []
                         for (let i = startColIdx; i <= endColIdx; i++) {
                             let col = cols[i]
@@ -181,10 +173,6 @@ export default {
                             let row = rows[i]
                             arrRow.push(row.displayName)
                         }
-                        // let startCol = this.$store.getters.getColByAlias(select.wholePosi.startColAlias).displayName
-                        // let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
-                        // let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
-                        // let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
                         cache.evenetList['regionChange'][i].apply(this, [{
                             point: {
                                 col: arrCol,

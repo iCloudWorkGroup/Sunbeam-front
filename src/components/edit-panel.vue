@@ -131,19 +131,8 @@ export default {
             // 拖动选择区域事件
             let bindSelectChange = selectChange.bind(this)
             document.addEventListener('mousemove', bindSelectChange)
-            // cache.eventList.set(el, {
-            //     'mousemove': {
-            //         [bindSelectChange]: true
-            //     }
-            // })
             document.addEventListener('mouseup', function() {
-                // let elEvents = cache.eventList.get(el)
-                // if (elEvents != null &&
-                //     elEvents['mousemove'] != null &&
-                //     elEvents['mousemove'][bindSelectChange]) {
                 document.removeEventListener('mousemove', bindSelectChange)
-                // cache.eventList.delete(el)
-                // }
             })
             function selectChange(moveEvent) {
                 let endCol = getters.getColByPosi(moveEvent.clientX - clientRect.left + this.offsetLeft)

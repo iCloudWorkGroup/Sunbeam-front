@@ -18,7 +18,7 @@ export default {
         // 设置该模型覆盖其位置
         let activeCell = getters.activeCell()
         let propStruct = {}
-        if (activeCell !== null) {
+        if (activeCell != null) {
             let content = activeCell.content
             let physicsBox = activeCell.physicsBox
             propStruct = {

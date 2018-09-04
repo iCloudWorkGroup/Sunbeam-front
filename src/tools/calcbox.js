@@ -14,6 +14,7 @@ export function getTextHeight(text, fontSize, fontFamily, width) {
         style = el.currentStyle
     }
     let result = style.height
+    el.style.cssText = `display:none;`
     result = parseInt(result.substring(0, result.length - 2), 10)
     return result
 }

@@ -126,8 +126,8 @@ export default {
                     }
                     cache.evenetList['mousedown'][i].apply(this, [{
                         point: {
-                            Col: arrCol,
-                            Row: arrRow
+                            col: arrCol,
+                            row: arrRow
                         }
                     }])
                 }
@@ -190,8 +190,8 @@ export default {
                         // let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
                         cache.evenetList['regionChange'][i].apply(this, [{
                             point: {
-                                Col: arrCol,
-                                Row: arrRow
+                                col: arrCol,
+                                row: arrRow
                             }
                         }])
                     }

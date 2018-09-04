@@ -472,8 +472,8 @@ export default {
                         insertCells.push(insertCell)
                     }
                 }
+                dispatch(A_CELLS_DESTORY, [cell])
             }
-            dispatch(A_CELLS_DESTORY, [cell])
         })
         dispatch('A_CELLS_ADD', insertCells)
     },
@@ -507,23 +507,20 @@ export default {
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
         let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-        // let data = {
-        //     coordinate: [{
-        //         startCol: cols[startColIndex].sort,
-        //         startRow: rows[startRowIndex].sort,
-        //         endCol: endColIndex === 'MAX' ? -1 : cols[
-        //             endColIndex].sort,
-        //         endRow: endRowIndex === 'MAX' ? -1 : rows[
-        //             endRowIndex].sort
-        //     }],
-        //     format,
-        //     express
-        // }
-
-        // send({
-        //     url: config.url['format'],
-        //     data: JSON.stringify(data)
-        // })
+        let data = {
+            coordinate: [{
+                startCol: startColIndex,
+                startRow: startRowIndex,
+                endCol: endColIndex === 'MAX' ? -1 : endColIndex,
+                endRow: endRowIndex === 'MAX' ? -1 : endRowIndex,
+            }],
+            format,
+            express
+        }
+        send({
+            url: config.url.format,
+            body: JSON.stringify(data)
+        })
         let rules = parseExpress(value)
         let props = {
             content: {
@@ -657,7 +654,7 @@ export default {
             })
         }
     },
-    async [CELLS_UPDATE_PROP]({
+    [CELLS_UPDATE_PROP]({
         commit,
         dispatch,
         getters
@@ -710,21 +707,6 @@ export default {
             }
         }
         dispatch(A_CELLS_ADD, insertCellList)
-        let data = {
-            coordinate: [
-                {
-                    startCol: startColIndex,
-                    startRow: startRowIndex,
-                    endCol: endColIndex,
-                    endRow: endRowIndex
-                }
-            ],
-            auto: props.content.wordWrap,
-        }
-        await send({
-            url: config.url.wordWrap,
-            body: JSON.stringify(data)
-        })
         updateCellInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_CELL, {
                 idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
@@ -957,7 +939,7 @@ export default {
 
         })
     },
-    [CELLS_WORDWRAP]({
+    async [CELLS_WORDWRAP]({
         dispatch,
         getters
     }, payload) {
@@ -1011,6 +993,21 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
+            let data = {
+                coordinate: [
+                    {
+                        startCol: startColIndex,
+                        startRow: startRowIndex,
+                        endCol: endColIndex,
+                        endRow: endRowIndex
+                    }
+                ],
+                auto: props.content.wordWrap,
+            }
+            await send({
+                url: config.url.wordWrap,
+                body: JSON.stringify(data)
+            })
             dispatch(CELLS_UPDATE_PROP, {
                 startColIndex,
                 startRowIndex,

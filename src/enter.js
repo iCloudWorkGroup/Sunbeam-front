@@ -4,13 +4,14 @@ let ss = new Sunbeam({
     toolbar: '.tools'
 })
 ss.load().then(() => {
-    // ss.setRowHeight('2', '30')
+
 })
 
-
-
-ss.addEventListener('mousedown', function (point) {
-    // console.log(point.point)
+ss.addEventListener('regionChange', function (e) {
+    // console.log(e.point.row.length)
+    // console.log(e.point.col.length)
+    // console.log(e.point.row[0])
+    // console.log(e.point.col[0])
 })
 document.getElementById('dd').addEventListener('click', function () {
     ss.setDataSourceState()
@@ -19,12 +20,3 @@ document.getElementById('aa').addEventListener('click', function () {
     ss.setSelectState()
     ss.destroyDataSoure()
 })
-
-
-// ss.on('reginchange', function(ret) {
-//     console.log('24')
-// })
-// console.log(ss.rootSelector)
-// ss.addEventListener('regionChange', function (point) {
-//     console.log(point)
-// })

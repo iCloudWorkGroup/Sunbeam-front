@@ -74,8 +74,10 @@ export default {
             // 用于处理合并单元格的情况
             let top = rows[startRowIndex].top
             let left = cols[startColIndex].left
+
             // 当结束列为hidden是，寻找前一个，直到最前面
             let width = endColIndex === -1 ? 'inhert' : caclWidth()
+
             function caclWidth() {
                 for (let i = endColIndex; i > startColIndex - 1; i--) {
                     let item = cols[i]
@@ -86,6 +88,7 @@ export default {
                 return 0
             }
             let height = endRowIndex === -1 ? 'inhert' : caclHeight()
+
             function caclHeight() {
                 for (let i = endRowIndex; i > startRowIndex - 1; i--) {
                     let item = rows[i]
@@ -118,14 +121,11 @@ export default {
     },
     /**
      * 修改单元格属性
-     * @param {[type]}  options.state      [description]
-     * @param {[type]}  options.commit     [description]
-     * @param {[type]}  options.dispatch   [description]
-     * @param {[type]}  options.getters    [description]
      * @param {[type]}  options.propName   [属性名，发送到后台，根据命令的不同]
      * @param {[type]}  options.propStruct [属性结构，直接覆盖独享的结构]
      * @param {Boolean} options.coordinate [修改的范围，如果是boolean值，就按照给定的方位
      * 如果是boolean值，根据视图的选中区域执行操作]
+     * coordinate 内部存储的是alias
      */
     async A_CELLS_UPDATE({
         state,
@@ -137,82 +137,55 @@ export default {
         propStruct,
         coordinate = false
     }) {
-        let select
-        if (coordinate === false) {
-            let selects = getters.allSelects
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
-        } else {
-            select = coordinate
-        }
+        let select = coordinate === false ?
+            getters.selectByType(SELECT) : {}
+        let wholePosi = coordinate === false ?
+            select.wholePosi :
+            coordinate
+
         let rows = getters.allRows
         let cols = getters.allCols
-        // let rowsOffset = rows[select.signalSort.startRow].height
-        let data = {}
-        let cellsPosi = {
-            coordinate: [{
-                startCol: select.signalSort.startCol,
-                startRow: select.signalSort.startRow,
-                endCol: select.signalSort.endCol === 'MAX' ? -1 : select.signalSort.endCol,
-                endRow: select.signalSort.endRow === 'MAX' ? -1 : select.signalSort.endRow
-            }]
-        }
-        let property = {}
-        if (propStruct.hasOwnProperty('border')) {
-            // property = {
-            //     direction: border,
-            //     line: line
-            // }
-        } else if (propName === 'texts') {
-            property = {
-                content: propStruct.content.texts,
-                // effect: [
-                //     {
-                //         row: select.signalSort.startRow,
-                //         offset: rowsOffset
-                //     }
-                // ]
-            }
-            cellsPosi = {
-                coordinate: {
-                    startCol: select.signalSort.startCol,
-                    startRow: select.signalSort.startRow,
-                    endCol: select.signalSort.endCol === 'MAX' ? -1 : select.signalSort.endCol,
-                    endRow: select.signalSort.endRow === 'MAX' ? -1 : select.signalSort.endRow
-                }
-            }
-        } else {
-            // 修正参数
-            let propNames
-            if (propName === 'background') {
-                propNames = 'color'
-            } else if (propName.indexOf('align') > -1) {
-                propNames = 'align'
-            } else {
-                propNames = propName
-            }
-            property = {
-                [propNames]: propStruct.content[propName]
-            }
-        }
-        data = extend(cellsPosi, property)
-        await send({
-            url: config.url[propName],
-            body: JSON.stringify(data)
-        })
-
-        // 修正参数
-        let wholePosi = select.wholePosi
-
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
         let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
+        let signalSort = coordinate === false ? select.signalSort : {
+            startCol: cols[startColIndex].sort,
+            startRow: rows[startRowIndex].sort,
+            endCol: cols[startColIndex].sort,
+            endRow: rows[endRowIndex].sort
+        }
+        let sendArgs = {
+            coordinate: signalSort
+        }
+        if (propName === 'texts') {
+            sendArgs = extend(sendArgs, {
+                texts: propStruct
+            })
+        }
+        if (propName === 'border') {
+            let line
+            for (let key in propStruct) {
+                if (Object.prototype.hasOwnProperty.call(propStruct, key)) {
+                    line = key
+                }
+            }
+            let direction = propStruct[line]
+            sendArgs = extend(sendArgs, {
+                direction,
+                line
+            })
+        }
+        if (propName === 'alignCol' || propName === 'alignRow') {
+            sendArgs = extend(sendArgs, {
+                align: propStruct.content
+            })
+        }
+        await send({
+            url: config.url[propName],
+            body: JSON.stringify(sendArgs)
+        })
 
         // 修正参数
         if (endRowIndex === -1) {
@@ -355,14 +328,12 @@ export default {
             select = coordinate
         }
         let data = {
-            coordinate: [
-                {
-                    startCol: select.signalSort.startCol,
-                    startRow: select.signalSort.startRow,
-                    endCol: select.signalSort.endCol,
-                    endRow: select.signalSort.endRow
-                }
-            ]
+            coordinate: [{
+                startCol: select.signalSort.startCol,
+                startRow: select.signalSort.startRow,
+                endCol: select.signalSort.endCol,
+                endRow: select.signalSort.endRow
+            }]
         }
         await send({
             url: config.url.merge,
@@ -423,14 +394,12 @@ export default {
             select = coordinate
         }
         let data = {
-            coordinate: [
-                {
-                    startCol: select.signalSort.startCol,
-                    startRow: select.signalSort.startRow,
-                    endCol: select.signalSort.endCol,
-                    endRow: select.signalSort.endRow
-                }
-            ]
+            coordinate: [{
+                startCol: select.signalSort.startCol,
+                startRow: select.signalSort.startRow,
+                endCol: select.signalSort.endCol,
+                endRow: select.signalSort.endRow
+            }]
         }
         await send({
             url: config.url.split,
@@ -497,6 +466,7 @@ export default {
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
+
         // 修正参数
         let wholePosi = select.wholePosi
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)

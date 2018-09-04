@@ -7,22 +7,22 @@ export default {
     allSelects(state) {
         return state.list
     },
-    selectState(state) {
-        return state.selectState
+    activeType(state) {
+        return state.activeType
     },
     selectByType(state) {
         return function(type) {
-            if (type !== 'SELECT' && type !== 'DATASOUCE') {
-                return
-            }
-            let selects = state.list
-            let len = selects.length
-            for (let i = 0; i < len; i++) {
-                let item = selects[i]
-                if (item.type === type) {
-                    return item
+            if (type === 'SELECT' || type === 'DATASOUCE') {
+                let selects = state.list
+                let len = selects.length
+                for (let i = 0; i < len; i++) {
+                    let item = selects[i]
+                    if (item.type === type) {
+                        return item
+                    }
                 }
             }
+            return null
         }
     },
     getOprRegion(state, getters) {

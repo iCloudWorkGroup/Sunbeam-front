@@ -73,14 +73,12 @@ export default {
             endColAlias: cols[endColIndex].alias,
             endRowAlias: rows[endRowIndex].alias
         }
-        let type = getters.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
         let fixedSelect = extend(template, {
             alias,
             wholePosi,
             activePosi,
             physicsBox,
-            signalSort,
-            type
+            signalSort
         })
         commit(mutationTypes.INSERT_SELECT, fixedSelect)
         dispatch(COLS_ACTIVE, {
@@ -144,15 +142,6 @@ export default {
             rowAlias: activeRowAlias,
             colAlias: activeColAlias
         }
-        let selects = getters.allSelects
-        let select
-        selects.forEach((item, idx) => {
-            if (getters.selectState === 'select') {
-                select = selects[0]
-            } else {
-                select = selects[1]
-            }
-        })
         let wholePosi = {
             startColAlias: cols[startColIndex].alias,
             startRowAlias: rows[startRowIndex].alias,
@@ -160,13 +149,13 @@ export default {
             endRowAlias: rows[endRowIndex].alias
         }
         commit(mutationTypes.UPDATE_SELECT, {
-            select,
             props: {
                 signalSort,
                 physicsBox,
                 activePosi,
-                wholePosi
-            }
+                wholePosi,
+            },
+            type: getters.activeType
         })
         dispatch(COLS_ACTIVE, {
             startIndex: startColIndex,

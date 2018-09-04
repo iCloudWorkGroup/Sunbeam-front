@@ -13,7 +13,7 @@ const state = {
      * @type {Object}
      */
     list: [],
-    selectState: 'SELECT'
+    activeType: 'SELECT'
 }
 export default {
     state,

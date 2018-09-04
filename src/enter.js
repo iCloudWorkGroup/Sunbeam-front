@@ -1,13 +1,16 @@
 import Sunbeam from './api/sunbeam.js'
 let ss = new Sunbeam({
-    root: '.table',
+    root: '#a',
     toolbar: '.tools'
 })
 ss.load().then(() => {
-    ss.setFontColor('rgb(255,0,0)', 'C1')
+    // ss.setRowHeight('2', '30')
 })
-ss.addEventListener('regionChange', function (point) {
-    console.log(point)
+
+
+
+ss.addEventListener('mousedown', function (point) {
+    // console.log(point.point)
 })
 document.getElementById('dd').addEventListener('click', function () {
     ss.setDataSourceState()

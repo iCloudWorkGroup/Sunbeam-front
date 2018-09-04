@@ -16,8 +16,7 @@ import {
     unit
 } from '../filters/unit'
 import {
-    M_UPDATE_LOAD,
-    UPDATE_FOCUSSTATE
+    M_UPDATE_LOAD
 } from '../store/mutation-types'
 
 export default {

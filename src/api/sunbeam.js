@@ -15,16 +15,20 @@ let SpreadSheet = function(options) {
     this.handlers = {}
     this.rootSelector = options.root
     this.toolbarSelector = options.toolbar
+    this.loadStatus = true
 }
 SpreadSheet.prototype = {
     async load() {
-        await App({
-            root: this.rootSelector,
-            toolbar: this.toolbarSelector
-        }).then(function(vms) {
-            this.vm = vms.bookVm
-            this.bookVm = vms.toolBarVm
-        }.bind(this))
+        if (this.loadStatus === true) {
+            await App({
+                root: this.rootSelector,
+                toolbar: this.toolbarSelector
+            }).then(function(vms) {
+                this.loadStatus = false
+                this.vm = vms.bookVm
+                this.bookVm = vms.toolBarVm
+            }.bind(this))
+        }
     },
 
     // 获取字母对应数值
@@ -40,7 +44,6 @@ SpreadSheet.prototype = {
 
     // 获取point区间   返回值 { startRow : startRow,endRow : endRow,startCol : startCol,endCol : endCol}
     getPoint(point) {
-        console.log(point)
         // 设开始行列初始值
         let startRowIndex = 0
         let endRowIndex = -1
@@ -68,7 +71,7 @@ SpreadSheet.prototype = {
                 let letter = point.match(/^[A-Z]+/gi).toString()
                 let number = point.match(/\d+$/gi)
                 let num = 0
-                num = this.getLetterNum(letter)
+                num = this.getLetterNum(letter.toUpperCase())
                 startRowIndex = endRowIndex = Number(number) - 1
                 startColIndex = endColIndex = num
             }
@@ -79,7 +82,7 @@ SpreadSheet.prototype = {
             let _this = this
             point.forEach((value, index) => {
                 letter[index] = _this.getLetterNum(value.match(
-                    /^[A-Z]+/gi).toString())
+                    /^[A-Z]+/gi).toString().toUpperCase())
                 number[index] = Number(value.match(/\d+$/gi)) - 1
             })
             startRowIndex = number[1] > number[0] ? number[0] : number[1]
@@ -113,8 +116,7 @@ SpreadSheet.prototype = {
 
     // 修改字体样式、颜色、背景色
     setFont(select, propStruct, propName) {
-        console.log(select)
-        this.vm.$store.dispatch(A_types.CELLS_UPDATE, {
+        this.vm.$store.dispatch(A_types.A_CELLS_UPDATE, {
             propName: propName,
             propStruct: propStruct,
             coordinate: select
@@ -130,64 +132,124 @@ SpreadSheet.prototype = {
     },
 
     // 设置字体颜色
-    setFontColor(color, point) {
-        let select = this.getPoint(point)
+    setFontColor(sheetId, color, point) {
+        let clo
+        let p
+        if (arguments.length === 2) {
+            clo = sheetId
+            p = color
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            clo = color
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setFont(select, {
             content: {
-                color: color
+                color: clo
             }
         }, 'color')
     },
 
     // 设置单元格背景
-    setFillColor(color, point) {
-        let select = this.getPoint(point)
+    setFillColor(sheetId, color, point) {
+        let clo
+        let p
+        if (arguments.length === 2) {
+            clo = sheetId
+            p = color
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            clo = color
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setFont(select, {
             content: {
-                background: color
+                background: clo
             }
         }, 'background')
     },
 
     // 批量设置单元格背景色
-    batchFillBg(color, points) {
-        points.forEach((point, index) => {
+    batchFillBg(sheetId, color, points) {
+        let clo
+        let p
+        if (arguments.length === 2) {
+            clo = sheetId
+            p = color
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            clo = color
+            p = points
+        }
+        p.forEach((point, index) => {
             let select = this.getPoint([point.startCol + point.startRow,
                 point.endCol + point.endRow
             ])
             this.setFont(select, {
                 content: {
-                    background: color
+                    background: clo
                 }
             }, 'background')
         })
     },
 
     // 设置字体类型
-    setFontFamily(name, point) {
-        let select = this.getPoint(point)
+    setFontFamily(sheetId, name, point) {
+        let nm
+        let p
+        if (arguments.length === 2) {
+            nm = sheetId
+            p = name
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            nm = name
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setFont(select, {
             content: {
-                family: name
+                family: nm
             }
         }, 'family')
     },
 
     // 设置字体大小
-    setFontSize(size, point) {
-        let select = this.getPoint(point)
+    setFontSize(sheetId, size, point) {
+        let sz
+        let p
+        if (arguments.length === 2) {
+            sz = sheetId
+            p = size
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            sz = size
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setFont(select, {
             content: {
-                size: size
+                size: sz
             }
         }, 'size')
     },
 
     // 字体加粗
-    setFontWeight(weight, point) {
-        let select = this.getPoint(point)
+    setFontWeight(sheetId, weight, point) {
+        let wg
+        let p
+        if (arguments.length === 2) {
+            wg = sheetId
+            p = weight
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            wg = weight
+            p = point
+        }
+        let select = this.getPoint(p)
         let bool
-        if (weight === 'blod') {
+        if (wg === 'bold') {
             bool = true
         } else {
             bool = false
@@ -200,10 +262,20 @@ SpreadSheet.prototype = {
     },
 
     //  字体倾斜
-    setFontStyle(style, point) {
-        let select = this.getPoint(point)
+    setFontStyle(sheetId, style, point) {
+        let st
+        let p
+        if (arguments.length === 2) {
+            st = sheetId
+            p = style
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            st = style
+            p = point
+        }
+        let select = this.getPoint(p)
         let bool
-        if (style === 'italic') {
+        if (st === 'italic') {
             bool = true
         } else {
             bool = false
@@ -215,11 +287,47 @@ SpreadSheet.prototype = {
         }, 'italic')
     },
 
+    // 下划线
+    setFontUnderline(sheetId, underline, point) {
+        let ul
+        let p
+        if (arguments.length === 2) {
+            ul = sheetId
+            p = underline
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            ul = underline
+            p = point
+        }
+        let select = this.getPoint(p)
+        let bool
+        if (ul === 'underline') {
+            bool = true
+        } else {
+            bool = false
+        }
+        this.setFont(select, {
+            content: {
+                underline: bool
+            }
+        }, 'underline')
+    },
+
     // 设置单元格边框
-    setCellBorder(border, point) {
-        let select = this.getPoint(point)
-        let structName = 'border.' + border
-        let value = border === 'none' ? 0 : 1
+    setCellBorder(sheetId, border, point) {
+        let bd
+        let p
+        if (arguments.length === 2) {
+            bd = sheetId
+            p = border
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            bd = border
+            p = point
+        }
+        let select = this.getPoint(p)
+        let structName = 'border.' + bd
+        let value = bd === 'none' ? 0 : 1
         let propStruct = {}
         if (structName === 'border.all') {
             let toward = ['top', 'right', 'bottom', 'left']
@@ -240,41 +348,75 @@ SpreadSheet.prototype = {
     },
 
     // 设置文本对齐方式
-    setAlign(align, point) {
-        let select = this.getPoint(point)
-        if (align === 'left' || align === 'right' || align === 'center') {
+    setAlign(sheetId, align, point) {
+        let al
+        let p
+        if (arguments.length === 2) {
+            al = sheetId
+            p = align
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            al = align
+            p = point
+        }
+        let select = this.getPoint(p)
+        if (al === 'left' || al === 'right' || al === 'center') {
             this.setFont(select, {
                 content: {
-                    alignRow: align
+                    alignRow: al
                 }
             }, 'alignRow')
         } else {
             this.setFont(select, {
                 content: {
-                    alignCol: align
+                    alignCol: al
                 }
             }, 'alignCol')
         }
     },
 
     // 设置单元格内容为常规类型
-    setNormalType(point) {
-        let select = this.getPoint(point)
+    setNormalType(sheetId, point) {
+        let p
+        if (arguments.length === 1) {
+            p = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setTextFormat(select, 'routine-G')
     },
 
     // 设置单元格内容为文本类型
-    setTextType(point) {
-        let select = this.getPoint(point)
+    setTextType(sheetId, point) {
+        let p
+        if (arguments.length === 1) {
+            p = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setTextFormat(select, 'text-@')
     },
 
     // 设置单元格内容为数字类型
-    setNumType(thousands, decimal, point) {
-        let select = this.getPoint(point)
+    setNumType(sheetId, thousands, decimal, point) {
+        let p
+        let deci
+        if (arguments.length === 3) {
+            deci = thousands
+            p = decimal
+        }
+        if (arguments.length === 4 && typeof arguments[0] === 'string') {
+            deci = decimal
+            p = point
+        }
+        let select = this.getPoint(p)
         let str = 'number-0'
         let sp = '.'
-        for (let i = 0; i < decimal; i++) {
+        for (let i = 0; i < deci; i++) {
             sp += 0
         }
         if (sp !== '.') {
@@ -284,17 +426,37 @@ SpreadSheet.prototype = {
     },
 
     // 设置单元格内容为日期类型
-    setDateType(dateFormat, point) {
-        let select = this.getPoint(point)
-        this.setTextFormat(select, 'date-' + dateFormat)
+    setDateType(sheetId, dateFormat, point) {
+        let p
+        let date
+        if (arguments.length === 2) {
+            date = sheetId
+            p = dateFormat
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            date = dateFormat
+            p = point
+        }
+        let select = this.getPoint(p)
+        this.setTextFormat(select, 'date-' + date)
     },
 
     // 设置单元格内容为百分比类型
-    setPercentType(decimal, point) {
-        let select = this.getPoint(point)
+    setPercentType(sheetId, decimal, point) {
+        let p
+        let deci
+        if (arguments.length === 2) {
+            deci = sheetId
+            p = decimal
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            deci = decimal
+            p = point
+        }
+        let select = this.getPoint(p)
         let str = 'percent-0'
         let sp = '.'
-        for (let i = 0; i < decimal; i++) {
+        for (let i = 0; i < deci; i++) {
             sp += 0
         }
         if (sp !== '.') {
@@ -305,11 +467,24 @@ SpreadSheet.prototype = {
     },
 
     // 设置单元格内容为货币类型
-    setCoinType(decimal, sign, point) {
-        let select = this.getPoint(point)
-        let str = 'currency-' + sign + '#,##0'
+    setCoinType(sheetId, decimal, sign, point) {
+        let p
+        let deci
+        let s
+        if (arguments.length === 3) {
+            deci = sheetId
+            s = decimal
+            p = sign
+        }
+        if (arguments.length === 4 && typeof arguments[0] === 'string') {
+            deci = decimal
+            s = sign
+            p = point
+        }
+        let select = this.getPoint(p)
+        let str = 'currency-' + s + '#,##0'
         let sp = '.'
-        for (let i = 0; i < decimal; i++) {
+        for (let i = 0; i < deci; i++) {
             sp += 0
         }
         if (sp !== '.') {
@@ -319,69 +494,117 @@ SpreadSheet.prototype = {
     },
 
     // 合并单元格
-    mergeCell(point) {
-        let select = this.getPoint(point)
+    mergeCell(sheetId, point) {
+        let p
+        if (arguments.length === 1) {
+            p = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            p = point
+        }
+        let select = this.getPoint(p)
         this.vm.$store.dispatch(A_types.A_CELLS_MERGE, select)
     },
 
     // 拆分单元格
-    splitCell(point) {
-        let select = this.getPoint(point)
+    splitCell(sheetId, point) {
+        let p
+        if (arguments.length === 1) {
+            p = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            p = point
+        }
+        let select = this.getPoint(p)
         this.vm.$store.dispatch(A_types.A_CELLS_SPLIT, select)
     },
 
     // 设置单元格文本内容（每次只能设置一个单元格的文本）
-    setCellContent(text, point) {
-        let select = this.getPoint(point)
+    setCellContent(sheetId, text, point) {
+        let p
+        let txt
+        if (arguments.length === 2) {
+            txt = sheetId
+            p = text
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            txt = text
+            p = point
+        }
+        let select = this.getPoint(p)
         this.setFont(select, {
             content: {
-                displayTexts: text,
-                texts: text
+                displayTexts: txt,
+                texts: txt
             }
         }, 'texts')
     },
 
     // 冻结窗口
-    frozen(point) {
-        let p = this.getPoint(point)
-        this.vm.$store.dispatch(A_types.SHEET_FROZEN, {
-            startColIndex: p.startCol,
-            endColIndex: p.endCol,
-            startRowIndex: p.startRow,
-            endRowIndex: p.endRow,
-        })
+    frozen(sheetId, point) {
+        console.log('empty')
+        // let p = this.getPoint(point)
+        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, {
+        //     startColIndex: p.startCol,
+        //     endColIndex: p.endCol,
+        //     startRowIndex: p.startRow,
+        //     endRowIndex: p.endRow,
+        // })
     },
 
     // 解冻冻结
     unFrozen() {
-        this.vm.$store.dispatch(A_types.SHEET_UNFROZEN)
+        console.log('empty')
+        // this.vm.$store.dispatch(A_types.SHEET_UNFROZEN)
     },
 
     // 冻结视图区域首列
     colFrozen() {
-        this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstColFrozen')
+        console.log('empty')
+        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstColFrozen')
     },
 
     // 冻结视图区域首行
     rowFrozen() {
-        this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstRowFrozen')
+        console.log('empty')
+        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstRowFrozen')
     },
 
     // 设置列的宽度（冻结状态不可用）
-    setColWidth(col, width) {
-        let colIdx = this.getLetterNum(col)
+    setColWidth(sheetId, col, width) {
+        let c
+        let w
+        if (arguments.length === 2) {
+            c = sheetId
+            w = col
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            c = col
+            w = width
+        }
+        let colIdx = this.getLetterNum(c)
         this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
             index: colIdx,
-            width: width
+            width: w
         })
     },
 
     // 设置行的高度（冻结状态不可用）
-    setRowHeight(row, height) {
-        let rorIdx = Number(row) - 1
+    setRowHeight(sheetId, row, height) {
+        let r
+        let h
+        if (arguments.length === 2) {
+            r = sheetId
+            h = row
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            r = row
+            h = height
+        }
+        let rorIdx = Number(r) - 1
         this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
             index: rorIdx,
-            height: height
+            height: h
         })
     },
 
@@ -400,15 +623,22 @@ SpreadSheet.prototype = {
     },
 
     //  获取相应坐标下单元格的文本
-    getTextByCoordinate(point) {
-        let select = this.getPoint(point)
+    getTextByCoordinate(sheetId, point) {
+        let p
+        if (arguments.length === 1) {
+            p = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            p = point
+        }
+        let select = this.getPoint(p)
         let s = this.vm.$store.getters.cellsByVertical({
             startColIndex: select.signalSort.startCol,
             endColIndex: select.signalSort.endCol,
             startRowIndex: select.signalSort.startRow,
             endRowIndex: select.signalSort.endRow
         })[0]
-        return s.content.displayTexts
+        return s.content.texts
     },
 
     // 鼠标选择操作状态切换为数据源操作状态
@@ -436,10 +666,20 @@ SpreadSheet.prototype = {
     },
 
     // 使用相对于浏览器页面坐标获取在表格中行列位置
-    getPointByPosi(clientX, clientY) {
+    getPointByPosi(sheetId, clientX, clientY) {
+        let x
+        let y
+        if (arguments.length === 2) {
+            x = sheetId
+            y = clientX
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            x = clientX
+            y = clientY
+        }
         let colIndex = String.fromCharCode(this.vm.$store.getters.getColIndexByPosi(
-            clientX) + 65)
-        let rowIndex = this.vm.$store.getters.getRowIndexByPosi(clientY) +
+            x) + 65)
+        let rowIndex = this.vm.$store.getters.getRowIndexByPosi(y) +
             1
         return {
             point: {
@@ -450,9 +690,19 @@ SpreadSheet.prototype = {
     },
 
     // 设置批注内容
-    modifyComment(comment, point) {
-        this.getPoint(point)
-        console.log('empty')
+    modifyComment(sheetId, comment, point) {
+        let p
+        let com
+        if (arguments.length === 2) {
+            com = sheetId
+            p = comment
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            p = point
+            com = comment
+        }
+        this.getPoint(p)
+        console.log('empty' + com)
     },
 
     // 弹出新增批注窗口
@@ -466,56 +716,117 @@ SpreadSheet.prototype = {
     },
 
     // 删除批注
-    deleteComment(point) {
+    deleteComment(sheetId, point) {
         console.log('empty')
     },
 
     // 添加行（冻结状态不可用）
-    addRow(row) {
-        let r = Number(row) - 1
-        this.vm.$store.dispatch(A_types.ROWS_INSERTROW, r)
+    addRow(sheetId, row) {
+        let r
+        if (arguments.length === 1) {
+            r = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            r = row
+        }
+        let rowIdx = Number(r) - 1
+        this.vm.$store.dispatch(A_types.ROWS_INSERTROW, rowIdx)
     },
 
     // 删除行（冻结状态不可用）
-    deleteRow(row) {
-        let r = Number(row) - 1
-        this.vm.$store.dispatch(A_types.ROWS_DELETEROW, r)
+    deleteRow(sheetId, row) {
+        let r
+        if (arguments.length === 1) {
+            r = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            r = row
+        }
+        let rowIdx = Number(r) - 1
+        this.vm.$store.dispatch(A_types.ROWS_DELETEROW, rowIdx)
     },
 
     // 添加列（冻结状态不可用）
-    addCol(col) {
-        let c = this.getLetterNum(col)
-        this.vm.$store.dispatch(A_types.COLS_INSERTCOL, c)
+    addCol(sheetId, col) {
+        let c
+        if (arguments.length === 1) {
+            c = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            c = col
+        }
+        let colIdx = this.getLetterNum(c)
+        this.vm.$store.dispatch(A_types.COLS_INSERTCOL, colIdx)
     },
 
     // 删除列（冻结状态不可用）
-    deleteCol(col) {
-        let c = this.getLetterNum(col)
-        this.vm.$store.dispatch(A_types.COLS_DELETECOL, c)
+    deleteCol(sheetId, col) {
+        let c
+        if (arguments.length === 1) {
+            c = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            c = col
+        }
+        let colIdx = this.getLetterNum(c)
+        this.vm.$store.dispatch(A_types.COLS_DELETECOL, colIdx)
     },
 
     // 隐藏行（冻结状态不可用）
-    rowHide(row) {
-        let rowIdx = Number(row) - 1
-        this.vm.$store.dispatch(A_types.ROWS_HIDE, rowIdx
-        )
+    rowHide(sheetId, row) {
+        let r
+        if (arguments.length === 1) {
+            r = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            r = row
+        }
+        let rowIdx = Number(r) - 1
+        let rows = this.vm.$store.getters.allRows
+        if (!rows[rowIdx].hidden) {
+            this.vm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
+        }
     },
 
     // 取消隐藏行（冻结状态不可用）
-    rowCancelHide(row) {
-        let rowIdx = Number(row) - 1
+    rowCancelHide(sheetId, row) {
+        let r
+        if (arguments.length === 1) {
+            r = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            r = row
+        }
+        let rowIdx = Number(r) - 1
         this.vm.$store.dispatch(A_types.ROWS_CANCELHIDE, rowIdx)
     },
 
     // 隐藏列（冻结状态不可用）
-    colHide(col) {
-        let colIdx = this.getLetterNum(col)
-        this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)
+    colHide(sheetId, col) {
+        let c
+        if (arguments.length === 1) {
+            c = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            c = col
+        }
+        let colIdx = Number(c) - 1
+        let cols = this.vm.$store.getters.allCols
+        if (!cols[colIdx].hidden) {
+            this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)
+        }
     },
 
     // 取消隐藏列（冻结状态不可用）
-    colCancelHide(col) {
-        let colIdx = this.getLetterNum(col)
+    colCancelHide(sheetId, col) {
+        let c
+        if (arguments.length === 1) {
+            c = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            c = col
+        }
+        let colIdx = this.getLetterNum(c)
         this.vm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
     },
 

@@ -55,6 +55,10 @@
 import {
     pathToStruct
 } from '../../tools/format'
+import {
+    A_CELLS_UPDATE
+} from '../../store/action-types'
+
 function activeStatus(env) {
     let cell = env.$store.getters['activeCell']()
     if (cell == null) {
@@ -95,7 +99,7 @@ export default {
                 structName,
                 value
             })
-            this.$store.dispatch(CELLS_UPDATE, {
+            this.$store.dispatch(A_CELLS_UPDATE, {
                 propName: 'alignCol',
                 propStruct
             })

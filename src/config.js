@@ -89,7 +89,8 @@ export default {
         'cut': 'sheet/cut',
         'copy': 'sheet/copy',
         'area': 'sheet/area',
-        'clearqueue': 'sheet/clear_queue'
+        'clearqueue': 'sheet/clear_queue',
+        'wordWrap': 'cell/wordwrap'
     },
     operSendPropName: {
         'alignRow': 'align',

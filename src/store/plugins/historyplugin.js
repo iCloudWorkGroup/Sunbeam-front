@@ -259,7 +259,7 @@ let userAction = {
     [actionTypes.EDIT_HIDE]: true,
     [actionTypes.A_CELLS_MERGE]: true,
     [actionTypes.CELLS_UPDATE_BORDER]: true,
-    [actionTypes.CELLS_UPDATE]: true,
+    [actionTypes.A_CELLS_UPDATE]: true,
     [actionTypes.CELLS_PASTE]: true,
     [actionTypes.ROWS_HIDE]: true,
     [actionTypes.ROWS_CANCELHIDE]: true,

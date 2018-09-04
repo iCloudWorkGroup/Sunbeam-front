@@ -3,7 +3,6 @@ import {
     SHEET_INSERT,
     ROWS_ADD,
     COLS_ADD,
-    A_CELLS_ADD,
     SELECTS_INSERT,
     A_CLEAR_QUEUE
 } from './action-types'
@@ -32,7 +31,6 @@ export default {
             let cells = bookItem.cells
             cache.localRowPosi = bookItem.maxRowPixel
             cache.localColPosi = bookItem.maxColPixel
-            console.log(cols)
             // 存储行、列别名的最大值，为后面再增加行、列生成列名做准备
             generator.rowAliasGenerator(parseInt(bookItem.maxRowAlias,
                 0))
@@ -77,6 +75,6 @@ export default {
         // 整理数据
         send({
             url: config.url.clearqueue
-        })
+        }, false)
     }
 }

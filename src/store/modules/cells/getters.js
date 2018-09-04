@@ -481,6 +481,39 @@ export default {
         }
     },
     /**
+     * 选中单元格是否换行
+     * @param  {[type]}  state   [description]
+     * @param  {[type]}  getters [description]
+     * @return {Boolean}         [description]
+     */
+    isWordWrapCell(state, getters) {
+        return function() {
+            // let allCells = state.list
+            let selects = getters.allSelects
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let wholePosi = select.wholePosi
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let verticalCells = getters.cellsByVertical({
+                startColIndex,
+                startRowIndex,
+                endColIndex: startColIndex,
+                endRowIndex: startRowIndex
+            })
+            for (let i = 0, len = verticalCells.length; i < len; i++) {
+                let cell = verticalCells[i]
+                return cell.content.wordWrap
+            }
+            return false
+        }
+    },
+    /**
      * 根据行列别名查找单元格的索引，
      * 以行为查找方向
      */

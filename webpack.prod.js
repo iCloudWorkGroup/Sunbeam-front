@@ -10,7 +10,7 @@ const baseConfig = merge(base, {
 		main: './src/api/sunbeam.js'
 	},
 	output: {
-		publicPath: '/',
+		publicPath: 'http://excel-inc.acmr.com.cn/vender/master/',
 		filename: 'sunbeam.js',
 		library: 'Sunbeam',
 		libraryExport: 'default'

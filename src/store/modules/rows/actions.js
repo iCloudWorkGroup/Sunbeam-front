@@ -421,20 +421,17 @@ export default {
             let occupy = cell.occupy.row
             if (occupy.indexOf(rowAlias) !== -1) {
                 if (occupy.length === 1) {
-                    console.log(cell.physicsBox.height +
-                        rowHeight + 1)
                     updateCellInfo.push({
                         cell,
                         props: {
                             status: {
                                 hidden: false
+                            },
+                            physicsBox: {
+                                height: cell.physicsBox.height +
+                                rowHeight + 1
                             }
                         },
-                        physicsBox: {
-                            height: cell.physicsBox.height +
-                            rowHeight + 2
-                        }
-
                     })
                 } else {
                     cell.physicsBox.height > 0 ?
@@ -546,7 +543,7 @@ export default {
         let sort = getters.allRows[index].sort
         send({
             url: config.url['insertrow'],
-            data: JSON.stringify({
+            body: JSON.stringify({
                 row: sort,
             }),
         })
@@ -737,10 +734,10 @@ export default {
     }) {
         let rows = getters.allRows
         let row = rows[index]
-
+        // console.log(row, height)
         send({
-            url: config.url['adjustrow'],
-            data: JSON.stringify({
+            url: config.url.adjustrow,
+            body: JSON.stringify({
                 row: row.sort,
                 offset: height
             }),
@@ -889,7 +886,7 @@ export default {
 
         send({
             url: config.url['deleterow'],
-            data: JSON.stringify({
+            body: JSON.stringify({
                 row: row.sort
             }),
         })

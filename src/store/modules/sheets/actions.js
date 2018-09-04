@@ -996,11 +996,11 @@ export default {
         // 暂时用内部函数代替
         // ---------------
         /**
-         * 增加行
+         * 增加列
          * @return {[type]} [description]
          */
         function expand() {
-            let num = config.prestrainWidth / (config.rowWidth + 1)
+            let num = Math.ceil(config.prestrainWidth / (config.colWidth + 1))
             send({
                 url: config.url.createLine,
                 body: JSON.stringify({
@@ -1008,12 +1008,12 @@ export default {
                     num
                 })
             }).then(() => {
-                let last = lastRow()
+                let last = lastCol()
                 for (let i = 0; i < num; i++) {
                     dispatch(actionTypes.COLS_ADD, [{
                         sort: last.sort + i + 1,
                         left: last.left + last.width + 1 +
-                            config.rowWidth * i
+                            config.colWidth * i
                     }])
                     if (i === num - 1) {
                         last = lastCol()

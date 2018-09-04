@@ -894,6 +894,7 @@ SpreadSheet.prototype = {
 
     // 重新加载所有数据，表格会进行局部刷新，并滚动回初始位置
     reload() {
+        cache.step = 0
         // 销毁vue实例
         this.vm.$destroy()
         this.toolBarVm.$destroy()

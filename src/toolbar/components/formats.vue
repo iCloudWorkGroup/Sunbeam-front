@@ -45,13 +45,13 @@
                             <div class="widget-pad">数字 0.0000</div>
                         </span>
                 </li>
-                <li data-value="date-yyyy/mm/dd">
+                <li data-value="date-yyyy/m/d">
                     <span class="fui-cf-ico ico-date widget-ico"></span>
                     <span class="widget-content">
                             <div class="widget-pad">日期 1999/01/01</div>
                         </span>
                 </li>
-                <li data-value="date-yyyy年mm月dd日">
+                <li data-value="date-yyyy年m月d日">
                     <span class="fui-cf-ico ico-date widget-ico"></span>
                     <span class="widget-content">
                             <div class="widget-pad">日期 1999年01月01日</div>

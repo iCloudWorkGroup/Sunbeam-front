@@ -11,7 +11,7 @@ export default function(sbm, store) {
                         background: color
                     }
                 }
-                store.dispatch(types.CELLS_UPDATE, info)
+                store.dispatch(types.A_CELLS_UPDATE, info)
             })
         }
     }

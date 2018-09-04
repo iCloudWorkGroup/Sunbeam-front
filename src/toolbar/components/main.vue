@@ -1,21 +1,6 @@
 <template>
 <div class="tools">
     <div class="toolBar">
-        <div class="topBar">
-            <div class="file-control">
-                <span>文件</span>
-            </div>
-            <ul class="fui-control-list">
-                <li><span>开始</span></li>
-                <li><span>审阅</span></li>
-                <li><span>下载</span></li>
-            </ul>
-            <div class="excel-name">
-                <div class="textarea">Book Name</div>
-            </div>
-            <div class="version">Version frontend : 1.0.0</div>
-            <div class="version">Version java : 1.0.0</div>
-        </div>
         <div class="menu-container">
             <ul>
                 <!-- <tool-panel title="撤销">
@@ -39,6 +24,9 @@
                 <!-- <tool-panel title="视图">
                     <frozen/>
                 </tool-panel>  -->
+                <panel title="自动换行">
+                    <word-wrap/>
+                </panel>
                 <panel title="隐藏">
                     <hide/>
                 </panel>
@@ -61,7 +49,7 @@ import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
-// import WordWrap from './wordwrap.vue'
+import WordWrap from './wordwrap.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 import {
@@ -79,7 +67,7 @@ export default {
         // Undo,
         // Clip,
         Format,
-        // WordWrap
+        WordWrap
     },
     mounted() {
         document.getElementsByTagName('body')[0]

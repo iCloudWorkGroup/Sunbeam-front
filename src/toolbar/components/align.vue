@@ -55,6 +55,10 @@
 import {
     pathToStruct
 } from '../../tools/format'
+import {
+    A_CELLS_UPDATE
+} from '../../store/action-types'
+
 function activeStatus(env) {
     let cell = env.$store.getters['activeCell']()
     if (cell == null) {

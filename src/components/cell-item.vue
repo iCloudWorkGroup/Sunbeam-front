@@ -62,9 +62,13 @@ export default {
             const physicsBox = this.cell.physicsBox
             const borderProp = this.cell.border
             let top = physicsBox.top - this.offsetTop
+            // top = top < 2 ? top + 2 : top
             let left = physicsBox.left - this.offsetLeft
+            // left = left < 2 ? left + 2 : left
             let width = physicsBox.width
+            width = width < 2 ? width + 2 : width
             let height = physicsBox.height
+            height = height < 2 ? height + 2 : height
             let topBorder = caclBorder({
                 type: borderProp.top
             }, {

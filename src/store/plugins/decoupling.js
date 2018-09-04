@@ -1,16 +1,16 @@
 import {
     COLS_DELETE,
-    CELLS_UPDATE,
-    ROWS_DELETE
+    A_CELLS_UPDATE,
+    ROWS_DELETE,
     SHEET_FROZEN
 } from '../action-types'
 let sequenceMap = {
     [COLS_DELETE]: {
-        before: [CELLS_UPDATE]
+        before: [A_CELLS_UPDATE]
         after: [SHEET_FROZEN]
     },
     [ROWS_DELETE]: {
-        before: [CELLS_UPDATE]
+        before: [A_CELLS_UPDATE]
     }
 }
 

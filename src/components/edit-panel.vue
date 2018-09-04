@@ -95,7 +95,40 @@ export default {
                 activeColAlias: col.alias,
                 activeRowAlias: row.alias
             })
-
+            if (cache.evenetList['mousedown']) {
+                for (let i = 0; i < cache.evenetList['mousedown'].length; i++) {
+                    let selects = this.$store.state.selects.list
+                    let select
+                    let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
+                    selects.forEach((item, index) => {
+                        if (item.type === state) {
+                            select = item
+                        }
+                    })
+                    let startColIdx = select.signalSort.startCol
+                    let endColIdx = select.signalSort.endCol
+                    let startRowIdx = select.signalSort.startRow
+                    let endRowIdx = select.signalSort.endRow
+                    let cols = this.$store.getters.allCols
+                    let rows = this.$store.getters.allRows
+                    let arrCol = []
+                    for (let i = startColIdx; i <= endColIdx; i++) {
+                        let col = cols[i]
+                        arrCol.push(col.displayName)
+                    }
+                    let arrRow = []
+                    for (let i = startRowIdx; i <= endRowIdx; i++) {
+                        let row = rows[i]
+                        arrRow.push(row.displayName)
+                    }
+                    cache.evenetList['mousedown'][i].apply(this, [{
+                        point: {
+                            Col: arrCol,
+                            Row: arrRow
+                        }
+                    }])
+                }
+            }
             // 拖动选择区域事件
             let bindSelectChange = selectChange.bind(this)
             document.addEventListener('mousemove', bindSelectChange)
@@ -132,16 +165,30 @@ export default {
                                 select = item
                             }
                         })
-                        let startCol = this.$store.getters.getColByAlias(select.wholePosi.startColAlias).displayName
-                        let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
-                        let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
-                        let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
+                        let startColIdx = select.signalSort.startCol
+                        let endColIdx = select.signalSort.endCol
+                        let startRowIdx = select.signalSort.startRow
+                        let endRowIdx = select.signalSort.endRow
+                        let cols = this.$store.getters.allCols
+                        let rows = this.$store.getters.allRows
+                        let arrCol = []
+                        for (let i = startColIdx; i <= endColIdx; i++) {
+                            let col = cols[i]
+                            arrCol.push(col.displayName)
+                        }
+                        let arrRow = []
+                        for (let i = startRowIdx; i <= endRowIdx; i++) {
+                            let row = rows[i]
+                            arrRow.push(row.displayName)
+                        }
+                        // let startCol = this.$store.getters.getColByAlias(select.wholePosi.startColAlias).displayName
+                        // let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
+                        // let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
+                        // let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
                         cache.evenetList['regionChange'][i].apply(this, [{
                             point: {
-                                startCol: startCol,
-                                endCol: endCol,
-                                startRow: startRow,
-                                endRow: endRow
+                                Col: arrCol,
+                                Row: arrRow
                             }
                         }])
                     }

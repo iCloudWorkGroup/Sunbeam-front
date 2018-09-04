@@ -529,9 +529,6 @@ export default {
         }
         let cols = getters.allCols
         let col = cols[index]
-        console.log(JSON.stringify({
-            col: col.sort
-        }))
         send({
             url: config.url.hidecol,
             body: JSON.stringify({
@@ -808,7 +805,6 @@ export default {
             return
         }
         let col = cols[index]
-        console.log(col.sort)
         send({
             url: config.url.showcol,
             body: JSON.stringify({
@@ -1255,7 +1251,7 @@ export default {
             props
         } = payload
         if (typeof startIndex === 'undefined') {
-            let selects = getters.selectList
+            let selects = getters.allSelects
             let select
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === SELECT) {
@@ -1269,7 +1265,7 @@ export default {
         endIndex = endIndex == null ? startIndex : endIndex
 
         let updateColInfo = []
-        let cols = getters.colList
+        let cols = getters.allCols
 
         for (let i = startIndex; i < endIndex + 1; i++) {
             updateColInfo.push({

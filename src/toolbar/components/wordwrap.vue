@@ -18,8 +18,7 @@ import {
 export default {
     computed: {
         wordWrapState() {
-            let cellProps = this.$store.getters.getSelectCell
-            return cellProps.content.wordWrap
+            return this.$store.getters.isWordWrapCell()
         }
     },
     methods: {

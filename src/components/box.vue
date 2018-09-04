@@ -78,8 +78,14 @@ export default {
             this.$store.dispatch('A_INPUT_EDITDONE', texts)
         },
         copyData(e) {
-            let select = this.$store.getters.activeSelect
-            let selects = this.$store.getters.selectList
+            let selects = this.$store.getters.allSelects
+            let select
+            let state = this.$store.getters.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
+            selects.forEach((item, index) => {
+                if (item.type === state) {
+                    select = item
+                }
+            })
             let wholePosi = select.wholePosi
             if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias ===
                 'MAX') {

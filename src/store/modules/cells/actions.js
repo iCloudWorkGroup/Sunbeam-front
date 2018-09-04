@@ -1,4 +1,5 @@
 import {
+    A_CELLS_ADD,
     CELLS_UPDATE_PROP,
     COLS_OPERCOLS,
     ROWS_OPERROWS,
@@ -10,7 +11,8 @@ import {
     CELLS_INNERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
-    ROWS_EXECADJUSTHEIGHT
+    // ROWS_EXECADJUSTHEIGHT,
+    ROWS_ADJUSTHEIGHT
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import {
@@ -85,7 +87,6 @@ export default {
                 return 0
             }
             let height = endRowIndex === -1 ? 'inhert' : caclHeight()
-
             function caclHeight() {
                 for (let i = endRowIndex; i > startRowIndex - 1; i--) {
                     let item = rows[i]
@@ -138,8 +139,6 @@ export default {
         coordinate = false
     }) {
         let select
-        let wholePosi
-        let signalSort
         if (coordinate === false) {
             let selects = getters.allSelects
             for (let i = 0, len = selects.length; i < len; i++) {
@@ -148,31 +147,73 @@ export default {
                     break
                 }
             }
-            wholePosi = select.wholePosi
         } else {
-            wholePosi = coordinate
+            select = coordinate
         }
         let rows = getters.allRows
         let cols = getters.allCols
+        // let rowsOffset = rows[select.signalSort.startRow].height
+        let data = {}
+        let cellsPosi = {
+            coordinate: [{
+                startCol: select.signalSort.startCol,
+                startRow: select.signalSort.startRow,
+                endCol: select.signalSort.endCol === 'MAX' ? -1 : select.signalSort.endCol,
+                endRow: select.signalSort.endRow === 'MAX' ? -1 : select.signalSort.endRow
+            }]
+        }
+        let property = {}
+        if (propStruct.hasOwnProperty('border')) {
+            property = {
+                direction: border,
+                line: line
+            }
+        } else if (propName === 'texts') {
+            property = {
+                content: propStruct.content.texts,
+                // effect: [
+                //     {
+                //         row: select.signalSort.startRow,
+                //         offset: rowsOffset
+                //     }
+                // ]
+            }
+            cellsPosi = {
+                coordinate: {
+                    startCol: select.signalSort.startCol,
+                    startRow: select.signalSort.startRow,
+                    endCol: select.signalSort.endCol === 'MAX' ? -1 : select.signalSort.endCol,
+                    endRow: select.signalSort.endRow === 'MAX' ? -1 : select.signalSort.endRow
+                }
+            }
+        } else {
+            // 修正参数
+            let propNames
+            if (propName === 'background') {
+                propNames = 'color'
+            } else if (propName.indexOf('align') > -1) {
+                propNames = 'align'
+            } else {
+                propNames = propName
+            }
+            property = {
+                [propNames]: propStruct.content[propName]
+            }
+        }
+        data = extend(cellsPosi, property)
+        await send({
+            url: config.url[propName],
+            body: JSON.stringify(data)
+        })
+
+        // 修正参数
+        let wholePosi = select.wholePosi
+
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
         let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
 
-        if (coordinate === false) {
-            signalSort = select.signalSort
-        } else {
-            signalSort = {
-                startCol: cols[startColIndex].sort,
-                startRow: rows[startRowIndex].sort,
-                endCol: cols[startColIndex].sort,
-                endRow: rows[endRowIndex].sort
-            }
-        }
-        await send({
-            url: config.url[propName],
-            body: JSON.stringify(signalSort)
-        })
 
         // 修正参数
         if (endRowIndex === -1) {
@@ -408,8 +449,6 @@ export default {
             endRowIndex
         })
         let insertCells = []
-
-
 
         cells.forEach(cell => {
             let occupyCol = cell.occupy.col
@@ -774,7 +813,7 @@ export default {
             endRowIndex = startRowIndex
             endColIndex = startColIndex
         } else {
-            let region = getters.getOprRegion
+            let region = getters.getOprRegion()
             startColIndex = region.startColIndex
             startRowIndex = region.startRowIndex
             endRowIndex = region.endRowIndex
@@ -823,19 +862,18 @@ export default {
             })
             if (oprRows) {
                 oprRows.forEach(info => {
-                    dispatch(ROWS_EXECADJUSTHEIGHT, {
-                        sort: info.sort,
-                        value: info.height
+                    dispatch(ROWS_ADJUSTHEIGHT, {
+                        index: info.index,
+                        height: info.height
                     })
                 })
             }
         }
 
         function getAdaptRows() {
-            let cols = getters.colList
+            let cols = getters.allCols
             let rows = getters.allRows
             let cells = getters.cells
-            let getPointInfo = getters.getPointInfo
             let temp = {}
             let oprRows = []
             for (let i = startRowIndex; i < endRowIndex + 1; i++) {
@@ -843,10 +881,9 @@ export default {
                 let rowAlias = rows[i].alias
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let colAlias = cols[j].alias
-                    let cellIndex = getPointInfo(colAlias, rowAlias,
-                        'cellIndex')
-                    if (typeof cellIndex === 'number' && !temp[cellIndex]) {
-                        let cell = cells[cellIndex]
+                    let cellIdx = getters.IdxByRow(colAlias, rowAlias)
+                    if (typeof cellIdx === 'number' && !temp[cellIdx]) {
+                        let cell = cells[cellIdx]
                         if (cell.occupy.col.length === 1 && cell.occupy.row.length ===
                             1) {
                             let height = getTextHeight(cell.content.texts,
@@ -861,7 +898,7 @@ export default {
                 }
                 if (maxHeight > rows[i].height) {
                     oprRows.push({
-                        sort: rows[i].sort,
+                        index: i,
                         height: maxHeight
                     })
                 }

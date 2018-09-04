@@ -3,7 +3,6 @@ import {
     SHEET_INSERT,
     ROWS_ADD,
     COLS_ADD,
-    A_CELLS_ADD,
     SELECTS_INSERT,
     A_CLEAR_QUEUE
 } from './action-types'

@@ -19,27 +19,22 @@ export default {
     /**
      * 只能进行单个更新
      */
-    [UPDATE_SELECT](state, select) {
+    [UPDATE_SELECT](state, payload) {
+        let type = payload.type
+        let fixProps = payload.props
         let selects = state.list
-        selects.forEach((item, index) => {
-            if (item === select.select) {
-                extend(true, state.list[index], select.props)
+        for (let i = 0, len = selects.length; i < len; i++) {
+            let item = selects[i]
+            if (item.type === type) {
+                extend(true, item, fixProps)
             }
-        })
-        // for (let i = 0, len = state.list.length; i < len; i++) {
-        //     let item = state.list[i]
-        //     for (let name in select) {
-        //         if (item[name]) {
-        //             item[name] = select[name]
-        //         }
-        //     }
-        // }
+        }
     },
     /**
      * 更新选择区域状态
      */
     [M_SELECT_UPDATE_STATE](state, type) {
-        state.selectState = type
+        state.activeType = type
     },
     [DELETE_SELECT](state, payload) {
         let select = payload.select
@@ -53,6 +48,6 @@ export default {
     },
     M_CLEAR_SELECT(state) {
         state.list = []
-        state.selectState = 'select'
+        state.activeType = 'SELECT'
     }
 }

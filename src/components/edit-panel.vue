@@ -99,7 +99,7 @@ export default {
                 for (let i = 0; i < cache.evenetList['mousedown'].length; i++) {
                     let selects = this.$store.state.selects.list
                     let select
-                    let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
+                    let state = this.selectState === 'SELECT' ? 'SELECT' : 'DATESOURCE'
                     selects.forEach((item, index) => {
                         if (item.type === state) {
                             select = item
@@ -132,19 +132,8 @@ export default {
             // 拖动选择区域事件
             let bindSelectChange = selectChange.bind(this)
             document.addEventListener('mousemove', bindSelectChange)
-            // cache.eventList.set(el, {
-            //     'mousemove': {
-            //         [bindSelectChange]: true
-            //     }
-            // })
             document.addEventListener('mouseup', function() {
-                // let elEvents = cache.eventList.get(el)
-                // if (elEvents != null &&
-                //     elEvents['mousemove'] != null &&
-                //     elEvents['mousemove'][bindSelectChange]) {
                 document.removeEventListener('mousemove', bindSelectChange)
-                // cache.eventList.delete(el)
-                // }
             })
             function selectChange(moveEvent) {
                 let endCol = getters.getColByPosi(moveEvent.clientX - clientRect.left + this.offsetLeft)
@@ -159,7 +148,7 @@ export default {
                     for (let i = 0; i < cache.evenetList['regionChange'].length; i++) {
                         let selects = this.$store.state.selects.list
                         let select
-                        let state = this.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
+                        let state = this.selectState === 'SELECT' ? 'SELECT' : 'DATESOURCE'
                         selects.forEach((item, index) => {
                             if (item.type === state) {
                                 select = item
@@ -181,10 +170,6 @@ export default {
                             let row = rows[i]
                             arrRow.push(row.displayName)
                         }
-                        // let startCol = this.$store.getters.getColByAlias(select.wholePosi.startColAlias).displayName
-                        // let endCol = this.$store.getters.getColByAlias(select.wholePosi.endColAlias).displayName
-                        // let startRow = this.$store.getters.getRowByAlias(select.wholePosi.startRowAlias).displayName
-                        // let endRow = this.$store.getters.getRowByAlias(select.wholePosi.endRowAlias).displayName
                         cache.evenetList['regionChange'][i].apply(this, [{
                             point: {
                                 col: arrCol,

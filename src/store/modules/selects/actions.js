@@ -74,6 +74,7 @@ export default {
             endRowAlias: rows[endRowIndex].alias
         }
         let fixedSelect = extend(template, {
+            type: getters.activeType,
             alias,
             wholePosi,
             activePosi,

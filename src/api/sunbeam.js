@@ -643,7 +643,7 @@ SpreadSheet.prototype = {
 
     // 鼠标选择操作状态切换为数据源操作状态
     setDataSourceState() {
-        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATESOURCE')
+        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATASOURCE')
     },
 
     // 鼠标选择操作状态切换为普通选中操作状态
@@ -656,7 +656,7 @@ SpreadSheet.prototype = {
         let selects = this.vm.$store.state.selects.list
         let destroyDataSource = {}
         selects.forEach((item, index) => {
-            if (item.type === 'DATESOURCE') {
+            if (item.type === 'DATASOURCE') {
                 destroyDataSource = item
             }
         })

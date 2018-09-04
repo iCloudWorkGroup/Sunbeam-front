@@ -87,8 +87,10 @@ export default {
             let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
 
             // 如果是选择数据源，需要判断数据源是否存在
-            if (this.selectState === 'DATESOURCE' &&
-                getters.selectByType(this.selectState) == null) {
+            let selectState = this.$store.getters.activeType
+            if (selectState === 'DATASOURCE' &&
+                getters.selectByType(selectState) == null) {
+                console.log(getters.selectByType(selectState))
                 this.$store.dispatch(SELECTS_INSERT, {
                     colAlias: col.alias,
                     rowAlias: row.alias
@@ -142,12 +144,12 @@ export default {
                     endRowAlias: endRow.alias
                 })
                 let regionChangeEvents = cache.evenetList['regionChange']
-
+                let selectState = this.$store.getters.activeType
                 if (regionChangeEvents != null) {
                     let cols = this.$store.getters.allCols
                     let rows = this.$store.getters.allRows
                     for (let i = 0, len = regionChangeEvents.length; i < len; i++) {
-                        let select = getters.selectByType(this.selectState)
+                        let select = getters.selectByType(selectState)
                         let startColIdx = select.signalSort.startCol
                         let endColIdx = select.signalSort.endCol
                         let startRowIdx = select.signalSort.startRow

@@ -99,7 +99,7 @@ export default {
                 structName,
                 value
             })
-            this.$store.dispatch(A_CELLS_UPDATE, {
+            this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'alignCol',
                 propStruct
             })

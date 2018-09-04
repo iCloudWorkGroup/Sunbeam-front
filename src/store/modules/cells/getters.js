@@ -123,7 +123,7 @@ export default {
      * 返回合法的操作区域
      * 区域内只能包含完整的单元格
      */
-    getFullOprRegion(state, getters, rootState) {
+    fullRegion(state, getters, rootState) {
         return function({
             startColIndex,
             startRowIndex,
@@ -162,22 +162,29 @@ export default {
                 endColIndex: endCol,
                 endRowIndex: endRow
             })
-            for (let i = 0, len = cells.length; i < len; i++) {
-                let cell = cells[i]
-                let occupyCols = cell.occupy.col
-                let occupyRows = cell.occupy.row
-                let localStartRow = getters.rowIndexByAlias(occupyRows[0])
-                let localEndRow = getters.rowIndexByAlias(occupyRows[
-                    occupyRows.length - 1])
-                let localStartCol = getters.colIndexByAlias(occupyCols[0])
-                let localEndCol = getters.colIndexByAlias(occupyCols[
-                    occupyCols.length - 1])
-                startCol = localStartCol < startCol ? localStartCol :
-                    startCol
-                startRow = localStartRow < startRow ? localStartRow :
-                    startRow
-                endRow = localEndRow > endRow ? localEndRow : endRow
-                endCol = localEndCol > endCol ? localEndCol : endCol
+            let len = cells.length
+            if (len > 0) {
+                for (let i = 0; i < len; i++) {
+                    let cell = cells[i]
+                    let occupyCols = cell.occupy.col
+                    let occupyRows = cell.occupy.row
+                    let firstRow = occupyRows[0]
+                    let lastRow = occupyRows[occupyRows.length - 1]
+                    let firstCol = occupyCols[0]
+                    let lastCol = occupyCols[occupyCols.length - 1]
+                    let firstRowIdx = getters.rowIndexByAlias(firstRow)
+                    let lastRowIdx = getters.rowIndexByAlias(lastRow)
+                    let firstColIdx = getters.colIndexByAlias(firstCol)
+                    let lastColIdx = getters.colIndexByAlias(lastCol)
+                    startRow = firstRowIdx === -1 ? firstRowIdx :
+                        Math.min(firstRowIdx, startRow)
+                    startCol = firstColIdx === -1 ? firstColIdx :
+                        Math.min(firstColIdx, startCol)
+                    endRow = lastRowIdx === -1 ? lastRowIdx :
+                        Math.max(lastRowIdx, endRow)
+                    endCol = lastColIdx === -1 ? lastColIdx :
+                        Math.max(lastColIdx, endCol)
+                }
             }
             return {
                 startColIndex: startCol,

@@ -37,10 +37,16 @@ export default {
             startRowIndex,
             endColIndex,
             endRowIndex
-        } = getters.getFullOprRegion({
+        } = getters.fullRegion({
             startColIndex: getters.colIndexByAlias(colAlias),
             startRowIndex: getters.rowIndexByAlias(rowAlias)
         })
+        if (startRowIndex === -1 ||
+            endRowIndex === -1 ||
+            startColIndex === -1 ||
+            endColIndex === -1) {
+            throw new Error('CUSTOM ERROR: index out of loaded arrange')
+        }
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,
             endCol: getters.getColByIndex(endColIndex).sort,
@@ -104,12 +110,18 @@ export default {
             startRowIndex,
             endColIndex,
             endRowIndex
-        } = getters.getFullOprRegion({
+        } = getters.fullRegion({
             startColIndex: getters.colIndexByAlias(activeColAlias),
             startRowIndex: getters.rowIndexByAlias(activeRowAlias),
             endColIndex: getters.colIndexByAlias(endColAlias),
             endRowIndex: getters.rowIndexByAlias(endRowAlias)
         })
+        if (startRowIndex === -1 ||
+            endRowIndex === -1 ||
+            startColIndex === -1 ||
+            endColIndex === -1) {
+            throw new Error('index out of loaded arrange')
+        }
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,
             endCol: getters.getColByIndex(endColIndex).sort,

@@ -32,8 +32,6 @@ export default async function(options) {
     let bottom = $rootEl.offsetHeight + config.scrollBufferHeight
     let right = $rootEl.offsetWidth + config.scrollBufferWidth
     store.commit('M_SET_CLASS', rootSelector)
-    let toolBarVm
-    let bookVm
     await store.dispatch(RESTORE, {
         left: 0,
         top: 0,
@@ -46,8 +44,8 @@ export default async function(options) {
         100)
     cache.prestrainWidth = Math.max(cache.prestrainWidth, right +
         100)
-
-    bookVm = new Vue({
+    let toolBarVm
+    let bookVm = new Vue({
         store,
         render: h => h(Book)
     }).$mount(rootSelector)

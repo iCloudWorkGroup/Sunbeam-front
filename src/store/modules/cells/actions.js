@@ -8,9 +8,7 @@ import {
     A_CELLS_DESTORY,
     A_CELLS_SPLIT,
     CELLS_FORMAT,
-    CELLS_PASTE,
     CELLS_INNERPASTE,
-    CELLS_OUTERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
     // ROWS_EXECADJUSTHEIGHT,
@@ -138,9 +136,7 @@ export default {
     }, {
         propName,
         propStruct,
-        coordinate = false,
-        border = 'none',
-        line = '0'
+        coordinate = false
     }) {
         let select
         if (coordinate === false) {
@@ -212,6 +208,7 @@ export default {
 
         // 修正参数
         let wholePosi = select.wholePosi
+
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
@@ -576,161 +573,6 @@ export default {
 
         // pause
         console.log()
-    },
-    [CELLS_PASTE]({
-        getters,
-        dispatch
-    }, text) {
-        let {
-            startColIndex,
-            startRowIndex
-        } = getters.getOprRegion
-        let cols = getters.colList
-        let rows = getters.allRows
-        let startRowSort = rows[startRowIndex].sort
-        let startColSort = cols[startColIndex].sort
-        if (typeof text !== 'undefined') {
-            send({
-                url: config.url['outerpaste'],
-                data: JSON.stringify({
-                    oprCol: startColSort,
-                    oprRow: startRowSort,
-                    content: text
-                }),
-                success(data) {
-                    if (data.isLegal) {
-                        dispatch(CELLS_OUTERPASTE, {
-                            startRowSort,
-                            startColSort,
-                            parseDate: parseClipStr(text)
-                        })
-                    }
-                }
-            })
-        } else {
-            let clip
-            let selects = getters.selectList
-            for (let i = 0, len = selects.length; i < len; i++) {
-                let item = selects[i]
-                if (item.type === CLIP) {
-                    clip = item
-                }
-            }
-            if (!clip) {
-                return
-            }
-            let wholePosi = clip.wholePosi
-            let clipStartColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-            let clipStartRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-            let clipEndColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-            let clipEndRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-            send({
-                url: config.url[cache.clipState],
-                data: JSON.stringify({
-                    orignal: {
-                        startCol: cols[clipStartColIndex].sort,
-                        startRow: rows[clipStartRowIndex].sort,
-                        endCol: cols[clipEndColIndex].sort,
-                        endRow: rows[clipEndRowIndex].sort
-                    },
-                    target: {
-                        oprCol: startColSort,
-                        oprRow: startRowSort
-                    }
-                }),
-                success(data) {
-                    if (data.isLegal) {
-                        dispatch(CELLS_INNERPASTE, {
-                            startRowSort,
-                            startColSort,
-                            clipStartColSort: cols[
-                                clipStartColIndex].sort,
-                            clipStartRowSort: rows[
-                                clipStartRowIndex].sort,
-                            clipEndColSort: cols[
-                                clipEndColIndex].sort,
-                            clipEndRowSort: rows[
-                                clipEndRowIndex].sort
-                        })
-                    }
-                }
-            })
-        }
-    },
-    async [CELLS_UPDATE_PROP]({
-        commit,
-        dispatch,
-        getters
-    }, {
-        startColIndex,
-        endColIndex,
-        startRowIndex,
-        endRowIndex,
-        props,
-        fn
-    }) {
-        // let getPointInfo = getters.IdxByRow
-        let tempSign = {}
-        let cols = getters.allCols
-        let rows = getters.allRows
-        let cells = getters.cells
-        let updateCellInfo = []
-        let insertCellList = []
-        let colAlias
-        let rowAlias
-        let cellIdx
-        for (let i = startColIndex; i <= endColIndex; i++) {
-            for (let j = startRowIndex; j <= endRowIndex; j++) {
-                colAlias = cols[i].alias
-                rowAlias = rows[j].alias
-                cellIdx = getters.IdxByRow(colAlias, rowAlias)
-                if (cellIdx !== -1) {
-                    let cell
-                    if ((cell = cells[cellIdx]) && !tempSign[cell.alias]) {
-                        let updateProp
-                        if (fn) {
-                            updateProp = extend({}, props, fn(cell))
-                        } else {
-                            updateProp = props
-                        }
-                        updateCellInfo.push({
-                            cell,
-                            props: updateProp
-                        })
-                    }
-                } else {
-                    let cell = extend({
-                        occupy: {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                    }, props)
-                    insertCellList.push(cell)
-                }
-            }
-        }
-        dispatch(A_CELLS_ADD, insertCellList)
-        let data = {
-            coordinate: [
-                {
-                    startCol: startColIndex,
-                    startRow: startRowIndex,
-                    endCol: endColIndex,
-                    endRow: endRowIndex
-                }
-            ],
-            auto: props.content.wordWrap,
-        }
-        await send({
-            url: config.url.wordWrap,
-            body: JSON.stringify(data)
-        })
-        updateCellInfo.forEach((item, index) => {
-            commit(mutationTypes.UPDATE_CELL, {
-                idx: getters.IdxByRow(item.cell.occupy.col[0], item.cell.occupy.row[0]),
-                prop: item.props
-            })
-        })
     },
     [CELLS_INNERPASTE]({
         state,

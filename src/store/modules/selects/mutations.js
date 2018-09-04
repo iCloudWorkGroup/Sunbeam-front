@@ -53,6 +53,6 @@ export default {
     },
     M_CLEAR_SELECT(state) {
         state.list = []
-        state.selectState = 'select'
+        state.selectState = 'SELECT'
     }
 }

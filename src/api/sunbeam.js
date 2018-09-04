@@ -643,12 +643,12 @@ SpreadSheet.prototype = {
 
     // 鼠标选择操作状态切换为数据源操作状态
     setDataSourceState() {
-        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'dateSource')
+        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATESOURCE')
     },
 
     // 鼠标选择操作状态切换为普通选中操作状态
     setSelectState() {
-        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'select')
+        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'SELECT')
     },
 
     // 销毁数据源选区

@@ -41,7 +41,7 @@ export default {
                 endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             }
             if (endRowIndex === 'MAX' || endColIndex === 'MAX') {
-                let fullRegion = getters.getFullOprRegion({
+                let fullRegion = getters.fullRegion({
                     startColIndex,
                     endColIndex,
                     startRowIndex,

@@ -157,33 +157,51 @@ export default {
             endRow: rows[endRowIndex].sort
         }
         let sendArgs = {
-            coordinate: signalSort
+            coordinate: [signalSort]
         }
-        if (propName === 'texts') {
-            sendArgs = extend(sendArgs, {
-                texts: propStruct
-            })
+        let fixPropName = propName
+        switch (propName) {
+            case 'texts':
+                sendArgs = extend({
+                    coordinate: signalSort
+                }, {
+                    content: propStruct.content[propName]
+                })
+                break
+            case 'border.top':
+            case 'border.right':
+            case 'border.bottom':
+            case 'border.left':
+            case 'border.all':
+            case 'border.none':
+                fixBorder()
+                break
+            case 'alignRow':
+            case 'alignCol':
+                sendArgs = extend(sendArgs, {
+                    align: propStruct.content[propName]
+                })
+                break
+            default:
+                sendArgs = extend(sendArgs, {
+                    [propName]: propStruct.content[propName]
+                })
+                break
         }
-        if (propName === 'border') {
-            let line
-            for (let key in propStruct) {
-                if (Object.prototype.hasOwnProperty.call(propStruct, key)) {
-                    line = key
-                }
-            }
-            let direction = propStruct[line]
+
+        function fixBorder() {
+            fixPropName = 'border'
+            let direction = propName.split('.')[1]
+            let line = direction === 'all' || direction === 'none' ?
+                propStruct.border.top :
+                propStruct.border[direction]
             sendArgs = extend(sendArgs, {
                 direction,
                 line
             })
         }
-        if (propName === 'alignCol' || propName === 'alignRow') {
-            sendArgs = extend(sendArgs, {
-                align: propStruct.content
-            })
-        }
         await send({
-            url: config.url[propName],
+            url: config.url[fixPropName],
             body: JSON.stringify(sendArgs)
         })
 

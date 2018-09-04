@@ -227,7 +227,7 @@ export default {
                     // 隐藏行不为最后一列可视行
                     if (startSort !== endVisibleSort) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     height: rows[index + 1].height
@@ -252,7 +252,7 @@ export default {
                     // 隐藏行为最后一列可视行
                     if (startSort === endVisibleSort) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     top: rows[index - 1].top,
@@ -279,7 +279,7 @@ export default {
                 // 隐藏行在选择行上方
                 if (startSort < rowSort) {
                     updateSelectInfo.push({
-                        select,
+                        type: getters.activeType,
                         props: {
                             physicsBox: {
                                 top: rows[index - 1].top,
@@ -291,7 +291,7 @@ export default {
             // 第二种情况 选择多行
             if (startSort < endSort) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height -
@@ -487,7 +487,7 @@ export default {
 
             if (startIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             top: select.physicsBox.top +
@@ -497,7 +497,7 @@ export default {
                 })
             } else if (endIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height +
@@ -652,7 +652,7 @@ export default {
 
             if (startIndex >= index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             top: select.physicsBox.top +
@@ -662,7 +662,7 @@ export default {
                 })
             } else if (endIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height +
@@ -815,7 +815,7 @@ export default {
             let endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
             if (startIndex <= index && endIndex >= index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height +
@@ -825,7 +825,7 @@ export default {
                 })
             } else if (startIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             top: select.physicsBox.top +
@@ -983,7 +983,7 @@ export default {
                 if (startIndex === endIndex) {
                     if (index === rows.length - 1) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     height: rows[index - 1].height
@@ -1001,7 +1001,7 @@ export default {
                         })
                     } else {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     height: rows[index + 1].height
@@ -1020,7 +1020,7 @@ export default {
                     }
                 } else {
                     updateSelectInfo.push({
-                        select,
+                        type: getters.activeType,
                         props: {
                             physicsBox: {
                                 height: select.physicsBox.height -
@@ -1034,7 +1034,7 @@ export default {
                 }
             } else if (startIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             top: select.physicsBox.top -
@@ -1044,7 +1044,7 @@ export default {
                 })
             } else if (endIndex === index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height -
@@ -1057,7 +1057,7 @@ export default {
                 })
             } else if (endIndex < index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             height: select.physicsBox.height -

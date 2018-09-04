@@ -157,7 +157,7 @@ export default {
             endPosi = getters.getColByAlias(wholePosi.endColAlias).left
             if (startPosi === colLeft) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox.width +
@@ -167,7 +167,7 @@ export default {
                 })
             } else if (startPosi > colLeft) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             left: select.physicsBox.left +
@@ -178,7 +178,7 @@ export default {
 
             } else if (endPosi > colLeft) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox.width +
@@ -335,7 +335,7 @@ export default {
                 if (startIndex === endIndex) {
                     if (index === cols.length - 1) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     width: cols[index - 1].width
@@ -353,7 +353,7 @@ export default {
                         })
                     } else {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     width: cols[index + 1].width
@@ -372,7 +372,7 @@ export default {
                     }
                 } else {
                     updateSelectInfo.push({
-                        select,
+                        type: getters.activeType,
                         props: {
                             physicsBox: {
                                 width: select.physicsBox.width -
@@ -386,7 +386,7 @@ export default {
                 }
             } else if (startIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             left: select.physicsBox.left -
@@ -396,7 +396,7 @@ export default {
                 })
             } else if (endIndex === index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox.width -
@@ -409,7 +409,7 @@ export default {
                 })
             } else if (endIndex < index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox.width -
@@ -669,7 +669,7 @@ export default {
                     // 隐藏行不为最后一列可视行
                     if (startSort !== endVisibleSort) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     width: cols[index + 1].width
@@ -694,7 +694,7 @@ export default {
                     // 隐藏行为最后一列可视行
                     if (startSort === endVisibleSort) {
                         updateSelectInfo.push({
-                            select,
+                            type: getters.activeType,
                             props: {
                                 physicsBox: {
                                     left: cols[index - 1].left,
@@ -721,7 +721,7 @@ export default {
                 // 隐藏行在选择行上方
                 if (startSort < colSort) {
                     updateSelectInfo.push({
-                        select,
+                        type: getters.activeType,
                         props: {
                             physicsBox: {
                                 left: cols[index - 1].left
@@ -733,7 +733,7 @@ export default {
             // 第二种情况 选择多行
             if (startSort < endSort) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox.width -
@@ -931,7 +931,7 @@ export default {
             endIndex = getters.colIndexByAlias(wholePosi.endColAlias)
             if (startIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             left: select.physicsBox
@@ -942,7 +942,7 @@ export default {
                 })
             } else if (endIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox
@@ -1093,7 +1093,7 @@ export default {
 
             if (startIndex >= index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             left: select.physicsBox
@@ -1104,7 +1104,7 @@ export default {
                 })
             } else if (endIndex > index) {
                 updateSelectInfo.push({
-                    select,
+                    type: getters.activeType,
                     props: {
                         physicsBox: {
                             width: select.physicsBox

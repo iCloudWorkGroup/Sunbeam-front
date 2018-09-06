@@ -549,7 +549,6 @@ export default {
                 row: sort,
             }),
         })
-        console.log(sort)
         dispatch(actionTypes.ROWS_EXECINSERTROW, {
             sort,
             rowModel
@@ -739,7 +738,6 @@ export default {
     }) {
         let rows = getters.allRows
         let row = rows[index]
-        // console.log(row, height)
         send({
             url: config.url.adjustrow,
             body: JSON.stringify({

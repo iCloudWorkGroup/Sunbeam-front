@@ -46,7 +46,7 @@ export function parseExpress(str) {
 }
 export function isNum(value) {
     let reg
-    if (value === '') {
+    if (value === '' || value == null) {
         return false
     }
     if (value.indexOf(',') === -1) {
@@ -61,7 +61,7 @@ export function isDate(value) {
     let month
     let day
     let date
-    if (value === '') {
+    if (value === '' || value == null) {
         return false
     }
     if (!regularLine.test(value) && !regularWord.test(value)) {

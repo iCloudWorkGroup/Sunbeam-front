@@ -1,33 +1,33 @@
 <template>
 <div class="col-head-panel">
-    <!-- @mousedown="mouseDownHandle"
-     @mousemove="mouseMoveHandle" -->
+    <!--@mousedown="mouseDownHandle"-->
+    <!--@mousemove="mouseMoveHandle"-->
     <col-head-item
         v-for="col in viewCols"
         :key="col.alias"
         :col="col"
         :offsetLeft="offsetLeft"/>
-    <!-- <col-head-item v-if="adjustState"
-                   ref="adjustColView"
-                   class="adjust-col-head-item"
-                   :offsetLeft="offsetLeft"
-                   :col="adjustCol">
-    </col-head-item>
-    <div v-if="adjustState"
-         ref="adjustPanelView"
-         class="temp-space-container">
-        <col-head-item v-for="col in adjustColList"
-                       :key="col.alias"
-                       :col="col"
-                       :offsetLeft="offsetLeft">
-        </col-head-item>
-    </div> -->
+    <!--<col-head-item v-if="adjustState"-->
+                   <!--ref="adjustColView"-->
+                   <!--class="adjust-col-head-item"-->
+                   <!--:offsetLeft="offsetLeft"-->
+                   <!--:col="adjustCol">-->
+    <!--</col-head-item>-->
+    <!--<div v-if="adjustState"-->
+         <!--ref="adjustPanelView"-->
+         <!--class="temp-space-container">-->
+        <!--<col-head-item v-for="col in adjustColList"-->
+                       <!--:key="col.alias"-->
+                       <!--:col="col"-->
+                       <!--:offsetLeft="offsetLeft">-->
+        <!--</col-head-item>-->
+    <!--</div>-->
 </div>
 </template>
 <script>
 import ColHeadItem from './col-head-item.vue'
 import {
-    SELECTS_UPDATESELECT,
+    SELECTS_CHANGE,
     COLS_ADJUSTWIDTH
 } from '../store/action-types'
 import {
@@ -43,6 +43,11 @@ export default {
     components: {
         ColHeadItem
     },
+    data() {
+        return {
+            adjustState: false,
+        }
+    },
     computed: {
         viewCols() {
             return this.$store.getters.colsByRange(this.start, this.over)
@@ -52,6 +57,7 @@ export default {
             return cols.slice(this.adjustColIndex + 1)
         },
         mouseState() {
+            console.log(this.$store.state.mouseState)
             return this.$store.state.mouseState
         }
     },
@@ -78,7 +84,7 @@ export default {
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: colIndex,
                 startRowIndex: 'MAX'
             })
@@ -89,7 +95,7 @@ export default {
         startAdjustHandleState(e) {
             let posi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(posi)
-            let cols = this.$store.getters.colList
+            let cols = this.$store.getters.allCols
             let adjustHandle
             let self = this
 
@@ -134,7 +140,7 @@ export default {
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: colIndex,
                 startRowIndex: 'MAX'
             })

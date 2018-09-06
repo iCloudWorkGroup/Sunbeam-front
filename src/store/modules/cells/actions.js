@@ -1,5 +1,4 @@
 import {
-    CELLS_UPDATE_PROP,
     COLS_OPERCOLS,
     ROWS_OPERROWS,
     OCCUPY_UPDATE,
@@ -186,13 +185,17 @@ export default {
                     align: propStruct.content[propName]
                 })
                 break
+            case 'background':
+                sendArgs = extend(sendArgs, {
+                    color: propStruct.content[propName]
+                })
+                break
             default:
                 sendArgs = extend(sendArgs, {
                     [propName]: propStruct.content[propName]
                 })
                 break
         }
-
         function fixBorder() {
             fixPropName = 'border'
             let direction = propName.split('.')[1]
@@ -210,12 +213,8 @@ export default {
         })
 
         // 修正参数
-        if (endRowIndex === -1) {
-            endRowIndex = rows.length - 1
-        }
-        if (endColIndex === -1) {
-            endColIndex = cols.length - 1
-        }
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
 
         // 如果有对应的单元格，修改属性
         // 如果没有对应的单元格，插入单元格
@@ -512,14 +511,35 @@ export default {
                 props
             })
         } else {
-            dispatch(CELLS_UPDATE_PROP, {
-                startColIndex,
-                endColIndex,
-                startRowIndex,
-                endRowIndex,
-                props,
-                fn: parseText
-            })
+            let avoidRepeat = {}
+            let cols = getters.allCols
+            let rows = getters.allRows
+            let cells = getters.cells
+            for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+                for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                    let colAlias = cols[i].alias
+                    let rowAlias = rows[j].alias
+                    let idx = getters.IdxByRow(colAlias, rowAlias)
+                    if (idx !== -1) {
+                        if (!avoidRepeat[idx]) {
+                            avoidRepeat[idx] = true
+                            let display = parseText(cells[idx])
+                            extend(true, props, display)
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: props
+                            })
+                        }
+                    } else {
+                        dispatch('A_CELLS_ADD', extend(template, props, {
+                            occupy: {
+                                col: [colAlias],
+                                row: [rowAlias]
+                            }
+                        }))
+                    }
+                }
+            }
         }
 
         function parseText(cell) {

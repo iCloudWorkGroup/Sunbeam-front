@@ -13,6 +13,7 @@ import './directors/focus'
 export default async function(options) {
     // 用户参数合法性验证
     cache.AUTHENTIC_KEY = document.getElementById('auth_key').value
+    window.SPREADSHEET_AUTHENTIC_KEY = document.getElementById('auth_key').value
     let rootSelector = options.root
     let $rootEl
     if (rootSelector != null &&

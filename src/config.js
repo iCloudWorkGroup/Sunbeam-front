@@ -39,7 +39,7 @@ export default {
      * 这样利于表格自动扩展
      * 在自动增加行处，作用很大
      */
-    prestrainWidth: 1420,
+    prestrainWidth: 1440,
     prestrainHeight: 1200,
     /**
      * 请求区域宽、高度, 单位px

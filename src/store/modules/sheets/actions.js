@@ -1000,7 +1000,7 @@ export default {
          * @return {[type]} [description]
          */
         function expand() {
-            let num = Math.ceil(config.prestrainWidth / (config.colWidth + 1))
+            let num = config.prestrainWidth / (config.colWidth + 1)
             send({
                 url: config.url.createLine,
                 body: JSON.stringify({

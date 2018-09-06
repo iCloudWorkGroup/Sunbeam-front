@@ -16,6 +16,7 @@ let SpreadSheet = function(options) {
     this.rootSelector = options.root
     this.toolbarSelector = options.toolbar
     this.loadStatus = true
+    window.SPREADSHEET_AUTHENTIC_KEY = document.getElementById('auth_key').value
 }
 SpreadSheet.prototype = {
     async load() {
@@ -493,7 +494,6 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        console.log(select)
         this.vm.$store.dispatch(A_types.A_CELLS_MERGE, select)
     },
 
@@ -562,7 +562,7 @@ SpreadSheet.prototype = {
     },
 
     // 设置列的宽度（冻结状态不可用）
-    setColWidth(sheetId, col, width) {
+    async setColWidth(sheetId, col, width) {
         let c
         let w
         if (arguments.length === 2) {
@@ -574,14 +574,14 @@ SpreadSheet.prototype = {
             w = width
         }
         let colIdx = this.getLetterNum(c)
-        this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
+        await this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
             index: colIdx,
             width: w
         })
     },
 
     // 设置行的高度（冻结状态不可用）
-    setRowHeight(sheetId, row, height) {
+    async setRowHeight(sheetId, row, height) {
         let r
         let h
         if (arguments.length === 2) {
@@ -592,9 +592,9 @@ SpreadSheet.prototype = {
             r = row
             h = height
         }
-        let rorIdx = Number(r) - 1
-        this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
-            index: rorIdx,
+        let rowIdx = Number(r) - 1
+        await this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
+            index: rowIdx,
             height: h
         })
     },
@@ -623,13 +623,10 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        let s = this.vm.$store.getters.cellsByVertical({
-            startColIndex: select.signalSort.startCol,
-            endColIndex: select.signalSort.endCol,
-            startRowIndex: select.signalSort.startRow,
-            endRowIndex: select.signalSort.endRow
-        })[0]
-        return s.content.texts
+        let cellIdx = this.vm.$store.getters.IdxByRow(select.startColAlias, select.startRowAlias)
+        let cells = this.vm.$store.getters.cells
+        let cell = cells[cellIdx]
+        return cell.content.texts
     },
 
     // 鼠标选择操作状态切换为数据源操作状态
@@ -885,10 +882,10 @@ SpreadSheet.prototype = {
 
     // 重新加载所有数据，表格会进行局部刷新，并滚动回初始位置
     reload() {
-        cache.step = 0
+        this.vm.$store.commit('M_UPDATE_LOAD', true)
         // 销毁vue实例
         this.vm.$destroy()
-        this.toolBarVm.$destroy()
+        this.bookVm.$destroy()
         let bottom = this.vm.$el.offsetHeight + config.scrollBufferHeight
         let right = this.vm.$el.offsetWidth + config.scrollBufferWidth
         // // 清空 store 行 列 单元格 sheet select 信息
@@ -897,9 +894,8 @@ SpreadSheet.prototype = {
         this.vm.$store.commit(M_types.M_CLEAR_SHEET)
         this.vm.$store.commit(M_types.M_CLEAR_ROWS)
         this.vm.$store.commit(M_types.M_CLEAR_COLS)
-
-        let rootSelector = this.root
-        let toolsSelector = this.toolbar
+        let rootSelector = this.rootSelector
+        let toolsSelector = this.toolbarSelector
         // 重新获取数据
         this.vm.$store.dispatch(A_types.RESTORE, {
             left: 0,
@@ -919,7 +915,7 @@ SpreadSheet.prototype = {
                 render: h => h(Book)
             }).$mount(rootSelector)
             // 新建vue实例tools
-            this.toolBarVm = new Vue({
+            this.bookVm = new Vue({
                 store,
                 render: h => h(Main)
             }).$mount(toolsSelector)

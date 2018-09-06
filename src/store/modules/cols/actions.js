@@ -67,7 +67,7 @@ export default {
             currentSheet: rootState.currentSheet
         })
     },
-    [actionTypes.COLS_ADJUSTWIDTH]({
+    async [actionTypes.COLS_ADJUSTWIDTH]({
         dispatch,
         getters
     }, {
@@ -76,7 +76,7 @@ export default {
     }) {
         let cols = getters.allCols
         let col = cols[index]
-        send({
+        await send({
             url: config.url['adjustcol'],
             body: JSON.stringify({
                 col: col.sort,

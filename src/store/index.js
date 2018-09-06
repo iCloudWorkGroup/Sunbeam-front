@@ -20,7 +20,8 @@ const state = {
      */
     active: null,
     loading: false,
-    name: ''
+    name: '',
+    mouseState: ''
 }
 export default new Vuex.Store({
     state,

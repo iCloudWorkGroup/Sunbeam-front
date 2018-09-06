@@ -170,10 +170,10 @@ module.exports = {
         // 在类的非静态方法中，必须存在对 this 的引用
         // @off 太严格了
         'class-methods-use-this': 'off',
-        // 禁止函数的循环复杂度超过 20，https://en.wikipedia.org/wiki/Cyclomatic_complexity
+        // 禁止函数的循环复杂度超过 21，https://en.wikipedia.org/wiki/Cyclomatic_complexity
         'complexity': [
             'error', {
-                max: 20
+                max: 21
             }
         ],
         // 禁止函数在不同分支返回不同类型的值

@@ -51,41 +51,6 @@ export default {
             props
         }) {
             state.list[row.sort] = extend(true, row, props)
-            // let rowOprProp = row.props
-            // clearDefaultValue(rowOprProp, cellTemplate)
-
-            // function clearDefaultValue(object, template) {
-            //     let hasOwnProp = Object.prototype.hasOwnProperty
-            //     for (let name in object) {
-            //         if (hasOwnProp.call(object, name)) {
-            //             let currentProp = object[name]
-            //             let defaultValue = template[name]
-            //             if (typeof currentProp === 'object') {
-            //                 if (isEmptyObj(currentProp)) {
-            //                     delete object[name]
-            //                 } else {
-            //                     let result = clearDefaultValue(
-            //                         currentProp, defaultValue)
-            //                     if (result) {
-            //                         delete object[name]
-            //                     }
-            //                 }
-            //             } else if (currentProp === defaultValue) {
-            //                 delete object[name]
-            //             }
-            //         }
-            //     }
-            //     return isEmptyObj(object)
-            // }
-
-            // function isEmptyObj(obj) {
-            //     for (let name in obj) {
-            //         if (Object.prototype.hasOwnProperty.call(obj, name)) {
-            //             return false
-            //         }
-            //     }
-            //     return true
-            // }
         })
     },
     [DELETE_ROW](state, {

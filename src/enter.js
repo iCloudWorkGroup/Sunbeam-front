@@ -8,7 +8,13 @@ let ss = new Sunbeam({
 
 
 ss.load().then(() => {
-
+    ss.setRowHeight('1', 0).then(() => {
+        return ss.setColWidth('A', 0)
+    }).then(() => {
+        return ss.setRowHeight('2', 0)
+    }).then(() => {
+        console.log(1)
+    })
 })
 
 ss.addEventListener('regionChange', function (e) {
@@ -18,18 +24,14 @@ ss.addEventListener('regionChange', function (e) {
     // console.log(e.point.col[0])
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.setRowHeight('1', 20).then(() => {
-        return ss.setRowHeight('2', 20)
-    }).then(() => {
-        ss.setColWidth('A', 70).then(() => {
-            setTimeout(ss.reload(), 1000)
-        })
-    })
+    ss.setRowHeight('1', 0)
+    ss.setColWidth('A', 0)
+    ss.setRowHeight('2', 0)
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.setRowHeight('1', 0)
-    ss.setRowHeight('2', 0)
-    ss.setColWidth('A', 0)
+    ss.setRowHeight('1', 20)
+    ss.setColWidth('A', 70)
+    ss.setRowHeight('2', 20)
 })
 document.getElementById('clear').addEventListener('click', function () {
     send({

@@ -80,22 +80,6 @@ export default {
                 row: row.sort
             })
         })
-        // .then(() => {
-        //     let cellIdx = getters.getRowIndexBySort(row.sort)
-        //     let cells = getters.cellsByTransverse({
-        //         startColIndex: 0,
-        //         startRowIndex: cellIdx,
-        //         endColIndex: -1
-        //     })
-        //     for (let i = 0, len = cells.length; i < len; i++) {
-        //         commit(mutationTypes.UPDATE_CELL, {
-        //             cell: cells[i],
-        //             status: {
-        //                 hidden: true
-        //             }
-        //         })
-        //     }
-        // })
         dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
     },
     [actionTypes.ROWS_EXECHIDE]({
@@ -729,7 +713,7 @@ export default {
             dispatch(actionTypes.A_CELLS_ADD, insertCellList)
         }
     },
-    [actionTypes.ROWS_ADJUSTHEIGHT]({
+    async [actionTypes.ROWS_ADJUSTHEIGHT]({
         dispatch,
         getters
     }, {
@@ -738,16 +722,16 @@ export default {
     }) {
         let rows = getters.allRows
         let row = rows[index]
-        send({
+        dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
+            sort: row.sort,
+            value: height
+        })
+        await send({
             url: config.url.adjustrow,
             body: JSON.stringify({
                 row: row.sort,
                 offset: height
             }),
-        })
-        dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
-            sort: row.sort,
-            value: height
         })
     },
     [actionTypes.ROWS_EXECADJUSTHEIGHT]({
@@ -806,7 +790,6 @@ export default {
 
         let updateSelectInfo = []
         let selects = getters.allSelects
-
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
             let startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
@@ -834,11 +817,9 @@ export default {
 
             }
         })
-
         updateSelectInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_SELECT, item)
         })
-
         let updateRowInfo = []
         for (let i = index, len = rows.length; i < len; i++) {
             let row = rows[i]

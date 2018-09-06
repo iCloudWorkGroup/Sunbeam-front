@@ -48,6 +48,8 @@ export default {
             } else {
                 height = height - 2
             }
+            height = height > 0 ? height : 0
+            width = width > 0 ? width : 0
             return {
                 left: unit(left),
                 top: unit(top),

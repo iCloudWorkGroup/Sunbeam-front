@@ -19,7 +19,8 @@ export default {
             // 所以总数据还得 -1
             // 所以最后需要减去开头和结尾的两部分
             // 是整体 -2
-            return unit(this.row.physicsBox.height - 2)
+            let rowHeight = this.row.physicsBox.height - 2 > 0 ? this.row.physicsBox.height - 2 : 0
+            return unit(rowHeight)
         }
     }
 }

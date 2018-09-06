@@ -648,7 +648,7 @@ SpreadSheet.prototype = {
                 destroyDataSource = item
             }
         })
-        this.vm.$store.commit(M_types.DELETE_SELECT, {
+        this.vm.$store.dispatch(A_types.SELECTS_DELETE, {
             select: destroyDataSource
         })
     },
@@ -798,7 +798,7 @@ SpreadSheet.prototype = {
         if (arguments.length === 2 && typeof arguments[0] === 'string') {
             c = col
         }
-        let colIdx = Number(c) - 1
+        let colIdx = this.getLetterNum(c)
         let cols = this.vm.$store.getters.allCols
         if (!cols[colIdx].hidden) {
             this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)

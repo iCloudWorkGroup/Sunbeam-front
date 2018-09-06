@@ -1,28 +1,29 @@
 <template>
-<div class="col-head-panel">
-    <!--@mousedown="mouseDownHandle"-->
-    <!--@mousemove="mouseMoveHandle"-->
-    <col-head-item
-        v-for="col in viewCols"
-        :key="col.alias"
-        :col="col"
-        :offsetLeft="offsetLeft"/>
-    <!--<col-head-item v-if="adjustState"-->
-                   <!--ref="adjustColView"-->
-                   <!--class="adjust-col-head-item"-->
-                   <!--:offsetLeft="offsetLeft"-->
-                   <!--:col="adjustCol">-->
-    <!--</col-head-item>-->
-    <!--<div v-if="adjustState"-->
-         <!--ref="adjustPanelView"-->
-         <!--class="temp-space-container">-->
-        <!--<col-head-item v-for="col in adjustColList"-->
-                       <!--:key="col.alias"-->
-                       <!--:col="col"-->
-                       <!--:offsetLeft="offsetLeft">-->
-        <!--</col-head-item>-->
-    <!--</div>-->
-</div>
+    <div class="col-head-panel"
+         ref="panel"
+         @mousedown="mouseDownHandle"
+         @mousemove="mouseMoveHandle">
+        <col-head-item
+                v-for="col in viewCols"
+                :key="col.alias"
+                :col="col"
+                :offsetLeft="offsetLeft"/>
+        <col-head-item v-if="adjustState"
+                       ref="adjustColView"
+                       class="adjust-col-head-item"
+                       :offsetLeft="offsetLeft"
+                       :col="adjustCol">
+        </col-head-item>
+        <div v-if="adjustState"
+             ref="adjustPanelView"
+             class="temp-space-container">
+            <col-head-item v-for="col in adjustColList"
+                           :key="col.alias"
+                           :col="col"
+                           :offsetLeft="offsetLeft">
+            </col-head-item>
+        </div>
+    </div>
 </template>
 <script>
 import ColHeadItem from './col-head-item.vue'
@@ -127,13 +128,15 @@ export default {
             let posi = this.getRelativePosi(e.clientX)
             let col = this.$store.getters.getColByPosi(posi)
             let panel = this.$refs.panel
-
             if (col.left + col.width - posi < 5) {
                 panel.style.cursor = 'col-resize'
                 this.currentMouseDownState = this.startAdjustHandleState
             } else {
                 panel.style.cursor = 'pointer'
-                this.currentMouseDownState = this.locateState
+                // this.currentMouseDownState = this.locateState
+                this.currentMouseDownState = function () {
+                    console.log()
+                }
             }
         },
         dragState(e) {

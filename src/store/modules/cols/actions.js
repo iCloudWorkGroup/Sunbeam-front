@@ -76,16 +76,16 @@ export default {
     }) {
         let cols = getters.allCols
         let col = cols[index]
+        dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
+            sort: col.sort,
+            value: width
+        })
         await send({
             url: config.url['adjustcol'],
             body: JSON.stringify({
                 col: col.sort,
                 offset: width
             }),
-        })
-        dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
-            sort: col.sort,
-            value: width
         })
     },
     [actionTypes.COLS_EXECADJUSTWIDTH]({

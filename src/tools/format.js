@@ -134,7 +134,8 @@ export function formatText(rules, text) {
             return parseInt(this.origin, 10)
         },
         percent: function(rule) {
-            return this.origin * 100
+            this.origin = this.origin * 100
+            return this.origin
         },
         article: function() {
             return this.origin.toString()
@@ -173,8 +174,10 @@ export function formatText(rules, text) {
             let localDate = new Date(this.origin)
             let dateMap = {
                 y: localDate.getFullYear(),
-                m: localDate.getMonth() + 1,
-                d: localDate.getDate()
+                m: (localDate.getMonth() + 1) < 10 ? '0' + (localDate.getMonth() + 1) : (localDate.getMonth() + 1),
+                d: localDate.getDate() < 10 ? '0' + localDate.getDate() : localDate.getDate()
+                // m: localDate.getMonth() + 1,
+                // d: localDate.getDate()
             }
             let ret = rule.match.replace(/([ymd]+)/g, function(
                 match, name) {

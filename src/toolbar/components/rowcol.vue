@@ -5,7 +5,7 @@
                 <span class="fui-layout" >
                      <div class="fui-section fui-alone" data-initiator="insdel" data-opr="insert" @click="ejectMenu($event, 'insdel')" >
                         <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
-                        <div class="fui-cf-desc">
+                        <div class="fui-cf-desc" data-initiator="insdel">
                             <div class="fui-cf-text">&nbsp;&nbsp;插入&nbsp;&nbsp;</div>
                             <div class="fui-cf-extend spreadSheetCaret"></div>
                         </div>
@@ -14,7 +14,7 @@
                 <span class="fui-layout">
                     <div class="fui-section fui-alone" data-initiator="insdel" data-opr="delete" @click="ejectMenu($event, 'insdel')">
                         <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
-                        <div class="fui-cf-desc">
+                        <div class="fui-cf-desc" data-initiator="insdel">
                             <div class="fui-cf-text">&nbsp;&nbsp;删除&nbsp;</div>
                             <div class="fui-cf-extend spreadSheetCaret"></div>
                         </div>

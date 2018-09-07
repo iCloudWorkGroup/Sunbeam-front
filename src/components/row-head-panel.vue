@@ -45,7 +45,8 @@ export default {
     data() {
         return {
             adjustState: false,
-            adjustRow: ''
+            adjustRow: '',
+            adjustRowIndex: ''
         }
     },
     components: {
@@ -95,14 +96,9 @@ export default {
             })
         },
         startAdjustHandleState(e) {
-            let posi = this.getRelativePosi(e.clientY)
-            let rowIndex = this.$store.getters.getRowIndexByPosi(posi)
-            let rows = this.$store.getters.allRows
             let adjustHandle
             let self = this
 
-            this.adjustRowIndex = rowIndex
-            this.adjustRow = rows[rowIndex]
             this.adjustState = true
 
             if (!(adjustHandle = this.adjustHandle)) {
@@ -129,16 +125,27 @@ export default {
             let posi = this.getRelativePosi(e.clientY)
             let row = this.$store.getters.getRowByPosi(posi)
             let panel = this.$refs.panel
+            let rows = this.$store.getters.allRows
+            let rowIndex = this.$store.getters.getRowIndexByPosi(posi)
 
             if (row.height + row.top - posi < 5) {
                 panel.style.cursor = 'row-resize'
+                this.adjustRowIndex = rowIndex
+                this.adjustRow = rows[rowIndex]
+                this.currentMouseDownState = this.startAdjustHandleState
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else if (posi - row.top < 5 && rowIndex !== 0) {
+                if (rows[rowIndex - 1].hidden) {
+                    return
+                }
+                panel.style.cursor = 'row-resize'
+                this.adjustRowIndex = rowIndex - 1
+                this.adjustRow = rows[rowIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
             } else {
                 panel.style.cursor = 'pointer'
                 // this.currentMouseDownState = this.locateState
-                this.currentMouseDownState = function () {
-                    console.log()
-                }
+                this.currentMouseDownState = function () {}
             }
         },
         dragState(e) {

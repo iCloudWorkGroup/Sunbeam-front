@@ -6,7 +6,7 @@ import mutations from './mutations'
  * 选中区域状态值
  */
 const state = {
-    box: null
+    box: null,
 }
 
 export default {

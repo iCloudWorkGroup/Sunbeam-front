@@ -7,8 +7,8 @@
                     data-initiator="format"  @click="ejectMenu($event, 'format')">
                     <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
                     <div class="fui-cf-desc">
-                        <div class="fui-cf-text">文本格式</div>
-                        <div class="fui-cf-extend spreadSheetCaret"></div>
+                        <div class="fui-cf-text" data-initiator="format">文本格式</div>
+                        <div class="fui-cf-extend spreadSheetCaret" data-initiator="format"></div>
                     </div>
                 </div>
             </div>

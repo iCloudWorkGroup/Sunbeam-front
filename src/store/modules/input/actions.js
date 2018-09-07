@@ -1,11 +1,10 @@
 import * as actionTypes from '../../action-types'
-// import {
-//     parseExpress,
-//     formatText,
-//     isNum,
-//     isDate
-// } from '../../../tools/format'
-
+import {
+    isDate, formatText,
+    isNum, parseExpress,
+} from '../../../tools/format'
+import send from '../../../util/send'
+import config from '../../../config'
 export default {
     [actionTypes.EDIT_SHOW]({
         state,
@@ -76,14 +75,54 @@ export default {
         if (colAlias == null || rowAlias == null) {
             return
         }
-        await dispatch('A_CELLS_UPDATE', {
-            propName: 'texts',
-            propStruct: {
+        let colIndex = getters.colIndexByAlias(colAlias)
+        let rowIndex = getters.rowIndexByAlias(rowAlias)
+        let cell = getters.cellsByVertical({
+            startColIndex: colIndex,
+            startRowIndex: rowIndex,
+            endColIndex: colIndex,
+            endRowIndex: rowIndex
+        })[0]
+        let rules
+        let date
+        let propStruct
+        if (cell) {
+            rules = parseExpress(cell.content.express)
+            date = cell.content.express === 'yyyy/mm/dd' || cell.content.express === 'yyyy年m月d日' ? true : false
+            propStruct = {
+                content: {
+                    texts,
+                    displayTexts: parseText(texts)
+                }
+            }
+        } else {
+            propStruct = {
                 content: {
                     texts,
                     displayTexts: texts
                 }
-            },
+            }
+        }
+        if (isNum(texts)) {
+            propStruct.content.alignRow = 'right'
+            let sendArgs = {
+                coordinate: [
+                    {
+                        startCol: colIndex,
+                        startRow: rowIndex,
+                        endCol: colIndex,
+                        endRow: rowIndex
+                    }],
+                align: 'right'
+            }
+            send({
+                url: config.url.alignRow,
+                body: JSON.stringify(sendArgs)
+            })
+        }
+        await dispatch('A_CELLS_UPDATE', {
+            propName: 'texts',
+            propStruct,
             coordinate: {
                 startColAlias: colAlias,
                 endColAlias: colAlias,
@@ -94,5 +133,15 @@ export default {
 
         // 恢复到初始状态
         commit('M_INPUT_RESET')
+        // 将单元格显示内容格式化
+        function parseText(texts) {
+            let text = texts
+            if (date && isDate(text)) {
+                text = formatText(rules, text)
+            } else if (!date && isNum(text)) {
+                text = formatText(rules, parseFloat(text, 10))
+            }
+            return text
+        }
     }
 }

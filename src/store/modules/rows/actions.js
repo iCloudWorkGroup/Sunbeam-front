@@ -510,21 +510,13 @@ export default {
         dispatch
     }, payload) {
         let index = payload
-        let selects = getters.allSelects
         if (typeof index === 'undefined') {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(getters.activeType)
             if (select.wholePosi.endRowAlias === 'MAX') {
                 return
             }
             index = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
         }
-        let rowModel = getters.allRows[index - 1]
         let row = getters.allRows[index]
         let sort = row.sort
         send({
@@ -533,6 +525,8 @@ export default {
                 row: sort,
             }),
         })
+        let rowModel
+        rowModel = index === 0 ? rowModel : getters.allRows[index - 1]
         dispatch(actionTypes.ROWS_EXECINSERTROW, {
             sort,
             rowModel
@@ -623,7 +617,6 @@ export default {
                 prop: item.props
             })
         })
-
         let updateSelectInfo = []
         let selects = getters.allSelects
         selects.forEach(function(select) {
@@ -678,6 +671,30 @@ export default {
         commit(mutationTypes.INSERT_ROW, {
             rows: [insertRow]
         })
+        // 当前行不为第一行时, 以前一行单元格模板插入/修改单元格occupy、alias、texts、displayTexts
+        if (index !== 0) {
+            cells = getters.cellsByVertical({
+                startColIndex: 0,
+                startRowIndex: index - 1,
+                endColIndex: -1,
+                endRowIndex: index - 1,
+            })
+            cells.forEach((item, index) => {
+                if (item.occupy.row.length === 1) {
+                    dispatch('A_CELLS_ADD', extend(item, {
+                        alias: null,
+                        content: {
+                            texts: null,
+                            displayTexts: null
+                        },
+                        occupy: {
+                            col: item.occupy.col,
+                            row: [insertRow.alias]
+                        }
+                    }))
+                }
+            })
+        }
         if (cache.localRowPosi > 0) {
             cache.localRowPosi += rowHeight + 1
         }

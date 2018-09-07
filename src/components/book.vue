@@ -6,7 +6,7 @@
             <sheet></sheet>
             <sheet-sider/>
         </div>
-        <div class="loadmark" v-show="show"></div>
+        <!--<div class="loadmark" v-show="show"></div>-->
     </div>
 </template>
 <script type="text/javascript">

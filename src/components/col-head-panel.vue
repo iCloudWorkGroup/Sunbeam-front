@@ -8,11 +8,11 @@
                 :key="col.alias"
                 :col="col"
                 :offsetLeft="offsetLeft"/>
-        <col-head-item v-if="adjustState"
-                       ref="adjustColView"
-                       class="adjust-col-head-item"
-                       :offsetLeft="offsetLeft"
-                       :col="adjustCol">
+        <col-head-item  v-if="adjustState"
+                        ref="adjustColView"
+                        class="adjust-col-head-item"
+                        :offsetLeft="offsetLeft"
+                        :col="adjustCol">
         </col-head-item>
         <div v-if="adjustState"
              ref="adjustPanelView"
@@ -47,6 +47,8 @@ export default {
     data() {
         return {
             adjustState: false,
+            adjustCol: '',
+            adjustColIndex: ''
         }
     },
     computed: {
@@ -58,7 +60,6 @@ export default {
             return cols.slice(this.adjustColIndex + 1)
         },
         mouseState() {
-            console.log(this.$store.state.mouseState)
             return this.$store.state.mouseState
         }
     },
@@ -94,14 +95,9 @@ export default {
             })
         },
         startAdjustHandleState(e) {
-            let posi = this.getRelativePosi(e.clientX)
-            let colIndex = this.$store.getters.getColIndexByPosi(posi)
-            let cols = this.$store.getters.allCols
             let adjustHandle
             let self = this
 
-            this.adjustColIndex = colIndex
-            this.adjustCol = cols[colIndex]
             this.adjustState = true
 
             if (!(adjustHandle = this.adjustHandle)) {
@@ -127,16 +123,26 @@ export default {
             }
             let posi = this.getRelativePosi(e.clientX)
             let col = this.$store.getters.getColByPosi(posi)
+            let cols = this.$store.getters.allCols
+            let colIndex = this.$store.getters.getColIndexByPosi(posi)
             let panel = this.$refs.panel
             if (col.left + col.width - posi < 5) {
                 panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex
+                this.adjustCol = cols[colIndex]
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else if (posi - col.left < 5 && colIndex !== 0) {
+                if (cols[colIndex - 1].hidden) {
+                    return
+                }
+                panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex - 1
+                this.adjustCol = cols[colIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
             } else {
                 panel.style.cursor = 'pointer'
                 // this.currentMouseDownState = this.locateState
-                this.currentMouseDownState = function () {
-                    console.log()
-                }
+                this.currentMouseDownState = function () {}
             }
         },
         dragState(e) {

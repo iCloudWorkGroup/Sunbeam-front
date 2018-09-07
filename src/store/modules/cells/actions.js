@@ -125,7 +125,7 @@ export default {
      * 如果是boolean值，根据视图的选中区域执行操作]
      * coordinate 内部存储的是alias
      */
-    async A_CELLS_UPDATE({
+    A_CELLS_UPDATE({
         state,
         commit,
         dispatch,
@@ -207,7 +207,7 @@ export default {
                 line
             })
         }
-        await send({
+        send({
             url: config.url[fixPropName],
             body: JSON.stringify(sendArgs)
         })
@@ -436,8 +436,8 @@ export default {
                     for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
                         let insertCell = extend(cell)
                         if (i !== 0 || j !== 0) {
-                            insertCell.content.texts = ''
-                            insertCell.content.displayTexts = ''
+                            insertCell.content.texts = null
+                            insertCell.content.displayTexts = null
                             insertCell.alias = generator.cellAliasGenerator()
                         }
                         insertCell.occupy = {
@@ -551,7 +551,7 @@ export default {
             }
             return {
                 content: {
-                    displayTexts: text
+                    displayTexts: text,
                 }
             }
         }

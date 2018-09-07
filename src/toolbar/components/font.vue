@@ -10,7 +10,8 @@
                 {{ activeProps.family }}
                     </span>
                 <span
-                class="fui-transverse-model fui-cf-fontfamily-extend active">
+                class="fui-transverse-model fui-cf-fontfamily-extend active"
+                data-initiator="familys">
                     <span class="spreadSheetCaret"></span>
                 </span>
             </span>
@@ -22,7 +23,8 @@
                         {{ activeProps.size }}
                     </span>
             <span
-                class="fui-transverse-model fui-cf-fontsize-extend active">
+                class="fui-transverse-model fui-cf-fontsize-extend active"
+                data-initiator="sizes">
                 <span class="spreadSheetCaret"></span>
             </span>
             </span>
@@ -51,7 +53,8 @@
                   data-initiator="borders"
                   @click="ejectMenu($event, 'borders')">
                 <span class="fui-cf-ico ico-borderbottom ico-section-ico"></span>
-                <span class="ico-section-rightarrow">
+                <span class="ico-section-rightarrow"
+                      data-initiator="borders">
                     <span class="spreadSheetCaret"></span>
                 </span>
             </span>
@@ -60,7 +63,8 @@
                   data-initiator="backgrounds"
                   @click="ejectMenu($event, 'backgrounds')">
                 <span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
-                <span class="ico-section-rightarrow">
+                <span class="ico-section-rightarrow"
+                      data-initiator="backgrounds">
                     <span class="spreadSheetCaret"></span>
                 </span>
             </span>
@@ -69,7 +73,8 @@
                   title="字体颜色"
                   @click="ejectMenu($event, 'colors')">
                 <span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
-                <span class="ico-section-rightarrow">
+                <span class="ico-section-rightarrow"
+                      data-initiator="colors">
                     <span class="spreadSheetCaret"></span>
                 </span>
             </span>

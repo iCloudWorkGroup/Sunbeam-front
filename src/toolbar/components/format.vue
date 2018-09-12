@@ -1,20 +1,20 @@
 <template>
-    <div class="fui-body">
-       <div class="fui-body" id="textFormatContainer">
-            <div class="fui-layout">
-                <div class="fui-section fui-alone"
-                    data-widget="format"
-                    data-initiator="format"  @click="ejectMenu($event, 'format')">
-                    <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
-                    <div class="fui-cf-desc">
-                        <div class="fui-cf-text">文本格式</div>
-                        <div class="fui-cf-extend caret"></div>
-                    </div>
+<div class="fui-body">
+   <div class="fui-body">
+        <div class="fui-layout">
+            <div class="fui-section fui-alone"
+                data-initiator="format"
+                @click="ejectMenu($event, 'format')">
+                <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
+                <div class="fui-cf-desc">
+                    <div class="fui-cf-text">文本格式</div>
+                    <div class="fui-cf-extend caret"></div>
                 </div>
             </div>
         </div>
-        <formats ref="format" v-show="tool == 'format'"></formats>
     </div>
+    <formats ref="format" v-show="tool == 'format'"></formats>
+</div>
 </template>
 <script type="text/javascript">
 import {

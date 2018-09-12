@@ -88,7 +88,7 @@ span { display: inline-block; }
 .ico-section:hover, .fui-section:hover { background: #d3f0e0; }
 .ico-section.active, .fui-section.active { background: #9fd5b7; }
 .ico-section a { display: inline-block; }
-.fui-body { height: 75px; }
+.fui-body { height: 75px; overflow: hidden;}
 .font-list { font-size: 12pt; }
 .font-list li:hover, .widget-menu li:hover { background: #9fd5b7; cursor: default; }
 .font-list li span { margin: 3px; padding: 3px; margin-right: 50px; }

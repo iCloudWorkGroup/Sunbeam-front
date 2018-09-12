@@ -59,14 +59,7 @@ export default {
         }
         let index = payload
         if (typeof index === 'undefined') {
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endRowAlias === 'MAX') {
                 return
             }
@@ -98,7 +91,12 @@ export default {
         let rowHeight = row.height
         let rowAlias = row.alias
 
-
+        /**
+         * 隐藏行
+         * 将需要隐藏的行hidden设为true
+         * 并修改前一行bottomAjacentHide属性为true
+         * 隐藏行后面所有行top上移
+         */
         let updateRowInfo = [{
             row: rows[index],
             props: {
@@ -128,7 +126,9 @@ export default {
         if (cache.localRowPosi > 0) {
             cache.localRowPosi -= rowHeight + 1
         }
-
+        /**
+         * 对隐藏行(包括隐藏行)之下所有单元格进行样式修改
+         */
         let cells = getters.cellsByOpr({
             startColIndex: 0,
             startRowIndex: index,
@@ -151,8 +151,7 @@ export default {
                         }
                     })
                 } else {
-                    cell.physicsBox.height -
-                    rowHeight - 1 > 0 ?
+                    cell.physicsBox.height - rowHeight - 1 > 0 ?
                         updateCellInfo.push({
                             cell,
                             props: {
@@ -305,22 +304,15 @@ export default {
         dispatch
     }, payload) {
         let index = payload
-        let selects = getters.allSelects
         let rows = getters.allRows
         let visibleRows = getters.visibleRowList()
 
         if (typeof index === 'undefined') {
-            let select
+            let select = getters.selectByType(SELECT)
             let startIndex
             let endIndex
             let visibleStartRow = visibleRows[0]
             let visibleEndRow = visibleRows[visibleRows.length - 1]
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
             let startRowAlias = select.wholePosi.startRowAlias
             let endRowAlias = select.wholePosi.endRowAlias
             if (endRowAlias === 'MAX') {
@@ -867,16 +859,9 @@ export default {
         getters,
         dispatch,
     }, payload) {
-        let selects = getters.allSelects
         let index = payload
         if (typeof index === 'undefined') {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endRowAlias === 'MAX') {
                 return
             }
@@ -1221,14 +1206,7 @@ export default {
             props
         } = payload
         if (typeof startIndex === 'undefined') {
-            let selects = getters.selectList
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             startIndex = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
             endIndex = getters.rowIndexByAlias(select.wholePosi.endRowAlias)
         }

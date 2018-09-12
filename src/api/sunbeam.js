@@ -606,7 +606,7 @@ SpreadSheet.prototype = {
 
     // 自适应容器大小，使用js调整spreadsheet容器大小时，调用该方法，触发自适应大小
     adaptScreen() {
-        let name = this.vm.$store.state.name
+        let name = this.vm.$store.state.rootSelector
         let offsetWidth = document.querySelector(name).offsetWidth
         let offsetHeight = document.querySelector(name).offsetHeight
         this.vm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
@@ -624,9 +624,12 @@ SpreadSheet.prototype = {
         }
         let select = this.getPoint(p)
         let cellIdx = this.vm.$store.getters.IdxByRow(select.startColAlias, select.startRowAlias)
+        if (cellIdx === -1) {
+            return ''
+        }
         let cells = this.vm.$store.getters.cells
         let cell = cells[cellIdx]
-        return cell.content.texts
+        return cell.content.texts === null ? '' : cell.content.texts
     },
 
     // 鼠标选择操作状态切换为数据源操作状态
@@ -665,14 +668,20 @@ SpreadSheet.prototype = {
             x = clientX
             y = clientY
         }
-        let colIndex = String.fromCharCode(this.vm.$store.getters.getColIndexByPosi(
-            x) + 65)
-        let rowIndex = this.vm.$store.getters.getRowIndexByPosi(y) +
+        let colHead = config.cornerHeight
+        let rowHead = config.cornerWidth
+        let el = this.vm.$el.getBoundingClientRect()
+        let scroll = this.vm.$store.state.sheets.scroll
+        let posiX = x - el.left - rowHead + scroll.left
+        let posiY = y - el.top - colHead + scroll.top
+        let colAlias = String.fromCharCode(this.vm.$store.getters.getColIndexByPosi(
+            posiX) + 65)
+        let rowAlias = this.vm.$store.getters.getRowIndexByPosi(posiY) +
             1
         return {
             point: {
-                col: colIndex,
-                row: rowIndex
+                col: colAlias,
+                row: rowAlias
             }
         }
     },

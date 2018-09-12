@@ -53,6 +53,12 @@ export default {
      * @type {Number}
      */
     toolbarHeight: 130,
+    /**
+     * 批注栏宽/高
+     * @type {Number}
+     */
+    commentWidth: 100,
+    commentHeigth: 100,
     url: {
         family: 'cell/font-family',
         size: 'cell/font-size',
@@ -90,7 +96,9 @@ export default {
         copy: 'sheet/copy',
         area: 'sheet/area',
         clearqueue: 'sheet/clear_queue',
-        wordWrap: 'cell/wordwrap'
+        wordWrap: 'cell/wordwrap',
+        comment: 'cell/comment-plus',
+        recomment: 'cell/comment-reduce'
     },
     operSendPropName: {
         'alignRow': 'align',

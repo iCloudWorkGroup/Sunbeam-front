@@ -18,7 +18,8 @@ import {
     DELETE_SELECT
 } from '../store/mutation-types'
 import {
-    CLIP
+    CLIP,
+    SELECT
 } from '../tools/constant'
 import cache from '../tools/cache'
 import config from '../config'
@@ -93,7 +94,12 @@ export default {
                 }
             }
             cache.clipState = 'copy'
-            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            this.$store.commit('M_SELECT_UPDATE_STATE', CLIP)
+            this.$store.dispatch(SELECTS_INSERT, {
+                colAlias: wholePosi.startColAlias,
+                rowAlias: wholePosi.startRowAlias
+            })
+            this.$store.commit('M_SELECT_UPDATE_STATE', SELECT)
             let getters = this.$store.getters
             let text = getters.getClipData()
             let clipboardData
@@ -116,9 +122,7 @@ export default {
             }
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === CLIP) {
-                    let currentSheet = this.$store.state.currentSheet
                     this.$store.commit(DELETE_SELECT, {
-                        currentSheet,
                         select: selects[i]
                     })
                 }

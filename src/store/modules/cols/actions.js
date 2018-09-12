@@ -224,15 +224,8 @@ export default {
         dispatch
     }, payload) {
         let index = payload
-        let selects = getters.allSelects
         if (typeof index === 'undefined') {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -514,14 +507,7 @@ export default {
         }
         let index = payload
         if (typeof index === 'undefined') {
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -764,19 +750,11 @@ export default {
         let cols = getters.allCols
         let index = payload
         if (typeof index === 'undefined') {
-            let selects = getters.allSelects
-            let select
+            let select = getters.selectByType(SELECT)
             let startIndex
             let endIndex
             let visibleStartCol = visibleCols[0]
             let visibleEndCol = visibleCols[visibleCols.length - 1]
-
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -1273,14 +1251,7 @@ export default {
             props
         } = payload
         if (typeof startIndex === 'undefined') {
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             startIndex = getters.colIndexByAlias(select.wholePosi.startColAlias)
             endIndex = getters.colIndexByAlias(select.wholePosi.endColAlias)
         }

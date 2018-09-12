@@ -8,13 +8,9 @@ let ss = new Sunbeam({
 
 
 ss.load().then(() => {
-    // ss.setRowHeight('1', 0).then(() => {
-    //     return ss.setColWidth('A', 0)
-    // }).then(() => {
-    //     return ss.setRowHeight('2', 0)
-    // }).then(() => {
-    //     ss.setColWidth('B', 0)
-    // })
+    document.addEventListener('mousemove', function (e) {
+        ss.getPointByPosi('1', e.clientX, e.clientY)
+    })
 })
 
 ss.addEventListener('regionChange', function (e) {
@@ -24,23 +20,23 @@ ss.addEventListener('regionChange', function (e) {
     // console.log(e.point.col[0])
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.setRowHeight('1', 0)
-    ss.setColWidth('A', 0)
-    ss.setRowHeight('2', 0)
-    ss.setColWidth('B', 0)
-})
-document.getElementById('aa').addEventListener('click', function () {
-    ss.setRowHeight('1', 20)
-    ss.setColWidth('A', 70)
-    ss.setRowHeight('2', 20)
-    ss.setColWidth('B', 70)
+    send({
+        url: config.url.comment,
+        body: JSON.stringify({
+            coordinate: [
+                {
+                    startCol: 2,
+                    startRow: 3,
+                    endCol: 2,
+                    endRow: 3
+                }
+            ],
+            comment: '123'
+        })
+    })
 })
 document.getElementById('clear').addEventListener('click', function () {
     send({
         url: config.url.clearqueue
     }, false)
-})
-
-document.getElementById('text').addEventListener('blur', function () {
-    console.log(1)
 })

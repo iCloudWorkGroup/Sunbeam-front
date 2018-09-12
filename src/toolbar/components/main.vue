@@ -30,8 +30,11 @@
                 <panel title="隐藏">
                     <hide/>
                 </panel>
-                 <panel  title="行列">
+                <panel  title="行列">
                     <rowcol/>
+                </panel>
+                <panel  title="批注">
+                    <comment/>
                 </panel>
             </ul>
         </div>
@@ -49,6 +52,7 @@ import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
+import Comment from './comment.vue'
 import WordWrap from './wordwrap.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
@@ -67,7 +71,8 @@ export default {
         // Undo,
         // Clip,
         Format,
-        WordWrap
+        WordWrap,
+        Comment
     },
     mounted() {
         document.getElementsByTagName('body')[0]

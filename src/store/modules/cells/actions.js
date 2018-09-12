@@ -140,7 +140,6 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
-
         let rows = getters.allRows
         let cols = getters.allCols
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
@@ -151,7 +150,7 @@ export default {
         let signalSort = coordinate === false ? select.signalSort : {
             startCol: cols[startColIndex].sort,
             startRow: rows[startRowIndex].sort,
-            endCol: cols[startColIndex].sort,
+            endCol: cols[endColIndex].sort,
             endRow: rows[endRowIndex].sort
         }
         let sendArgs = {
@@ -190,6 +189,14 @@ export default {
                     color: propStruct.content[propName]
                 })
                 break
+            case 'comment':
+                sendArgs = extend(sendArgs, {
+                    [propName]: propStruct.customProp[propName]
+                })
+                break
+            case 'recomment':
+                sendArgs = extend(sendArgs)
+                break
             default:
                 sendArgs = extend(sendArgs, {
                     [propName]: propStruct.content[propName]
@@ -211,7 +218,6 @@ export default {
             url: config.url[fixPropName],
             body: JSON.stringify(sendArgs)
         })
-
         // 修正参数
         endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
@@ -719,9 +725,12 @@ export default {
         commit,
         rootState
     }, texts) {
-        let activeCell = getters.activeCell()
-        let colAlias = activeCell.occupy.col[0]
-        let rowAlias = activeCell.occupy.row[0]
+        // let activeCell = getters.activeCell()
+        // let colAlias = activeCell.occupy.col[0]
+        // let rowAlias = activeCell.occupy.row[0]
+        let select = getters.selectByType('SELECT')
+        let colAlias = select.activePosi.colAlias
+        let rowAlias = select.activePosi.rowAlias
         let oprCol = getters.getColByAlias(colAlias)
         let oprRow = getters.getRowByAlias(rowAlias)
         await send({

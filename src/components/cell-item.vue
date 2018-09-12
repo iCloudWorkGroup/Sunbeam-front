@@ -5,6 +5,12 @@
              :style="viewProps">
             {{cell.content.displayTexts}}
         </div>
+        <!--<div class="comment-ico" v-if="comment">-->
+            <!--<div-->
+                <!--class="triangle"-->
+                <!--@mouseleave="commentHide"-->
+                <!--@mouseenter="commentShow"></div>-->
+        <!--</div>-->
     </div>
 </template>
 <script>
@@ -42,7 +48,7 @@ function caclBorder({
             padding = 1
             break
         case 2:
-            width = 3
+            width = 2
             color = '#000'
             margin = 0
             padding = 0
@@ -58,6 +64,9 @@ function caclBorder({
 export default {
     props: ['cell', 'offsetTop', 'offsetLeft'],
     computed: {
+        comment() {
+            return this.cell.customProp.comment != null && this.cell.customProp.comment !== ''
+        },
         viewPosi() {
             const physicsBox = this.cell.physicsBox
             const borderProp = this.cell.border
@@ -210,6 +219,15 @@ export default {
                 }
             }
             return result
+        }
+    },
+    methods: {
+        commentShow(e) {
+            this.$emit('moveon', this.cell)
+        },
+        commentHide() {
+            this.$emit('moveout', { right: 20 })
+            console.log()
         }
     }
 }

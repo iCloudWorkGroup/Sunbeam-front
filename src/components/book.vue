@@ -1,12 +1,12 @@
 <template>
-    <div :class="name" :id="name">
+    <div :class="rootSelector" :id="rootSelector">
         <div class="book"
              @mouseup="offStatus"
              :style="{ width, height}">
             <sheet></sheet>
             <sheet-sider/>
         </div>
-        <div class="loadmark" v-show="show"></div>
+        <!--<div class="loadmark" v-show="show"></div>-->
     </div>
 </template>
 <script type="text/javascript">
@@ -34,8 +34,8 @@ export default {
         SheetSider
     },
     computed: {
-        name() {
-            return this.$store.state.name.replace(/\.|\#/, '')
+        rootSelector() {
+            return this.$store.state.rootSelector.replace(/\.|\#/, '')
         },
         show() {
             return this.$store.state.loading
@@ -58,9 +58,9 @@ export default {
                 clearTimeout(timeOutId)
             }
             timeOutId = setTimeout(function () {
-                let name = _this.$store.state.name
-                let offsetWidth = document.querySelector(name).offsetWidth
-                let offsetHeight = document.querySelector(name).offsetHeight
+                let rootSelector = _this.$store.state.rootSelector
+                let offsetWidth = document.querySelector(rootSelector).offsetWidth
+                let offsetHeight = document.querySelector(rootSelector).offsetHeight
                 _this.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
                 _this.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
             }, 100)
@@ -82,7 +82,7 @@ export default {
 </script>
 <style type="text/css">
 .app {
-    position:absolute;
+    /*position:absolute;*/
     left:0;
     right:0;
     top:0;

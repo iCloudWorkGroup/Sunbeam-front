@@ -12,7 +12,7 @@ export default {
     },
     selectByType(state) {
         return function(type) {
-            if (type === 'SELECT' || type === 'DATASOURCE') {
+            if (type === 'SELECT' || type === 'DATASOURCE' || type === 'CLIP') {
                 let selects = state.list
                 let len = selects.length
                 for (let i = 0; i < len; i++) {

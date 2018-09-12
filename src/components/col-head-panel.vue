@@ -1,33 +1,34 @@
 <template>
-<div class="col-head-panel">
-    <!-- @mousedown="mouseDownHandle"
-     @mousemove="mouseMoveHandle" -->
-    <col-head-item
-        v-for="col in viewCols"
-        :key="col.alias"
-        :col="col"
-        :offsetLeft="offsetLeft"/>
-    <!-- <col-head-item v-if="adjustState"
-                   ref="adjustColView"
-                   class="adjust-col-head-item"
-                   :offsetLeft="offsetLeft"
-                   :col="adjustCol">
-    </col-head-item>
-    <div v-if="adjustState"
-         ref="adjustPanelView"
-         class="temp-space-container">
-        <col-head-item v-for="col in adjustColList"
-                       :key="col.alias"
-                       :col="col"
-                       :offsetLeft="offsetLeft">
+    <div class="col-head-panel"
+         ref="panel"
+         @mousedown="mouseDownHandle"
+         @mousemove="mouseMoveHandle">
+        <col-head-item
+                v-for="col in viewCols"
+                :key="col.alias"
+                :col="col"
+                :offsetLeft="offsetLeft"/>
+        <col-head-item  v-if="adjustState"
+                        ref="adjustColView"
+                        class="adjust-col-head-item"
+                        :offsetLeft="offsetLeft"
+                        :col="adjustCol">
         </col-head-item>
-    </div> -->
-</div>
+        <div v-if="adjustState"
+             ref="adjustPanelView"
+             class="temp-space-container">
+            <col-head-item v-for="col in adjustColList"
+                           :key="col.alias"
+                           :col="col"
+                           :offsetLeft="offsetLeft">
+            </col-head-item>
+        </div>
+    </div>
 </template>
 <script>
 import ColHeadItem from './col-head-item.vue'
 import {
-    SELECTS_UPDATESELECT,
+    SELECTS_CHANGE,
     COLS_ADJUSTWIDTH
 } from '../store/action-types'
 import {
@@ -42,6 +43,13 @@ export default {
     props: ['start', 'over', 'offsetLeft'],
     components: {
         ColHeadItem
+    },
+    data() {
+        return {
+            adjustState: false,
+            adjustCol: '',
+            adjustColIndex: ''
+        }
     },
     computed: {
         viewCols() {
@@ -78,7 +86,7 @@ export default {
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: colIndex,
                 startRowIndex: 'MAX'
             })
@@ -87,14 +95,9 @@ export default {
             })
         },
         startAdjustHandleState(e) {
-            let posi = this.getRelativePosi(e.clientX)
-            let colIndex = this.$store.getters.getColIndexByPosi(posi)
-            let cols = this.$store.getters.colList
             let adjustHandle
             let self = this
 
-            this.adjustColIndex = colIndex
-            this.adjustCol = cols[colIndex]
             this.adjustState = true
 
             if (!(adjustHandle = this.adjustHandle)) {
@@ -120,21 +123,33 @@ export default {
             }
             let posi = this.getRelativePosi(e.clientX)
             let col = this.$store.getters.getColByPosi(posi)
+            let cols = this.$store.getters.allCols
+            let colIndex = this.$store.getters.getColIndexByPosi(posi)
             let panel = this.$refs.panel
-
             if (col.left + col.width - posi < 5) {
                 panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex
+                this.adjustCol = cols[colIndex]
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else if (posi - col.left < 5 && colIndex !== 0) {
+                if (cols[colIndex - 1].hidden) {
+                    return
+                }
+                panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex - 1
+                this.adjustCol = cols[colIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
             } else {
                 panel.style.cursor = 'pointer'
-                this.currentMouseDownState = this.locateState
+                // this.currentMouseDownState = this.locateState
+                this.currentMouseDownState = function () {}
             }
         },
         dragState(e) {
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: colIndex,
                 startRowIndex: 'MAX'
             })

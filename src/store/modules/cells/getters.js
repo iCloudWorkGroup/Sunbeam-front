@@ -65,7 +65,7 @@ export default {
     },
     getClipData(state, getters) {
         return function() {
-            let select = getters.activeSelect()
+            let select = getters.selectByType('CLIP')
             let wholePosi = select.wholePosi
             let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
@@ -74,14 +74,13 @@ export default {
             let temp = {}
             let result = ''
             let cells = getters.cells
-            let cols = getters.colList
-            let rows = getters.rowList
+            let cols = getters.allCols
+            let rows = getters.allRows
             for (let i = startRowIndex; i < endRowIndex + 1; i++) {
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let aliasCol = cols[j].alias
                     let aliasRow = rows[i].alias
-                    let cellIndex = getters.getPointInfo(aliasCol, aliasRow,
-                        'cellIndex')
+                    let cellIndex = getters.IdxByCol(aliasCol, aliasRow)
                     if (cellIndex != null && !temp[cellIndex]) {
                         let cell = cells[cellIndex]
                         result += cell.content.texts
@@ -281,6 +280,8 @@ export default {
             endRowIndex = startRowIndex,
 
         }) {
+            // 监听单元格长度，
+            let cells = state.list
             let rows = getters.visibleRowList()
             let cols = getters.visibleColList()
             let allRows = getters.allRows
@@ -293,7 +294,6 @@ export default {
                 endRowIndex
             let result = []
             let avoidRepeat = {}
-
             let startCol = Math.max(startColIndex, cols[0].sort)
             let startRow = Math.max(startRowIndex, rows[0].sort)
             let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
@@ -303,9 +303,53 @@ export default {
                     let colAlias = allCols[i].alias
                     let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
-                    if (idx !== -1 && !avoidRepeat[idx] && !state.list[idx].status.hidden && !state.list[idx].status.destroy) {
+                    if (idx !== -1 && !avoidRepeat[idx] && !cells[idx].status.hidden && !cells[idx].status.destroy) {
                         avoidRepeat[idx] = true
-                        result.push(state.list[idx])
+                        result.push(cells[idx])
+                    }
+                }
+            }
+            return result
+        }
+    },
+    /**
+     * 查选区域内所有可视且有批注的单元格(垂直方向)
+     */
+    cellsByVerticalHasComment(state, getters) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex = startColIndex,
+            endRowIndex = startRowIndex,
+        }) {
+            // 监听单元格长度，
+            let cells = state.list
+            let rows = getters.visibleRowList()
+            let cols = getters.visibleColList()
+            let allRows = getters.allRows
+            let allCols = getters.allCols
+            let endCol = endColIndex === -1 ?
+                cols.length - 1 :
+                endColIndex
+            let endRow = endRowIndex === -1 ?
+                rows.length - 1 :
+                endRowIndex
+            let result = []
+            let avoidRepeat = {}
+            let startCol = Math.max(startColIndex, cols[0].sort)
+            let startRow = Math.max(startRowIndex, rows[0].sort)
+            let endColLen = Math.min(endCol, cols[cols.length - 1].sort)
+            let endRowLen = Math.min(endRow, rows[rows.length - 1].sort)
+            for (let i = startCol; i <= endColLen; i++) {
+                for (let j = startRow; j <= endRowLen; j++) {
+                    let colAlias = allCols[i].alias
+                    let rowAlias = allRows[j].alias
+                    let idx = getters.IdxByRow(colAlias, rowAlias)
+                    if (idx !== -1 && !avoidRepeat[idx]) {
+                        if (!cells[idx].status.hidden && !cells[idx].status.destroy && cells[idx].customProp.comment != null && cells[idx].customProp.comment !== '') {
+                            avoidRepeat[idx] = true
+                            result.push(cells[idx])
+                        }
                     }
                 }
             }
@@ -538,5 +582,11 @@ export default {
                 map.get(colAlias).get(rowAlias) :
                 -1
         }
+    },
+    /**
+     * 获取批注编辑状态
+     */
+    activeComment: function (state) {
+        return state.activeComment
     }
 }

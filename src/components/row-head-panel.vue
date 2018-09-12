@@ -1,33 +1,35 @@
 <template>
-<div class="row-head-panel">
-     <!-- @mousedown="mouseDownHandle"
-     @mousemove="mouseMoveHandle" -->
+<div class="row-head-panel"
+     ref="panel"
+     @mousedown="mouseDownHandle"
+     @mousemove="mouseMoveHandle" >
     <row-head-item
         v-for="row in viewRows"
         :key="row.alias"
         :row="row"
         :offsetTop="offsetTop"/>
-<!--     <row-head-item class="adjust-row-head-item"
-                   v-if="adjustState"
+
+    <row-head-item class="adjust-row-head-item"
                    ref="adjustRowView"
+                   v-if="adjustState"
                    :offsetTop="offsetTop"
                    :row="adjustRow">
     </row-head-item>
     <div class="temp-space-container"
-         v-if="adjustState"
          ref="adjustPanelView">
         <row-head-item v-for="row in adjustRowList"
+                       v-if="adjustState"
                        :key="row.alias"
                        :row="row"
                        :offsetTop="offsetTop">
         </row-head-item>
-    </div> -->
+    </div>
 </div>
 </template>
 <script type="text/javascript">
 import RowHeadItem from './row-head-item.vue'
 import {
-    SELECTS_UPDATESELECT,
+    SELECTS_CHANGE,
     ROWS_ADJUSTHEIGHT
 } from '../store/action-types'
 import {
@@ -40,6 +42,13 @@ import {
 
 export default {
     props: ['start', 'over', 'offsetTop'],
+    data() {
+        return {
+            adjustState: false,
+            adjustRow: '',
+            adjustRowIndex: ''
+        }
+    },
     components: {
         RowHeadItem
     },
@@ -48,7 +57,7 @@ export default {
             return this.$store.getters.rowsByRange(this.start, this.over)
         },
         adjustRowList() {
-            let rowList = this.$store.getters.rowList
+            let rowList = this.$store.getters.allRows
             return rowList.slice(this.adjustRowIndex + 1)
         },
         mouseState() {
@@ -78,7 +87,7 @@ export default {
             let rowPosi = this.getRelativePosi(e.clientY)
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: 'MAX',
                 startRowIndex: rowIndex
             })
@@ -87,14 +96,9 @@ export default {
             })
         },
         startAdjustHandleState(e) {
-            let posi = this.getRelativePosi(e.clientY)
-            let rowIndex = this.$store.getters.getRowIndexByPosi(posi)
-            let rows = this.$store.getters.rowList
             let adjustHandle
             let self = this
 
-            this.adjustRowIndex = rowIndex
-            this.adjustRow = rows[rowIndex]
             this.adjustState = true
 
             if (!(adjustHandle = this.adjustHandle)) {
@@ -118,24 +122,37 @@ export default {
             if (this.adjustState) {
                 return
             }
-
             let posi = this.getRelativePosi(e.clientY)
             let row = this.$store.getters.getRowByPosi(posi)
             let panel = this.$refs.panel
+            let rows = this.$store.getters.allRows
+            let rowIndex = this.$store.getters.getRowIndexByPosi(posi)
 
             if (row.height + row.top - posi < 5) {
                 panel.style.cursor = 'row-resize'
+                this.adjustRowIndex = rowIndex
+                this.adjustRow = rows[rowIndex]
+                this.currentMouseDownState = this.startAdjustHandleState
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else if (posi - row.top < 5 && rowIndex !== 0) {
+                if (rows[rowIndex - 1].hidden) {
+                    return
+                }
+                panel.style.cursor = 'row-resize'
+                this.adjustRowIndex = rowIndex - 1
+                this.adjustRow = rows[rowIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
             } else {
                 panel.style.cursor = 'pointer'
-                this.currentMouseDownState = this.locateState
+                // this.currentMouseDownState = this.locateState
+                this.currentMouseDownState = function () {}
             }
         },
         dragState(e) {
             let rowPosi = this.getRelativePosi(e.clientY)
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
 
-            this.$store.dispatch(SELECTS_UPDATESELECT, {
+            this.$store.dispatch(SELECTS_CHANGE, {
                 startColIndex: 'MAX',
                 startRowIndex: rowIndex
             })
@@ -147,7 +164,7 @@ export default {
             let row = this.adjustRow
             let temp
 
-            if ((temp = posi - row.top) > 5) {
+            if ((temp = posi - row.top) >= 0) {
                 rowView.style.height = temp + 'px'
                 panelView.style.top = temp - row.height + 'px'
             }

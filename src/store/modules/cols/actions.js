@@ -67,7 +67,7 @@ export default {
             currentSheet: rootState.currentSheet
         })
     },
-    [actionTypes.COLS_ADJUSTWIDTH]({
+    async [actionTypes.COLS_ADJUSTWIDTH]({
         dispatch,
         getters
     }, {
@@ -76,16 +76,16 @@ export default {
     }) {
         let cols = getters.allCols
         let col = cols[index]
-        send({
+        dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
+            sort: col.sort,
+            value: width
+        })
+        await send({
             url: config.url['adjustcol'],
             body: JSON.stringify({
                 col: col.sort,
                 offset: width
             }),
-        })
-        dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
-            sort: col.sort,
-            value: width
         })
     },
     [actionTypes.COLS_EXECADJUSTWIDTH]({
@@ -224,15 +224,8 @@ export default {
         dispatch
     }, payload) {
         let index = payload
-        let selects = getters.allSelects
         if (typeof index === 'undefined') {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -514,14 +507,7 @@ export default {
         }
         let index = payload
         if (typeof index === 'undefined') {
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -764,19 +750,11 @@ export default {
         let cols = getters.allCols
         let index = payload
         if (typeof index === 'undefined') {
-            let selects = getters.allSelects
-            let select
+            let select = getters.selectByType(SELECT)
             let startIndex
             let endIndex
             let visibleStartCol = visibleCols[0]
             let visibleEndCol = visibleCols[visibleCols.length - 1]
-
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
@@ -969,21 +947,13 @@ export default {
         dispatch
     }, payload) {
         let index = payload
-        let selects = getters.allSelects
         if (typeof index === 'undefined') {
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(getters.activeType)
             if (select.wholePosi.endColAlias === 'MAX') {
                 return
             }
             index = getters.colIndexByAlias(select.wholePosi.startColAlias)
         }
-
         let sort = getters.allCols[index].sort
         send({
             url: config.url.insertcol,
@@ -991,8 +961,11 @@ export default {
                 col: sort,
             }),
         })
+        let colModel
+        colModel = index === 0 ? colModel : getters.allCols[index - 1]
         dispatch(actionTypes.COLS_EXECINSERTCOL, {
-            sort
+            sort,
+            colModel
         })
     },
     [actionTypes.COLS_EXECINSERTCOL]({
@@ -1009,13 +982,16 @@ export default {
         let index = getters.getColIndexBySort(sort)
         if (!colModel) {
             insertCol = extend(template)
-            insertCol.alias = generator.colAliasGenerator()
-            insertCol.sort = sort
-            insertCol.displayName = getColDisplayName(sort)
-            insertCol.left = cols[index].left
         } else {
-            insertCol = colModel
+            insertCol = extend(colModel)
         }
+        insertCol.alias = generator.colAliasGenerator()
+        insertCol.sort = sort
+        insertCol.displayName = getColDisplayName(sort)
+        insertCol.left = cols[index].left
+
+
+
         let colWidth = insertCol.width
         let insertColAlias = insertCol.alias
         let currentColAlias = cols[index].alias
@@ -1139,6 +1115,30 @@ export default {
             currentSheet: rootState.currentSheet,
             cols: [insertCol]
         })
+        // 当前行不为第一列时, 以前一列单元格模板插入/修改单元格occupy、alias、texts、displayTexts
+        if (index !== 0) {
+            cells = getters.cellsByVertical({
+                startColIndex: index - 1,
+                startRowIndex: 0,
+                endColIndex: index - 1,
+                endRowIndex: -1,
+            })
+            cells.forEach((item, index) => {
+                if (item.occupy.col.length === 1) {
+                    dispatch('A_CELLS_ADD', extend(item, {
+                        alias: null,
+                        content: {
+                            texts: null,
+                            displayTexts: null
+                        },
+                        occupy: {
+                            col: [insertCol.alias],
+                            row: item.occupy.row
+                        }
+                    }))
+                }
+            })
+        }
         if (cache.localColPosi > 0) {
             cache.localColPosi += colWidth + 1
         }
@@ -1251,14 +1251,7 @@ export default {
             props
         } = payload
         if (typeof startIndex === 'undefined') {
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let select = getters.selectByType(SELECT)
             startIndex = getters.colIndexByAlias(select.wholePosi.startColAlias)
             endIndex = getters.colIndexByAlias(select.wholePosi.endColAlias)
         }

@@ -33,6 +33,10 @@ export default {
         underline: 0,
         background: '#fff'
     },
+    // 批注属性
+    customProp: {
+        comment: null
+    },
     border: {
         top: 0,
         right: 0,

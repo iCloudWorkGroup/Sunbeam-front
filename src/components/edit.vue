@@ -58,6 +58,18 @@ export default {
     mounted() {
         // this.setOccupy()
         // this.updateUserView()
+        // 火狐浏览器 添加鼠标滚轮事件监听
+        if (navigator.userAgent.indexOf('Firefox') > -1) {
+            let _this = this
+            this.$el.addEventListener('DOMMouseScroll', function (e) {
+                let delta = e.detail
+                if (delta > 0) {
+                    _this.$el.scrollTop += 20
+                } else if (delta < 0) {
+                    _this.$el.scrollTop = _this.$el.scrollTop > 20 ? _this.$el.scrollTop - 20 : 0
+                }
+            })
+        }
     },
     beforeDestroy() {
         // this.updateOccupy([], [])
@@ -105,7 +117,6 @@ export default {
         tabSurface() {
             let scrollLeft = this.$el.scrollLeft
             let scrollTop = this.$el.scrollTop
-
             if (this._events['scrollPanel'] != null) {
                 this.$emit('scrollPanel', {
                     scrollTop,

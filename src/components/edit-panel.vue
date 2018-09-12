@@ -90,7 +90,6 @@ export default {
             let selectState = this.$store.getters.activeType
             if (selectState === 'DATASOURCE' &&
                 getters.selectByType(selectState) == null) {
-                console.log(getters.selectByType(selectState))
                 this.$store.dispatch(SELECTS_INSERT, {
                     colAlias: col.alias,
                     rowAlias: row.alias

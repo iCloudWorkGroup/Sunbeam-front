@@ -11,7 +11,8 @@ import getters from './getters'
 const state = {
     list: [],
     rowMap: new Map(),
-    colMap: new Map()
+    colMap: new Map(),
+    activeComment: false
 }
 
 export default {

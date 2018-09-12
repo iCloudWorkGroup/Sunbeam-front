@@ -7,7 +7,7 @@
             <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
             <div class="fui-cf-desc">
                 <div class="fui-cf-text">冻结窗口</div>
-                <div class="fui-cf-extend caret"></div>
+                <div class="fui-cf-extend spreadSheetCaret"></div>
             </div>
         </div>
     </div>

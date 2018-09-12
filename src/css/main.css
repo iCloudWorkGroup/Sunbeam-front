@@ -505,6 +505,8 @@ textarea {
 }
 
 .comment-ico {
+    top: 0px;
+    right: 0px;
     position: absolute;
     height: inherit;
     width: inherit;

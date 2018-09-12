@@ -39,7 +39,7 @@ export default {
      * 这样利于表格自动扩展
      * 在自动增加行处，作用很大
      */
-    prestrainWidth: 1420,
+    prestrainWidth: 1440,
     prestrainHeight: 1200,
     /**
      * 请求区域宽、高度, 单位px
@@ -53,6 +53,12 @@ export default {
      * @type {Number}
      */
     toolbarHeight: 130,
+    /**
+     * 批注栏宽/高
+     * @type {Number}
+     */
+    commentWidth: 100,
+    commentHeigth: 100,
     url: {
         family: 'cell/font-family',
         size: 'cell/font-size',
@@ -90,7 +96,9 @@ export default {
         copy: 'sheet/copy',
         area: 'sheet/area',
         clearqueue: 'sheet/clear_queue',
-        wordWrap: 'cell/wordwrap'
+        wordWrap: 'cell/wordwrap',
+        comment: 'cell/comment-plus',
+        recomment: 'cell/comment-reduce'
     },
     operSendPropName: {
         'alignRow': 'align',
@@ -107,6 +115,5 @@ export default {
      * @type {String}
      */
     rootPath: 'http://excel-inc.acmr.com.cn/'
-
     // rootPath: 'http://192.168.3.84:8080/sunbeam/'
 }

@@ -4,7 +4,8 @@ import {
     SELECTS_INSERT,
     SELECTS_CHANGE,
     COLS_ACTIVE,
-    ROWS_ACTIVE
+    ROWS_ACTIVE,
+    SELECTS_DELETE
 } from '../../action-types'
 import generator from '../../../tools/generator'
 import template from './template'
@@ -158,6 +159,31 @@ export default {
             },
             type: getters.activeType
         })
+        dispatch(COLS_ACTIVE, {
+            startIndex: startColIndex,
+            endIndex: endColIndex
+        })
+        dispatch(ROWS_ACTIVE, {
+            startIndex: startRowIndex,
+            endIndex: endRowIndex
+        })
+    },
+    /**
+     * 删除选中区域
+     */
+    [SELECTS_DELETE]({
+        getters,
+        commit,
+        dispatch
+    }, payload) {
+        commit(mutationTypes.DELETE_SELECT, {
+            select: payload.select
+        })
+        let select = getters.allSelects[0]
+        let startColIndex = select.signalSort.startCol
+        let endColIndex = select.signalSort.endCol
+        let startRowIndex = select.signalSort.startRow
+        let endRowIndex = select.signalSort.endRow
         dispatch(COLS_ACTIVE, {
             startIndex: startColIndex,
             endIndex: endColIndex

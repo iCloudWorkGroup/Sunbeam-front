@@ -84,7 +84,7 @@ export default {
                 value
             })
             this.$store.dispatch('A_CELLS_UPDATE', {
-                propName: '   ',
+                propName: 'alignRow',
                 propStruct
             })
         },

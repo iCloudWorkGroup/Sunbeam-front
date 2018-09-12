@@ -22,6 +22,7 @@ export default {
             url: 'reload',
             body: JSON.stringify(area),
         }, false).then((data) => {
+            cache.step = 0
             let bookItem
             if (data == null || (bookItem = data.sheets[0]) == null) {
                 throw new Error('backend data failed from server')

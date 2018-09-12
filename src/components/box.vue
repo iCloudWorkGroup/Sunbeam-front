@@ -18,7 +18,8 @@ import {
     DELETE_SELECT
 } from '../store/mutation-types'
 import {
-    CLIP
+    CLIP,
+    SELECT
 } from '../tools/constant'
 import cache from '../tools/cache'
 import config from '../config'
@@ -79,13 +80,7 @@ export default {
         },
         copyData(e) {
             let selects = this.$store.getters.allSelects
-            let select
-            let state = this.$store.getters.selectState === 'select' ? 'SELECT' : 'DATESOURCE'
-            selects.forEach((item, index) => {
-                if (item.type === state) {
-                    select = item
-                }
-            })
+            let select = this.$store.getters.selectByType(this.$store.getters.activeType)
             let wholePosi = select.wholePosi
             if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias ===
                 'MAX') {
@@ -93,15 +88,18 @@ export default {
             }
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === CLIP) {
-                    let currentSheet = this.$store.state.currentSheet
                     this.$store.commit(DELETE_SELECT, {
-                        currentSheet,
                         select: selects[i]
                     })
                 }
             }
             cache.clipState = 'copy'
-            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            this.$store.commit('M_SELECT_UPDATE_STATE', CLIP)
+            this.$store.dispatch(SELECTS_INSERT, {
+                colAlias: wholePosi.startColAlias,
+                rowAlias: wholePosi.startRowAlias
+            })
+            this.$store.commit('M_SELECT_UPDATE_STATE', SELECT)
             let getters = this.$store.getters
             let text = getters.getClipData()
             let clipboardData
@@ -124,9 +122,7 @@ export default {
             }
             for (let i = 0, len = selects.length; i < len; i++) {
                 if (selects[i].type === CLIP) {
-                    let currentSheet = this.$store.state.currentSheet
                     this.$store.commit(DELETE_SELECT, {
-                        currentSheet,
                         select: selects[i]
                     })
                 }
@@ -164,7 +160,7 @@ export default {
             let key = e.key
             let altKey = e.altKey
             if (key === 'Enter' && !altKey) {
-                this.completeEdit()
+                this.doneEdit(e)
             } else if (key === 'Enter' && altKey) {
                 this.insertAtCursor('\n', e.target)
             }

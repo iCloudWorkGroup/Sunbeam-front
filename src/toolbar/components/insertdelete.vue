@@ -6,25 +6,25 @@
                 <li @mousedown.stop="insertRow" v-show="opr === 'insert'">
                     <span class=" widget-ico"></span>
                     <span class="widget-content">
-                            <div class="widget-weight">插入工作表行</div>
-                        </span>
+                            <div class="widget-weight">插入行</div>
+                    </span>
                 </li>
                 <li @mousedown.stop="insertCol" v-show="opr === 'insert'">
                     <span class="widget-ico"></span>
                     <span class="widget-content">
-                            <div class="widget-weight">插入工作表列</div>
+                            <div class="widget-weight">插入列</div>
                         </span>
                 </li>
                 <li @mousedown.stop="deleteRow" v-show="opr === 'delete'">
                     <span class="widget-ico"></span>
                     <span class="widget-content">
-                            <div class="widget-weight">删除工作表行</div>
+                            <div class="widget-weight">删除行</div>
                         </span>
                 </li>
                 <li @mousedown.stop="deleteCol" v-show="opr === 'delete'">
                     <span class="widget-ico"></span>
                     <span class="widget-content">
-                            <div class="widget-weight">删除工作表列</div>
+                            <div class="widget-weight">删除列</div>
                         </span>
                 </li>
             </ul>

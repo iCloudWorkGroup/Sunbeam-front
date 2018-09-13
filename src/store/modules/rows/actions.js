@@ -92,7 +92,7 @@ export default {
         let rowAlias = row.alias
         let max = getters.max
         commit('UPDATE_SHEETS_MAX', {
-            rowPixel: max.rowPixel - rowHeight
+            rowPixel: max.rowPixel - rowHeight - 1
         })
         /**
          * 隐藏行
@@ -366,7 +366,7 @@ export default {
         let rowAlias = row.alias
         let max = getters.max
         commit('UPDATE_SHEETS_MAX', {
-            rowPixel: max.rowPixel + rowHeight
+            rowPixel: max.rowPixel + rowHeight + 1
         })
         let updateRowInfo = [{
             row: rows[index],
@@ -551,8 +551,10 @@ export default {
         insertRow.sort = sort
         insertRow.displayName = getRowDisplayName(sort)
         insertRow.top = rows[index].top
-
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            rowPixel: max.rowPixel + insertRow.height + 1
+        })
         let rowHeight = insertRow.height
         let insertRowAlias = insertRow.alias
         let currentRowAlias = rows[index].alias
@@ -763,10 +765,21 @@ export default {
         let row = rows[index]
         let rowAlias = row.alias
         let adjustHeight = value - row.height
+
         let max = getters.max
-        commit('UPDATE_SHEETS_MAX', {
-            rowPixel: max.rowPixel + adjustHeight
-        })
+        if (adjustHeight !== 0 && row.height === 0) {
+            commit('UPDATE_SHEETS_MAX', {
+                rowPixel: max.rowPixel + adjustHeight + 1
+            })
+        } else if (adjustHeight !== 0 && value === 0) {
+            commit('UPDATE_SHEETS_MAX', {
+                rowPixel: max.rowPixel + adjustHeight - 1
+            })
+        } else {
+            commit('UPDATE_SHEETS_MAX', {
+                rowPixel: max.rowPixel + adjustHeight
+            })
+        }
         let updateCellInfo = []
         let cells = getters.cellsByVertical({
             startColIndex: 0,
@@ -907,7 +920,10 @@ export default {
         let deleteRowHeight = deleteRow.height
         let updateOccupys = []
         let updateCellInfo = []
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            rowPixel: max.rowPixel - deleteRow - 1
+        })
         cells.forEach(function(cell) {
             let occupyRow = cell.occupy.row
             let aliasIndex

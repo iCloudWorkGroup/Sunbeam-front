@@ -2,7 +2,6 @@
 <textarea class="edit-frame"
           :value="texts"
           :style="styleObject"
-          @input="inputHandle"
           @keydown="keydownHandle"
           @blur="doneEdit"
           @copy="copyData"
@@ -61,7 +60,7 @@ export default {
                 physical.family,
                 width)
             let height = physical.height - 8 < 0 ? 0 : physical.height - 8
-            height = limitHeight > height ? limitHeight : height
+            height = Math.max(limitHeight, height)
             return {
                 top: unit(top),
                 left: unit(left),
@@ -89,22 +88,10 @@ export default {
         }
     },
     methods: {
-        inputHandle(e) {
-            let texts = e.target.value.trim()
-            let props = this.$store.getters.inputProps
-            let physical = props.physical
-            let width = physical.width - 8 < 0 ? 0 : physical.width - 8
-            let limitHeight = getTextHeight(texts,
-                physical.size,
-                physical.family,
-                width) - 6
-            if (limitHeight > window.parseInt(this.styleObject.height)) {
-                // this.styleObject.height = unit(limitHeight)
-            }
-        },
         doneEdit(e) {
             const texts = e.target.value.trim()
-            this.$store.dispatch('A_INPUT_EDITDONE', texts)
+            let status = this.$store.getters.inputProps.physical.edit
+            this.$store.dispatch('A_INPUT_EDITDONE', { texts, status })
         },
         copyData(e) {
             let selects = this.$store.getters.allSelects

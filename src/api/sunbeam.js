@@ -714,12 +714,12 @@ SpreadSheet.prototype = {
 
     // 弹出新增批注窗口
     createAddCommentView() {
-        this.vm.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
+        this.vm.$store.dispatch('EDIT_SHOW', 'COMMENT')
     },
 
     // 弹出编辑批注窗口
     createEditCommentView() {
-        this.vm.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
+        this.vm.$store.dispatch('EDIT_SHOW', 'COMMENT')
     },
 
     // 删除批注

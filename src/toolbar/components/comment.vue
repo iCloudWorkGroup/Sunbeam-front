@@ -32,7 +32,7 @@ export default {
     },
     methods: {
         addComment() {
-            this.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
+            this.$store.dispatch('EDIT_SHOW', 'COMMENT')
         },
         deleteComment() {
             this.$store.dispatch('A_CELLS_UPDATE', {
@@ -45,7 +45,7 @@ export default {
             })
         },
         editComment() {
-            this.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
+            this.$store.dispatch('EDIT_SHOW', 'COMMENT')
         }
     }
 }

@@ -104,9 +104,19 @@ export default {
         let adjustWidth = value - col.width
         let updateCellInfo = []
         let max = getters.max
-        commit('UPDATE_SHEETS_MAX', {
-            colPixel: max.colPixel + adjustWidth
-        })
+        if (adjustWidth !== 0 && value === 0) {
+            commit('UPDATE_SHEETS_MAX', {
+                colPixel: max.colPixel + adjustWidth - 1
+            })
+        } else if (adjustWidth !== 0 && col.width === 0) {
+            commit('UPDATE_SHEETS_MAX', {
+                colPixel: max.colPixel + adjustWidth + 1
+            })
+        } else {
+            commit('UPDATE_SHEETS_MAX', {
+                colPixel: max.colPixel + adjustWidth
+            })
+        }
         let cells = getters.cellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -263,6 +273,10 @@ export default {
         let deleteCol = cols[index]
         let deleteColAlias = deleteCol.alias
         let deleteColWidth = deleteCol.width
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            colPixel: max.colPixel - deleteCol.width - 1
+        })
         let updateOccupys = []
         let updateCellInfo = []
         cells.forEach(function(cell) {
@@ -542,7 +556,7 @@ export default {
         let colAlias = col.alias
         let max = getters.max
         commit('UPDATE_SHEETS_MAX', {
-            colPixel: max.colPixel - colWidth
+            colPixel: max.colPixel - colWidth - 1
         })
         let updateColInfo = [{
             col: cols[index],
@@ -811,7 +825,7 @@ export default {
         let updateCellInfo = []
         let max = getters.max
         commit('UPDATE_SHEETS_MAX', {
-            colPixel: max.colPixel + colWidth
+            colPixel: max.colPixel + colWidth + 1
         })
         let updateColInfo = [{
             col: cols[index],
@@ -999,7 +1013,10 @@ export default {
         insertCol.displayName = getColDisplayName(sort)
         insertCol.left = cols[index].left
 
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            colPixel: max.colPixel + insertCol.width + 1
+        })
 
         let colWidth = insertCol.width
         let insertColAlias = insertCol.alias

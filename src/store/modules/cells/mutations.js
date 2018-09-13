@@ -106,8 +106,5 @@ export default {
         state.list = []
         state.rowMap = new Map()
         state.colMap = new Map()
-    },
-    M_UPDATE_COMMENT_SATTUS(state, comment) {
-        state.activeComment = comment
     }
 }

@@ -80,9 +80,6 @@
     </table>
     <box :scroll-top="scrollTop"
          :scroll-left="scrollLeft"/>
-    <CommentInput
-         :scroll-top="scrollTop"
-         :scroll-left="scrollLeft"/>
 </div>
 </template>
 <script type="text/javascript">
@@ -91,7 +88,6 @@ import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import Box from './box.vue'
-import CommentInput from './comment-input.vue'
 export default {
     data() {
         return {
@@ -163,7 +159,6 @@ export default {
         RowHead,
         Edit,
         Box,
-        CommentInput
     },
     methods: {
         /**

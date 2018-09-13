@@ -73,9 +73,11 @@ export default {
         // }, false)
     },
     methods: {
-        offStatus() {
-            let props = this.$store.getters.inputProps
-            this.$store.commit('M_INPUT_UPDATE_STATUS', !props.assist.status)
+        offStatus(e) {
+            if (e.target.getAttribute('class') !== 'edit-frame') {
+                let props = this.$store.getters.inputProps
+                this.$store.commit('M_INPUT_UPDATE_STATUS', !props.assist.status)
+            }
         }
     }
 }

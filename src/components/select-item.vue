@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         editing() {
-            this.$store.dispatch(types.EDIT_SHOW)
+            this.$store.dispatch(types.EDIT_SHOW, 'EDIT')
         }
     },
     mounted() {

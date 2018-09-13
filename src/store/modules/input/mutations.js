@@ -13,5 +13,8 @@ export default {
     },
     M_INPUT_RESET(state) {
         extend(true, state.box, template)
+    },
+    M_INPUT_SATTUS(state, status) {
+        state.editStatus = status
     }
 }

@@ -7,6 +7,7 @@ import mutations from './mutations'
  */
 const state = {
     box: null,
+    editStatus: 'EDIT'
 }
 
 export default {

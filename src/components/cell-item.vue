@@ -3,6 +3,7 @@
         :style="viewPosi">
         <div class="cell-content"
              :style="viewProps">
+            <!--v-html="text"-->
             {{cell.content.displayTexts}}
         </div>
         <!--<div class="comment-ico" v-if="comment">-->
@@ -64,6 +65,13 @@ function caclBorder({
 export default {
     props: ['cell', 'offsetTop', 'offsetLeft'],
     computed: {
+        text() {
+            let reg = new RegExp('\n', 'g')
+            if (this.cell.content.displayTexts == null) {
+                return null
+            }
+            return this.cell.content.displayTexts.replace(reg, '<br>')
+        },
         comment() {
             return this.cell.customProp.comment != null && this.cell.customProp.comment !== ''
         },
@@ -229,6 +237,6 @@ export default {
             this.$emit('moveout', { right: 20 })
             console.log()
         }
-    }
+    },
 }
 </script>

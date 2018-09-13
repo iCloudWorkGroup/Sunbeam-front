@@ -76,7 +76,7 @@ SpreadSheet.prototype = {
                 startRowIndex = endRowIndex = Number(number) - 1
                 startColIndex = endColIndex = num
             }
-        } else { // point传入数组
+        } else if (Array.prototype.isPrototypeOf(point)) { // point传入数组
             // 判断数组  console.log(Array.prototype.isPrototypeOf(point))
             let letter = []
             let number = []
@@ -90,6 +90,8 @@ SpreadSheet.prototype = {
             endRowIndex = number[1] < number[0] ? number[0] : number[1]
             startColIndex = letter[1] > letter[0] ? letter[0] : letter[1]
             endColIndex = letter[1] < letter[0] ? letter[0] : letter[1]
+        } else {
+            throw new Error('error point typeof')
         }
         let select = {}
         let startRow = this.vm.$store.getters.allRows[startRowIndex]
@@ -175,9 +177,17 @@ SpreadSheet.prototype = {
             p = points
         }
         p.forEach((point, index) => {
-            let select = this.getPoint([point.startCol + point.startRow,
-                point.endCol + point.endRow
-            ])
+            // 修正参数
+            let select
+            if (typeof point.endCol === 'undefined') {
+                select = this.getPoint([point.startCol + point.startRow,
+                    point.startCol + point.startRow
+                ])
+            } else {
+                select = this.getPoint([point.startCol + point.startRow,
+                    point.endCol + point.endRow
+                ])
+            }
             this.setFont(select, {
                 content: {
                     background: clo
@@ -704,17 +714,24 @@ SpreadSheet.prototype = {
 
     // 弹出新增批注窗口
     createAddCommentView() {
-        console.log('empty')
+        this.vm.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
     },
 
     // 弹出编辑批注窗口
-    createEditComment() {
-        console.log('empty')
+    createEditCommentView() {
+        this.vm.$store.commit('M_UPDATE_COMMENT_SATTUS', true)
     },
 
     // 删除批注
-    deleteComment(sheetId, point) {
-        console.log('empty')
+    deleteComment() {
+        this.vm.$store.dispatch('A_CELLS_UPDATE', {
+            propName: 'recomment',
+            propStruct: {
+                customProp: {
+                    comment: null
+                }
+            }
+        })
     },
 
     // 添加行（冻结状态不可用）

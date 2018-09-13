@@ -1,6 +1,6 @@
 import  Sunbeam from './api/sunbeam'
-import send from './util/send'
-import config from './config'
+// import send from './util/send'
+// import config from './config'
 let ss = new Sunbeam({
     root: '#a',
     toolbar: '.tools'
@@ -20,23 +20,11 @@ ss.addEventListener('regionChange', function (e) {
     // console.log(e.point.col[0])
 })
 document.getElementById('dd').addEventListener('click', function () {
-    send({
-        url: config.url.comment,
-        body: JSON.stringify({
-            coordinate: [
-                {
-                    startCol: 2,
-                    startRow: 3,
-                    endCol: 2,
-                    endRow: 3
-                }
-            ],
-            comment: '123'
-        })
-    })
+    ss.createAddCommentView()
+})
+document.getElementById('aa').addEventListener('click', function () {
+    ss.createEditCommentView()
 })
 document.getElementById('clear').addEventListener('click', function () {
-    send({
-        url: config.url.clearqueue
-    }, false)
+    ss.deleteComment()
 })

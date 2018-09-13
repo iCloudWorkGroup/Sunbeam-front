@@ -1,13 +1,14 @@
 <template>
 <textarea class="edit-frame"
-        :value="texts"
-        :style="styleObject"
-        @keydown="keydownHandle"
-        @blur="doneEdit"
-        @copy="copyData"
-        @cut="cutData"
-        @paste="pasteData"
-        v-focus="isEditing">
+          :value="texts"
+          :style="styleObject"
+          @input="inputHandle"
+          @keydown="keydownHandle"
+          @blur="doneEdit"
+          @copy="copyData"
+          @cut="cutData"
+          @paste="pasteData"
+          v-focus="isEditing">
 </textarea>
 </template>
 <script type="text/javascript">
@@ -26,16 +27,25 @@ import config from '../config'
 import {
     unit
 } from '../filters/unit'
+import {
+    getTextHeight
+} from '../tools/calcbox'
+// import extend from '../util/extend'
 export default {
     props: [
         'scrollTop',
         'scrollLeft'
     ],
+    data() {
+        return {
+            style: {}
+        }
+    },
     computed: {
         styleObject() {
             let props = this.$store.getters.inputProps
             let physical = props.physical
-
+            let texts = physical.texts == null ? physical.texts : physical.texts.trim()
             /**
              * 1. 因为单元格相对于内容区域定位，
              * 而编辑框是相对于所以编辑区，所以需要考虑corner的大小
@@ -46,7 +56,12 @@ export default {
             let top = physical.top - this.scrollTop + config.cornerHeight - 1
             let left = physical.left - this.scrollLeft + config.cornerWidth - 1
             let width = physical.width - 8 < 0 ? 0 : physical.width - 8
+            let limitHeight = getTextHeight(texts,
+                physical.size,
+                physical.family,
+                width)
             let height = physical.height - 8 < 0 ? 0 : physical.height - 8
+            height = limitHeight > height ? limitHeight : height
             return {
                 top: unit(top),
                 left: unit(left),
@@ -74,6 +89,19 @@ export default {
         }
     },
     methods: {
+        inputHandle(e) {
+            let texts = e.target.value.trim()
+            let props = this.$store.getters.inputProps
+            let physical = props.physical
+            let width = physical.width - 8 < 0 ? 0 : physical.width - 8
+            let limitHeight = getTextHeight(texts,
+                physical.size,
+                physical.family,
+                width) - 6
+            if (limitHeight > window.parseInt(this.styleObject.height)) {
+                // this.styleObject.height = unit(limitHeight)
+            }
+        },
         doneEdit(e) {
             const texts = e.target.value.trim()
             this.$store.dispatch('A_INPUT_EDITDONE', texts)
@@ -113,8 +141,8 @@ export default {
             clipboardData.setData('Text', text)
         },
         cutData(e) {
-            let select = this.$store.getters.activeSelect
-            let selects = this.$store.getters.selectList
+            let select = this.$store.getters.selectByType(SELECT)
+            let selects = this.$store.getters.allSelects
             let wholePosi = select.wholePosi
             if (wholePosi.endColAlias === 'MAX' || wholePosi.endRowAlias ===
                 'MAX') {
@@ -128,7 +156,12 @@ export default {
                 }
             }
             cache.clipState = 'cut'
-            this.$store.dispatch(SELECTS_INSERT, CLIP)
+            this.$store.commit('M_SELECT_UPDATE_STATE', CLIP)
+            this.$store.dispatch(SELECTS_INSERT, {
+                colAlias: wholePosi.startColAlias,
+                rowAlias: wholePosi.startRowAlias
+            })
+            this.$store.commit('M_SELECT_UPDATE_STATE', SELECT)
             let getters = this.$store.getters
             let text = getters.getClipData()
             let clipboardData

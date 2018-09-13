@@ -807,7 +807,6 @@ export default {
         // 所有视图， 记录对象
         let allLoaded = rootGetters['loaded']
         let max = rootGetters['max']
-
         // 当前视图，记录点，行、列长度
         let rowLen = viewLoaded.rows.length
         let colLen = viewLoaded.cols.length

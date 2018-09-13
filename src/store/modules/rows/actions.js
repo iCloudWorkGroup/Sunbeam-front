@@ -90,7 +90,10 @@ export default {
         let updateCellInfo = []
         let rowHeight = row.height
         let rowAlias = row.alias
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            rowPixel: max.rowPixel - rowHeight
+        })
         /**
          * 隐藏行
          * 将需要隐藏的行hidden设为true
@@ -361,7 +364,10 @@ export default {
         let updateCellInfo = []
         let rowHeight = row.height
         let rowAlias = row.alias
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            rowPixel: max.rowPixel + rowHeight
+        })
         let updateRowInfo = [{
             row: rows[index],
             props: {
@@ -757,6 +763,10 @@ export default {
         let row = rows[index]
         let rowAlias = row.alias
         let adjustHeight = value - row.height
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            rowPixel: max.rowPixel + adjustHeight
+        })
         let updateCellInfo = []
         let cells = getters.cellsByVertical({
             startColIndex: 0,

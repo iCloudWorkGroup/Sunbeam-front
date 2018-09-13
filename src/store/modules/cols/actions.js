@@ -103,7 +103,10 @@ export default {
         let colAlias = col.alias
         let adjustWidth = value - col.width
         let updateCellInfo = []
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            colPixel: max.colPixel + adjustWidth
+        })
         let cells = getters.cellsByVertical({
             startColIndex: index,
             startRowIndex: 0,
@@ -537,7 +540,10 @@ export default {
         let updateCellInfo = []
         let colWidth = col.width
         let colAlias = col.alias
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            colPixel: max.colPixel - colWidth
+        })
         let updateColInfo = [{
             col: cols[index],
             props: {
@@ -803,7 +809,10 @@ export default {
         let colWidth = col.width
         let colAlias = col.alias
         let updateCellInfo = []
-
+        let max = getters.max
+        commit('UPDATE_SHEETS_MAX', {
+            colPixel: max.colPixel + colWidth
+        })
         let updateColInfo = [{
             col: cols[index],
             props: {

@@ -69,6 +69,7 @@ export const SHEET_SCROLL = 'SHEET_SCROLL'
 
 export const EDIT_UPDATE = 'EDIT_UPDATE'
 export const EDIT_SHOW = 'EDIT_SHOW'
+export const COMMENT_SHOW = 'COMMENT_SHOW'
 export const EDIT_HIDE = 'EDIT_HIDE'
 
 export const OCCUPY_UPDATE = 'OCCUPY_UPDATE'

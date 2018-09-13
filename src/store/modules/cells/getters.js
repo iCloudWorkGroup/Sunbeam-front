@@ -81,9 +81,9 @@ export default {
                     let aliasCol = cols[j].alias
                     let aliasRow = rows[i].alias
                     let cellIndex = getters.IdxByCol(aliasCol, aliasRow)
-                    if (cellIndex != null && !temp[cellIndex]) {
+                    if (cellIndex !== -1 && !temp[cellIndex]) {
                         let cell = cells[cellIndex]
-                        result += cell.content.texts
+                        result = cell.content.texts == null ? null : result + cell.content.texts
                         temp[cellIndex] = true
                     }
                     if (j !== endColIndex) {

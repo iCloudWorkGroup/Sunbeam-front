@@ -911,7 +911,9 @@ SpreadSheet.prototype = {
         this.bookVm.$store.commit('M_UPDATE_LOAD', true)
         // 销毁vue实例
         this.bookVm.$destroy()
-        this.toolBarVm.$destroy()
+        if (typeof this.toolBarVm !== 'undefined') {
+            this.toolBarVm.$destroy()
+        }
         let bottom = this.bookVm.$el.offsetHeight + config.scrollBufferHeight
         let right = this.bookVm.$el.offsetWidth + config.scrollBufferWidth
         // // 清空 store 行 列 单元格 sheet select 信息
@@ -941,10 +943,12 @@ SpreadSheet.prototype = {
                 render: h => h(Book)
             }).$mount(rootSelector)
             // 新建vue实例tools
-            this.toolBarVm = new Vue({
-                store,
-                render: h => h(Main)
-            }).$mount(toolsSelector)
+            if (typeof toolbarSelector !== 'undefined') {
+                this.toolBarVm = new Vue({
+                    store,
+                    render: h => h(Main)
+                }).$mount(toolsSelector)
+            }
         })
     },
 

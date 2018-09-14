@@ -12,7 +12,7 @@
                 <span
                 class="fui-transverse-model fui-cf-fontfamily-extend active"
                 data-initiator="familys">
-                    <span class="spreadSheetCaret"></span>
+                    <span class="fui-cf-caret"></span>
                 </span>
             </span>
             <span class="section"
@@ -25,7 +25,7 @@
             <span
                 class="fui-transverse-model fui-cf-fontsize-extend active"
                 data-initiator="sizes">
-                <span class="spreadSheetCaret"></span>
+                <span class="fui-cf-caret"></span>
             </span>
             </span>
         </div>
@@ -55,7 +55,7 @@
                 <span class="fui-cf-ico ico-borderbottom ico-section-ico"></span>
                 <span class="ico-section-rightarrow"
                       data-initiator="borders">
-                    <span class="spreadSheetCaret"></span>
+                    <span class="fui-cf-caret"></span>
                 </span>
             </span>
             <span class="ico-section"
@@ -65,7 +65,7 @@
                 <span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
                 <span class="ico-section-rightarrow"
                       data-initiator="backgrounds">
-                    <span class="spreadSheetCaret"></span>
+                    <span class="fui-cf-caret"></span>
                 </span>
             </span>
             <span class="ico-section"
@@ -75,7 +75,7 @@
                 <span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
                 <span class="ico-section-rightarrow"
                       data-initiator="colors">
-                    <span class="spreadSheetCaret"></span>
+                    <span class="fui-cf-caret"></span>
                 </span>
             </span>
         </div>
@@ -139,27 +139,6 @@ export default {
                 size: content.size
             }
         }
-        // areaProps() {
-        //     let allSelects = this.$store.getters.allSelects
-        //     let activePosi = allSelects[0].activePosi
-        //     let cell = this.$store.getters.getCellByAlias({
-        //         colAlias: activePosi.colAlias,
-        //         rowAlias: activePosi.rowAlias
-        //     })
-
-        //     let cellProps = this.$store.getters.getSelectCell()
-        //     let family = cellProps.content.family
-        //     const font2zh = {
-        //         'SimSun': '宋体',
-        //         'SimHei': '黑体',
-        //         'KaiTi': '楷体'
-        //     }
-        //     let temp
-        //     if ((temp = font2zh[family])) {
-        //         cellProps.content.family = temp
-        //     }
-        //     return cellProps
-        // }
     },
     methods: {
         setWeight() {
@@ -205,76 +184,6 @@ export default {
                 this.$store.commit(SWITCH_NAME, menuName)
             }
         }
-        // activeWidget(e) {
-        //     let elem = e.currentTarget
-        //     let widgetId = elem.dataset.widget
-        //     let widget
-        //     let box
-
-        //     if (!widgetId) {
-        //         return
-        //     }
-
-        //     box = elem.getBoundingClientRect()
-        //     widget = this.$refs[widgetId]
-        //     widget.style.top = box.top + box.height + 'px'
-        //     widget.style.left = box.left + 'px'
-
-        //     this.$emit('updateActiveWidgetId', widgetId)
-        // },
-        // setAction(e) {
-        //     e.stopPropagation()
-        //     let currentTarget = e.currentTarget
-        //     let type = currentTarget.dataset.type
-        //     let target = e.target
-        //     let value
-
-        //     value = this.getValue(target, currentTarget)
-        //     if (value == null) {
-        //         return
-        //     }
-        //     this.$store.dispatch(CELLS_UPDATE, {
-        //         propNames: type,
-        //         value
-        //     })
-        //     this.$emit('updateActiveWidgetId', '')
-        // },
-        // getValue(elem, currentTarget) {
-        //     let value = elem.dataset.value
-        //     if (value == null) {
-        //         if (elem === currentTarget) {
-        //             return
-        //         } else {
-        //             return this.getValue(elem.parentNode, currentTarget)
-        //         }
-        //     } else {
-        //         return value
-        //     }
-        // },
-        // setBorder(e) {
-        //     e.stopPropagation()
-        //     let currentTarget = e.currentTarget
-        //     let target = e.target
-        //     let value
-
-        //     value = this.getValue(target, currentTarget)
-        //     if (value == null) {
-        //         return
-        //     }
-        //     this.$store.dispatch(CELLS_UPDATE_BORDER, {
-        //         value
-        //     })
-        //     this.$emit('updateActiveWidgetId', '')
-        // },
-        // reverseAction(e) {
-        //     e.stopPropagation()
-        //     let type = e.currentTarget.dataset.type
-
-        //     this.$store.dispatch(CELLS_UPDATE, {
-        //         propNames: type
-        //     })
-        //     this.$emit('updateActiveWidgetId', '')
-        // }
     },
     components: {
         Sizes,

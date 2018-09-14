@@ -39,6 +39,16 @@ export default {
                 0))
             generator.cellAliasGenerator(0)
 
+            // 模拟数据的行为
+            // bookItem.frozen = {
+            //     rowAlias: '5',
+            //     colAlias: '5'
+            // }
+            // commit('M_SHEETS_ADD_LOADED', {
+            //     colAlias: '6',
+            //     rowAlias: '6'
+            // })
+            // 模拟数据行为结束
             commit('M_SHEETS_ADD_LOADED', {
                 colAlias: cols[cols.length - 1].alias,
                 rowAlias: rows[rows.length - 1].alias

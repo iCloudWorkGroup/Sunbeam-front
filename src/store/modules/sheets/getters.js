@@ -1,42 +1,9 @@
-let viewTypes = {
-    mainRule: 'mainView',
-    leftRule: 'leftView',
-    topRule: 'topView',
-    cornerRule: 'cornerView'
-}
-
 export default {
-    frozenState(state, getters, rootState) {
+    isFrozen(state) {
         return function() {
-            let alias = rootState.currentSheet
-            let list = state.list
-            let sheet
-            for (let i = 0, len = list.length; i < len; i++) {
-                if (list[i].alias === alias) {
-                    sheet = list[i]
-                    break
-                }
-            }
-            return sheet.frozenState
-        }
-    },
-    getEditViewOccupy(state, getters, rootState) {
-        return function(type) {
-            let alias = rootState.currentSheet
-            let list = state.list
-            let sheet
-
-            for (let i = 0, len = list.length; i < len; i++) {
-                if (list[i].alias === alias) {
-                    sheet = list[i]
-                    break
-                }
-            }
-            if (type == null) {
-                return sheet.editViewOccupy
-            } else {
-                return sheet.editViewOccupy[viewTypes[type]]
-            }
+            let frozen = state.list[0].frozen
+            return (frozen.col.length > 0 || frozen.row.length > 0) ?
+                true : false
         }
     },
     loaded(state) {

@@ -22,7 +22,7 @@ li { list-style: none; }
 .fui-cf-comment-ico { background: url('../img/comment.png'); }
 .fui-cf-bg-extend2-ico { background: url('../img/funcBgExtend2.png'); }
 .fui-section { border: 1px solid #fafafa; }
-.spreadSheetCaret { display: inline-block; width: 0; height: 0; vertical-align: middle; border-top: 3px dashed; border-right: 3px solid transparent; border-left: 3px solid transparent; }
+.fui-cf-caret { display: inline-block; width: 0; height: 0; vertical-align: middle; border-top: 3px dashed; border-right: 3px solid transparent; border-left: 3px solid transparent; }
 .fui-group { display: inline-block; }
 .fui-separator, .fui-container { display: inline-block; }
 .fui-separator { height: 80px; border-right: 1px dashed #c6c6c6; margin: 0 6px; display: inline-block; }

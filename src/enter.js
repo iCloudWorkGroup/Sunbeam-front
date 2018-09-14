@@ -3,7 +3,7 @@ import  Sunbeam from './api/sunbeam'
 // import config from './config'
 let ss = new Sunbeam({
     root: '#a',
-    toolbar: '.tools'
+    toolbar: '.sss'
 })
 
 

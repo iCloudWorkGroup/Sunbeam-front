@@ -56,6 +56,7 @@ export default async function(options) {
             store,
             render: h => h(Main)
         }).$mount(toolSelector)
+        store.commit('M_SET_TOOLBAR_CLASS', toolSelector)
     }
     // 初始化offset宽高
     let offsetWidth = document.querySelector(rootSelector).offsetWidth

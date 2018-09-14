@@ -26,8 +26,8 @@ SpreadSheet.prototype = {
                 toolbar: this.toolbarSelector
             }).then(function(vms) {
                 this.loadStatus = false
-                this.vm = vms.bookVm
-                this.bookVm = vms.toolBarVm
+                this.bookVm = vms.bookVm
+                this.toolBarVm = vms.toolBarVm
             }.bind(this))
         }
     },
@@ -94,10 +94,10 @@ SpreadSheet.prototype = {
             throw new Error('error point typeof')
         }
         let select = {}
-        let startRow = this.vm.$store.getters.allRows[startRowIndex]
-        let endRow = this.vm.$store.getters.allRows[endRowIndex]
-        let startCol = this.vm.$store.getters.allCols[startColIndex]
-        let endCol = this.vm.$store.getters.allCols[endColIndex]
+        let startRow = this.bookVm.$store.getters.allRows[startRowIndex]
+        let endRow = this.bookVm.$store.getters.allRows[endRowIndex]
+        let startCol = this.bookVm.$store.getters.allCols[startColIndex]
+        let endCol = this.bookVm.$store.getters.allCols[endColIndex]
         select = {
             startColAlias: startCol.alias,
             startRowAlias: startRow.alias,
@@ -109,7 +109,7 @@ SpreadSheet.prototype = {
 
     // 修改字体样式、颜色、背景色
     setFont(select, propStruct, propName) {
-        this.vm.$store.dispatch(A_types.A_CELLS_UPDATE, {
+        this.bookVm.$store.dispatch(A_types.A_CELLS_UPDATE, {
             propName: propName,
             propStruct: propStruct,
             coordinate: select
@@ -118,7 +118,7 @@ SpreadSheet.prototype = {
 
     // 修改单元格文本格式
     setTextFormat(select, type) {
-        this.vm.$store.dispatch(A_types.CELLS_FORMAT, {
+        this.bookVm.$store.dispatch(A_types.CELLS_FORMAT, {
             coordinate: select,
             value: type
         })
@@ -504,7 +504,7 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        this.vm.$store.dispatch(A_types.A_CELLS_MERGE, select)
+        this.bookVm.$store.dispatch(A_types.A_CELLS_MERGE, select)
     },
 
     // 拆分单元格
@@ -517,7 +517,7 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        this.vm.$store.dispatch(A_types.A_CELLS_SPLIT, select)
+        this.bookVm.$store.dispatch(A_types.A_CELLS_SPLIT, select)
     },
 
     // 设置单元格文本内容（每次只能设置一个单元格的文本）
@@ -545,7 +545,7 @@ SpreadSheet.prototype = {
     frozen(sheetId, point) {
         console.log('empty')
         // let p = this.getPoint(point)
-        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, {
+        // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, {
         //     startColIndex: p.startCol,
         //     endColIndex: p.endCol,
         //     startRowIndex: p.startRow,
@@ -556,19 +556,19 @@ SpreadSheet.prototype = {
     // 解冻冻结
     unFrozen() {
         console.log('empty')
-        // this.vm.$store.dispatch(A_types.SHEET_UNFROZEN)
+        // this.bookVm.$store.dispatch(A_types.SHEET_UNFROZEN)
     },
 
     // 冻结视图区域首列
     colFrozen() {
         console.log('empty')
-        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstColFrozen')
+        // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, 'firstColFrozen')
     },
 
     // 冻结视图区域首行
     rowFrozen() {
         console.log('empty')
-        // this.vm.$store.dispatch(A_types.SHEET_FROZEN, 'firstRowFrozen')
+        // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, 'firstRowFrozen')
     },
 
     // 设置列的宽度（冻结状态不可用）
@@ -584,7 +584,7 @@ SpreadSheet.prototype = {
             w = width
         }
         let colIdx = this.getLetterNum(c)
-        this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
+        this.bookVm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
             index: colIdx,
             width: w
         })
@@ -603,7 +603,7 @@ SpreadSheet.prototype = {
             h = height
         }
         let rowIdx = Number(r) - 1
-        this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
+        this.bookVm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
             index: rowIdx,
             height: h
         })
@@ -616,11 +616,11 @@ SpreadSheet.prototype = {
 
     // 自适应容器大小，使用js调整spreadsheet容器大小时，调用该方法，触发自适应大小
     adaptScreen() {
-        let name = this.vm.$store.state.rootSelector
+        let name = this.bookVm.$store.state.rootSelector
         let offsetWidth = document.querySelector(name).offsetWidth
         let offsetHeight = document.querySelector(name).offsetHeight
-        this.vm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
-        this.vm.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
+        this.bookVm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
+        this.bookVm.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
     },
 
     //  获取相应坐标下单元格的文本
@@ -633,35 +633,35 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        let cellIdx = this.vm.$store.getters.IdxByRow(select.startColAlias, select.startRowAlias)
+        let cellIdx = this.bookVm.$store.getters.IdxByRow(select.startColAlias, select.startRowAlias)
         if (cellIdx === -1) {
             return ''
         }
-        let cells = this.vm.$store.getters.cells
+        let cells = this.bookVm.$store.getters.cells
         let cell = cells[cellIdx]
         return cell.content.texts === null ? '' : cell.content.texts
     },
 
     // 鼠标选择操作状态切换为数据源操作状态
     setDataSourceState() {
-        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATASOURCE')
+        this.bookVm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATASOURCE')
     },
 
     // 鼠标选择操作状态切换为普通选中操作状态
     setSelectState() {
-        this.vm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'SELECT')
+        this.bookVm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'SELECT')
     },
 
     // 销毁数据源选区
     destroyDataSoure() {
-        let selects = this.vm.$store.state.selects.list
+        let selects = this.bookVm.$store.state.selects.list
         let destroyDataSource = {}
         selects.forEach((item, index) => {
             if (item.type === 'DATASOURCE') {
                 destroyDataSource = item
             }
         })
-        this.vm.$store.dispatch(A_types.SELECTS_DELETE, {
+        this.bookVm.$store.dispatch(A_types.SELECTS_DELETE, {
             select: destroyDataSource
         })
     },
@@ -680,13 +680,13 @@ SpreadSheet.prototype = {
         }
         let colHead = config.cornerHeight
         let rowHead = config.cornerWidth
-        let el = this.vm.$el.getBoundingClientRect()
-        let scroll = this.vm.$store.state.sheets.scroll
+        let el = this.bookVm.$el.getBoundingClientRect()
+        let scroll = this.bookVm.$store.state.sheets.scroll
         let posiX = x - el.left - rowHead + scroll.left
         let posiY = y - el.top - colHead + scroll.top
-        let colAlias = String.fromCharCode(this.vm.$store.getters.getColIndexByPosi(
+        let colAlias = String.fromCharCode(this.bookVm.$store.getters.getColIndexByPosi(
             posiX) + 65)
-        let rowAlias = this.vm.$store.getters.getRowIndexByPosi(posiY) +
+        let rowAlias = this.bookVm.$store.getters.getRowIndexByPosi(posiY) +
             1
         return {
             point: {
@@ -714,17 +714,17 @@ SpreadSheet.prototype = {
 
     // 弹出新增批注窗口
     createAddCommentView() {
-        this.vm.$store.dispatch('EDIT_SHOW', 'COMMENT')
+        this.bookVm.$store.dispatch('EDIT_SHOW', 'COMMENT')
     },
 
     // 弹出编辑批注窗口
     createEditCommentView() {
-        this.vm.$store.dispatch('EDIT_SHOW', 'COMMENT')
+        this.bookVm.$store.dispatch('EDIT_SHOW', 'COMMENT')
     },
 
     // 删除批注
     deleteComment() {
-        this.vm.$store.dispatch('A_CELLS_UPDATE', {
+        this.bookVm.$store.dispatch('A_CELLS_UPDATE', {
             propName: 'recomment',
             propStruct: {
                 customProp: {
@@ -744,7 +744,7 @@ SpreadSheet.prototype = {
             r = row
         }
         let rowIdx = Number(r) - 1
-        this.vm.$store.dispatch(A_types.ROWS_INSERTROW, rowIdx)
+        this.bookVm.$store.dispatch(A_types.ROWS_INSERTROW, rowIdx)
     },
 
     // 删除行（冻结状态不可用）
@@ -757,7 +757,7 @@ SpreadSheet.prototype = {
             r = row
         }
         let rowIdx = Number(r) - 1
-        this.vm.$store.dispatch(A_types.ROWS_DELETEROW, rowIdx)
+        this.bookVm.$store.dispatch(A_types.ROWS_DELETEROW, rowIdx)
     },
 
     // 添加列（冻结状态不可用）
@@ -770,7 +770,7 @@ SpreadSheet.prototype = {
             c = col
         }
         let colIdx = this.getLetterNum(c)
-        this.vm.$store.dispatch(A_types.COLS_INSERTCOL, colIdx)
+        this.bookVm.$store.dispatch(A_types.COLS_INSERTCOL, colIdx)
     },
 
     // 删除列（冻结状态不可用）
@@ -783,7 +783,7 @@ SpreadSheet.prototype = {
             c = col
         }
         let colIdx = this.getLetterNum(c)
-        this.vm.$store.dispatch(A_types.COLS_DELETECOL, colIdx)
+        this.bookVm.$store.dispatch(A_types.COLS_DELETECOL, colIdx)
     },
 
     // 隐藏行（冻结状态不可用）
@@ -796,9 +796,9 @@ SpreadSheet.prototype = {
             r = row
         }
         let rowIdx = Number(r) - 1
-        let rows = this.vm.$store.getters.allRows
+        let rows = this.bookVm.$store.getters.allRows
         if (!rows[rowIdx].hidden) {
-            await this.vm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
+            await this.bookVm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
         }
     },
 
@@ -812,7 +812,7 @@ SpreadSheet.prototype = {
             r = row
         }
         let rowIdx = Number(r) - 1
-        await this.vm.$store.dispatch(A_types.ROWS_CANCELHIDE, rowIdx)
+        await this.bookVm.$store.dispatch(A_types.ROWS_CANCELHIDE, rowIdx)
     },
 
     // 隐藏列（冻结状态不可用）
@@ -825,9 +825,9 @@ SpreadSheet.prototype = {
             c = col
         }
         let colIdx = this.getLetterNum(c)
-        let cols = this.vm.$store.getters.allCols
+        let cols = this.bookVm.$store.getters.allCols
         if (!cols[colIdx].hidden) {
-            await this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)
+            await this.bookVm.$store.dispatch(A_types.COLS_HIDE, colIdx)
         }
     },
 
@@ -841,7 +841,7 @@ SpreadSheet.prototype = {
             c = col
         }
         let colIdx = this.getLetterNum(c)
-        await this.vm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
+        await this.bookVm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
     },
 
     // 自定义监听事件
@@ -908,22 +908,22 @@ SpreadSheet.prototype = {
 
     // 重新加载所有数据，表格会进行局部刷新，并滚动回初始位置
     reload() {
-        this.vm.$store.commit('M_UPDATE_LOAD', true)
+        this.bookVm.$store.commit('M_UPDATE_LOAD', true)
         // 销毁vue实例
-        this.vm.$destroy()
         this.bookVm.$destroy()
-        let bottom = this.vm.$el.offsetHeight + config.scrollBufferHeight
-        let right = this.vm.$el.offsetWidth + config.scrollBufferWidth
+        this.toolBarVm.$destroy()
+        let bottom = this.bookVm.$el.offsetHeight + config.scrollBufferHeight
+        let right = this.bookVm.$el.offsetWidth + config.scrollBufferWidth
         // // 清空 store 行 列 单元格 sheet select 信息
-        this.vm.$store.commit(M_types.M_CLEAR_CELLS)
-        this.vm.$store.commit(M_types.M_CLEAR_SELECT)
-        this.vm.$store.commit(M_types.M_CLEAR_SHEET)
-        this.vm.$store.commit(M_types.M_CLEAR_ROWS)
-        this.vm.$store.commit(M_types.M_CLEAR_COLS)
+        this.bookVm.$store.commit(M_types.M_CLEAR_CELLS)
+        this.bookVm.$store.commit(M_types.M_CLEAR_SELECT)
+        this.bookVm.$store.commit(M_types.M_CLEAR_SHEET)
+        this.bookVm.$store.commit(M_types.M_CLEAR_ROWS)
+        this.bookVm.$store.commit(M_types.M_CLEAR_COLS)
         let rootSelector = this.rootSelector
         let toolsSelector = this.toolbarSelector
         // 重新获取数据
-        this.vm.$store.dispatch(A_types.RESTORE, {
+        this.bookVm.$store.dispatch(A_types.RESTORE, {
             left: 0,
             top: 0,
             right,
@@ -932,16 +932,16 @@ SpreadSheet.prototype = {
             // 设置初始宽度
             let offsetWidth = document.querySelector(rootSelector).offsetWidth
             let offsetHeight = document.querySelector(rootSelector).offsetHeight
-            this.vm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
-            this.vm.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
-            let store = this.vm.$store
+            this.bookVm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
+            this.bookVm.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
+            let store = this.bookVm.$store
             // 新建vue实例table
-            this.vm = new Vue({
+            this.bookVm = new Vue({
                 store,
                 render: h => h(Book)
             }).$mount(rootSelector)
             // 新建vue实例tools
-            this.bookVm = new Vue({
+            this.toolBarVm = new Vue({
                 store,
                 render: h => h(Main)
             }).$mount(toolsSelector)
@@ -951,7 +951,7 @@ SpreadSheet.prototype = {
     // 清空队列
     clearQueue() {
         cache.step = 0
-        this.vm.$store.dispatch(A_types.A_CLEAR_QUEUE)
+        this.bookVm.$store.dispatch(A_types.A_CLEAR_QUEUE)
     }
 }
 // window.spreadSheet = SpreadSheet

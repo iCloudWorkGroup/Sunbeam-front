@@ -16,13 +16,7 @@ import EditPanel from './edit-panel.vue'
 import config from '../config'
 // import cache from '../tools/cache'
 import send from '../util/send'
-import * as actionTypes from '../store/action-types'
 import * as mutationTypes from '../store/mutation-types'
-import generator from '../tools/generator'
-import {
-    getColDisplayName,
-    getRowDisplayName
-} from '../util/displayname'
 import {
     unit
 } from '../filters/unit'
@@ -96,16 +90,19 @@ export default {
             let startRow = rows.map.get(this.rowStart)
             let overRow = rows.map.get(this.rowOver)
             let lastRow = rows.list[rows.list.length - 1]
+            let firstRow = rows.list[0]
             let limitHeight = 0
             // 如果视图的最后元素和已经加载元素一致
             // 说明不是冻结视图 需要考虑上下边框的距离
-            if (overRow.alias === lastRow.alias) {
+            if (overRow.alias === lastRow.alias &&
+                startRow.alias === firstRow.alias) {
                 limitHeight = this.$store.getters.offsetHeight - config.cornerHeight - config.sheetSider
                 if (this.needSider) {
                     limitHeight -= scrollbar()
                 }
             } else {
                 limitHeight = overRow.top + overRow.height
+                // limitHeight = this.$el ? this.$el.clientHeight : 0
             }
             return unit(limitHeight - startRow.top)
         }
@@ -168,114 +165,6 @@ export default {
                 limitMin,
                 limitMax,
                 viewLoaded: this.viewLoaded
-            })
-        },
-        transverseRequest(left, right, resolve, fn) {
-            let startRowAlias = this.rowOccupy[0]
-            let endRowAlias = this.rowOccupy[this.rowOccupy.length - 1]
-            let startRow = this.$store.getters.getRowByAlias(startRowAlias)
-            let endRow = this.$store.getters.getRowByAlias(endRowAlias)
-            let top = startRow.top
-            let bottom = endRow.top + endRow.height
-
-            send({
-                url: 'sheet/area',
-                isPublic: false,
-                data: JSON.stringify({
-                    left,
-                    top,
-                    right,
-                    bottom
-                }),
-                success: data => {
-                    if (fn) {
-                        let colData = data.gridLineCol
-                        let endColAlias = colData[colData.length - 1].alias
-                        let firstCol = colData[0]
-
-                        if (firstCol.hidden) {
-                            let index = this.$store.getters.colIndexByAlias(firstCol.alias)
-                            if (index > 0) {
-                                let cols = this.$store.getters.colList
-                                this.$store.commit(mutationTypes.UPDATE_COL, {
-                                    col: cols[index - 1],
-                                    props: {
-                                        rightAjacentHide: true
-                                    }
-                                })
-                            }
-                        }
-                        for (let i = 0, len = colData.length; i < len; i++) {
-                            let col = colData[i]
-                            if (col.hidden && i > 0) {
-                                colData[i - 1].rightAjacentHide = true
-                            }
-                            col.displayName = getColDisplayName(col.sort)
-                        }
-                        this.$store.dispatch(actionTypes.COLS_RESTORECOLS, colData)
-                        fn(endColAlias)
-                    }
-                    let cells = data.cells
-                    cells.forEach(function(cell) {
-                        cell.alias = generator.cellAliasGenerator()
-                    })
-                    this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
-                    resolve()
-                }
-            })
-        },
-        verticalRequest(top, bottom, resolve, fn) {
-            let startColAlias = this.colOccupy[0]
-            let endColAlias = this.colOccupy[this.colOccupy.length - 1]
-            let startCol = this.$store.getters.getColByAlias(startColAlias)
-            let endCol = this.$store.getters.getColByAlias(endColAlias)
-            let left = startCol.left
-            let right = endCol.left + endCol.width
-            return send({
-                url: 'sheet/area',
-                isPublic: false,
-                data: JSON.stringify({
-                    left,
-                    top,
-                    right,
-                    bottom
-                }),
-                success: (data) => {
-                    if (fn) {
-                        let rowData = data.gridLineRow
-                        let endRowAlias = rowData[rowData.length - 1].alias
-                        let firstRow = rowData[0]
-
-                        if (firstRow.hidden) {
-                            let index = this.$store.getters.getRowIndexByAlias(firstRow.alias)
-                            if (index > 0) {
-                                let rows = this.$store.getters.rowList
-                                this.$store.commit(mutationTypes.UPDATE_ROW, {
-                                    row: rows[index - 1],
-                                    props: {
-                                        bottomAjacentHide: true
-                                    }
-                                })
-                            }
-                        }
-                        for (let i = 0, len = rowData.length; i < len; i++) {
-                            let row = rowData[i]
-                            if (row.hidden && i > 0) {
-                                rowData[i - 1].bottomAjacentHide = true
-                            }
-                            row.displayName = getRowDisplayName(row.sort)
-                        }
-
-                        this.$store.dispatch(actionTypes.ROWS_RESTOREROWS, rowData)
-                        fn(endRowAlias)
-                    }
-                    let cells = data.cells
-                    cells.forEach(function(cell) {
-                        cell.alias = generator.cellAliasGenerator()
-                    })
-                    this.$store.dispatch(actionTypes.CELLS_RESTORECELL, cells)
-                    resolve()
-                }
             })
         },
         updateUserView() {

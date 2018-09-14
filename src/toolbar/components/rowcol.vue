@@ -9,7 +9,7 @@
                     <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">插入工作表</div>
-                        <div class="fui-cf-extend caret"></div>
+                        <div class="fui-cf-extend fui-cf-caret"></div>
                     </div>
                 </div>
             </span>
@@ -21,7 +21,7 @@
                     <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">删除工作表</div>
-                        <div class="fui-cf-extend caret"></div>
+                        <div class="fui-cf-extend fui-cf-caret"></div>
                     </div>
                 </div>
             </span>

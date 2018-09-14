@@ -3,17 +3,17 @@
    <div class="fui-body">
         <div class="fui-layout">
             <div class="fui-section fui-alone"
-                data-initiator="format"
-                @click="ejectMenu($event, 'format')">
+                data-initiator="formats"
+                @click="ejectMenu($event, 'formats')">
                 <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
                 <div class="fui-cf-desc">
                     <div class="fui-cf-text">文本格式</div>
-                    <div class="fui-cf-extend caret"></div>
+                    <div class="fui-cf-extend fui-cf-caret"></div>
                 </div>
             </div>
         </div>
     </div>
-    <formats ref="format" v-show="tool == 'format'"></formats>
+    <formats ref="formats" v-show="tool==='formats'"></formats>
 </div>
 </template>
 <script type="text/javascript">
@@ -24,14 +24,14 @@ import formats from './formats.vue'
 import {
     SWITCH_NAME
 } from '../store/mutation-type'
+import {
+    mapGetters
+} from '../../lib/vuex.esm'
 export default {
     computed: {
-        // ...mapGetters({
-        //     tool: 'activeTool'
-        // }),
-        tool() {
-            return this.$store.getters.activeTool
-        }
+        ...mapGetters({
+            tool: 'activeTool'
+        })
     },
     components: {
         formats

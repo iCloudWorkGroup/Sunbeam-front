@@ -1,7 +1,6 @@
 import {
     COLS_OPERCOLS,
     ROWS_OPERROWS,
-    OCCUPY_UPDATE,
     A_CELLS_MERGE,
     A_CELLS_DESTORY,
     A_CELLS_SPLIT,
@@ -247,95 +246,6 @@ export default {
                     }))
                 }
             }
-        }
-    },
-    [OCCUPY_UPDATE]({
-        commit,
-        getters,
-        rootState,
-        dispatch
-    }, {
-        col,
-        row
-    }) {
-        if (col.length === 0 || row.length === 0) {
-            return
-        }
-        let startRowIndex = getters.rowIndexByAlias(row[0])
-        let startColIndex = getters.colIndexByAlias(col[0])
-        let endRowIndex = getters.rowIndexByAlias(row[row.length - 1])
-        let endColIndex = getters.colIndexByAlias(col[col.length - 1])
-        let cols = getters.colList
-        let rows = getters.allRows
-        let getPointInfo = getters.getPointInfo
-        let temp
-
-        for (let i = startRowIndex; i < endRowIndex + 1; i++) {
-            if (!isEmpty(temp = rows[i].props)) {
-                for (let j = startColIndex; j < endColIndex + 1; j++) {
-                    let rowAlias = rows[i].alias
-                    let colAlias = cols[j].alias
-                    let index = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                    let cell = extend({}, temp)
-
-                    cell.occupy = {
-                        col: [colAlias],
-                        row: [rowAlias]
-                    }
-                    if (typeof index !== 'number') {
-                        dispatch('A_CELLS_ADD', [cell])
-                    }
-                }
-            }
-        }
-
-
-        for (let i = startColIndex; i < endColIndex + 1; i++) {
-            if (!isEmpty(temp = cols[i].props)) {
-                for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                    let rowAlias = rows[j].alias
-                    let colAlias = cols[i].alias
-                    let index = getPointInfo(colAlias, rowAlias, 'cellIndex')
-                    let cell = extend({}, temp)
-
-                    cell.occupy = {
-                        col: [colAlias],
-                        row: [rowAlias]
-                    }
-                    if (typeof index !== 'number') {
-                        dispatch('A_CELLS_ADD', [cell])
-                    }
-                }
-            }
-        }
-
-        function isEmpty(obj) {
-            let content = obj.content
-            if (content) {
-                for (let key in content) {
-                    if (Object.prototype.hasOwnProperty.call(content, key)) {
-                        return false
-                    }
-                }
-            }
-            let border = obj.border
-            if (border) {
-                for (let key in border) {
-                    if (Object.prototype.hasOwnProperty.call(border, key)) {
-                        return false
-                    }
-                }
-            }
-            let customProp = obj.customProp
-            if (customProp) {
-                for (let key in customProp) {
-                    if (Object.prototype.hasOwnProperty.call(customProp, key)) {
-                        return false
-                    }
-                }
-
-            }
-            return true
         }
     },
     async [A_CELLS_MERGE]({

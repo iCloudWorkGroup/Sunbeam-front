@@ -15,17 +15,17 @@
                 <panel title="对齐方式">
                     <align/>
                 </panel>
-                <panel title="文本格式">
+                <panel title="数字">
                     <format/>
                 </panel>
                 <panel title="合并拆分">
                     <merge/>
                 </panel>
-                <!-- <tool-panel title="视图">
-                    <frozen/>
-                </tool-panel>  -->
                 <panel title="自动换行">
                     <word-wrap/>
+                </panel>
+                <panel title="视图">
+                    <frozen/>
                 </panel>
                 <panel title="隐藏">
                     <hide/>
@@ -44,7 +44,7 @@
 <script type="text/javascript">
 import Panel from './panel.vue'
 import Font from './font.vue'
-// import Frozen from './frozen.vue'
+import Frozen from './frozen.vue'
 import Align from './align.vue'
 import Merge from './merge.vue'
 import Format from './format.vue'
@@ -63,7 +63,7 @@ export default {
     components: {
         Panel,
         Font,
-        // Frozen,
+        Frozen,
         Align,
         Merge,
         Rowcol,
@@ -81,16 +81,28 @@ export default {
                     let el = e.target
                     let activeName = el.dataset.initiator
                     if (activeName == null) {
+                        /**
+                         * 只进行两次向上查找，找不到就结束
+                         */
+                        let searchTime = 2
                         el = e.target.parentNode
-                        activeName = el.dataset.initiator
-                    }
-                    if (activeName) {
-                        if (activeName !== this.$store.getters['activeTool']) {
-                            this.$store.commit(SWITCH_NAME, activeName)
+                        while (searchTime !== 0) {
+                            activeName = el.dataset && el.dataset.initiator
+                            if (activeName == null) {
+                                el = el.parentNode
+                                searchTime -= 1
+                            } else {
+                                return
+                            }
                         }
+                    }
+                    if (activeName == null) {
+                        this.$store.commit(SWITCH_NAME, null)
                         return
                     }
-                    this.$store.commit(SWITCH_NAME, null)
+                    if (activeName !== this.$store.getters['activeTool']) {
+                        this.$store.commit(SWITCH_NAME, activeName)
+                    }
                 }.bind(this))
     }
 }

@@ -66,11 +66,6 @@ export default {
             }, 100)
 
         }
-        // document.addEventListener('mouseup', function() {
-        //     self.$store.commit(UPDATE_MOUSESTATE, {
-        //         state: LOCATE
-        //     })
-        // }, false)
     },
     methods: {
         offStatus(e) {

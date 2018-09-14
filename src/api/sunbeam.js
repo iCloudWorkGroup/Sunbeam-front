@@ -572,7 +572,7 @@ SpreadSheet.prototype = {
     },
 
     // 设置列的宽度（冻结状态不可用）
-    async setColWidth(sheetId, col, width) {
+    setColWidth(sheetId, col, width) {
         let c
         let w
         if (arguments.length === 2) {
@@ -584,14 +584,14 @@ SpreadSheet.prototype = {
             w = width
         }
         let colIdx = this.getLetterNum(c)
-        await this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
+        this.vm.$store.dispatch(A_types.COLS_ADJUSTWIDTH, {
             index: colIdx,
             width: w
         })
     },
 
     // 设置行的高度（冻结状态不可用）
-    async setRowHeight(sheetId, row, height) {
+    setRowHeight(sheetId, row, height) {
         let r
         let h
         if (arguments.length === 2) {
@@ -603,7 +603,7 @@ SpreadSheet.prototype = {
             h = height
         }
         let rowIdx = Number(r) - 1
-        await this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
+        this.vm.$store.dispatch(A_types.ROWS_ADJUSTHEIGHT, {
             index: rowIdx,
             height: h
         })
@@ -787,7 +787,7 @@ SpreadSheet.prototype = {
     },
 
     // 隐藏行（冻结状态不可用）
-    rowHide(sheetId, row) {
+    async rowHide(sheetId, row) {
         let r
         if (arguments.length === 1) {
             r = sheetId
@@ -798,12 +798,12 @@ SpreadSheet.prototype = {
         let rowIdx = Number(r) - 1
         let rows = this.vm.$store.getters.allRows
         if (!rows[rowIdx].hidden) {
-            this.vm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
+            await this.vm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
         }
     },
 
     // 取消隐藏行（冻结状态不可用）
-    rowCancelHide(sheetId, row) {
+    async rowCancelHide(sheetId, row) {
         let r
         if (arguments.length === 1) {
             r = sheetId
@@ -812,11 +812,11 @@ SpreadSheet.prototype = {
             r = row
         }
         let rowIdx = Number(r) - 1
-        this.vm.$store.dispatch(A_types.ROWS_CANCELHIDE, rowIdx)
+        await this.vm.$store.dispatch(A_types.ROWS_CANCELHIDE, rowIdx)
     },
 
     // 隐藏列（冻结状态不可用）
-    colHide(sheetId, col) {
+    async colHide(sheetId, col) {
         let c
         if (arguments.length === 1) {
             c = sheetId
@@ -827,12 +827,12 @@ SpreadSheet.prototype = {
         let colIdx = this.getLetterNum(c)
         let cols = this.vm.$store.getters.allCols
         if (!cols[colIdx].hidden) {
-            this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)
+            await this.vm.$store.dispatch(A_types.COLS_HIDE, colIdx)
         }
     },
 
     // 取消隐藏列（冻结状态不可用）
-    colCancelHide(sheetId, col) {
+    async colCancelHide(sheetId, col) {
         let c
         if (arguments.length === 1) {
             c = sheetId
@@ -841,7 +841,7 @@ SpreadSheet.prototype = {
             c = col
         }
         let colIdx = this.getLetterNum(c)
-        this.vm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
+        await this.vm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
     },
 
     // 自定义监听事件

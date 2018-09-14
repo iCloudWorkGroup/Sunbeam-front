@@ -49,7 +49,7 @@ export default {
             endIndex
         })
     },
-    [actionTypes.ROWS_HIDE]({
+    async [actionTypes.ROWS_HIDE]({
         commit,
         getters,
         dispatch
@@ -67,13 +67,13 @@ export default {
         }
         let rows = getters.allRows
         let row = rows[index]
-        send({
+        dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
+        await send({
             url: config.url.hiderow,
             body: JSON.stringify({
                 row: row.sort
             })
         })
-        dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
     },
     [actionTypes.ROWS_EXECHIDE]({
         state,
@@ -84,7 +84,7 @@ export default {
     }, sort) {
         let index = getters.getRowIndexBySort(sort)
         let rows = getters.allRows
-        let visibleRows = getters.visibleRowList()
+        // let visibleRows = getters.visibleRowList()
         // 将被隐藏行
         let row = rows[index]
         let updateCellInfo = []
@@ -203,72 +203,29 @@ export default {
         selects.forEach(function(select) {
             let wholePosi = select.wholePosi
             let rowSort = row.sort
-            let endVisibleSort = visibleRows[visibleRows.length - 1].sort
+            // let endVisibleSort = visibleRows[visibleRows.length - 1].sort
             let startSort = getters.getRowByAlias(wholePosi.startRowAlias).sort
             let endSort = getters.getRowByAlias(wholePosi.endRowAlias).sort
             // 第一种情况 选择单行
             if (startSort === endSort) {
                 // 隐藏行为选择行
                 if (startSort === rowSort) {
-                    // 隐藏行不为最后一列可视行
-                    if (startSort !== endVisibleSort) {
-                        updateSelectInfo.push({
-                            type: getters.activeType,
-                            props: {
-                                physicsBox: {
-                                    height: rows[index + 1].height
-                                },
-                                wholePosi: {
-                                    startRowAlias: rows[index + 1].alias,
-                                    endRowAlias: rows[index + 1].alias
-                                },
-                                signalSort: {
-                                    startRow: index + 1,
-                                    endRow: index + 1
-                                },
-                                active: {
-                                    startRowAlias: rows[index + 1].alias,
-                                }
-                            }
-                        })
-                        commit(mutationTypes.ACTIVE_ROW, {
-                            startIndex: index + 1
-                        })
-                    }
-                    // 隐藏行为最后一列可视行
-                    if (startSort === endVisibleSort) {
-                        updateSelectInfo.push({
-                            type: getters.activeType,
-                            props: {
-                                physicsBox: {
-                                    top: rows[index - 1].top,
-                                    height: rows[index - 1].height
-                                },
-                                wholePosi: {
-                                    startRowAlias: rows[index - 1].alias,
-                                    endRowAlias: rows[index - 1].alias
-                                },
-                                signalSort: {
-                                    startRow: rows[index - 1].sort,
-                                    endRow: rows[index - 1].sort
-                                },
-                                active: {
-                                    startRowAlias: rows[index - 1].alias,
-                                }
-                            }
-                        })
-                        commit(mutationTypes.ACTIVE_ROW, {
-                            startIndex: index - 1
-                        })
-                    }
-                }
-                // 隐藏行在选择行上方
-                if (startSort < rowSort) {
                     updateSelectInfo.push({
                         type: getters.activeType,
                         props: {
                             physicsBox: {
-                                top: rows[index - 1].top,
+                                height: 0
+                            }
+                        }
+                    })
+                }
+                // 隐藏行在选择行上方
+                if (startSort > rowSort) {
+                    updateSelectInfo.push({
+                        type: getters.activeType,
+                        props: {
+                            physicsBox: {
+                                top: rows[startSort].top,
                             }
                         }
                     })
@@ -296,13 +253,12 @@ export default {
                 })
             }
         })
-
         updateSelectInfo.forEach((item, index) => {
             commit(mutationTypes.UPDATE_SELECT, item)
         })
 
     },
-    [actionTypes.ROWS_CANCELHIDE]({
+    async [actionTypes.ROWS_CANCELHIDE]({
         getters,
         dispatch
     }, payload) {
@@ -342,13 +298,13 @@ export default {
         if (typeof index === 'undefined' || !rows[index].hidden) {
             return
         }
-        send({
+        dispatch(actionTypes.ROWS_EXECCANCELHIDE, rows[index].sort)
+        await send({
             url: config.url.showrow,
             body: JSON.stringify({
                 row: rows[index].sort
             }),
         })
-        dispatch(actionTypes.ROWS_EXECCANCELHIDE, rows[index].sort)
     },
     [actionTypes.ROWS_EXECCANCELHIDE]({
         state,
@@ -466,8 +422,16 @@ export default {
 
             let startIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
             let endIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-
-            if (startIndex > index) {
+            if (startIndex === index) {
+                updateSelectInfo.push({
+                    type: getters.activeType,
+                    props: {
+                        physicsBox: {
+                            height: rowHeight + 1
+                        }
+                    }
+                })
+            } else if (startIndex > index) {
                 updateSelectInfo.push({
                     type: getters.activeType,
                     props: {
@@ -730,7 +694,7 @@ export default {
             dispatch(actionTypes.A_CELLS_ADD, insertCellList)
         }
     },
-    async [actionTypes.ROWS_ADJUSTHEIGHT]({
+    [actionTypes.ROWS_ADJUSTHEIGHT]({
         dispatch,
         getters
     }, {
@@ -743,7 +707,7 @@ export default {
             sort: row.sort,
             value: height
         })
-        await send({
+        send({
             url: config.url.adjustrow,
             body: JSON.stringify({
                 row: row.sort,
@@ -922,7 +886,7 @@ export default {
         let updateCellInfo = []
         let max = getters.max
         commit('UPDATE_SHEETS_MAX', {
-            rowPixel: max.rowPixel - deleteRow - 1
+            rowPixel: max.rowPixel - deleteRow.height - 1
         })
         cells.forEach(function(cell) {
             let occupyRow = cell.occupy.row

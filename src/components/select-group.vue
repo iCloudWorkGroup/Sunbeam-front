@@ -91,4 +91,9 @@ export default {
     width: inherit;
     height: inherit;
 }
+.comment {
+    word-wrap:break-word;
+    word-break:break-all;
+    overflow: hidden
+}
 </style>

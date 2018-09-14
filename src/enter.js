@@ -8,8 +8,12 @@ let ss = new Sunbeam({
 
 
 ss.load().then(() => {
-    document.addEventListener('mousemove', function (e) {
-        ss.getPointByPosi('1', e.clientX, e.clientY)
+    ss.colHide('1', 'A').then(() => {
+        return ss.rowHide('1', '1')
+    }).then(() => {
+        return ss.rowHide('1', '2')
+    }).then(() => {
+        ss.reload()
     })
 })
 
@@ -20,11 +24,23 @@ ss.addEventListener('regionChange', function (e) {
     // console.log(e.point.col[0])
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.createAddCommentView()
+    ss.colHide('1', 'A').then(() => {
+        return ss.rowHide('1', '1')
+    }).then(() => {
+        return ss.rowHide('1', '2')
+    }).then(() => {
+        ss.reload()
+    })
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.createEditCommentView()
+    ss.colCancelHide('1', 'A').then(() => {
+        return ss.rowCancelHide('1', '1')
+    }).then(() => {
+        return ss.rowCancelHide('1', '2')
+    }).then(() => {
+        ss.reload()
+    })
 })
 document.getElementById('clear').addEventListener('click', function () {
-    ss.deleteComment()
+
 })

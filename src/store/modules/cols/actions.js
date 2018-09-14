@@ -67,7 +67,7 @@ export default {
             currentSheet: rootState.currentSheet
         })
     },
-    async [actionTypes.COLS_ADJUSTWIDTH]({
+    [actionTypes.COLS_ADJUSTWIDTH]({
         dispatch,
         getters
     }, {
@@ -80,7 +80,7 @@ export default {
             sort: col.sort,
             value: width
         })
-        await send({
+        send({
             url: config.url['adjustcol'],
             body: JSON.stringify({
                 col: col.sort,
@@ -515,7 +515,7 @@ export default {
             }
         }
     },
-    [actionTypes.COLS_HIDE]({
+    async [actionTypes.COLS_HIDE]({
         getters,
         dispatch
     }, payload) {
@@ -532,13 +532,13 @@ export default {
         }
         let cols = getters.allCols
         let col = cols[index]
-        send({
+        dispatch(actionTypes.COLS_EXECHIDE, col.sort)
+        await send({
             url: config.url.hidecol,
             body: JSON.stringify({
                 col: col.sort
             }),
         })
-        dispatch(actionTypes.COLS_EXECHIDE, col.sort)
     },
     [actionTypes.COLS_EXECHIDE]({
         state,
@@ -550,7 +550,7 @@ export default {
         let cols = getters.allCols
         let index = getters.getColIndexBySort(sort)
         let col = cols[index]
-        let visibleCols = getters.visibleColList()
+        // let visibleCols = getters.visibleColList()
         let updateCellInfo = []
         let colWidth = col.width
         let colAlias = col.alias
@@ -662,8 +662,7 @@ export default {
             let startSort
             let endSort
             let colSort = col.sort
-            let endVisibleSort = visibleCols[visibleCols.length -
-                1].sort
+            // let endVisibleSort = visibleCols[visibleCols.length - 1].sort
 
             startSort = getters.getColByAlias(wholePosi.startColAlias).sort
             endSort = getters.getColByAlias(wholePosi.endColAlias).sort
@@ -672,65 +671,22 @@ export default {
             if (startSort === endSort) {
                 // 隐藏行为选择行
                 if (startSort === colSort) {
-                    // 隐藏行不为最后一列可视行
-                    if (startSort !== endVisibleSort) {
-                        updateSelectInfo.push({
-                            type: getters.activeType,
-                            props: {
-                                physicsBox: {
-                                    width: cols[index + 1].width
-                                },
-                                wholePosi: {
-                                    startColAlias: cols[index + 1].alias,
-                                    endColAlias: cols[index + 1].alias
-                                },
-                                signalSort: {
-                                    startCol: index + 1,
-                                    endCol: index + 1
-                                },
-                                active: {
-                                    startColAlias: cols[index + 1].alias
-                                }
-                            }
-                        })
-                        commit(mutationTypes.ACTIVE_COL, {
-                            startIndex: index + 1
-                        })
-                    }
-                    // 隐藏行为最后一列可视行
-                    if (startSort === endVisibleSort) {
-                        updateSelectInfo.push({
-                            type: getters.activeType,
-                            props: {
-                                physicsBox: {
-                                    left: cols[index - 1].left,
-                                    width: cols[index - 1].width
-                                },
-                                wholePosi: {
-                                    startColAlias: cols[index - 1].alias,
-                                    endColAlias: cols[index - 1].alias
-                                },
-                                signalSort: {
-                                    startCol: cols[index - 1].sort,
-                                    endCol: cols[index - 1].sort
-                                },
-                                active: {
-                                    startColAlias: cols[index - 1].alias,
-                                }
-                            }
-                        })
-                        commit(mutationTypes.ACTIVE_COL, {
-                            startIndex: index - 1
-                        })
-                    }
-                }
-                // 隐藏行在选择行上方
-                if (startSort < colSort) {
                     updateSelectInfo.push({
                         type: getters.activeType,
                         props: {
                             physicsBox: {
-                                left: cols[index - 1].left
+                                width: 0
+                            }
+                        }
+                    })
+                }
+                // 隐藏行在选择行上方
+                if (startSort > colSort) {
+                    updateSelectInfo.push({
+                        type: getters.activeType,
+                        props: {
+                            physicsBox: {
+                                left: cols[startSort].left
                             }
                         }
                     })
@@ -762,7 +718,7 @@ export default {
             commit(mutationTypes.UPDATE_SELECT, item)
         })
     },
-    [actionTypes.COLS_CANCELHIDE]({
+    async [actionTypes.COLS_CANCELHIDE]({
         getters,
         dispatch
     }, payload) {
@@ -803,13 +759,13 @@ export default {
             return
         }
         let col = cols[index]
-        send({
+        dispatch(actionTypes.COLS_EXECCANCELHIDE, col.sort)
+        await send({
             url: config.url.showcol,
             body: JSON.stringify({
                 col: col.sort
             })
         })
-        dispatch(actionTypes.COLS_EXECCANCELHIDE, col.sort)
     },
     [actionTypes.COLS_EXECCANCELHIDE]({
         rootState,
@@ -930,7 +886,16 @@ export default {
 
             startIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             endIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-            if (startIndex > index) {
+            if (startIndex === index) {
+                updateSelectInfo.push({
+                    type: getters.activeType,
+                    props: {
+                        physicsBox: {
+                            width: colWidth + 1
+                        }
+                    }
+                })
+            } else if (startIndex > index) {
                 updateSelectInfo.push({
                     type: getters.activeType,
                     props: {

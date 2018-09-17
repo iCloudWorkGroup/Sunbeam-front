@@ -477,7 +477,7 @@ export default {
     }) {
 
         // pause
-        console.log()
+        console.log('A_CELLS_INNERPASTE')
     },
     [CELLS_INNERPASTE]({
         state,
@@ -494,8 +494,7 @@ export default {
             clipEndColSort,
             clipEndRowSort
         } = payload
-        let currentSheet = rootState.currentSheet
-        let cols = getters.colList
+        let cols = getters.allCols
         let rows = getters.allRows
         let startColIndex = getters.getColIndexBySort(startColSort)
         let startRowIndex = getters.getRowIndexBySort(startRowSort)
@@ -512,9 +511,8 @@ export default {
             for (let j = clipStartRowIndex; j < clipEndRowIndex + 1; j++) {
                 let aliasCol = cols[i].alias
                 let aliasRow = rows[j].alias
-                let cellIndex = getters.getPointInfo(aliasCol, aliasRow,
-                    'cellIndex')
-                if (cellIndex != null && !temp[cellIndex]) {
+                let cellIndex = getters.IdxByCol(aliasCol, aliasRow)
+                if (cellIndex !== -1 && !temp[cellIndex]) {
                     temp[cellIndex] = true
                     cacheInfo.push({
                         colRelative,
@@ -523,7 +521,6 @@ export default {
                     })
                     if (cache.clipState === 'cut') {
                         commit(mutationTypes.M_UPDATE_POINTS, {
-                            currentSheet,
                             info: {
                                 colAlias: aliasCol,
                                 rowAlias: aliasRow,
@@ -551,7 +548,6 @@ export default {
                 let aliasCol = cols[i]
                 let aliasRow = rows[j]
                 commit(mutationTypes.M_UPDATE_POINTS, {
-                    currentSheet,
                     info: {
                         colAlias: aliasCol,
                         rowAlias: aliasRow,
@@ -602,18 +598,9 @@ export default {
                 flag = false
             }
             if (flag) {
-                let clip
-                let selects = getters.selectList
-                for (let i = 0, len = selects.length; i < len; i++) {
-                    let select = selects[i]
-                    if (select.type === CLIP) {
-                        clip = select
-                        break
-                    }
-                }
+                let clip = getters.selectByType(CLIP)
                 cache.clipState = ''
                 commit(mutationTypes.DELETE_SELECT, {
-                    currentSheet,
                     select: clip
                 })
             }
@@ -745,26 +732,24 @@ export default {
                 wordWrap: value
             }
         }
-        if (endRowIndex === 'MAX') {
-            dispatch(COLS_OPERCOLS, {
-                startIndex: startColIndex,
-                endIndex: endColIndex,
-                props
-            })
-        } else if (endColIndex === 'MAX') {
-            dispatch(ROWS_OPERROWS, {
-                startIndex: startRowIndex,
-                endIndex: endRowIndex,
-                props
-            })
+        if (endRowIndex === -1) {
+            throw new Error('CUSTOM ERROR:row index out of loaded arrange')
+            // dispatch(COLS_OPERCOLS, {
+            //     startIndex: startColIndex,
+            //     endIndex: endColIndex,
+            //     props
+            // })
+        } else if (endColIndex === -1) {
+            throw new Error('CUSTOM ERROR:col index out of loaded arrange')
+            // dispatch(ROWS_OPERROWS, {
+            //     startIndex: startRowIndex,
+            //     endIndex: endRowIndex,
+            //     props
+            // })
         } else {
             if (value) {
                 oprRows = getAdaptRows()
             }
-            // await send({
-            //     url: config.url.wordWrap,
-            //     body: JSON.stringify(data)
-            // })
             dispatch('A_CELLS_UPDATE', {
                 propName: 'wordWrap',
                 propStruct: props
@@ -778,7 +763,7 @@ export default {
                 })
             }
         }
-
+        // 获得换行后的高度
         function getAdaptRows() {
             let cols = getters.allCols
             let rows = getters.allRows

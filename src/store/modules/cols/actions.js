@@ -76,15 +76,16 @@ export default {
     }) {
         let cols = getters.allCols
         let col = cols[index]
+        let limitWidth = width > 5 ? width : 5
         dispatch(actionTypes.COLS_EXECADJUSTWIDTH, {
             sort: col.sort,
-            value: width
+            value: limitWidth
         })
         send({
             url: config.url['adjustcol'],
             body: JSON.stringify({
                 col: col.sort,
-                offset: width
+                offset: limitWidth
             }),
         })
     },
@@ -828,7 +829,7 @@ export default {
                                 hidden: false
                             },
                             physicsBox: {
-                                width: cell.physicsBox.width + colWidth + 1
+                                width: cell.physicsBox.width + colWidth
                             }
                         }
                     })
@@ -838,7 +839,7 @@ export default {
                             cell,
                             props: {
                                 physicsBox: {
-                                    width: cell.physicsBox.width + colWidth + 1
+                                    width: cell.physicsBox.width + colWidth
                                 }
                             }
                         }) :
@@ -846,8 +847,7 @@ export default {
                             cell,
                             props: {
                                 physicsBox: {
-                                    width: cell.physicsBox
-                                        .width + colWidth + 1
+                                    width: cell.physicsBox.width + colWidth + 1
                                 },
                                 status: {
                                     hidden: false

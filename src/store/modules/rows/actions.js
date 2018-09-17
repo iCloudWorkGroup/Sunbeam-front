@@ -366,8 +366,7 @@ export default {
                                 hidden: false
                             },
                             physicsBox: {
-                                height: cell.physicsBox.height +
-                                rowHeight + 1
+                                height: cell.physicsBox.height + rowHeight
                             }
                         },
                     })
@@ -377,8 +376,7 @@ export default {
                             cell,
                             props: {
                                 physicsBox: {
-                                    height: cell.physicsBox.height +
-                                        rowHeight + 1
+                                    height: cell.physicsBox.height + rowHeight
                                 }
                             }
                         }) :
@@ -389,8 +387,7 @@ export default {
                                     hidden: false
                                 },
                                 physicsBox: {
-                                    height: cell.physicsBox.height +
-                                    rowHeight + 1
+                                    height: cell.physicsBox.height + rowHeight + 1
                                 }
                             }
                         })
@@ -703,15 +700,16 @@ export default {
     }) {
         let rows = getters.allRows
         let row = rows[index]
+        let limitHeight = height > 5 ? height : 5
         dispatch(actionTypes.ROWS_EXECADJUSTHEIGHT, {
             sort: row.sort,
-            value: height
+            value: limitHeight
         })
         send({
             url: config.url.adjustrow,
             body: JSON.stringify({
                 row: row.sort,
-                offset: height
+                offset: limitHeight
             }),
         })
     },

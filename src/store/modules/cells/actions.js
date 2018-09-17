@@ -776,7 +776,7 @@ export default {
                 for (let j = startColIndex; j < endColIndex + 1; j++) {
                     let colAlias = cols[j].alias
                     let cellIdx = getters.IdxByRow(colAlias, rowAlias)
-                    if (typeof cellIdx === -1 && !temp[cellIdx]) {
+                    if (cellIdx !== -1 && !temp[cellIdx]) {
                         let cell = cells[cellIdx]
                         if (cell.occupy.col.length === 1 && cell.occupy.row.length ===
                             1) {

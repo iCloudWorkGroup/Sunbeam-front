@@ -3,8 +3,8 @@ import {
     isDate, formatText,
     isNum, parseExpress,
 } from '../../../tools/format'
-import send from '../../../util/send'
-import config from '../../../config'
+// import send from '../../../util/send'
+// import config from '../../../config'
 export default {
     [actionTypes.EDIT_SHOW]({
         state,
@@ -90,7 +90,7 @@ export default {
                         width: 150,
                         height: 150,
                         texts: customProp.comment,
-                        size: content.size,
+                        size: 11,
                         family: content.family,
                         color: content.color,
                         weight: content.weight,
@@ -177,20 +177,10 @@ export default {
             }
             if (isNum(texts)) {
                 propStruct.content.alignRow = 'right'
-                let sendArgs = {
-                    coordinate: [
-                        {
-                            startCol: colIndex,
-                            startRow: rowIndex,
-                            endCol: colIndex,
-                            endRow: rowIndex
-                        }],
-                    align: 'right'
-                }
-                send({
-                    url: config.url.alignRow,
-                    body: JSON.stringify(sendArgs)
-                })
+                // send({
+                //     url: config.url.alignRow,
+                //     body: JSON.stringify(sendArgs)
+                // })
             }
         }
         if (status === 'comment') {

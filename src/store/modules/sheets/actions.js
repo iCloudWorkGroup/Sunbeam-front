@@ -231,14 +231,14 @@ export default {
                     overIdx: cordRowIndex
                 })
                 delView({
-                    alias: cordRowAlias
+                    alias: firstRowAlias
                 })
             }
             // 滚动方向： UP
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordRow.top) {
+            if (limitMax < cordRow.left) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: firstColIndex,
                     endColIndex: lastColIndex,
@@ -309,9 +309,11 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allColMap = allLoaded.rowMap.get(lastRowAlias)
+            let allLoadedLastRowAlias = allLoaded.rows[allLoaded.rows.length - 1]
+            let allLoadedLastRowIdx = rootGetters.rowIndexByAlias(allLoadedLastRowAlias)
             let needRequire = allColMap != null &&
                 allColMap.get(lastColAlias) &&
-                allLoaded.rows.length - lastRowIndex > 1 ? false : true
+                allLoadedLastRowIdx - lastRowIndex > 1 ? false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
@@ -567,7 +569,7 @@ export default {
                     overIdx: cordColIndex
                 })
                 delView({
-                    alias: cordColAlias
+                    alias: firstColAlias
                 })
             }
             // 滚动方向： UP
@@ -645,9 +647,11 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allRowMap = allLoaded.colMap.get(lastColAlias)
+            let allLoadedLastColAlias = allLoaded.cols[allLoaded.cols.length - 1]
+            let allLoadedLastColIdx = rootGetters.colIndexByAlias(allLoadedLastColAlias)
             let needRequire = allRowMap != null &&
                 allRowMap.get(lastRowAlias) &&
-                allLoaded.cols.length - lastColIndex > 1 ? false : true
+                allLoadedLastColIdx - lastColIndex > 1 ? false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1

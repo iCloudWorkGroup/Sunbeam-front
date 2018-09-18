@@ -440,10 +440,10 @@ export default {
                         if (!avoidRepeat[idx]) {
                             avoidRepeat[idx] = true
                             let display = parseText(cells[idx])
-                            extend(true, props, display)
+                            let updateProps = extend(props, display)
                             commit(mutationTypes.UPDATE_CELL, {
                                 idx,
-                                prop: props
+                                prop: updateProps
                             })
                         }
                     } else {

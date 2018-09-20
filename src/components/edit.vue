@@ -94,17 +94,31 @@ export default {
             let limitHeight = 0
             // 如果视图的最后元素和已经加载元素一致
             // 说明不是冻结视图 需要考虑上下边框的距离
-            if (overRow.alias === lastRow.alias &&
-                startRow.alias === firstRow.alias) {
-                limitHeight = this.$store.getters.offsetHeight - config.cornerHeight - config.sheetSider
-                if (this.needSider) {
-                    limitHeight -= scrollbar()
-                }
-            } else {
-                limitHeight = overRow.top + overRow.height
-                // limitHeight = this.$el ? this.$el.clientHeight : 0
+            limitHeight = this.$store.getters.offsetHeight - config.cornerHeight - config.sheetSider
+            if (this.needSider) {
+                limitHeight -= scrollbar()
             }
-            return unit(limitHeight - startRow.top)
+            if (startRow.alias === firstRow.alias &&
+                overRow.alias === lastRow.alias) {
+                return unit(limitHeight)
+            }
+            let isFrozen = this.$store.getters.isFrozen()
+            let frozenAlias = this.$store.getters.frozenAlias()
+            let frozenAliasRow = frozenAlias.row
+            let userView = this.$store.getters.userView()
+            if (isFrozen && frozenAliasRow != null) {
+                let frozenRow = this.$store.getters.getRowByAlias(
+                    frozenAliasRow)
+                let topDistance = frozenRow.top + frozenRow.height - userView.top
+                let neighborRow = this.$store.getters.neighborRowByAlias(frozenAliasRow, 'NEXT')
+                if (frozenAliasRow === this.rowOver) {
+                    limitHeight = topDistance
+                }
+                if (neighborRow.alias === this.rowStart) {
+                    limitHeight -= topDistance
+                }
+            }
+            return unit(limitHeight)
         }
     },
     components: {

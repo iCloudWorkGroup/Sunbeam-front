@@ -45,8 +45,8 @@ export default {
             //     colAlias: '5'
             // }
             // commit('M_SHEETS_ADD_LOADED', {
-            //     colAlias: '6',
-            //     rowAlias: '6'
+            //     colAlias: '5',
+            //     rowAlias: '5'
             // })
             // 模拟数据行为结束
             commit('M_SHEETS_ADD_LOADED', {

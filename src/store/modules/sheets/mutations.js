@@ -40,7 +40,7 @@ export default {
         }
     },
     /**
-     * [M_SHEETS_ADD_LOADED 添加loaded数据]
+     * [M_SHEETS_ADD_LOADED 添加loaded数据, 自动去重]
      * @param {[type]}  state             [description]
      * @param {[type]}  options.colAlias  [description]
      * @param {Boolean} options.colSupply [是否添加到数组中，避免数组重复]
@@ -49,21 +49,14 @@ export default {
      */
     M_SHEETS_ADD_LOADED(state, {
         colAlias,
-        colSupply = true,
         rowAlias,
-        rowSupply = true
     }) {
         let loaded = state.loaded
-        if (colSupply) {
-            loaded.cols.push(colAlias)
-        }
-        if (rowSupply) {
-            loaded.rows.push(rowAlias)
-        }
         let colMap = loaded.colMap
         let rowItem = colMap.get(colAlias)
         if (rowItem == null) {
             colMap.set(colAlias, new Map().set(rowAlias, true))
+            loaded.cols.push(colAlias)
         } else {
             rowItem.set(rowAlias, true)
         }
@@ -72,6 +65,7 @@ export default {
         let colItem = rowMap.get(rowAlias)
         if (colItem == null) {
             rowMap.set(rowAlias, new Map().set(colAlias, true))
+            loaded.rows.push(rowAlias)
         } else {
             colItem.set(colAlias, true)
         }

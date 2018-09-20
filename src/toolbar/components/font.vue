@@ -4,10 +4,10 @@
         <div class="fui-transverse">
             <span class="section"
                   data-initiator="familys"
-                  @click="ejectMenu($event, 'familys')">
-                    <span
-                    class="fui-transverse-model fui-cf-fontfamily">
-                {{ activeProps.family }}
+                  @click="ejectMenu($event, 'familys')"
+                  :class="{ active: tool==='familys' }">
+                    <span class="fui-transverse-model fui-cf-fontfamily">
+                        {{ activeProps.family }}
                     </span>
                 <span
                 class="fui-transverse-model fui-cf-fontfamily-extend active"

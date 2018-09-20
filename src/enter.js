@@ -1,4 +1,4 @@
-import  Sunbeam from './api/sunbeam'
+import Sunbeam from './api/sunbeam'
 // import send from './util/send'
 // import config from './config'
 let ss = new Sunbeam({

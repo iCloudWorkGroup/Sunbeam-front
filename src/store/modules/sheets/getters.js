@@ -6,6 +6,16 @@ export default {
                 true : false
         }
     },
+    frozenAlias(state) {
+        return function() {
+            return state.list[0].frozen.alias
+        }
+    },
+    userView(state) {
+        return function() {
+            return state.list[0].userView
+        }
+    },
     loaded(state) {
         return state.loaded
     },

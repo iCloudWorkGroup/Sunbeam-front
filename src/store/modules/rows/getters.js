@@ -39,8 +39,7 @@ export default {
                 endIdx = Math.min(visibleRows[visibleRows.length - 1].sort, endIdx)
 
                 // 因为索引总是 -1，所以结束要 +1
-                // return state.list.slice(beginIdx, endIdx + 1)
-                return visibleRows
+                return state.list.slice(beginIdx, endIdx + 1)
             }
             return null
         }

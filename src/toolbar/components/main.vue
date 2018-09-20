@@ -1,5 +1,5 @@
 <template>
-<div class="tools">
+<div :class="toolbarSelector" :id="toolbarSelector">
     <div class="toolBar">
         <div class="menu-container">
             <ul>
@@ -73,6 +73,11 @@ export default {
         Format,
         WordWrap,
         Comment
+    },
+    computed: {
+        toolbarSelector() {
+            return this.$store.state.toolbarSelector.replace(/\.|\#/, '')
+        },
     },
     mounted() {
         document.getElementsByTagName('body')[0]

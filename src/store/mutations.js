@@ -11,5 +11,8 @@ export default {
     },
     M_SET_CLASS(state, rootSelector) {
         state.rootSelector = rootSelector
+    },
+    M_SET_TOOLBAR_CLASS(state, toolbarSelector) {
+        state.toolbarSelector = toolbarSelector
     }
 }

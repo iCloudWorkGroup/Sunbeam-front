@@ -262,8 +262,8 @@ export default {
                 })
             }
         }
-        // 滚动方向： UP
-        // 向上滚动时，加载被隐藏的DOM结构
+        // 判断方向： UP
+        // 滚动时，上面加载被隐藏的DOM结构
         // 没有考虑向上滚动时，没有数据的情况
         // 基于目前的功能，不存在这种情况
         if (limitMin < firstRowDistance) {
@@ -271,6 +271,16 @@ export default {
                 alias: firstRowAlias,
                 type: 'ROWS'
             })
+            let isFrozen = rootGetters.isFrozen()
+            let frozenAlias = rootGetters.frozenAlias()
+            let frozenAliasRow = frozenAlias.row
+            // 冻结情况下，DOM的加载位置上限是冻结位置
+            if (isFrozen && frozenAliasRow != null) {
+                let neighborRow = rootGetters.neighborRowByAlias(frozenAliasRow, 'NEXT')
+                if (firstRowAlias === neighborRow.alias) {
+                    loadedIdx = -1
+                }
+            }
             if (loadedIdx !== 0 && loadedIdx !== -1) {
                 let preRow = allLoaded.rows[loadedIdx - 1]
                 let preRowIdx = rootGetters.rowIndexByAlias(preRow)
@@ -409,8 +419,7 @@ export default {
                 let backRowAlias = rows[rows.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {
                     rowAlias: backRowAlias,
-                    colAlias: lastCol.alias,
-                    colSupply: false
+                    colAlias: lastCol.alias
                 })
                 addView(backRowAlias)
             })
@@ -745,8 +754,7 @@ export default {
                 let backColAlias = cols[cols.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {
                     rowAlias: lastRow.alias,
-                    colAlias: backColAlias,
-                    rowSupply: false
+                    colAlias: backColAlias
                 })
                 addView(backColAlias)
             })

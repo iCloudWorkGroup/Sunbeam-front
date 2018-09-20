@@ -1,17 +1,21 @@
 <template>
     <div class="fui-body">
         <span class="fui-layout">
-            <div class="fui-section fui-transverse" data-initiator="hide" @click="ejectMenu($event,'hide')">
+            <div class="fui-section fui-transverse"
+                 data-initiator="hide"
+                 @click="ejectMenu($event,'hide')">
                 <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
-                <div class="fui-cf-desc" data-initiator="hide">
+                <div class="fui-cf-desc">
                     <div class="fui-cf-text">隐藏</div>
                 </div>
             </div>
         </span>
         <span class="fui-layout">
-            <div class="fui-section fui-transverse" data-initiator="show" @click="ejectMenu($event,'show')">
+            <div class="fui-section fui-transverse"
+                 data-initiator="show"
+                 @click="ejectMenu($event,'show')">
                 <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
-                <div class="fui-cf-desc" data-initiator="show">
+                <div class="fui-cf-desc">
                     <div class="fui-cf-text">取消隐藏</div>
                 </div>
             </div>

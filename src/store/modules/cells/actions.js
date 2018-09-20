@@ -8,7 +8,8 @@ import {
     CELLS_INNERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
-    ROWS_ADJUSTHEIGHT
+    // ROWS_ADJUSTHEIGHT,
+    ROWS_EXECADJUSTHEIGHT
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import {
@@ -161,6 +162,7 @@ export default {
                 sendArgs = extend(sendArgs, {
                     auto: propStruct.content[propName]
                 })
+                // if (propStruct.row) {}
                 break
             case 'texts':
                 sendArgs = extend({
@@ -474,9 +476,31 @@ export default {
     },
     A_CELLS_INNERPASTE({
         getters
-    }) {
+    }, texts) {
+        let cols = getters.allCols
+        let rows = getters.allRows
+        let wholePosi = getters.selectByType('CLIP').wholePosi
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let cells = getters.cellsByVertical({
+            startColIndex,
+            startRowIndex,
+            endColIndex,
+            endRowIndex
+        })
+        console.log(cells)
+        let targetActivePosi = getters.selectByType('SELECT').activePosi
+        let targetStartRowIndex = getters.rowIndexByAlias(targetActivePosi.startRowAlias)
+        let targetStartColIndex = getters.colIndexByAlias(targetActivePosi.startColAlias)
+        let targetEndRowIndex = targetStartRowIndex + endRowIndex - startRowIndex
+        let targetEndColIndex = targetStartColIndex + endColIndex - startColIndex
+        if (endColIndex > cols.length - 1 || endRowIndex > rows.length - 1) {
+            throw new Error('opration area has outter of loaded area')
+        }
+        console.log(targetStartRowIndex, targetStartColIndex, targetEndRowIndex, targetEndColIndex)
 
-        // pause
         console.log('A_CELLS_INNERPASTE')
     },
     [CELLS_INNERPASTE]({
@@ -628,6 +652,9 @@ export default {
         let select = getters.selectByType('SELECT')
         let colAlias = select.activePosi.colAlias
         let rowAlias = select.activePosi.rowAlias
+        let cells = getters.cells
+        let rules
+        let date
         let oprCol = getters.getColByAlias(colAlias)
         let oprRow = getters.getRowByAlias(rowAlias)
         await send({
@@ -675,12 +702,16 @@ export default {
                     }
                 })
             } else {
+                let item = cells[idx]
+                let express = item.content.express
+                rules = parseExpress(express)
+                date = item.content.express === 'yyyy/mm/dd' || item.content.express === 'yyyy年m月d日' ? true : false
                 dispatch('A_CELLS_UPDATE', {
                     propName: 'texts',
                     propStruct: {
                         content: {
                             texts: cell.text,
-                            displayTexts: cell.text
+                            displayTexts: parseText(cell.text)
                         }
                     },
                     coordinate: {
@@ -693,6 +724,15 @@ export default {
             }
 
         })
+        function parseText(texts) {
+            let text = texts
+            if (date && isDate(text)) {
+                text = formatText(rules, text)
+            } else if (!date && isNum(text)) {
+                text = formatText(rules, parseFloat(text, 10))
+            }
+            return text
+        }
     },
     async [CELLS_WORDWRAP]({
         dispatch,
@@ -750,18 +790,20 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
-            dispatch('A_CELLS_UPDATE', {
-                propName: 'wordWrap',
-                propStruct: props
-            })
             if (oprRows) {
                 oprRows.forEach(info => {
-                    dispatch(ROWS_ADJUSTHEIGHT, {
+                    dispatch(ROWS_EXECADJUSTHEIGHT, {
                         index: info.index,
                         height: info.height
                     })
                 })
+                props.row.index = oprRows[0].index
+                props.row.height = oprRows[0].height
             }
+            dispatch('A_CELLS_UPDATE', {
+                propName: 'wordWrap',
+                propStruct: props
+            })
         }
         // 获得换行后的高度
         function getAdaptRows() {

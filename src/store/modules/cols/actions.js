@@ -973,6 +973,7 @@ export default {
         } else {
             insertCol = extend(colModel)
         }
+        insertCol.hidden = false
         insertCol.alias = generator.colAliasGenerator()
         insertCol.sort = sort
         insertCol.displayName = getColDisplayName(sort)

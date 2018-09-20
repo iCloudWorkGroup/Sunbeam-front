@@ -13,6 +13,7 @@
 <script type="text/javascript">
 import {
     SELECTS_INSERT,
+    SELECTS_CHANGE
 } from '../store/action-types'
 import {
     DELETE_SELECT
@@ -114,6 +115,12 @@ export default {
                 colAlias: wholePosi.startColAlias,
                 rowAlias: wholePosi.startRowAlias
             })
+            this.$store.dispatch(SELECTS_CHANGE, {
+                activeColAlias: select.activePosi.colAlias,
+                activeRowAlias: select.activePosi.rowAlias,
+                endColAlias: wholePosi.endColAlias,
+                endRowAlias: wholePosi.endRowAlias
+            })
             this.$store.commit('M_SELECT_UPDATE_STATE', SELECT)
             let getters = this.$store.getters
             let text = getters.getClipData()
@@ -147,6 +154,12 @@ export default {
             this.$store.dispatch(SELECTS_INSERT, {
                 colAlias: wholePosi.startColAlias,
                 rowAlias: wholePosi.startRowAlias
+            })
+            this.$store.dispatch(SELECTS_CHANGE, {
+                activeColAlias: select.activePosi.colAlias,
+                activeRowAlias: select.activePosi.rowAlias,
+                endColAlias: wholePosi.endColAlias,
+                endRowAlias: wholePosi.endRowAlias
             })
             this.$store.commit('M_SELECT_UPDATE_STATE', SELECT)
             let getters = this.$store.getters

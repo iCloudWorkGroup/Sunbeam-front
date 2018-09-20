@@ -20,8 +20,8 @@ const state = {
         // 这里为了开发测试更方便，实际上应该是在reload里读取
         // 第一行，第一列的alias，存到这里
         // BUG： 在后续开发中进行修补
-        cols: ['1'],
-        rows: ['1'],
+        cols: [],
+        rows: [],
         colMap: new Map(),
         rowMap: new Map()
     },

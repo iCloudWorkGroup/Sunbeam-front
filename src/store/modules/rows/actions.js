@@ -508,6 +508,7 @@ export default {
         } else {
             insertRow = extend(rowModel)
         }
+        insertRow.hidden = false
         insertRow.alias = generator.rowAliasGenerator()
         insertRow.sort = sort
         insertRow.displayName = getRowDisplayName(sort)

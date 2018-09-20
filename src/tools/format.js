@@ -51,6 +51,8 @@ export function isNum(value) {
     }
     if (value.indexOf(',') === -1) {
         reg = /^(\-|\+)?[0-9]+(\.[0-9]+)?$/
+    } else {
+        return false
     }
     return reg.test(value)
 }
@@ -131,7 +133,7 @@ export function formatText(rules, text) {
                 let figure = exps.length - exps.indexOf('.') - 1
                 return this.origin.toFixed(figure)
             }
-            return parseInt(this.origin, 10)
+            return Math.round(this.origin)
         },
         percent: function(rule) {
             this.origin = this.origin * 100

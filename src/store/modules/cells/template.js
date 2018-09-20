@@ -24,7 +24,7 @@ export default {
         express: 'G',
         size: 11,
         family: 'SimSun',
-        color: 'rgb(0, 0, 0, 1)',
+        color: 'rgb(0, 0, 0)',
         weight: false,
         italic: false,
         alignRow: 'left',
@@ -58,7 +58,6 @@ export default {
      * @type {Object}
      */
     decoration: {
-        comment: null,
         locked: true
     },
     /**

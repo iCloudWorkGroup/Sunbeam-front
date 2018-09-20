@@ -158,22 +158,18 @@ export default {
         let date
         let propStruct
         if (status === 'texts') {
+            propStruct = {
+                content: {
+                    texts
+                }
+            }
             if (cell) {
-                rules = parseExpress(cell.content.express)
+                let express = cell.content.express
+                rules = parseExpress(express)
                 date = cell.content.express === 'yyyy/mm/dd' || cell.content.express === 'yyyy年m月d日' ? true : false
-                propStruct = {
-                    content: {
-                        texts,
-                        displayTexts: parseText(texts)
-                    }
-                }
+                propStruct.content.displayTexts = parseText(texts)
             } else {
-                propStruct = {
-                    content: {
-                        texts,
-                        displayTexts: texts
-                    }
-                }
+                propStruct.content.displayTexts = texts
             }
             if (isNum(texts)) {
                 propStruct.content.alignRow = 'right'

@@ -50,6 +50,10 @@ export default {
             // })
             // 模拟数据行为结束
             commit('M_SHEETS_ADD_LOADED', {
+                colAlias: cols[0].alias,
+                rowAlias: rows[0].alias
+            })
+            commit('M_SHEETS_ADD_LOADED', {
                 colAlias: cols[cols.length - 1].alias,
                 rowAlias: rows[rows.length - 1].alias
             })

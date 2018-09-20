@@ -943,7 +943,7 @@ SpreadSheet.prototype = {
                 render: h => h(Book)
             }).$mount(rootSelector)
             // 新建vue实例tools
-            if (typeof toolbarSelector !== 'undefined') {
+            if (typeof toolsSelector !== 'undefined') {
                 this.toolBarVm = new Vue({
                     store,
                     render: h => h(Main)

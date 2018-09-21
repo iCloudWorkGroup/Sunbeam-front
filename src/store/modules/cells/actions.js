@@ -162,7 +162,14 @@ export default {
                 sendArgs = extend(sendArgs, {
                     auto: propStruct.content[propName]
                 })
-                // if (propStruct.row) {}
+                if (propStruct.row) {
+                    sendArgs = extend(sendArgs, {
+                        effect: [{
+                            row: propStruct.row.index,
+                            offset: propStruct.row.height
+                        }]
+                    })
+                }
                 break
             case 'texts':
                 sendArgs = extend({
@@ -793,12 +800,16 @@ export default {
             if (oprRows) {
                 oprRows.forEach(info => {
                     dispatch(ROWS_EXECADJUSTHEIGHT, {
-                        index: info.index,
-                        height: info.height
+                        sort: info.index,
+                        value: info.height
                     })
                 })
-                props.row.index = oprRows[0].index
-                props.row.height = oprRows[0].height
+                props = extend(props, {
+                    row: {
+                        index: oprRows[0].index,
+                        height: oprRows[0].height
+                    },
+                })
             }
             dispatch('A_CELLS_UPDATE', {
                 propName: 'wordWrap',

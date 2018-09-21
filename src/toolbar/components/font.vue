@@ -17,7 +17,8 @@
             </span>
             <span class="section"
                   data-initiator="sizes"
-                  @click="ejectMenu($event, 'sizes')">
+                  @click="ejectMenu($event, 'sizes')"
+                  :class="{ active: tool==='sizes' }">
                     <span
                         class="fui-transverse-model fui-cf-fontsize">
                         {{ activeProps.size }}
@@ -61,7 +62,8 @@
             <span class="ico-section"
                   title="背景色"
                   data-initiator="backgrounds"
-                  @click="ejectMenu($event, 'backgrounds')">
+                  @click="ejectMenu($event, 'backgrounds')"
+                  :class="{ active: tool==='backgrounds' }">
                 <span class="fui-cf-ico ico-fillbg ico-section-ico"></span>
                 <span class="ico-section-rightarrow"
                       data-initiator="backgrounds">
@@ -71,7 +73,8 @@
             <span class="ico-section"
                   data-initiator="colors"
                   title="字体颜色"
-                  @click="ejectMenu($event, 'colors')">
+                  @click="ejectMenu($event, 'colors')"
+                  :class="{ active: tool==='colors' }">
                 <span class="fui-cf-ico ico-fillcolor ico-section-ico"></span>
                 <span class="ico-section-rightarrow"
                       data-initiator="colors">

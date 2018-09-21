@@ -5,7 +5,8 @@
                 <div class="fui-section"
                       data-initiator="insdel"
                       data-opr="insert"
-                      @click="ejectMenu($event, 'insdel')" >
+                      @click="ejectMenu($event, 'insdel')"
+                     :class="{ active: opr==='insert' && tool === 'insdel'}">
                     <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">插入</div>
@@ -17,7 +18,8 @@
                 <div class="fui-section"
                      data-initiator="insdel"
                      data-opr="delete"
-                     @click="ejectMenu($event, 'insdel')">
+                     @click="ejectMenu($event, 'insdel')"
+                     :class="{ active: opr==='delete' && tool === 'insdel'}">
                     <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">删除</div>

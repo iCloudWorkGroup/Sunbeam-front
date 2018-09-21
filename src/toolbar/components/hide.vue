@@ -5,7 +5,8 @@
                 <div class="fui-section"
                      data-initiator="hideshow"
                      data-opr="hide"
-                     @click="ejectMenu($event, 'hideshow')" >
+                     @click="ejectMenu($event, 'hideshow')"
+                     :class="{ active: opr==='hide' && tool === 'hideshow'}">
                     <div class="fui-cf-bg-extend2-ico ico-insert fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">隐藏行列</div>
@@ -17,7 +18,8 @@
                 <div class="fui-section"
                      data-initiator="hideshow"
                      data-opr="show"
-                     @click="ejectMenu($event, 'hideshow')">
+                     @click="ejectMenu($event, 'hideshow')"
+                     :class="{ active: opr==='show' && tool === 'hideshow'}">
                     <div class="fui-cf-bg-extend2-ico ico-delete fui-cf-alone"></div>
                     <div class="fui-cf-desc">
                         <div class="fui-cf-text">取消隐藏</div>

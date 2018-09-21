@@ -268,8 +268,6 @@ export default {
 
         if (typeof index === 'undefined') {
             let select = getters.selectByType(SELECT)
-            let startIndex
-            let endIndex
             let visibleStartRow = visibleRows[0]
             let visibleEndRow = visibleRows[visibleRows.length - 1]
             let startRowAlias = select.wholePosi.startRowAlias
@@ -277,16 +275,15 @@ export default {
             if (endRowAlias === 'MAX') {
                 return
             }
+            let startIndex = getters.rowIndexByAlias(startRowAlias)
+            let endIndex = getters.rowIndexByAlias(endRowAlias)
             if (visibleStartRow.alias === startRowAlias &&
-                visibleStartRow !== rows[0]) {
-                index = 0
+                visibleStartRow !== rows[0] && startRowAlias === endRowAlias) {
+                index = startIndex - 1
             } else if (visibleEndRow.alias === endRowAlias &&
-                visibleEndRow !== rows[rows.length - 1]) {
+                visibleEndRow !== rows[rows.length - 1] && startRowAlias === endRowAlias) {
                 index = rows.length - 1
             } else {
-                startIndex = getters.rowIndexByAlias(startRowAlias)
-                endIndex = getters.rowIndexByAlias(endRowAlias)
-
                 for (let i = startIndex; i <= endIndex + 1; i++) {
                     if (rows[i].hidden) {
                         index = i

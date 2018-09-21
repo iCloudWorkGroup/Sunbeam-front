@@ -272,9 +272,11 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allColMap = allLoaded.rowMap.get(lastRowAlias)
+            let idx = rootGetters.rowIndexByAlias(allLoaded.rows[allLoaded.rows.length - 1])
             let needRequire = allColMap != null &&
                 allColMap.get(lastColAlias) &&
-                allLoaded.rows.length - lastRowIndex > 1 ? false : true
+                idx - lastRowIndex > 1 ?
+                false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
@@ -629,9 +631,10 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allRowMap = allLoaded.colMap.get(lastColAlias)
+            let idx = rootGetters.colIndexByAlias(allLoaded.cols[allLoaded.cols.length - 1])
             let needRequire = allRowMap != null &&
                 allRowMap.get(lastRowAlias) &&
-                allLoaded.cols.length - lastColIndex > 1 ? false : true
+                idx - lastColIndex > 1 ? false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1

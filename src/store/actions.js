@@ -41,18 +41,14 @@ export default {
 
             // 模拟数据的行为
             // bookItem.frozen = {
-            //     rowAlias: '5',
-            //     colAlias: '5'
+            //     rowAlias: '6',
+            //     colAlias: '6'
             // }
             // commit('M_SHEETS_ADD_LOADED', {
-            //     colAlias: '5',
-            //     rowAlias: '5'
+            //     colAlias: '6',
+            //     rowAlias: '6'
             // })
             // 模拟数据行为结束
-            commit('M_SHEETS_ADD_LOADED', {
-                colAlias: cols[cols.length - 1].alias,
-                rowAlias: rows[rows.length - 1].alias
-            })
             commit('UPDATE_SHEETS_MAX', {
                 colAlias: bookItem.maxColAlias,
                 colPixel: bookItem.maxColPixel,
@@ -66,6 +62,11 @@ export default {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
                 frozen: bookItem.frozen
+            })
+            commit('M_SHEETS_ADD_LOADED', bookItem.frozen)
+            commit('M_SHEETS_ADD_LOADED', {
+                colAlias: cols[cols.length - 1].alias,
+                rowAlias: rows[rows.length - 1].alias
             })
             let visibleRows = getters.visibleRowList()
             let visibleCols = getters.visibleColList()

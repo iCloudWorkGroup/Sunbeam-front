@@ -40,8 +40,8 @@ export default {
         row: [],
         // 存储冻结处的别名
         alias: {
-            row: '5',
-            col: '5'
+            row: null,
+            col: null
         }
     }
 }

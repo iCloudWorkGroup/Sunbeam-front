@@ -34,39 +34,37 @@ export default {
     ],
     data() {
         return {
-            // 当前可视区域所占用的加载区域
-            viewLoaded: {
-                rows: [this.rowStart, this.rowOver],
-                cols: [this.colStart, this.colOver],
-                rowMap: new Map().set(this.rowOver,
-                    new Map().set(this.colOver, true)),
-                colMap: new Map().set(this.colOver,
-                    new Map().set(this.rowOver, true))
-            },
             timeoutId: -1,
             toward: null,
             offsetLeft: this.$store.getters.offsetLeft(this.colStart, this.colOver),
             offsetTop: this.$store.getters.offsetTop(this.rowStart, this.rowOver)
         }
     },
-    mounted() {
-        // this.setOccupy()
-        // this.updateUserView()
-        // 火狐浏览器 添加鼠标滚轮事件监听
-        if (navigator.userAgent.indexOf('Firefox') > -1) {
-            let _this = this
-            this.$el.addEventListener('DOMMouseScroll', function (e) {
-                let delta = e.detail
-                if (delta > 0) {
-                    _this.$el.scrollTop += 20
-                } else if (delta < 0) {
-                    _this.$el.scrollTop = _this.$el.scrollTop > 20 ? _this.$el.scrollTop - 20 : 0
-                }
-            })
+    created() {
+        // 当前可视区域所占用的加载区域
+        let isFrozen = this.$store.getters.isFrozen()
+        let frozenAlias = this.$store.getters.frozenAlias()
+        let neighborRow = this.$store.getters.neighborRowByAlias(this.rowStart, 'PRE')
+        let rowAlias = isFrozen &&
+            neighborRow != null &&
+            frozenAlias.row === neighborRow.alias ?
+            neighborRow.alias :
+            this.rowStart
+        let neighborCol = this.$store.getters.neighborColByAlias(this.colStart,
+            'PRE')
+        let colAlias = isFrozen &&
+            neighborCol != null &&
+            frozenAlias.col === neighborCol.alias ?
+            neighborCol.alias :
+            this.colStart
+        this.viewLoaded = {
+            rows: [rowAlias, this.rowOver],
+            cols: [colAlias, this.colOver],
+            rowMap: new Map().set(this.rowOver,
+                new Map().set(this.colOver, true)),
+            colMap: new Map().set(this.colOver,
+                new Map().set(this.rowOver, true))
         }
-    },
-    beforeDestroy() {
-        // this.updateOccupy([], [])
     },
     computed: {
         width() {
@@ -228,6 +226,22 @@ export default {
                     }
                 }
             }
+        }
+    },
+    mounted() {
+        // this.setOccupy()
+        // this.updateUserView()
+        // 火狐浏览器 添加鼠标滚轮事件监听
+        if (navigator.userAgent.indexOf('Firefox') > -1) {
+            let _this = this
+            this.$el.addEventListener('DOMMouseScroll', function (e) {
+                let delta = e.detail
+                if (delta > 0) {
+                    _this.$el.scrollTop += 20
+                } else if (delta < 0) {
+                    _this.$el.scrollTop = _this.$el.scrollTop > 20 ? _this.$el.scrollTop - 20 : 0
+                }
+            })
         }
     }
 }

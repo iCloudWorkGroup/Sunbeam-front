@@ -32,6 +32,7 @@ export default {
             let cells = bookItem.cells
             cache.localRowPosi = bookItem.maxRowPixel
             cache.localColPosi = bookItem.maxColPixel
+
             // 存储行、列别名的最大值，为后面再增加行、列生成列名做准备
             generator.rowAliasGenerator(parseInt(bookItem.maxRowAlias,
                 0))
@@ -63,7 +64,9 @@ export default {
                 name: bookItem.name,
                 frozen: bookItem.frozen
             })
-            commit('M_SHEETS_ADD_LOADED', bookItem.frozen)
+            if (bookItem.frozen != null) {
+                commit('M_SHEETS_ADD_LOADED', bookItem.frozen)
+            }
             commit('M_SHEETS_ADD_LOADED', {
                 colAlias: cols[cols.length - 1].alias,
                 rowAlias: rows[rows.length - 1].alias

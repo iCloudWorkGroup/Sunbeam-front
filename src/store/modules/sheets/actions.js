@@ -67,7 +67,7 @@ export default {
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
     },
-    [actionTypes.SHEET_FROZEN]({
+    A_SHEETS_FROZEN({
         state,
         getters,
         rootState,
@@ -82,6 +82,16 @@ export default {
                 oprCol: select.signalSort.startCol,
                 oprRow: select.signalSort.startRow
             })
+        }).then(function(data) {
+            // console.log(data)
+            // window.location.reload()
+        })
+    },
+    A_SHEETS_UNFROZEN({
+        dispatch
+    }) {
+        send({
+            url: config.url.unfrozen
         }).then(function(data) {
             // console.log(data)
             // window.location.reload()

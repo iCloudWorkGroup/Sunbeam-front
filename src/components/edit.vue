@@ -3,12 +3,12 @@
          @scroll="tabSurface"
          :style="{ width, height }">
         <edit-panel
-                :row-start="rowStart"
-                :row-over="rowOver"
-                :col-start="colStart"
-                :col-over="colOver"
-                :offsetTop="offsetTop"
-                :offsetLeft="offsetLeft"/>
+            :row-start="rowStart"
+            :row-over="rowOver"
+            :col-start="colStart"
+            :col-over="colOver"
+            :offsetTop="offsetTop"
+            :offsetLeft="offsetLeft"/>
     </div>
 </template>
 <script type="text/javascript">

@@ -20,7 +20,7 @@ export function parseExpress(str) {
         handle: 'whole',
         match: true
     }, {
-        reg: /0^\.|0\.0{1,3}/g,
+        reg: /0\.0{1,4}|\d/g,
         match: true,
         handle: 'decimal'
     }]

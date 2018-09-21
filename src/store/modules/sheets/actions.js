@@ -182,14 +182,14 @@ export default {
                     overIdx: cordRowIndex
                 })
                 delView({
-                    alias: cordRowAlias
+                    alias: firstRowAlias
                 })
             }
             // 滚动方向： UP
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordRow.top) {
+            if (limitMax < cordRow.left) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: firstColIndex,
                     endColIndex: lastColIndex,
@@ -541,7 +541,7 @@ export default {
                     overIdx: cordColIndex
                 })
                 delView({
-                    alias: cordColAlias
+                    alias: firstColAlias
                 })
             }
             // 滚动方向： UP

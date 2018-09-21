@@ -26,7 +26,7 @@
                 </div>
             </span>
         </div>
-        <ins-del ref="insdel" v-show="tool == 'insdel'" :opr="opr"></ins-del>
+        <row-cols ref="insdel" v-show="tool == 'insdel'" :opr="opr"></row-cols>
     </div>
 </template>
 <script type="text/javascript">
@@ -34,7 +34,7 @@
 // import {
 //     mapGetters
 // } from '../../lib/vuex.esm'
-import InsDel from './insertdelete.vue'
+import RowCols from './rowcols.vue'
 import {
     unit
 } from '../../filters/unit'
@@ -70,7 +70,7 @@ export default {
         }
     },
     components: {
-        InsDel
+        RowCols
     }
 }
 </script>

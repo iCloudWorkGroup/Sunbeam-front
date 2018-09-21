@@ -532,15 +532,8 @@ export default {
      */
     isWordWrapCell(state, getters) {
         return function() {
-            // let allCells = state.list
-            let selects = getters.allSelects
-            let select
-            for (let i = 0, len = selects.length; i < len; i++) {
-                if (selects[i].type === SELECT) {
-                    select = selects[i]
-                    break
-                }
-            }
+            let length = state.list.length
+            let select = getters.selectByType(SELECT)
             let wholePosi = select.wholePosi
             let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
             let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
@@ -550,7 +543,7 @@ export default {
                 endColIndex: startColIndex,
                 endRowIndex: startRowIndex
             })
-            for (let i = 0, len = verticalCells.length; i < len; i++) {
+            for (let i = 0, len = Math.min(verticalCells.length, length); i < len; i++) {
                 let cell = verticalCells[i]
                 return cell.content.wordWrap
             }

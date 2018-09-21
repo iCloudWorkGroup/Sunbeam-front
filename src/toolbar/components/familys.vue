@@ -26,13 +26,13 @@ export default {
         return {
             familys: [{
                 en: 'microsoft Yahei',
-                cn: '微软雅黑'
+                cn: 'microsoft Yahei'
             }, {
                 en: 'SimSun',
-                cn: '宋体'
+                cn: 'SimSun'
             }, {
                 en: 'SimHei',
-                cn: '黑体'
+                cn: 'SimHei'
             }, {
                 en: 'Tahoma',
                 cn: 'Tahoma'
@@ -41,7 +41,7 @@ export default {
                 cn: 'Arial'
             }, {
                 en: 'KaiTi',
-                cn: '楷体'
+                cn: 'KaiTi'
             }]
         }
     },

@@ -85,7 +85,6 @@ export default {
             let clientRect = el.getBoundingClientRect()
             let col = getters.getColByPosi(downEvent.clientX - clientRect.left + this.offsetLeft)
             let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
-
             // 如果是选择数据源，需要判断数据源是否存在
             let selectState = this.$store.getters.activeType
             if (selectState === 'DATASOURCE' &&
@@ -134,6 +133,7 @@ export default {
                 document.removeEventListener('mousemove', bindSelectChange)
             })
             function selectChange(moveEvent) {
+                let clientRect = el.getBoundingClientRect()
                 let endCol = getters.getColByPosi(moveEvent.clientX - clientRect.left + this.offsetLeft)
                 let endRow = getters.getRowByPosi(moveEvent.clientY - clientRect.top + this.offsetTop)
                 this.$store.dispatch(SELECTS_CHANGE, {

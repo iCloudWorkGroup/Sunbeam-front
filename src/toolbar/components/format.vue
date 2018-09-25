@@ -4,7 +4,8 @@
         <div class="fui-layout">
             <div class="fui-section fui-alone"
                 data-initiator="formats"
-                @click="ejectMenu($event, 'formats')">
+                @click="ejectMenu($event, 'formats')"
+                 :class="{ active: tool==='formats' }">
                 <div class="fui-cf-ico ico-routine fui-cf-alone"></div>
                 <div class="fui-cf-desc">
                     <div class="fui-cf-text">文本格式</div>

@@ -8,7 +8,8 @@ import {
     CELLS_INNERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
-    ROWS_ADJUSTHEIGHT
+    // ROWS_ADJUSTHEIGHT,
+    ROWS_EXECADJUSTHEIGHT
 } from '../../action-types'
 import * as mutationTypes from '../../mutation-types'
 import {
@@ -53,7 +54,6 @@ export default {
             let cols = getters.allCols
             let rows = getters.allRows
             let fixedCell = extend(template, cell)
-
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
@@ -161,6 +161,14 @@ export default {
                 sendArgs = extend(sendArgs, {
                     auto: propStruct.content[propName]
                 })
+                if (propStruct.row) {
+                    sendArgs = extend(sendArgs, {
+                        effect: [{
+                            row: propStruct.row.index,
+                            offset: propStruct.row.height
+                        }]
+                    })
+                }
                 break
             case 'texts':
                 sendArgs = extend({
@@ -289,8 +297,16 @@ export default {
         // 左上角位置的单元格，作为合并单元格的模板原型，
         // 如果没有单元格，以横向优先，竖向次之查找
         // 如果所有都没有，就按照template属性合并
+        // 无边框
         let templateCell = cells.length !== 0 ?
-            extend(cells[0]) : extend(template)
+            extend(cells[0], {
+                border: {
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }
+            }) : extend(template)
         let cols = []
         for (let i = startColIndex; i < endColIndex + 1; i++) {
             cols.push(getters.allCols[i].alias)
@@ -350,7 +366,14 @@ export default {
             if (occupyRow.length > 1 || occupyCol.length > 1) {
                 for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
                     for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-                        let insertCell = extend(cell)
+                        let insertCell = extend(cell, {
+                            border: {
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                right: 0
+                            }
+                        })
                         if (i !== 0 || j !== 0) {
                             insertCell.content.texts = null
                             insertCell.content.displayTexts = null
@@ -460,23 +483,66 @@ export default {
 
         function parseText(cell) {
             let text = cell.content.texts
+            let align = {}
+            // 判断对齐方式
+            if (format === 'text') {
+                align = {
+                    content: {
+                        alignRow: 'left'
+                    }
+                }
+            } else if ((format === 'number' || format === 'percent' || format === 'currency' || format === 'routine') && isNum(text)) {
+                align = {
+                    content: {
+                        alignRow: 'right'
+                    }
+                }
+            } else if ((format === 'data' || format === 'routine') && isDate(text)) {
+                align = {
+                    content: {
+                        alignRow: 'right'
+                    }
+                }
+            }
             if (format === 'date' && isDate(text)) {
                 text = formatText(rules, text)
             } else if (format !== 'date' && isNum(text)) {
                 text = formatText(rules, parseFloat(text, 10))
             }
-            return {
+            return extend({
                 content: {
                     displayTexts: text,
                 }
-            }
+            }, align)
         }
     },
     A_CELLS_INNERPASTE({
         getters
-    }) {
+    }, texts) {
+        let cols = getters.allCols
+        let rows = getters.allRows
+        let wholePosi = getters.selectByType('CLIP').wholePosi
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let cells = getters.cellsByVertical({
+            startColIndex,
+            startRowIndex,
+            endColIndex,
+            endRowIndex
+        })
+        console.log(cells)
+        let targetActivePosi = getters.selectByType('SELECT').activePosi
+        let targetStartRowIndex = getters.rowIndexByAlias(targetActivePosi.startRowAlias)
+        let targetStartColIndex = getters.colIndexByAlias(targetActivePosi.startColAlias)
+        let targetEndRowIndex = targetStartRowIndex + endRowIndex - startRowIndex
+        let targetEndColIndex = targetStartColIndex + endColIndex - startColIndex
+        if (endColIndex > cols.length - 1 || endRowIndex > rows.length - 1) {
+            throw new Error('opration area has outter of loaded area')
+        }
+        console.log(targetStartRowIndex, targetStartColIndex, targetEndRowIndex, targetEndColIndex)
 
-        // pause
         console.log('A_CELLS_INNERPASTE')
     },
     [CELLS_INNERPASTE]({
@@ -628,6 +694,9 @@ export default {
         let select = getters.selectByType('SELECT')
         let colAlias = select.activePosi.colAlias
         let rowAlias = select.activePosi.rowAlias
+        let cells = getters.cells
+        let rules
+        let date
         let oprCol = getters.getColByAlias(colAlias)
         let oprRow = getters.getRowByAlias(rowAlias)
         await send({
@@ -675,12 +744,16 @@ export default {
                     }
                 })
             } else {
+                let item = cells[idx]
+                let express = item.content.express
+                rules = parseExpress(express)
+                date = item.content.express === 'yyyy/mm/dd' || item.content.express === 'yyyy年m月d日' ? true : false
                 dispatch('A_CELLS_UPDATE', {
                     propName: 'texts',
                     propStruct: {
                         content: {
                             texts: cell.text,
-                            displayTexts: cell.text
+                            displayTexts: parseText(cell.text)
                         }
                     },
                     coordinate: {
@@ -693,6 +766,15 @@ export default {
             }
 
         })
+        function parseText(texts) {
+            let text = texts
+            if (date && isDate(text)) {
+                text = formatText(rules, text)
+            } else if (!date && isNum(text)) {
+                text = formatText(rules, parseFloat(text, 10))
+            }
+            return text
+        }
     },
     async [CELLS_WORDWRAP]({
         dispatch,
@@ -750,18 +832,24 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
+            if (oprRows) {
+                oprRows.forEach(info => {
+                    dispatch(ROWS_EXECADJUSTHEIGHT, {
+                        sort: info.index,
+                        value: info.height
+                    })
+                })
+                props = extend(props, {
+                    row: {
+                        index: oprRows[0].index,
+                        height: oprRows[0].height
+                    },
+                })
+            }
             dispatch('A_CELLS_UPDATE', {
                 propName: 'wordWrap',
                 propStruct: props
             })
-            if (oprRows) {
-                oprRows.forEach(info => {
-                    dispatch(ROWS_ADJUSTHEIGHT, {
-                        index: info.index,
-                        height: info.height
-                    })
-                })
-            }
         }
         // 获得换行后的高度
         function getAdaptRows() {

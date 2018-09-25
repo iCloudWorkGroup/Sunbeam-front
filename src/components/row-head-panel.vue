@@ -148,16 +148,16 @@ export default {
             }
         },
         dragState(e) {
-            // let rowPosi = this.getRelativePosi(e.clientY)
-            // let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
-            // let rowAlias = this.$store.getters.allRows[rowIndex].alias
-            // let firstColAlias = this.$store.getters.visibleColList()[0].alias
+            let rowPosi = this.getRelativePosi(e.clientY)
+            let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
+            let rowAlias = this.$store.getters.allRows[rowIndex].alias
+            let firstColAlias = this.$store.getters.visibleColList()[0].alias
             // let lastColAlias = this.$store.getters.visibleColList()[this.$store.getters.visibleColList().length - 1].alias
-            // this.$store.dispatch(SELECTS_CHANGE, {
-            //     activeColAlias: firstColAlias,
-            //     endColAlias: lastColAlias,
-            //     activeRowAlias: rowAlias
-            // })
+            this.$store.dispatch(SELECTS_CHANGE, {
+                activeColAlias: firstColAlias,
+                endColAlias: 'MAX',
+                activeRowAlias: rowAlias
+            })
         },
         adjustHandleState(e) {
             let rowView = this.$refs.adjustRowView.$el

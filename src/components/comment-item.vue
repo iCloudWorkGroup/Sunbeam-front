@@ -1,9 +1,18 @@
 <template>
-    <div class="comment-ico" :style="commentStyle">
+    <!--<div class="comment-ico" :style="commentStyle">-->
+        <!--<div-->
+            <!--class="triangle"-->
+            <!--@mouseleave="commentHide"-->
+            <!--@mouseenter="commentShow">-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="cell"
+         :style="commentStyle"
+         @mouseleave="commentHide"
+         @mouseenter="commentShow">
+        <div class="comment-ico">
         <div
-            class="triangle"
-            @mouseleave="commentHide"
-            @mouseenter="commentShow">
+        class="triangle"></div>
         </div>
     </div>
 </template>
@@ -26,10 +35,10 @@ export default {
             return extend({
                 // 因为现实的效果，需要共享单元格的边框
                 // 所以在左、上两面都 -2，这样可以对齐效果
-                top: unit(top - 2),
-                left: unit(left - 2),
-                width: unit(3),
-                height: unit(3)
+                top: unit(top - 4),
+                left: unit(left - 3 - physicsBox.width),
+                width: unit(physicsBox.width),
+                height: unit(physicsBox.height)
             })
         },
     },
@@ -45,7 +54,4 @@ export default {
 }
 </script>
 <style>
-    .comment-ico{
-        z-index: 1;
-    }
 </style>

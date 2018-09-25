@@ -51,19 +51,6 @@ export default {
             }
             height = height > 0 ? height : 0
             width = width > 0 ? width : 0
-            // console.log(width)
-            // console.log(this.$root.$el.getBoundingClientRect())
-            // let el = this.$root.$el.getBoundingClientRect()
-            // return {
-            //     zIndex: 0,
-            //     position: 'fixed',
-            //     left: unit(left + el.left + config.cornerWidth),
-            //     // top: unit(top),
-            //     width: unit(el.width - config.cornerWidth - 17),
-            //     height: unit(height),
-            //     bottom: 0,
-            //     top: unit(top + el.top + config.cornerHeight)
-            // }
             return {
                 left: unit(left),
                 top: unit(top),

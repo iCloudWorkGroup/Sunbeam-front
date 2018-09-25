@@ -116,20 +116,37 @@ export default {
             endColIndex: getters.colIndexByAlias(endColAlias),
             endRowIndex: getters.rowIndexByAlias(endRowAlias)
         })
-        if (startRowIndex === -1 ||
-            endRowIndex === -1 ||
-            startColIndex === -1 ||
-            endColIndex === -1) {
-            throw new Error('index out of loaded arrange')
-        }
-        let signalSort = {
-            startCol: getters.getColByIndex(startColIndex).sort,
-            endCol: getters.getColByIndex(endColIndex).sort,
-            startRow: getters.getRowByIndex(startRowIndex).sort,
-            endRow: getters.getRowByIndex(endRowIndex).sort
+        if (startRowIndex === -1 || endRowIndex === -1 || startColIndex === -1 || endColIndex === -1) {
+            // throw new Error('index out of loaded arrange')
+            if (startColIndex === -1) {
+                let temp
+                temp = startColIndex
+                startColIndex = endColIndex
+                endColIndex = temp
+            }
+            if (startRowIndex === -1) {
+                let temp
+                temp = startRowIndex
+                startRowIndex = endRowIndex
+                endRowIndex = temp
+            }
         }
         let rows = getters.allRows
         let cols = getters.allCols
+        let wholePosi = {
+            startColAlias: cols[startColIndex].alias,
+            startRowAlias: rows[startRowIndex].alias,
+            endColAlias: cols[endColIndex] ? cols[endColIndex].alias : 'MAX',
+            endRowAlias: rows[endRowIndex] ? rows[endRowIndex].alias : 'MAX'
+        }
+        let signalSort = {
+            startCol: getters.getColByIndex(startColIndex).sort,
+            endCol: getters.getColByIndex(endColIndex) ? getters.getColByIndex(endColIndex).sort : -1,
+            startRow: getters.getRowByIndex(startRowIndex).sort,
+            endRow: getters.getRowByIndex(endRowIndex) ? getters.getRowByIndex(endRowIndex).sort : -1
+        }
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         let physicsBox = {
             top: rows[startRowIndex].top,
             left: cols[startColIndex].left,
@@ -143,12 +160,6 @@ export default {
         let activePosi = {
             rowAlias: activeRowAlias,
             colAlias: activeColAlias
-        }
-        let wholePosi = {
-            startColAlias: cols[startColIndex].alias,
-            startRowAlias: rows[startRowIndex].alias,
-            endColAlias: cols[endColIndex].alias,
-            endRowAlias: rows[endRowIndex].alias
         }
         commit(mutationTypes.UPDATE_SELECT, {
             props: {

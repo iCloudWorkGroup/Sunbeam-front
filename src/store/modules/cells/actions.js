@@ -139,6 +139,9 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
+        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
+            throw new Error('index out of loaded arrange')
+        }
         let rows = getters.allRows
         let cols = getters.allCols
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
@@ -265,6 +268,9 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
+        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
+            throw new Error('index out of loaded arrange')
+        }
         let allCols = getters.allCols
         let allRows = getters.allRows
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
@@ -333,6 +339,9 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
+        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
+            throw new Error('index out of loaded arrange')
+        }
         let allCols = getters.allCols
         let allRows = getters.allRows
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
@@ -405,6 +414,9 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
+        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
+            throw new Error('index out of loaded arrange')
+        }
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
@@ -518,7 +530,7 @@ export default {
     },
     A_CELLS_INNERPASTE({
         getters
-    }, texts) {
+    }) {
         let cols = getters.allCols
         let rows = getters.allRows
         let wholePosi = getters.selectByType('CLIP').wholePosi
@@ -542,8 +554,6 @@ export default {
             throw new Error('opration area has outter of loaded area')
         }
         console.log(targetStartRowIndex, targetStartColIndex, targetEndRowIndex, targetEndColIndex)
-
-        console.log('A_CELLS_INNERPASTE')
     },
     [CELLS_INNERPASTE]({
         state,

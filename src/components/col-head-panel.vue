@@ -142,16 +142,19 @@ export default {
             } else {
                 panel.style.cursor = 'pointer'
                 // this.currentMouseDownState = this.locateState
-                this.currentMouseDownState = function () {}
+                this.currentMouseDownState = this.dragState
             }
         },
         dragState(e) {
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
-
+            let colAlias = this.$store.getters.allCols[colIndex].alias
+            let firstRowAlias = this.$store.getters.visibleColList()[0].alias
+            // let lastColAlias = this.$store.getters.visibleColList()[this.$store.getters.visibleColList().length - 1].alias
             this.$store.dispatch(SELECTS_CHANGE, {
-                startColIndex: colIndex,
-                startRowIndex: 'MAX'
+                activeRowAlias: firstRowAlias,
+                endRowAlias: 'MAX',
+                activeColAlias: colAlias
             })
         },
         adjustHandleState(e) {

@@ -390,7 +390,14 @@ export default {
                         addView(last.alias)
                     }
                 }
-
+                let select = rootGetters.selectByType('SELECT')
+                if (select.signalSort.endRow === -1) {
+                    dispatch('SELECTS_CHANGE', {
+                        activeRowAlias: select.wholePosi.startRowAlias,
+                        endRowAlias: 'MAX',
+                        activeColAlias: select.wholePosi.startColAlias
+                    })
+                }
                 function lastRow() {
                     let rows = rootGetters.allRows
                     return rows[rows.length - 1]
@@ -423,6 +430,14 @@ export default {
                     rowAlias: backRowAlias,
                     colAlias: lastCol.alias
                 })
+                let select = rootGetters.selectByType('SELECT')
+                if (select.signalSort.endRow === -1) {
+                    dispatch('SELECTS_CHANGE', {
+                        activeRowAlias: select.wholePosi.startRowAlias,
+                        endRowAlias: 'MAX',
+                        activeColAlias: select.wholePosi.startColAlias
+                    })
+                }
                 addView(backRowAlias)
             })
         }
@@ -727,7 +742,14 @@ export default {
                         addView(last.alias)
                     }
                 }
-
+                let select = rootGetters.selectByType('SELECT')
+                if (select.signalSort.endCol === -1) {
+                    dispatch('SELECTS_CHANGE', {
+                        activeColAlias: select.wholePosi.startColAlias,
+                        endColAlias: 'MAX',
+                        activeRowAlias: select.wholePosi.startRowAlias
+                    })
+                }
                 function lastCol() {
                     let cols = rootGetters.allCols
                     return cols[cols.length - 1]
@@ -760,6 +782,14 @@ export default {
                     rowAlias: lastRow.alias,
                     colAlias: backColAlias
                 })
+                let select = rootGetters.selectByType('SELECT')
+                if (select.signalSort.endCol === -1) {
+                    dispatch('SELECTS_CHANGE', {
+                        activeColAlias: select.wholePosi.startColAlias,
+                        endColAlias: 'MAX',
+                        activeRowAlias: select.wholePosi.startRowAlias
+                    })
+                }
                 addView(backColAlias)
             })
         }

@@ -11,7 +11,10 @@ export default {
         rootState,
         getters,
         commit
-    }, type) {
+    }, {
+        type,
+        value
+    }) {
         // 获取当前选中的单元格
         // 算出选中个的位置、宽高信息
         // 设置该模型覆盖其位置
@@ -71,6 +74,10 @@ export default {
                         endrowAlias
                     }
                 }
+            }
+            // 有传入值时，更新输入框的值
+            if (typeof value !== 'undefined') {
+                propStruct.physical.texts = value
             }
             // 批注
         } else if (type === 'COMMENT') {

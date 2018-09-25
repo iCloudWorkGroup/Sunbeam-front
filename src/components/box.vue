@@ -190,11 +190,27 @@ export default {
             }
         },
         keydownHandle(e) {
-            let key = e.key
+            let status = this.$store.getters.inputProps.physical.edit
             let altKey = e.altKey
-            if (key === 'Enter' && !altKey) {
+            let ctrlKey = e.ctrlKey
+            let keyCode = e.keyCode
+            let key = e.key
+            /* *
+             * 自动获取焦点
+             * keyCode 229表示中文输入法
+             */
+            if (((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 105)
+                || (keyCode >= 106 && keyCode <= 111 && keyCode !== 108) || (keyCode >= 186 && keyCode <= 191)
+                || (keyCode >= 219 && keyCode <= 222) || keyCode === 229) && !altKey && !ctrlKey && status === '') {
+                console.log(e)
+                this.$store.dispatch('EDIT_SHOW', {
+                    type: 'EDIT',
+                    value: key
+                })
+                return
+            } else if (keyCode === 13 && !altKey && status !== '') {
                 this.doneEdit(e)
-            } else if (key === 'Enter' && altKey) {
+            } else if (keyCode === 13 && altKey && status !== '') {
                 this.insertAtCursor('\n', e.target)
             }
         },

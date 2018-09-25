@@ -714,12 +714,16 @@ SpreadSheet.prototype = {
 
     // 弹出新增批注窗口
     createAddCommentView() {
-        this.bookVm.$store.dispatch('EDIT_SHOW', 'COMMENT')
+        this.bookVm.$store.dispatch('EDIT_SHOW', {
+            type: 'COMMENT',
+        })
     },
 
     // 弹出编辑批注窗口
     createEditCommentView() {
-        this.bookVm.$store.dispatch('EDIT_SHOW', 'COMMENT')
+        this.bookVm.$store.dispatch('EDIT_SHOW', {
+            type: 'COMMENT',
+        })
     },
 
     // 删除批注

@@ -90,7 +90,9 @@ export default {
     },
     methods: {
         editing() {
-            this.$store.dispatch(types.EDIT_SHOW, 'EDIT')
+            this.$store.dispatch(types.EDIT_SHOW, {
+                type: 'EDIT'
+            })
         }
     },
     mounted() {

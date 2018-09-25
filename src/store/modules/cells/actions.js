@@ -54,7 +54,6 @@ export default {
             let cols = getters.allCols
             let rows = getters.allRows
             let fixedCell = extend(template, cell)
-
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
@@ -298,8 +297,16 @@ export default {
         // 左上角位置的单元格，作为合并单元格的模板原型，
         // 如果没有单元格，以横向优先，竖向次之查找
         // 如果所有都没有，就按照template属性合并
+        // 无边框
         let templateCell = cells.length !== 0 ?
-            extend(cells[0]) : extend(template)
+            extend(cells[0], {
+                border: {
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }
+            }) : extend(template)
         let cols = []
         for (let i = startColIndex; i < endColIndex + 1; i++) {
             cols.push(getters.allCols[i].alias)
@@ -359,7 +366,14 @@ export default {
             if (occupyRow.length > 1 || occupyCol.length > 1) {
                 for (let i = 0, len1 = occupyCol.length; i < len1; i++) {
                     for (let j = 0, len2 = occupyRow.length; j < len2; j++) {
-                        let insertCell = extend(cell)
+                        let insertCell = extend(cell, {
+                            border: {
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                right: 0
+                            }
+                        })
                         if (i !== 0 || j !== 0) {
                             insertCell.content.texts = null
                             insertCell.content.displayTexts = null
@@ -469,16 +483,37 @@ export default {
 
         function parseText(cell) {
             let text = cell.content.texts
+            let align = {}
+            // 判断对齐方式
+            if (format === 'text') {
+                align = {
+                    content: {
+                        alignRow: 'left'
+                    }
+                }
+            } else if ((format === 'number' || format === 'percent' || format === 'currency' || format === 'routine') && isNum(text)) {
+                align = {
+                    content: {
+                        alignRow: 'right'
+                    }
+                }
+            } else if ((format === 'data' || format === 'routine') && isDate(text)) {
+                align = {
+                    content: {
+                        alignRow: 'right'
+                    }
+                }
+            }
             if (format === 'date' && isDate(text)) {
                 text = formatText(rules, text)
             } else if (format !== 'date' && isNum(text)) {
                 text = formatText(rules, parseFloat(text, 10))
             }
-            return {
+            return extend({
                 content: {
                     displayTexts: text,
                 }
-            }
+            }, align)
         }
     },
     A_CELLS_INNERPASTE({

@@ -70,6 +70,18 @@ export default {
             colItem.set(colAlias, true)
         }
     },
+    M_SHEETS_UPDATE_FROZEN(state, {
+        type,
+        value
+    }) {
+        let frozen = state.list[0].frozen
+        if (type === 'ROW' && frozen.row.length > 1) {
+            frozen.row[1].over = value
+        }
+        if (type === 'COL' && frozen.col.length > 1) {
+            frozen.col[1].over = value
+        }
+    },
     UPDATE_SHEETS_MAX(state, {
         rowAlias,
         colAlias,
@@ -104,6 +116,7 @@ export default {
         state.el = {
             offsetWidth: 0
         }
+
         // 当前表格的最大行、列的别名和像素
         state.max = {
             rowAlias: null,

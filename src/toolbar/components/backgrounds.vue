@@ -9,9 +9,9 @@
                         <span class="color-box"
                             :title="color.name">
                             <div class="color-body"
-                                 :data-value="'rgb(' + color.code + ')'"
+                                 :data-value="color.trans === true ? color.code : 'rgb(' + color.code + ')'"
                                  :data-struct="'content.background'"
-                                 :style="'background-color: rgb(' + color.code +');'">
+                                 :style="{ backgroundColor: color.trans === true ? color.code : 'rgb(' + color.code + ')'}">
                             </div>
                         </span>
                     </td>
@@ -32,11 +32,12 @@ export default {
                 code: '192, 0, 0',
                 name: '深红色'
             }, {
+                code: 'transparent',
+                name: '透明',
+                trans: true
+            }, {
                 code: '255, 0, 0',
                 name: '红色'
-            }, {
-                code: '255, 255, 255',
-                name: '白色'
             }, {
                 code: '255, 192, 0',
                 name: '橙色'
@@ -58,6 +59,9 @@ export default {
             }, {
                 code: '0, 32, 96',
                 name: '深蓝色'
+            }, {
+                code: '255, 255, 255',
+                name: '白色'
             }, {
                 code: '112, 48, 160',
                 name: '紫色'

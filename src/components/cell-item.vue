@@ -35,23 +35,26 @@ function caclBorder({
     let width
     let padding
     let margin
+    /**
+     * type代表边框的类型，
+     * 0, 无边框
+     * 1, 细边框
+     * 2, 粗边框
+     */
     switch (type) {
         case 0:
             width = 1
             color = 'transparent'
-            margin = 1
             padding = 1
             break
         case 1:
             width = 1
             color = '#000'
-            margin = 1
             padding = 1
             break
         case 2:
             width = 2
             color = '#000'
-            margin = 0
             padding = 0
             break
     }
@@ -91,32 +94,28 @@ export default {
             }, {
                 colorName: 'borderTopColor',
                 widthName: 'borderTopWidth',
-                paddingName: 'paddingTop',
-                marginName: 'marginTop'
+                paddingName: 'paddingTop'
             })
             let rightBorder = caclBorder({
                 type: borderProp.right
             }, {
                 colorName: 'borderRightColor',
                 widthName: 'borderRightWidth',
-                paddingName: 'paddingRight',
-                marginName: 'marginRight'
+                paddingName: 'paddingRight'
             })
             let bottomBorder = caclBorder({
                 type: borderProp.bottom
             }, {
                 colorName: 'borderBottomColor',
                 widthName: 'borderBottomWidth',
-                paddingName: 'paddingBottom',
-                marginName: 'marginBottom'
+                paddingName: 'paddingBottom'
             })
             let leftBorder = caclBorder({
                 type: borderProp.left
             }, {
                 colorName: 'borderLeftColor',
                 widthName: 'borderLeftWidth',
-                paddingName: 'paddingLeft',
-                marginName: 'marginLeft'
+                paddingName: 'paddingLeft'
             })
             return extend({
                 // 因为现实的效果，需要共享单元格的边框
@@ -125,12 +124,13 @@ export default {
                 left: unit(left - 2),
                 width: unit(width - 2),
                 height: unit(height - 2)
-            }, topBorder, rightBorder, bottomBorder, leftBorder)
+            }, topBorder, rightBorder, bottomBorder, leftBorder, {
+                backgroundColor: this.cell.content.background
+            })
         },
         viewProps() {
             let attrs = this.cell.content
             let props = {
-                background: attrs.background,
                 color: attrs.color,
                 textAlign: attrs.alignRow,
                 fontSize: attrs.size + 'pt',

@@ -37,6 +37,11 @@ export default {
                 start: neighbor.alias,
                 over: last
             }]
+            let alias = fixedSheet.frozen.alias
+            if (alias == null) {
+                fixedSheet.frozen.alias = {}
+            }
+            fixedSheet.frozen.alias.col = sheet.frozen.colAlias
         }
         if (sheet.frozen && sheet.frozen.rowAlias) {
             let rows = rootState.rows.list
@@ -54,97 +59,43 @@ export default {
                 start: neighbor.alias,
                 over: last
             }]
+            let alias = fixedSheet.frozen.alias
+            if (alias == null) {
+                fixedSheet.frozen.alias = {}
+            }
+            fixedSheet.frozen.alias.row = sheet.frozen.rowAlias
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
     },
-    [actionTypes.SHEET_FROZEN]({
+    A_SHEETS_FROZEN({
         state,
         getters,
         rootState,
         dispatch
     }, type) {
-        let currentSheet = rootState.currentSheet
-        let stateList = state.list
-        let frozenState
-
-        for (let i = 0, len = stateList.length; i < len; i++) {
-            if (stateList[i].alias === currentSheet) {
-                frozenState = stateList[i]
-                break
-            }
-        }
-
-        if (frozenState.isFrozen) {
-            return
-        }
-        let select = getters.activeSelect
-        let frozenRowAlias = select.wholePosi.startRowAlias
-        let frozenColAlias = select.wholePosi.startColAlias
-        let frozenRowIndex = getters.rowIndexByAlias(frozenRowAlias)
-        let frozenColIndex = getters.colIndexByAlias(frozenColAlias)
-
-        let userView = rootState.userView
-        let userViewTopIndex = getters.getRowIndexByPosi(userView.top)
-        let userViewLeftIndex = getters.getColIndexByPosi(userView.left)
-        let userViewBottomIndex = getters.getRowIndexByPosi(userView.bottom)
-        let userViewRightIndex = getters.getColIndexByPosi(userView.right)
-
-
-        // 非可视范围，不能进行冻结
-        if (frozenRowIndex - userViewTopIndex < 0 ||
-            userViewBottomIndex - frozenRowIndex < 0 ||
-            frozenColIndex - userViewLeftIndex < 0 ||
-            userViewRightIndex - frozenColIndex < 0) {
-            return
-        }
-        // 左上角位置不能进行冻结
-        if (frozenRowIndex === userViewTopIndex &&
-            frozenColIndex === userViewLeftIndex) {
-            return
-        }
-        let rows = getters.rowList
-        let cols = getters.colList
-        let userViewLeft = cols[userViewLeftIndex]
-        let userViewTop = rows[userViewTopIndex]
-        let frozenCol = cols[frozenColIndex]
-        let frozenRow = rows[frozenRowIndex]
+        let select = getters.selectByType('SELECT')
         send({
-            url: config.url['frozen'],
-            data: JSON.stringify({
-                viewRow: userViewTop.alias,
-                viewCol: userViewLeft.alias,
-                oprCol: frozenCol.alias,
-                oprRow: frozenRow.alias
+            url: config.url.frozen,
+            body: JSON.stringify({
+                viewRow: 0,
+                viewCol: 0,
+                oprCol: select.signalSort.startCol,
+                oprRow: select.signalSort.startRow
             })
+        }).then(function(data) {
+            // console.log(data)
+            // window.location.reload()
         })
-        if (type === 'firstRowFrozen') {
-            dispatch(actionTypes.SHEET_ROWFROZEN, {
-                userViewSort: userViewTop.sort,
-                frozenRowSort: userViewTop.sort + 1
-            })
-        } else if (type === 'firstColFrozen') {
-            dispatch(actionTypes.SHEET_COLFROZEN, {
-                userViewSort: userViewLeft.sort,
-                frozenColSort: userViewLeft.sort + 1
-            })
-        } else if (frozenColIndex === userViewLeftIndex) {
-            dispatch(actionTypes.SHEET_ROWFROZEN, {
-                userViewSort: userViewTop.sort,
-                frozenRowSort: frozenRow.sort
-            })
-        } else if (frozenRowIndex === userViewTopIndex) {
-            dispatch(actionTypes.SHEET_COLFROZEN, {
-                userViewSort: userViewLeft.sort,
-                frozenColSort: frozenCol.sort
-            })
-        } else {
-            dispatch(actionTypes.SHEET_POINTFROZEN, {
-                frozenColSort: frozenCol.sort,
-                frozenRowSort: frozenRow.sort,
-                userViewColSort: userViewLeft.sort,
-                userViewRowSort: userViewTop.sort
-            })
-        }
+    },
+    A_SHEETS_UNFROZEN({
+        dispatch
+    }) {
+        send({
+            url: config.url.unfrozen
+        }).then(function(data) {
+            // console.log(data)
+            // window.location.reload()
+        })
     },
     /**
      * [SHEET_SCROLL_DOWN 滚动视图]
@@ -274,9 +225,11 @@ export default {
             let isFrozen = rootGetters.isFrozen()
             let frozenAlias = rootGetters.frozenAlias()
             let frozenAliasRow = frozenAlias.row
+
             // 冻结情况下，DOM的加载位置上限是冻结位置
             if (isFrozen && frozenAliasRow != null) {
-                let neighborRow = rootGetters.neighborRowByAlias(frozenAliasRow, 'NEXT')
+                let neighborRow = rootGetters.neighborRowByAlias(frozenAliasRow,
+                    'NEXT')
                 if (firstRowAlias === neighborRow.alias) {
                     loadedIdx = -1
                 }
@@ -319,11 +272,11 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allColMap = allLoaded.rowMap.get(lastRowAlias)
-            let allLoadedLastRowAlias = allLoaded.rows[allLoaded.rows.length - 1]
-            let allLoadedLastRowIdx = rootGetters.rowIndexByAlias(allLoadedLastRowAlias)
+            let idx = rootGetters.rowIndexByAlias(allLoaded.rows[allLoaded.rows.length - 1])
             let needRequire = allColMap != null &&
                 allColMap.get(lastColAlias) &&
-                allLoadedLastRowIdx - lastRowIndex > 1 ? false : true
+                idx - lastRowIndex > 1 ?
+                false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
@@ -414,7 +367,13 @@ export default {
                 })
             }, false).then(function(data) {
                 let rows = data.gridLineRow
-                dispatch(actionTypes.ROWS_ADD, rows)
+                if (rootGetters.getRowByAlias(rows[0].alias) == null) {
+                    dispatch(actionTypes.ROWS_ADD, rows)
+                    commit('M_SHEETS_UPDATE_FROZEN', {
+                        type: 'ROW',
+                        value: rows[rows.length - 1].alias
+                    })
+                }
                 if (data.cells.length !== 0) {
                     dispatch(actionTypes.A_CELLS_ADD, data.cells)
                 }
@@ -499,6 +458,9 @@ export default {
         //     bottom: limitBottom
         // })
         // })
+        console.log(viewLoaded.rows)
+        console.log(viewLoaded.rowMap)
+        console.log(allLoaded)
     },
     SHEET_SCROLL_TRANSVERSE({
         state,
@@ -513,6 +475,7 @@ export default {
         // 所有视图， 记录对象
         let allLoaded = rootGetters['loaded']
         let max = rootGetters['max']
+
         // 当前视图，记录点，行、列长度
         let rowLen = viewLoaded.rows.length
         let colLen = viewLoaded.cols.length
@@ -618,6 +581,18 @@ export default {
                 alias: firstColAlias,
                 type: 'COLS'
             })
+            let isFrozen = rootGetters.isFrozen()
+            let frozenAlias = rootGetters.frozenAlias()
+            let frozenAliasCol = frozenAlias.col
+
+            // 冻结情况下，DOM的加载位置上限是冻结位置
+            if (isFrozen && frozenAliasCol != null) {
+                let neighborCol = rootGetters.neighborColByAlias(frozenAliasCol,
+                    'NEXT')
+                if (firstColAlias === neighborCol.alias) {
+                    loadedIdx = -1
+                }
+            }
             if (loadedIdx !== 0 && loadedIdx !== -1) {
                 let preCol = allLoaded.cols[loadedIdx - 1]
                 let preColIdx = rootGetters.colIndexByAlias(preCol)
@@ -656,11 +631,10 @@ export default {
 
             // 有这个记录点，并且这个记录点不是在最后一个位置，说明不需要请求后台
             let allRowMap = allLoaded.colMap.get(lastColAlias)
-            let allLoadedLastColAlias = allLoaded.cols[allLoaded.cols.length - 1]
-            let allLoadedLastColIdx = rootGetters.colIndexByAlias(allLoadedLastColAlias)
+            let idx = rootGetters.colIndexByAlias(allLoaded.cols[allLoaded.cols.length - 1])
             let needRequire = allRowMap != null &&
                 allRowMap.get(lastRowAlias) &&
-                allLoadedLastColIdx - lastColIndex > 1 ? false : true
+                idx - lastColIndex > 1 ? false : true
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
@@ -751,7 +725,13 @@ export default {
                 })
             }, false).then(function(data) {
                 let cols = data.gridLineCol
-                dispatch(actionTypes.COLS_ADD, cols)
+                if (rootGetters.getColByAlias(cols[0].alias) == null) {
+                    dispatch(actionTypes.COLS_ADD, cols)
+                    commit('M_SHEETS_UPDATE_FROZEN', {
+                        type: 'COL',
+                        value: cols[cols.length - 1].alias
+                    })
+                }
                 if (data.cells.length !== 0) {
                     dispatch(actionTypes.A_CELLS_ADD, data.cells)
                 }
@@ -832,5 +812,8 @@ export default {
         //     bottom: limitBottom
         // })
         // })
+        console.log(viewLoaded.cols)
+        console.log(viewLoaded.colMap)
+        console.log(allLoaded)
     }
 }

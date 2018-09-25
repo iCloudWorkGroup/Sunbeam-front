@@ -8,6 +8,10 @@ let ss = new Sunbeam({
 
 
 ss.load().then(() => {
+    console.log('over')
+    ss.rowCancelHide('1', '1')
+    ss.rowCancelHide('1', '2')
+    ss.colCancelHide('1', 'A')
     // ss.colHide('1', 'A').then(() => {
     //     return ss.rowHide('1', '1')
     // }).then(() => {

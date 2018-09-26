@@ -104,11 +104,15 @@ export default {
             let frozenAlias = this.$store.getters.frozenAlias()
             let frozenAliasRow = frozenAlias.row
             let userView = this.$store.getters.userView()
+            // 是冻结，并且行被冻结
             if (isFrozen && frozenAliasRow != null) {
                 let frozenRow = this.$store.getters.getRowByAlias(
                     frozenAliasRow)
                 let topDistance = frozenRow.top + frozenRow.height - userView.top
                 let neighborRow = this.$store.getters.neighborRowByAlias(frozenAliasRow, 'NEXT')
+                // 如果冻结的行等于这个视图的行开始值，说明是上半部分的视图
+                // 所以, 高度就是topDistance
+                // 不然就是，limitHeight -  topDistance
                 if (frozenAliasRow === this.rowOver) {
                     limitHeight = topDistance
                 }

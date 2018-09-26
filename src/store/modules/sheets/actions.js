@@ -189,7 +189,7 @@ export default {
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordRow.left) {
+            if (limitMax < cordRow.top) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: firstColIndex,
                     endColIndex: lastColIndex,
@@ -548,7 +548,7 @@ export default {
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordCol.top) {
+            if (limitMax < cordCol.left) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: cordColIndex,
                     endColIndex: lastColIndex,

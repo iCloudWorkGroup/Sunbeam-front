@@ -50,8 +50,13 @@ export default {
             let beginIdx = getters.colIndexByAlias(beginAlias)
             let endIdx = getters.colIndexByAlias(endAlias)
             if (beginIdx !== -1 && endIdx !== -1) {
+                let visibleCols = this.visibleColList()
+                beginIdx = Math.max(visibleCols[0].sort, beginIdx)
+                endIdx = Math.min(visibleCols[visibleCols.length - 1].sort, endIdx)
                 // 因为索引总是 -1，所以结束要 +1
-                return this.visibleColList().slice(beginIdx, endIdx + 1)
+                return state.list.slice(beginIdx, endIdx + 1).filter(cell => {
+                    return cell.visible === true
+                })
             }
             return null
         }

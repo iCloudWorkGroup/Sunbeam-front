@@ -29,6 +29,15 @@ export default {
             return 0
         }
     },
+    /**
+     * 返回区间内的所有行
+     * 因为涉及到冻结的情况，所以数据过滤的时候需要进行双重过滤
+     * 1. 通过范围和可视区域比较，确定应该返回的数据范围
+     * 2. 再次过滤掉不可视的数据，返回最终的数据
+     * @param  {[type]} state   [description]
+     * @param  {[type]} getters [description]
+     * @return {[type]}         [description]
+     */
     rowsByRange(state, getters) {
         return function(beginAlias, endAlias) {
             let beginIdx = getters.rowIndexByAlias(beginAlias)
@@ -39,7 +48,9 @@ export default {
                 endIdx = Math.min(visibleRows[visibleRows.length - 1].sort, endIdx)
 
                 // 因为索引总是 -1，所以结束要 +1
-                return state.list.slice(beginIdx, endIdx + 1)
+                return state.list.slice(beginIdx, endIdx + 1).filter(cell => {
+                    return cell.visible === true
+                })
             }
             return null
         }

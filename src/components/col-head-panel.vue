@@ -4,24 +4,24 @@
          @mousedown="mouseDownHandle"
          @mousemove="mouseMoveHandle">
         <col-head-item
-                v-for="col in viewCols"
-                :key="col.alias"
-                :col="col"
-                :offsetLeft="offsetLeft"/>
-        <col-head-item  v-if="adjustState"
-                        ref="adjustColView"
-                        class="adjust-col-head-item"
-                        :offsetLeft="offsetLeft"
-                        :col="adjustCol">
-        </col-head-item>
+            v-for="col in viewCols"
+            :key="col.alias"
+            :col="col"
+            :offsetLeft="offsetLeft"/>
+        <col-head-item
+            v-if="adjustState"
+            ref="adjustColView"
+            class="adjust-col-head-item"
+            :offsetLeft="offsetLeft"
+            :col="adjustCol"/>
         <div v-if="adjustState"
              ref="adjustPanelView"
              class="temp-space-container">
-            <col-head-item v-for="col in adjustColList"
-                           :key="col.alias"
-                           :col="col"
-                           :offsetLeft="offsetLeft">
-            </col-head-item>
+            <col-head-item
+                v-for="col in adjustCols"
+               :key="col.alias"
+               :col="col"
+               :offsetLeft="offsetLeft"/>
         </div>
     </div>
 </template>
@@ -55,7 +55,7 @@ export default {
         viewCols() {
             return this.$store.getters.colsByRange(this.start, this.over)
         },
-        adjustColList() {
+        adjustCols() {
             let cols = this.$store.getters.allCols
             return cols.slice(this.adjustColIndex + 1)
         },

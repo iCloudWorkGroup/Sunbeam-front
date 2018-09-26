@@ -8,21 +8,20 @@
         :key="row.alias"
         :row="row"
         :offsetTop="offsetTop"/>
-
-    <row-head-item class="adjust-row-head-item"
-                   ref="adjustRowView"
-                   v-if="adjustState"
-                   :offsetTop="offsetTop"
-                   :row="adjustRow">
-    </row-head-item>
+    <row-head-item
+        class="adjust-row-head-item"
+       ref="adjustRowView"
+       v-if="adjustState"
+       :offsetTop="offsetTop"
+       :row="adjustRow"/>
     <div class="temp-space-container"
          ref="adjustPanelView">
-        <row-head-item v-for="row in adjustRowList"
-                       v-if="adjustState"
-                       :key="row.alias"
-                       :row="row"
-                       :offsetTop="offsetTop">
-        </row-head-item>
+        <row-head-item
+            v-for="row in adjustRows"
+            v-if="adjustState"
+            :key="row.alias"
+            :row="row"
+            :offsetTop="offsetTop"/>
     </div>
 </div>
 </template>
@@ -56,7 +55,7 @@ export default {
         viewRows() {
             return this.$store.getters.rowsByRange(this.start, this.over)
         },
-        adjustRowList() {
+        adjustRows() {
             let rowList = this.$store.getters.allRows
             return rowList.slice(this.adjustRowIndex + 1)
         },

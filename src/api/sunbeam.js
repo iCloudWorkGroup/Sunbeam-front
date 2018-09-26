@@ -946,12 +946,14 @@ SpreadSheet.prototype = {
                 store,
                 render: h => h(Book)
             }).$mount(rootSelector)
+            cache.bookVm = this.bookVm
             // 新建vue实例tools
             if (typeof toolsSelector !== 'undefined') {
                 this.toolBarVm = new Vue({
                     store,
                     render: h => h(Main)
                 }).$mount(toolsSelector)
+                cache.bookVm = this.toolBarVm
             }
         })
     },

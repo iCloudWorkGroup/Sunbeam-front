@@ -26,8 +26,14 @@ export default {
     regionRecord: new Map(),
     // 存储rootElement元素
     rootEl: '',
+    // 存储bookVm实例
+    rootSelector: '',
+    bookVm: '',
     // 工具栏element元素
     toolEl: '',
+    // 存储toolVm实例
+    toolbarSelector: '',
+    toolVm: '',
     // 剪切板缓存数据
     clipData: null,
     // 剪切板状态

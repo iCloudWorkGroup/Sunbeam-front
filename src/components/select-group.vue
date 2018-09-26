@@ -69,15 +69,16 @@ export default {
         moveon(cell) {
             this.commentShow = true
             this.commentText = cell.customProp.comment
+            console.log(cell)
             this.style = {
                 fontSize: '10pt',
-                left: unit(cell.physicsBox.left + cell.physicsBox.width + 2),
-                top: unit(cell.physicsBox.top),
+                left: unit(cell.physicsBox.left + cell.physicsBox.width + 2 - this.offsetLeft),
+                top: unit(cell.physicsBox.top - this.offsetTop),
                 width: unit(config.commentWidth),
                 height: unit(config.commentHeigth)
             }
         },
-        moveout(style) {
+        moveout() {
             this.commentShow = false
         }
     }
@@ -92,8 +93,10 @@ export default {
     height: inherit;
 }
 .comment {
+    position: absolute;
+    z-index: 999;
     word-wrap:break-word;
     word-break:break-all;
-    overflow: hidden
+    overflow: hidden;
 }
 </style>

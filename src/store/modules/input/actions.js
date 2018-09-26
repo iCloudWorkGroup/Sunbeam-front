@@ -99,7 +99,7 @@ export default {
                         texts: customProp.comment,
                         size: 11,
                         family: content.family,
-                        color: content.color,
+                        color: 'rgb(0,0,0)',
                         weight: content.weight,
                         italic: content.italic,
                         edit: 'comment'
@@ -162,28 +162,63 @@ export default {
             endRowIndex: rowIndex
         })[0]
         let rules
-        let date
-        let propStruct
+        let date = false
+        let propStruct = { content: {}}
+        let fixText
+        let express
         if (status === 'texts') {
-            propStruct = {
-                content: {
-                    texts
+            // 判断输入类型
+            let inputExpress = ''
+            let percentReg = /^\d+(\.\d+)?%$/
+            let currencyReg = /^\$\d+(\.\d+)?$|^¥\d+(\.\d+)?$/
+            if (percentReg.test(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
+                inputExpress = '0.00%'
+                fixText = texts.replace(/\%/, '') / 100
+                if (fixText.toString().indexOf('.') > -1) {
+                    fixText = fixText.toFixed(4)
                 }
+            } else if (currencyReg.test(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
+                inputExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
+                fixText = texts.replace(/\$|¥/, '')
+                if (fixText.toString().indexOf('.') > -1) {
+                    fixText = parseFloat(fixText).toFixed(2)
+                }
+            } else {
+                fixText = texts
             }
             if (cell) {
-                let express = cell.content.express
-                rules = parseExpress(express)
-                date = cell.content.express === 'yyyy/mm/dd' || cell.content.express === 'yyyy年m月d日' ? true : false
-                propStruct.content.displayTexts = parseText(texts)
+                // 当原本express为常规时，根据输入类型修改express
+                if (cell.content.express === 'G' || cell.content.express === 'General') {
+                    express = inputExpress
+                    propStruct.content = {
+                        texts: fixText,
+                        express
+                    }
+                } else {
+                    express = cell.content.express
+                    date = cell.content.express === 'm/d/yy' || cell.content.express === 'yyyy"年"m"月"d"日"' || cell.content.express === 'yyyy"年"m"月"' ? true : false
+                    propStruct.content = {
+                        texts: fixText,
+                    }
+                }
             } else {
-                propStruct.content.displayTexts = texts
+                express = inputExpress === '' ? 'G' : inputExpress
+                propStruct.content = {
+                    texts: fixText,
+                    express
+                }
             }
-            if (isNum(texts)) {
+            // 修正单元格对齐方式
+            rules = parseExpress(express)
+            propStruct.content.displayTexts = parseText(fixText)
+            if (express === '@') {
+                propStruct.content.alignRow = 'left'
+            } else if ((express === 'G' || express === 'General' || express === '0' || express === '0.0' || express === '0.00' || express === '0.000'
+                || express === '0.0000' || express === '0.00%' || express === '$#,##0.00' || express === '¥#,##0.00')
+                && isNum(fixText)) {
                 propStruct.content.alignRow = 'right'
-                // send({
-                //     url: config.url.alignRow,
-                //     body: JSON.stringify(sendArgs)
-                // })
+            } else if ((express === 'm/d/yy' || express === 'yyyy"年"m"月"d"日"' || express === 'yyyy"年"m"月"' || express === 'G' || express === 'General') && isDate(texts)) {
+                propStruct.content.alignRow = 'right'
             }
         }
         if (status === 'comment') {

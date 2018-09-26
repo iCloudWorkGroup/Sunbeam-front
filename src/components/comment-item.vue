@@ -47,8 +47,7 @@ export default {
             this.$emit('moveon', this.cell)
         },
         commentHide() {
-            this.$emit('moveout', { right: 20 })
-            console.log()
+            this.$emit('moveout')
         }
     }
 }

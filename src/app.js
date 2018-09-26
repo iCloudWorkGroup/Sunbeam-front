@@ -19,6 +19,7 @@ export default async function(options) {
     if (rootSelector != null &&
         ($rootEl = document.querySelector(rootSelector)) != null) {
         cache.rootEl = $rootEl
+        cache.rootSelector = rootSelector
     } else {
         throw new Error('rootEl not exist')
     }
@@ -28,6 +29,7 @@ export default async function(options) {
     if (toolSelector != null &&
         ($toolEl = document.querySelector(toolSelector)) != null) {
         cache.toolEl = $toolEl
+        cache.toolbarSelector = toolSelector
     }
     // 发送restore请求
     let bottom = $rootEl.offsetHeight + config.scrollBufferHeight
@@ -50,12 +52,14 @@ export default async function(options) {
         store,
         render: h => h(Book)
     }).$mount(rootSelector)
+    cache.bookVm = bookVm
     if (toolSelector != null) {
         store.registerModule('toolbar', toolbar)
         toolBarVm = new Vue({
             store,
             render: h => h(Main)
         }).$mount(toolSelector)
+        cache.toolVm = toolBarVm
         store.commit('M_SET_TOOLBAR_CLASS', toolSelector)
     }
     // 初始化offset宽高

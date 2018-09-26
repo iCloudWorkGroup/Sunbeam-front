@@ -95,6 +95,21 @@ export default {
                 }
                 return 0
             }
+            // 为合并单元格时,无背景或背景透明时,修改背景颜色为白色
+            // 宽度减2 高度减2 top +1 left +1 露出边线
+            if (fixedCell.occupy.col.length > 1 || fixedCell.occupy.row.length > 1) {
+                if (fixedCell.content.background === 'transparent' || fixedCell.content.background === 'rgba(255, 255, 255, 0)' || !fixedCell.content.background) {
+                    fixedCell.content.background = 'rgb(255, 255, 255)'
+                }
+                height -= 2
+                width -= 2
+                left += 1
+                top += 1
+            } else {
+                if (fixedCell.content.background === 'rgb(255, 255, 255)') {
+                    fixedCell.content.background = 'rgba(255, 255, 255, 0)'
+                }
+            }
             fixedCell = extend(fixedCell, {
                 physicsBox: {
                     top,
@@ -159,6 +174,8 @@ export default {
             coordinate: [signalSort]
         }
         let fixPropName = propName
+        let direction
+        let txt
         switch (propName) {
             case 'wordWrap':
                 sendArgs = extend(sendArgs, {
@@ -174,10 +191,11 @@ export default {
                 }
                 break
             case 'texts':
+                txt = fixText(propStruct.content[propName])
                 sendArgs = extend({
                     coordinate: signalSort
                 }, {
-                    content: propStruct.content[propName]
+                    content: txt
                 })
                 break
             case 'border.top':
@@ -213,9 +231,22 @@ export default {
                 })
                 break
         }
+        function fixText(text) {
+            let txt = text
+            if (propStruct.content.express === '$#,##0.00') {
+                txt = '$' + txt
+            }
+            if (propStruct.content.express === '¥#,##0.00') {
+                txt = '¥' + txt
+            }
+            if (propStruct.content.express === '0.00%') {
+                txt = txt * 100 + '%'
+            }
+            return txt
+        }
         function fixBorder() {
             fixPropName = 'border'
-            let direction = propName.split('.')[1]
+            direction = propName.split('.')[1]
             let line = direction === 'all' || direction === 'none' ?
                 propStruct.border.top :
                 propStruct.border[direction]
@@ -243,10 +274,37 @@ export default {
                 if (idx !== -1) {
                     if (!avoidRepeat[idx]) {
                         avoidRepeat[idx] = true
-                        commit(mutationTypes.UPDATE_CELL, {
-                            idx,
-                            prop: propStruct
-                        })
+                        if (fixPropName !== 'border' || (fixPropName === 'border' && (direction === 'all' || direction === 'none'))) {
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: propStruct
+                            })
+                        }
+                        // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
+                        if (fixPropName === 'border' && direction === 'top' && j === startRowIndex) {
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: propStruct
+                            })
+                        }
+                        if (fixPropName === 'border' && direction === 'bottom' && j === endRowIndex) {
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: propStruct
+                            })
+                        }
+                        if (fixPropName === 'border' && direction === 'left' && i === startColIndex) {
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: propStruct
+                            })
+                        }
+                        if (fixPropName === 'border' && direction === 'right' && i === endColIndex) {
+                            commit(mutationTypes.UPDATE_CELL, {
+                                idx,
+                                prop: propStruct
+                            })
+                        }
                     }
                 } else {
                     dispatch('A_CELLS_ADD', extend(template, propStruct, {
@@ -320,6 +378,9 @@ export default {
         let rows = []
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
             rows.push(getters.allRows[i].alias)
+        }
+        if (templateCell.content.background === 'transparent' || templateCell.content.background === 'rgba(255, 255, 255, 0)') {
+            templateCell.content.background = 'rgb(255, 255, 255)'
         }
         templateCell.occupy = {
             row: rows,
@@ -757,7 +818,7 @@ export default {
                 let item = cells[idx]
                 let express = item.content.express
                 rules = parseExpress(express)
-                date = item.content.express === 'yyyy/mm/dd' || item.content.express === 'yyyy年m月d日' ? true : false
+                date = item.content.express === 'm/d/yy' || item.content.express === 'yyyy"年"m"月"d"日"' || cell.content.express === 'yyyy"年"m"月"' ? true : false
                 dispatch('A_CELLS_UPDATE', {
                     propName: 'texts',
                     propStruct: {

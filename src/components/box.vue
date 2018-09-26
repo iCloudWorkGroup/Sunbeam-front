@@ -45,7 +45,7 @@ export default {
         styleObject() {
             let props = this.$store.getters.inputProps
             let physical = props.physical
-            let texts = physical.texts == null ? physical.texts : physical.texts.trim()
+            let texts = physical.texts == null ? physical.texts : physical.texts.toString().trim()
             /**
              * 1. 因为单元格相对于内容区域定位，
              * 而编辑框是相对于所以编辑区，所以需要考虑corner的大小

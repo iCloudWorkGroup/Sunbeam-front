@@ -16,7 +16,8 @@ export function parseExpress(str) {
         reg: /^@$/g,
         handle: 'article'
     }, {
-        reg: /(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|(y{4})[-/年]?(m{1,2})[-/月]?/g,
+        // reg: /(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|(y{4})[-/年]?(m{1,2})[-/月]?/g,
+        reg: /(y{4})\"[-/年]\"?(m{1,2})\"[-/月]\"?(d{1,2})\"[日]\"?$|(y{4})\"[-/年]\"?(m{1,2})\"[-/月]\"?|m\/d\/yy/g,
         handle: 'whole',
         match: true
     }, {
@@ -49,7 +50,7 @@ export function isNum(value) {
     if (value === '' || value == null) {
         return false
     }
-    if (value.indexOf(',') === -1) {
+    if (value.toString().indexOf(',') === -1) {
         reg = /^(\-|\+)?[0-9]+(\.[0-9]+)?$/
     } else {
         return false
@@ -173,20 +174,23 @@ export function formatText(rules, text) {
             if (reg.test(this.origin)) {
                 this.origin = this.origin.replace(/\u5e74|\u6708|\u65e5/g, '/')
             }
+            let match = rule.match
+            if (rule.match === 'm/d/yy') {
+                match = 'yyyy/m/d'
+            }
             let localDate = new Date(this.origin)
             let dateMap = {
                 y: localDate.getFullYear(),
-                m: (localDate.getMonth() + 1) < 10 ? '0' + (localDate.getMonth() + 1) : (localDate.getMonth() + 1),
-                d: localDate.getDate() < 10 ? '0' + localDate.getDate() : localDate.getDate()
-                // m: localDate.getMonth() + 1,
-                // d: localDate.getDate()
+                m: (localDate.getMonth() + 1),
+                d: localDate.getDate()
             }
-            let ret = rule.match.replace(/([ymd]+)/g, function(
+            let ret = match.replace(/([ymd]+)/g, function(
                 match, name) {
                 let localName = name.substring(0, 1)
                 return (dateMap[localName] != null) ?
                     dateMap[localName] : ''
             })
+            ret = ret.replace(/\"/g, '')
             return ret
         }
     }

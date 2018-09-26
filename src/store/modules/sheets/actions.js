@@ -6,6 +6,10 @@ import {
 import template from './template'
 import send from '../../../util/send'
 import config from '../../../config'
+import cache from '../../../tools/cache'
+import Vue from 'vue'
+import Book from '../../../components/book.vue'
+import Main from '../../../toolbar/components/main.vue'
 export default {
     /**
      * 还原sheet
@@ -71,7 +75,8 @@ export default {
         state,
         getters,
         rootState,
-        dispatch
+        dispatch,
+        commit
     }, type) {
         let select = getters.selectByType('SELECT')
         send({
@@ -83,18 +88,97 @@ export default {
                 oprRow: select.signalSort.startRow
             })
         }).then(function(data) {
-            // console.log(data)
-            // window.location.reload()
+            // 销毁vue实例
+            cache.bookVm.$destroy()
+            if (typeof cache.toolVm !== 'undefined') {
+                cache.toolVm.$destroy()
+            }
+            let bottom = cache.bookVm.$el.offsetHeight + config.scrollBufferHeight
+            let right = cache.bookVm.$el.offsetWidth + config.scrollBufferWidth
+            // // 清空 store 行 列 单元格 sheet select 信息
+            cache.bookVm.$store.commit('M_CLEAR_CELLS')
+            cache.bookVm.$store.commit('M_CLEAR_SELECT')
+            cache.bookVm.$store.commit('M_CLEAR_SHEET')
+            cache.bookVm.$store.commit('M_CLEAR_ROWS')
+            cache.bookVm.$store.commit('M_CLEAR_COLS')
+            let rootSelector = cache.rootSelector
+            let toolsSelector = cache.toolbarSelector
+            // 重新获取数据
+            dispatch('RESTORE', {
+                left: 0,
+                top: 0,
+                right,
+                bottom
+            }).then(() => {
+                // 设置初始宽度
+                let offsetWidth = document.querySelector(rootSelector).offsetWidth
+                let offsetHeight = document.querySelector(rootSelector).offsetHeight
+                commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
+                commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
+                let store = cache.bookVm.$store
+                // 新建vue实例table
+                cache.bookVm = new Vue({
+                    store,
+                    render: h => h(Book)
+                }).$mount(rootSelector)
+                // 新建vue实例tools
+                if (typeof toolsSelector !== 'undefined') {
+                    cache.toolVm = new Vue({
+                        store,
+                        render: h => h(Main)
+                    }).$mount(toolsSelector)
+                }
+            })
         })
     },
     A_SHEETS_UNFROZEN({
-        dispatch
+        dispatch,
+        commit
     }) {
         send({
             url: config.url.unfrozen
         }).then(function(data) {
-            // console.log(data)
-            // window.location.reload()
+            // 销毁vue实例
+            cache.bookVm.$destroy()
+            if (typeof cache.toolVm !== 'undefined') {
+                cache.toolVm.$destroy()
+            }
+            let bottom = cache.bookVm.$el.offsetHeight + config.scrollBufferHeight
+            let right = cache.bookVm.$el.offsetWidth + config.scrollBufferWidth
+            // // 清空 store 行 列 单元格 sheet select 信息
+            cache.bookVm.$store.commit('M_CLEAR_CELLS')
+            cache.bookVm.$store.commit('M_CLEAR_SELECT')
+            cache.bookVm.$store.commit('M_CLEAR_SHEET')
+            cache.bookVm.$store.commit('M_CLEAR_ROWS')
+            cache.bookVm.$store.commit('M_CLEAR_COLS')
+            let rootSelector = cache.rootSelector
+            let toolsSelector = cache.toolbarSelector
+            // 重新获取数据
+            dispatch('RESTORE', {
+                left: 0,
+                top: 0,
+                right,
+                bottom
+            }).then(() => {
+                // 设置初始宽度
+                let offsetWidth = document.querySelector(rootSelector).offsetWidth
+                let offsetHeight = document.querySelector(rootSelector).offsetHeight
+                commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
+                commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
+                let store = cache.bookVm.$store
+                // 新建vue实例table
+                cache.bookVm = new Vue({
+                    store,
+                    render: h => h(Book)
+                }).$mount(rootSelector)
+                // 新建vue实例tools
+                if (typeof toolsSelector !== 'undefined') {
+                    cache.toolVm = new Vue({
+                        store,
+                        render: h => h(Main)
+                    }).$mount(toolsSelector)
+                }
+            })
         })
     },
     /**
@@ -189,7 +273,7 @@ export default {
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordRow.left) {
+            if (limitMax < cordRow.top) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: firstColIndex,
                     endColIndex: lastColIndex,
@@ -473,9 +557,6 @@ export default {
         //     bottom: limitBottom
         // })
         // })
-        console.log(viewLoaded.rows)
-        console.log(viewLoaded.rowMap)
-        console.log(allLoaded)
     },
     SHEET_SCROLL_TRANSVERSE({
         state,
@@ -563,7 +644,7 @@ export default {
             // 向上滚动时，判断视图底部的触发值
             // 是否小于cord坐标的top
             //   1. 如果小于cord坐标，就清除下面的map和DOM结构
-            if (limitMax < cordCol.top) {
+            if (limitMax < cordCol.left) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: cordColIndex,
                     endColIndex: lastColIndex,
@@ -842,8 +923,5 @@ export default {
         //     bottom: limitBottom
         // })
         // })
-        console.log(viewLoaded.cols)
-        console.log(viewLoaded.colMap)
-        console.log(allLoaded)
     }
 }

@@ -66,6 +66,11 @@ export default {
             })
             if (bookItem.frozen != null) {
                 commit('M_SHEETS_ADD_LOADED', bookItem.frozen)
+            } else {
+                commit('M_SHEETS_ADD_LOADED', {
+                    colAlias: cols[0].alias,
+                    rowAlias: rows[0].alias
+                })
             }
             commit('M_SHEETS_ADD_LOADED', {
                 colAlias: cols[cols.length - 1].alias,

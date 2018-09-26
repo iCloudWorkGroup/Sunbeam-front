@@ -31,7 +31,7 @@ export default {
         alignCol: 'middle',
         wordWrap: false,
         underline: 0,
-        background: '#fff'
+        background: 'transparent'
     },
     // 批注属性
     customProp: {

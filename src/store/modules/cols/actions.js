@@ -752,7 +752,6 @@ export default {
                     }
                 }
             }
-
         }
         if (typeof index === 'undefined' || !cols[index].hidden) {
             return

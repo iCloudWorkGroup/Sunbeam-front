@@ -32,7 +32,9 @@ export default {
     },
     methods: {
         addComment() {
-            this.$store.dispatch('EDIT_SHOW', 'COMMENT')
+            this.$store.dispatch('EDIT_SHOW', {
+                type: 'COMMENT'
+            })
         },
         deleteComment() {
             this.$store.dispatch('A_CELLS_UPDATE', {
@@ -45,7 +47,9 @@ export default {
             })
         },
         editComment() {
-            this.$store.dispatch('EDIT_SHOW', 'COMMENT')
+            this.$store.dispatch('EDIT_SHOW', {
+                type: 'COMMETN'
+            })
         }
     }
 }

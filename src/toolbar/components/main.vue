@@ -18,12 +18,6 @@
                 <panel title="数字">
                     <format/>
                 </panel>
-                <panel title="合并拆分">
-                    <merge/>
-                </panel>
-                <panel title="自动换行">
-                    <word-wrap/>
-                </panel>
                 <panel title="视图">
                     <frozen/>
                 </panel>
@@ -46,14 +40,12 @@ import Panel from './panel.vue'
 import Font from './font.vue'
 import Frozen from './frozen.vue'
 import Align from './align.vue'
-import Merge from './merge.vue'
 import Format from './format.vue'
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
 import Comment from './comment.vue'
-import WordWrap from './wordwrap.vue'
 import '../../css/toolbar.css'
 import '../../css/widget.css'
 import {
@@ -65,13 +57,11 @@ export default {
         Font,
         Frozen,
         Align,
-        Merge,
         Rowcol,
         Hide,
         // Undo,
         // Clip,
         Format,
-        WordWrap,
         Comment
     },
     computed: {

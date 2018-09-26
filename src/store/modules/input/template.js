@@ -15,6 +15,7 @@ export default {
         italic: false,
         underline: false,
         background: 'rgb(255, 255, 255)',
+        edit: ''
     },
     /**
      * 用于确定当前对象的信息
@@ -36,6 +37,5 @@ export default {
          * @type {Boolean}
          */
         status: false
-    }
-
+    },
 }

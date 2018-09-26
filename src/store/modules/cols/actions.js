@@ -728,8 +728,6 @@ export default {
         let index = payload
         if (typeof index === 'undefined') {
             let select = getters.selectByType(SELECT)
-            let startIndex
-            let endIndex
             let visibleStartCol = visibleCols[0]
             let visibleEndCol = visibleCols[visibleCols.length - 1]
             if (select.wholePosi.endColAlias === 'MAX') {
@@ -738,15 +736,15 @@ export default {
             let startColAlias = select.wholePosi.startColAlias
             let endColAlias = select.wholePosi.endColAlias
 
+            let startIndex = getters.colIndexByAlias(startColAlias)
+            let endIndex = getters.colIndexByAlias(endColAlias)
             if (visibleStartCol.alias === startColAlias &&
-                visibleStartCol !== cols[0]) {
-                index = 0
+                visibleStartCol !== cols[0] && startColAlias === endColAlias) {
+                index = startIndex - 1
             } else if (visibleEndCol.alias === endColAlias &&
-                visibleEndCol !== cols[cols.length - 1]) {
+                visibleEndCol !== cols[cols.length - 1] && startColAlias === endColAlias) {
                 index = cols.length - 1
             } else {
-                startIndex = getters.colIndexByAlias(startColAlias)
-                endIndex = getters.colIndexByAlias(endColAlias)
                 for (let i = startIndex; i <= endIndex + 1; i++) {
                     if (cols[i].hidden) {
                         index = i
@@ -973,6 +971,7 @@ export default {
         } else {
             insertCol = extend(colModel)
         }
+        insertCol.hidden = false
         insertCol.alias = generator.colAliasGenerator()
         insertCol.sort = sort
         insertCol.displayName = getColDisplayName(sort)

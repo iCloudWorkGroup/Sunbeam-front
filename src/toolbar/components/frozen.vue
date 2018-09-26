@@ -4,6 +4,7 @@
         <div class="fui-section fui-alone"
              data-widget="frozen"
              @click="ejectMenu($event, 'frozens')"
+             :class="{ active: tool==='frozens' }"
              data-initiator="frozens">
             <div class="fui-cf-extend-ico ico-frozencustomized fui-cf-alone"></div>
             <div class="fui-cf-desc">

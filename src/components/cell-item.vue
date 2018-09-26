@@ -89,6 +89,7 @@ export default {
             width = width < 2 ? width + 2 : width
             let height = physicsBox.height
             height = height < 2 ? height + 2 : height
+            let background = this.cell.content.background
             let topBorder = caclBorder({
                 type: borderProp.top
             }, {
@@ -117,6 +118,11 @@ export default {
                 widthName: 'borderLeftWidth',
                 paddingName: 'paddingLeft'
             })
+            if (this.cell.occupy.col.length > 1 || this.cell.occupy.row.length > 1) {
+                // if () {
+                //
+                // }
+            }
             return extend({
                 // 因为现实的效果，需要共享单元格的边框
                 // 所以在左、上两面都 -2，这样可以对齐效果
@@ -125,7 +131,7 @@ export default {
                 width: unit(width - 2),
                 height: unit(height - 2)
             }, topBorder, rightBorder, bottomBorder, leftBorder, {
-                backgroundColor: this.cell.content.background
+                backgroundColor: background
             })
         },
         viewProps() {

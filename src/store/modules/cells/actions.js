@@ -95,21 +95,6 @@ export default {
                 }
                 return 0
             }
-            // 为合并单元格时,无背景或背景透明时,修改背景颜色为白色
-            // 宽度减2 高度减2 top +1 left +1 露出边线
-            if (fixedCell.occupy.col.length > 1 || fixedCell.occupy.row.length > 1) {
-                if (fixedCell.content.background === 'transparent' || fixedCell.content.background === 'rgba(255, 255, 255, 0)' || !fixedCell.content.background) {
-                    fixedCell.content.background = 'rgb(255, 255, 255)'
-                }
-                height -= 2
-                width -= 2
-                left += 1
-                top += 1
-            } else {
-                if (fixedCell.content.background === 'rgb(255, 255, 255)') {
-                    fixedCell.content.background = 'rgba(255, 255, 255, 0)'
-                }
-            }
             fixedCell = extend(fixedCell, {
                 physicsBox: {
                     top,
@@ -378,9 +363,6 @@ export default {
         let rows = []
         for (let i = startRowIndex; i < endRowIndex + 1; i++) {
             rows.push(getters.allRows[i].alias)
-        }
-        if (templateCell.content.background === 'transparent' || templateCell.content.background === 'rgba(255, 255, 255, 0)') {
-            templateCell.content.background = 'rgb(255, 255, 255)'
         }
         templateCell.occupy = {
             row: rows,

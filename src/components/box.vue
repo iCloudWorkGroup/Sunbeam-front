@@ -92,7 +92,12 @@ export default {
         doneEdit(e) {
             const texts = e.target.value
             let status = this.$store.getters.inputProps.physical.edit
-            this.$store.dispatch('A_INPUT_EDITDONE', { texts, status })
+            if (cache.initText !== texts) {
+                if (texts !== '' || cache.initText != null) {
+                    this.$store.dispatch('A_INPUT_EDITDONE', { texts, status })
+                }
+            }
+            this.$store.commit('M_INPUT_RESET')
         },
         copyData(e) {
             let selects = this.$store.getters.allSelects

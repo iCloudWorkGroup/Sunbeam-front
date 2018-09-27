@@ -4,7 +4,7 @@ import {
     isNum, parseExpress,
     isPercent, isCurrency
 } from '../../../tools/format'
-// import send from '../../../util/send'
+import cache from '../../../tools/cache'
 // import config from '../../../config'
 export default {
     [actionTypes.EDIT_SHOW]({
@@ -26,6 +26,7 @@ export default {
             if (activeCell != null) {
                 let content = activeCell.content
                 let physicsBox = activeCell.physicsBox
+                cache.initText = content.texts
                 propStruct = {
                     physical: {
                         left: physicsBox.left,
@@ -35,7 +36,7 @@ export default {
                         texts: content.texts,
                         size: content.size,
                         family: content.family,
-                        color: content.color,
+                        color: 'rgb(0,0,0)',
                         weight: content.weight,
                         italic: content.italic,
                         edit: 'texts'
@@ -49,6 +50,7 @@ export default {
                     }
                 }
             } else {
+                cache.initText = null
                 let select = getters.selectByType('SELECT')
                 let colAlias = select.wholePosi.startColAlias
                 let rowAlias = select.wholePosi.startRowAlias
@@ -91,6 +93,7 @@ export default {
                 let content = activeCell.content
                 let customProp = activeCell.customProp
                 let physicsBox = activeCell.physicsBox
+                cache.initText = customProp.comment
                 propStruct = {
                     physical: {
                         left: physicsBox.left + select.physicsBox.width + 5,
@@ -114,6 +117,7 @@ export default {
                     }
                 }
             } else {
+                cache.initText = null
                 let colIndex = getters.colIndexByAlias(colAlias)
                 let rowIndex = getters.rowIndexByAlias(rowAlias)
                 let cols = getters.allCols
@@ -149,8 +153,8 @@ export default {
         let props = getters.inputProps
         let colAlias = props.assist.colAlias
         let rowAlias = props.assist.rowAlias
-        let endcolAlias = props.assist.endcolAlias
-        let endrowAlias = props.assist.endrowAlias
+        // let endcolAlias = props.assist.endcolAlias
+        // let endrowAlias = props.assist.endrowAlias
         if (colAlias == null || rowAlias == null) {
             return
         }
@@ -232,9 +236,9 @@ export default {
             propStruct,
             coordinate: {
                 startColAlias: colAlias,
-                endColAlias: endcolAlias,
+                endColAlias: colAlias,
                 startRowAlias: rowAlias,
-                endRowAlias: endrowAlias,
+                endRowAlias: rowAlias,
             }
         })
         // 恢复到初始状态

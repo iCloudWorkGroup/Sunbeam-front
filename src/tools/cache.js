@@ -51,5 +51,7 @@ export default {
     //          ]
     //      }
     // }
-    eventList: new Map()
+    eventList: new Map(),
+    // 储存开始编辑时，单元格的值/批注
+    initText: null
 }

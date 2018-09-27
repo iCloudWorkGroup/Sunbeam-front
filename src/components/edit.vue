@@ -145,7 +145,7 @@ export default {
                     scrollTop,
                     toward: this.toward
                 })
-            }.bind(this), 50)
+            }.bind(this), 30)
         },
         handleScroll({
             scrollLeft,

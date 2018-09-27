@@ -1,11 +1,4 @@
 <template>
-    <!--<div class="comment-ico" :style="commentStyle">-->
-        <!--<div-->
-            <!--class="triangle"-->
-            <!--@mouseleave="commentHide"-->
-            <!--@mouseenter="commentShow">-->
-        <!--</div>-->
-    <!--</div>-->
     <div class="cell"
          :style="commentStyle"
          @mouseleave="commentHide"
@@ -44,10 +37,10 @@ export default {
     },
     methods: {
         commentShow(e) {
-            this.$emit('moveon', this.cell)
+            this.$store.commit('M_UPDATE_MOUSEINCELL', this.cell)
         },
         commentHide() {
-            this.$emit('moveout')
+            this.$store.commit('M_UPDATE_MOUSEINCELL', null)
         }
     }
 }

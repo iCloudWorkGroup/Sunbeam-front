@@ -3,7 +3,7 @@ import {
     UPDATE_CELL,
     M_UPDATE_POINTS,
     M_DESTORY_CELL,
-    M_DELETE_POINTS
+    M_DELETE_POINTS,
 } from '../../mutation-types'
 import extend from '../../../util/extend'
 
@@ -101,6 +101,12 @@ export default {
                 }
             }
         }
+    },
+    /**
+     * 修改鼠标所在处有批注的单元格
+     */
+    M_UPDATE_MOUSEINCELL(state, cell) {
+        state.mouseInCell = cell
     },
     M_CLEAR_CELLS(state) {
         state.list = []

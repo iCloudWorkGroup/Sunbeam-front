@@ -12,7 +12,7 @@ const state = {
     list: [],
     rowMap: new Map(),
     colMap: new Map(),
-    activeComment: false
+    mouseInCell: null
 }
 
 export default {

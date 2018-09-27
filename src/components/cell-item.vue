@@ -2,9 +2,9 @@
     <div class="cell"
         :style="viewPosi">
         <div class="cell-content"
-             :style="viewProps">
-            <!--v-html="text"-->
-            {{cell.content.displayTexts}}
+             :style="viewProps"
+             v-html="text">
+            <!--{{cell.content.displayTexts}}-->
         </div>
         <!--<div class="comment-ico" v-if="comment">-->
             <!--<div-->
@@ -70,10 +70,11 @@ export default {
     computed: {
         text() {
             let reg = new RegExp('\n', 'g')
+            let spaceReg = new RegExp(' ', 'g')
             if (this.cell.content.displayTexts == null) {
                 return null
             }
-            return this.cell.content.displayTexts.replace(reg, '<br>')
+            return this.cell.content.displayTexts.toString().replace(reg, '<br>').replace(spaceReg, '&ensp;')
         },
         comment() {
             return this.cell.customProp.comment != null && this.cell.customProp.comment !== ''
@@ -118,10 +119,23 @@ export default {
                 widthName: 'borderLeftWidth',
                 paddingName: 'paddingLeft'
             })
+            // 为合并单元格且背景色为透明时，处理背景与边框颜色
             if (this.cell.occupy.col.length > 1 || this.cell.occupy.row.length > 1) {
-                // if () {
-                //
-                // }
+                if (typeof this.cell.content.background === 'undefined' || this.cell.content.background === 'transparent' || this.cell.content.background === 'rgba(255, 255, 255, 0)') {
+                    background = 'rgb(255, 255, 255)'
+                    if (this.cell.border.top === 0) {
+                        topBorder.borderTopColor = '#ccc'
+                    }
+                    if (this.cell.border.bottom === 0) {
+                        bottomBorder.borderBottomColor = '#ccc'
+                    }
+                    if (this.cell.border.left === 0) {
+                        leftBorder.borderLeftColor = '#ccc'
+                    }
+                    if (this.cell.border.right === 0) {
+                        rightBorder.borderRightColor = '#ccc'
+                    }
+                }
             }
             return extend({
                 // 因为现实的效果，需要共享单元格的边框

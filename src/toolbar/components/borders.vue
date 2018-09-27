@@ -99,9 +99,25 @@ export default {
                     value
                 })
             }
+            let direction = structName.split('.')[1]
+            let coordinate = this.$store.getters.selectByType('SELECT').wholePosi
+            // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
+            if (direction === 'top') {
+                coordinate.endRowAlias = coordinate.startRowAlias
+            }
+            if (direction === 'bottom') {
+                coordinate.startRowAlias = coordinate.endRowAlias
+            }
+            if (direction === 'left') {
+                coordinate.endColAlias = coordinate.startColAlias
+            }
+            if (direction === 'right') {
+                coordinate.startColAlias = coordinate.endColAlias
+            }
             this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: structName,
-                propStruct
+                propStruct,
+                coordinate
             })
         }
     }

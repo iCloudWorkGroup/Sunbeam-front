@@ -2,6 +2,7 @@ import * as actionTypes from '../../action-types'
 import {
     isDate, formatText,
     isNum, parseExpress,
+    isPercent, isCurrency
 } from '../../../tools/format'
 // import send from '../../../util/send'
 // import config from '../../../config'
@@ -169,15 +170,13 @@ export default {
         if (status === 'texts') {
             // 判断输入类型
             let inputExpress = ''
-            let percentReg = /^\d+(\.\d+)?%$/
-            let currencyReg = /^\$\d+(\.\d+)?$|^¥\d+(\.\d+)?$/
-            if (percentReg.test(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
+            if (isPercent(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
                 inputExpress = '0.00%'
                 fixText = texts.replace(/\%/, '') / 100
                 if (fixText.toString().indexOf('.') > -1) {
                     fixText = fixText.toFixed(4)
                 }
-            } else if (currencyReg.test(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
+            } else if (isCurrency(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
                 inputExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
                 fixText = texts.replace(/\$|¥/, '')
                 if (fixText.toString().indexOf('.') > -1) {

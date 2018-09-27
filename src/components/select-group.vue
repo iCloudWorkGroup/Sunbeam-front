@@ -11,22 +11,13 @@
             :key="item.alias"
             :cell="item"
             :offsetTop="offsetTop"
-            :offsetLeft="offsetLeft"
-            @moveon="moveon"
-            @moveout="moveout">
+            :offsetLeft="offsetLeft">
     </comment-item>
-    <div class="comment" :style="style" v-if="commentShow">
-        {{commentText}}
-    </div>
 </div>
 </template>
 <script>
 import SelectItem from './select-item.vue'
 import CommentItem from './comment-item.vue'
-import {
-    unit
-} from '../filters/unit'
-import config from '../config'
 export default {
     props: [
         'rowStart',
@@ -58,30 +49,6 @@ export default {
         SelectItem,
         CommentItem
     },
-    data() {
-        return {
-            style: '',
-            commentShow: false,
-            commentText: ''
-        }
-    },
-    methods: {
-        moveon(cell) {
-            this.commentShow = true
-            this.commentText = cell.customProp.comment
-            console.log(cell)
-            this.style = {
-                fontSize: '10pt',
-                left: unit(cell.physicsBox.left + cell.physicsBox.width + 2 - this.offsetLeft),
-                top: unit(cell.physicsBox.top - this.offsetTop),
-                width: unit(config.commentWidth),
-                height: unit(config.commentHeigth)
-            }
-        },
-        moveout() {
-            this.commentShow = false
-        }
-    }
 }
 </script>
 <style type="text/css">
@@ -91,12 +58,5 @@ export default {
     left: 0;
     width: inherit;
     height: inherit;
-}
-.comment {
-    position: absolute;
-    z-index: 999;
-    word-wrap:break-word;
-    word-break:break-all;
-    overflow: hidden;
 }
 </style>

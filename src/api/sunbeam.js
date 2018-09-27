@@ -345,6 +345,20 @@ SpreadSheet.prototype = {
                 value
             })
         }
+        let direction = structName.split('.')[1]
+        // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
+        if (direction === 'top') {
+            select.endRowAlias = select.startRowAlias
+        }
+        if (direction === 'bottom') {
+            select.startRowAlias = select.endRowAlias
+        }
+        if (direction === 'left') {
+            select.endColAlias = select.startColAlias
+        }
+        if (direction === 'right') {
+            select.startColAlias = select.endColAlias
+        }
         this.setFont(select, propStruct, 'border')
     },
 

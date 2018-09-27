@@ -5,7 +5,6 @@ import {
     A_CELLS_DESTORY,
     A_CELLS_SPLIT,
     CELLS_FORMAT,
-    CELLS_INNERPASTE,
     CELLS_WORDWRAP,
     SELECTS_CHANGE,
     // ROWS_ADJUSTHEIGHT,
@@ -259,37 +258,10 @@ export default {
                 if (idx !== -1) {
                     if (!avoidRepeat[idx]) {
                         avoidRepeat[idx] = true
-                        if (fixPropName !== 'border' || (fixPropName === 'border' && (direction === 'all' || direction === 'none'))) {
-                            commit(mutationTypes.UPDATE_CELL, {
-                                idx,
-                                prop: propStruct
-                            })
-                        }
-                        // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
-                        if (fixPropName === 'border' && direction === 'top' && j === startRowIndex) {
-                            commit(mutationTypes.UPDATE_CELL, {
-                                idx,
-                                prop: propStruct
-                            })
-                        }
-                        if (fixPropName === 'border' && direction === 'bottom' && j === endRowIndex) {
-                            commit(mutationTypes.UPDATE_CELL, {
-                                idx,
-                                prop: propStruct
-                            })
-                        }
-                        if (fixPropName === 'border' && direction === 'left' && i === startColIndex) {
-                            commit(mutationTypes.UPDATE_CELL, {
-                                idx,
-                                prop: propStruct
-                            })
-                        }
-                        if (fixPropName === 'border' && direction === 'right' && i === endColIndex) {
-                            commit(mutationTypes.UPDATE_CELL, {
-                                idx,
-                                prop: propStruct
-                            })
-                        }
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx,
+                            prop: propStruct
+                        })
                     }
                 } else {
                     dispatch('A_CELLS_ADD', extend(template, propStruct, {
@@ -571,148 +543,123 @@ export default {
             }, align)
         }
     },
-    A_CELLS_INNERPASTE({
-        getters
+    async A_CELLS_INNERPASTE({
+        getters,
+        commit,
+        dispatch
     }) {
         let cols = getters.allCols
         let rows = getters.allRows
-        let wholePosi = getters.selectByType('CLIP').wholePosi
-        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
-        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
-        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
-        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
-        let cells = getters.cellsByVertical({
-            startColIndex,
-            startRowIndex,
-            endColIndex,
-            endRowIndex
+        let clipWholePosi = getters.selectByType('CLIP').wholePosi
+        let clipStartRowIndex = getters.rowIndexByAlias(clipWholePosi.startRowAlias)
+        let clipStartColIndex = getters.colIndexByAlias(clipWholePosi.startColAlias)
+        let clipEndRowIndex = getters.rowIndexByAlias(clipWholePosi.endRowAlias)
+        let clipEndColIndex = getters.colIndexByAlias(clipWholePosi.endColAlias)
+        let clipCells = getters.cellsByVertical({
+            startColIndex: clipStartColIndex,
+            startRowIndex: clipStartRowIndex,
+            endColIndex: clipEndColIndex,
+            endRowIndex: clipEndRowIndex
         })
-        console.log(cells)
+        if (clipCells.length === 0) {
+            return
+        }
         let targetActivePosi = getters.selectByType('SELECT').activePosi
-        let targetStartRowIndex = getters.rowIndexByAlias(targetActivePosi.startRowAlias)
-        let targetStartColIndex = getters.colIndexByAlias(targetActivePosi.startColAlias)
-        let targetEndRowIndex = targetStartRowIndex + endRowIndex - startRowIndex
-        let targetEndColIndex = targetStartColIndex + endColIndex - startColIndex
-        if (endColIndex > cols.length - 1 || endRowIndex > rows.length - 1) {
-            throw new Error('opration area has outter of loaded area')
-        }
-        console.log(targetStartRowIndex, targetStartColIndex, targetEndRowIndex, targetEndColIndex)
-    },
-    [CELLS_INNERPASTE]({
-        state,
-        dispatch,
-        getters,
-        commit,
-        rootState
-    }, payload) {
-        let {
-            startRowSort,
-            startColSort,
-            clipStartColSort,
-            clipStartRowSort,
-            clipEndColSort,
-            clipEndRowSort
-        } = payload
-        let cols = getters.allCols
-        let rows = getters.allRows
-        let startColIndex = getters.getColIndexBySort(startColSort)
-        let startRowIndex = getters.getRowIndexBySort(startRowSort)
-        let clipStartColIndex = getters.getColIndexBySort(clipStartColSort)
-        let clipStartRowIndex = getters.getRowIndexBySort(clipStartRowSort)
-        let clipEndColIndex = getters.getColIndexBySort(clipEndColSort)
-        let clipEndRowIndex = getters.getRowIndexBySort(clipEndRowSort)
-        let cacheInfo = []
-        let colRelative = 0
-        let rowRelative = 0
-        let temp = {}
-        for (let i = clipStartColIndex; i < clipEndColIndex + 1; i++) {
-            rowRelative = 0
-            for (let j = clipStartRowIndex; j < clipEndRowIndex + 1; j++) {
-                let aliasCol = cols[i].alias
-                let aliasRow = rows[j].alias
-                let cellIndex = getters.IdxByCol(aliasCol, aliasRow)
-                if (cellIndex !== -1 && !temp[cellIndex]) {
-                    temp[cellIndex] = true
-                    cacheInfo.push({
-                        colRelative,
-                        rowRelative,
-                        cellIndex
-                    })
-                    if (cache.clipState === 'cut') {
-                        commit(mutationTypes.M_UPDATE_POINTS, {
-                            info: {
-                                colAlias: aliasCol,
-                                rowAlias: aliasRow,
-                                type: 'cellIndex',
-                                value: null
-                            }
-                        })
-                    }
-                }
-                rowRelative++
-            }
-            colRelative++
-        }
-        let endColIndex = startColIndex + clipEndColIndex - clipStartColIndex
-        let endRowIndex = startRowIndex + clipEndRowIndex - clipStartRowIndex
+        let targetStartRowIndex = getters.rowIndexByAlias(targetActivePosi.rowAlias)
+        let targetStartColIndex = getters.colIndexByAlias(targetActivePosi.colAlias)
+        let targetEndRowIndex = targetStartRowIndex + clipEndRowIndex - clipStartRowIndex
+        let targetEndColIndex = targetStartColIndex + clipEndColIndex - clipStartColIndex
 
-        // 过滤超出加载区域部分
-        endColIndex = endColIndex < cols.length - 1 ? endColIndex : cols.length -
-            1
-        endRowIndex = endRowIndex < rows.length - 1 ? endRowIndex : rows.length -
-            1
-
-        for (let i = startColIndex; i < endColIndex + 1; i++) {
-            for (let j = startRowIndex; j < endRowIndex + 1; j++) {
-                let aliasCol = cols[i]
-                let aliasRow = rows[j]
-                commit(mutationTypes.M_UPDATE_POINTS, {
-                    info: {
-                        colAlias: aliasCol,
-                        rowAlias: aliasRow,
-                        type: 'cellIndex',
-                        value: null
-                    }
-                })
+        // if (targetEndColIndex > cols.length - 1 || targetEndRowIndex > rows.length - 1) {
+        //     throw new Error('opration area has outter of loaded area')
+        // }
+        // 修正参数
+        targetEndColIndex = targetEndColIndex > cols.length - 1 ? cols.length - 1 : targetEndColIndex
+        targetEndRowIndex = targetEndRowIndex > rows.length - 1 ? rows.length - 1 : targetEndRowIndex
+        let isLegal
+        await send({
+            url: config.url[cache.clipState],
+            body: JSON.stringify({
+                orignal: {
+                    startCol: clipStartColIndex,
+                    startRow: clipStartRowIndex,
+                    endCol: clipEndColIndex,
+                    endRow: clipEndRowIndex
+                },
+                target: {
+                    oprCol: targetStartColIndex,
+                    oprRow: targetStartRowIndex
+                }
+            }),
+        }).then(function(data) {
+            isLegal = data.isLegal
+            if (!data.isLegal) {
+                return
+            }
+        })
+        if (!isLegal) {
+            return
+        }
+        let disRow = targetStartRowIndex - clipStartRowIndex
+        let disCol = targetStartColIndex - clipStartColIndex
+        // 清空目标区域所有单元格
+        let avoidRepeat = []
+        let destoryCells = []
+        console.log(targetEndColIndex, targetEndRowIndex)
+        for (let i = targetStartColIndex; i < targetEndColIndex + 1; i++) {
+            for (let j = targetStartRowIndex; j < targetEndRowIndex + 1; j++) {
+                let allCells = getters.cells
+                let targetColAlias = cols[i].alias
+                let targetRowAlias = rows[j].alias
+                let targetCellIdx = getters.IdxByCol(targetColAlias, targetRowAlias)
+                if (targetCellIdx !== -1 && !avoidRepeat[targetCellIdx]) {
+                    avoidRepeat[targetCellIdx] = true
+                    destoryCells.push(allCells[targetCellIdx])
+                }
             }
         }
-        let cells = getters.cells
-        for (let i = 0, len = cacheInfo.length; i < len; i++) {
-            let item = cacheInfo[i]
-            let cell = cells[item.cellIndex]
-            let insertCell = extend(cell)
-            let currentOccupyCol = insertCell.occupy.col
-            let currentOccupyRow = insertCell.occupy.row
-            let occupyCol = []
-            let occupyRow = []
-            for (let j = 0, len = currentOccupyCol.length; j < len; j++) {
-                if (startColIndex + item.colRelative + j < cols.length) {
-                    occupyCol.push(cols[startColIndex + item.colRelative + j].alias)
+        dispatch('A_CELLS_DESTORY', destoryCells)
+        let addCells = []
+        // 获取复制区域所有单元格
+        clipCells.forEach((item, index) => {
+            let newColOccupy = []
+            let newRowOccupy = []
+            item.occupy.col.forEach((col, index) => {
+                let newColIndex = getters.colIndexByAlias(col) + disCol
+                if (typeof cols[newColIndex] === 'undefined') {
+                    return true
                 }
-            }
-            for (let j = 0, len = currentOccupyRow.length; j < len; j++) {
-                if (startRowIndex + item.rowRelative + j < rows.length) {
-                    occupyRow.push(rows[startRowIndex + item.rowRelative + j].alias)
+                newColOccupy.push(cols[newColIndex].alias)
+            })
+            item.occupy.row.forEach((row, index) => {
+                let newRowIndex = getters.rowIndexByAlias(row) + disRow
+                if (typeof rows[newRowIndex] === 'undefined') {
+                    return true
                 }
-            }
-            if (occupyCol.length > 0 && occupyRow.length > 0) {
-                insertCell.occupy = {
-                    col: occupyCol,
-                    row: occupyRow
-                }
-                dispatch('A_CELLS_ADD', [insertCell])
-            }
+                newRowOccupy.push(rows[newRowIndex].alias)
+            })
+            let addCell = extend(item, {
+                alias: null,
+                occupy: {
+                    col: newColOccupy,
+                    row: newRowOccupy
+                },
+            })
+            addCells.push(addCell)
+        })
+        dispatch('A_CELLS_ADD', addCells)
+        if (cache.clipState === 'cut') {
+            dispatch('A_CELLS_DESTORY', clipCells)
         }
         destoryClip()
         adaptSelect()
-
         function destoryClip() {
             let flag = true
             if (cache.clipState !== 'cut' &&
-                (startRowIndex > clipEndRowIndex ||
-                    endRowIndex < clipStartRowIndex ||
-                    startColIndex > clipEndColIndex ||
-                    endColIndex < clipStartColIndex)
+                (targetStartRowIndex > clipEndRowIndex ||
+                    targetEndRowIndex < clipStartRowIndex ||
+                    targetStartColIndex > clipEndColIndex ||
+                    targetEndColIndex < clipStartColIndex)
             ) {
                 flag = false
             }
@@ -724,13 +671,13 @@ export default {
                 })
             }
         }
-
         function adaptSelect() {
+            console.log(targetStartRowIndex, targetStartColIndex, targetEndRowIndex, targetEndColIndex)
             dispatch(SELECTS_CHANGE, {
-                startRowIndex,
-                startColIndex,
-                endRowIndex,
-                endColIndex
+                activeRowAlias: rows[targetStartRowIndex].alias,
+                activeColAlias: cols[targetStartColIndex].alias,
+                endRowAlias: rows[targetEndRowIndex].alias,
+                endColAlias: cols[targetEndColIndex].alias
             })
         }
     },
@@ -752,18 +699,6 @@ export default {
         let date
         let oprCol = getters.getColByAlias(colAlias)
         let oprRow = getters.getRowByAlias(rowAlias)
-        await send({
-            url: config.url['outerpaste'],
-            body: JSON.stringify({
-                oprCol: oprCol.sort,
-                oprRow: oprRow.sort,
-                content: texts
-            })
-        }).then(function(data) {
-            if (!data.isLegal) {
-                return
-            }
-        })
 
         let parseData = parseClipStr(texts)
         let startColIndex = getters.getColIndexBySort(oprCol.sort)
@@ -776,6 +711,23 @@ export default {
         let endRowIndex = startRowIndex + parseRowLen - 1
         if (endColIndex > cols.length - 1 || endRowIndex > rows.length - 1) {
             throw new Error('opration area has outter of loaded area')
+        }
+        let isLegal
+        await send({
+            url: config.url['outerpaste'],
+            body: JSON.stringify({
+                oprCol: oprCol.sort,
+                oprRow: oprRow.sort,
+                content: texts
+            })
+        }).then(function(data) {
+            isLegal = data.isLegal
+            if (!data.isLegal) {
+                return
+            }
+        })
+        if (!isLegal) {
+            return
         }
 
         // 清除复制选中区
@@ -800,7 +752,7 @@ export default {
                 let item = cells[idx]
                 let express = item.content.express
                 rules = parseExpress(express)
-                date = item.content.express === 'm/d/yy' || item.content.express === 'yyyy"年"m"月"d"日"' || cell.content.express === 'yyyy"年"m"月"' ? true : false
+                date = item.content.express === 'm/d/yy' || item.content.express === 'yyyy"年"m"月"d"日"' || item.content.express === 'yyyy"年"m"月"' ? true : false
                 dispatch('A_CELLS_UPDATE', {
                     propName: 'texts',
                     propStruct: {
@@ -952,11 +904,9 @@ export default {
             commit(mutationTypes.M_DESTORY_CELL, cell)
             let occupyCols = cell.occupy.col
             let occupyRows = cell.occupy.row
-            let cellIdx = getters.IdxByRow(occupyCols[0], occupyRows[0])
-            commit(mutationTypes.M_UPDATE_POINTS, {
-                occupyCols,
-                occupyRows,
-                cellIdx
+            commit(mutationTypes.M_DELETE_POINTS, {
+                delOccupyCols: occupyCols,
+                delOccupyRows: occupyRows
             })
         })
     }

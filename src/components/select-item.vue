@@ -77,6 +77,12 @@ export default {
     },
     methods: {
         editing() {
+            let clipSelect = this.$store.getters.selectByType('CLIP')
+            if (clipSelect != null) {
+                this.$store.commit('DELETE_SELECT', {
+                    select: clipSelect
+                })
+            }
             this.$store.dispatch(types.EDIT_SHOW, {
                 type: 'EDIT'
             })

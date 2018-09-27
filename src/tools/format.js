@@ -57,6 +57,20 @@ export function isNum(value) {
     }
     return reg.test(value)
 }
+export function isPercent(value) {
+    let percentReg = /^\d+(\.\d+)?%$/
+    if (value === '' || value == null) {
+        return false
+    }
+    return percentReg.test(value)
+}
+export function isCurrency(value) {
+    let currency = /^\$\d+(\.\d+)?$|^¥\d+(\.\d+)?$/
+    if (value === '' || value == null) {
+        return false
+    }
+    return currency.test(value)
+}
 export function isDate(value) {
     let regularLine = /^\d{4}\/\d{1,2}\/\d{1,2}$/
     let regularWord = /^\d{4}\u5e74\d{1,2}\u6708(\d{1,2}\u65e5)?$/

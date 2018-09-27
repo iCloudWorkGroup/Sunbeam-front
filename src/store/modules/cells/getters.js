@@ -577,9 +577,9 @@ export default {
         }
     },
     /**
-     * 获取批注编辑状态
+     * 获取鼠标所在处有批注的单元格
      */
-    activeComment: function (state) {
-        return state.activeComment
+    mouseInCell: function (state) {
+        return state.mouseInCell
     }
 }

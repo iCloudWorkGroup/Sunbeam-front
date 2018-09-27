@@ -45,7 +45,7 @@ export default {
         styleObject() {
             let props = this.$store.getters.inputProps
             let physical = props.physical
-            let texts = physical.texts == null ? physical.texts : physical.texts.toString().trim()
+            let texts = physical.texts == null ? physical.texts : physical.texts.toString()
             /**
              * 1. 因为单元格相对于内容区域定位，
              * 而编辑框是相对于所以编辑区，所以需要考虑corner的大小
@@ -90,7 +90,7 @@ export default {
     },
     methods: {
         doneEdit(e) {
-            const texts = e.target.value.trim()
+            const texts = e.target.value
             let status = this.$store.getters.inputProps.physical.edit
             this.$store.dispatch('A_INPUT_EDITDONE', { texts, status })
         },
@@ -199,13 +199,29 @@ export default {
              * 自动获取焦点
              * keyCode 229表示中文输入法
              */
+            let clipSelect = this.$store.getters.selectByType('CLIP')
             if (((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 105)
                 || (keyCode >= 106 && keyCode <= 111 && keyCode !== 108) || (keyCode >= 186 && keyCode <= 191)
-                || (keyCode >= 219 && keyCode <= 222) || keyCode === 229) && !altKey && !ctrlKey && status === '') {
+                || (keyCode >= 219 && keyCode <= 222)) && !altKey && !ctrlKey && status === '') {
                 this.$store.dispatch('EDIT_SHOW', {
                     type: 'EDIT',
                     value: key
                 })
+                if (clipSelect != null) {
+                    this.$store.commit('DELETE_SELECT', {
+                        select: clipSelect
+                    })
+                }
+                return
+            } else if (keyCode === 229 && !altKey && !ctrlKey && status === '') {
+                this.$store.dispatch('EDIT_SHOW', {
+                    type: 'EDIT',
+                })
+                if (clipSelect != null) {
+                    this.$store.commit('DELETE_SELECT', {
+                        select: clipSelect
+                    })
+                }
                 return
             } else if (keyCode === 13 && !altKey && status !== '') {
                 this.doneEdit(e)

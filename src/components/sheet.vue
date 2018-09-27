@@ -80,6 +80,11 @@
     </table>
     <box :scroll-top="scrollTop"
          :scroll-left="scrollLeft"/>
+    <div class="comment"
+         :style="objStyle"
+         v-if="commentShow">
+        {{comment}}
+    </div>
 </div>
 </template>
 <script type="text/javascript">
@@ -88,6 +93,10 @@ import ColHead from './col-head.vue'
 import RowHead from './row-head.vue'
 import Edit from './edit.vue'
 import Box from './box.vue'
+import {
+    unit
+} from '../filters/unit'
+import config from '../config'
 export default {
     data() {
         return {
@@ -118,6 +127,22 @@ export default {
         },
         scrollTop() {
             return this.localState.sheets.scroll.top
+        },
+        objStyle() {
+            let cell = this.$store.getters.mouseInCell
+            return {
+                fontSize: '10pt',
+                width: unit(100),
+                height: unit(100),
+                left: unit(cell.physicsBox.left + cell.physicsBox.width - this.localState.sheets.scroll.left + config.cornerWidth + 2),
+                top: unit(cell.physicsBox.top - this.localState.sheets.scroll.top + config.cornerHeight - 2),
+            }
+        },
+        comment() {
+            return this.$store.getters.mouseInCell.customProp.comment
+        },
+        commentShow() {
+            return this.$store.getters.mouseInCell != null
         },
         rowFirst() {
             let rowRule = this.localSheet.frozen.row
@@ -183,7 +208,6 @@ export default {
     top: 0;
     left: 0;
 }
-
 .corner {
     border-width: 0 1px 1px 0;
     border-color: #bfbfbf;
@@ -192,5 +216,11 @@ export default {
     width: 36px;
     z-index: 100;
     background: white;
+}
+.comment {
+    position: absolute;
+    word-wrap:break-word;
+    word-break:break-all;
+    overflow: hidden;
 }
 </style>

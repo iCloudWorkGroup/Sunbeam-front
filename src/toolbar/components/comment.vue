@@ -48,7 +48,7 @@ export default {
         },
         editComment() {
             this.$store.dispatch('EDIT_SHOW', {
-                type: 'COMMETN'
+                type: 'COMMENT'
             })
         }
     }

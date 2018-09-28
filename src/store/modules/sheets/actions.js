@@ -611,9 +611,9 @@ export default {
         // ------------------
         // 如果可以保证每次加载的高度大于用户limit高度，就可以改为2
         if (colLen > 2) {
-            // 滚动方向： DOWN
+            // 滚动方向： RIGHT
             // 判断当前视图的触发点是否大于当前视图的第一个map点
-            //   1. 如果大于，向下滚动时，清除上的DOM
+            //   1. 如果大于，向右滚动时，清除左的DOM
             // 判断是否触发
             if (limitMin > cordColDistance) {
                 // 从map中查找记录点，删除记录点
@@ -640,10 +640,10 @@ export default {
                     alias: firstColAlias
                 })
             }
-            // 滚动方向： UP
-            // 向上滚动时，判断视图底部的触发值
-            // 是否小于cord坐标的top
-            //   1. 如果小于cord坐标，就清除下面的map和DOM结构
+            // 滚动方向： LEFT
+            // 向左滚动时，判断视图左部的触发值
+            // 是否小于cord坐标的left
+            //   1. 如果小于cord坐标，就清除右面的map和DOM结构
             if (limitMax < cordCol.left) {
                 let cells = rootGetters.cellsByVertical({
                     startColIndex: cordColIndex,
@@ -668,9 +668,9 @@ export default {
                 })
             }
         }
-        // 滚动方向： UP
-        // 向上滚动时，加载被隐藏的DOM结构
-        // 没有考虑向上滚动时，没有数据的情况
+        // 滚动方向： LEFT
+        // 向左滚动时，加载被隐藏的DOM结构
+        // 没有考虑向左滚动时，没有数据的情况
         // 基于目前的功能，不存在这种情况
         if (limitMin < firstColDistance) {
             let loadedIdx = rootGetters.loadedIdxByAlias({
@@ -731,6 +731,7 @@ export default {
             let needRequire = allRowMap != null &&
                 allRowMap.get(lastRowAlias) &&
                 idx - lastColIndex > 1 ? false : true
+            console.log(needRequire)
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1

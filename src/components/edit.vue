@@ -65,6 +65,8 @@ export default {
             colMap: new Map().set(this.colOver,
                 new Map().set(this.rowOver, true))
         }
+        // this.viewLoaded.rowMap.set(this.rowStart, new Map().set(this.colStart, true))
+        // this.viewLoaded.colMap.set(this.colStart, new Map().set(this.rowStart, true))
     },
     computed: {
         width() {

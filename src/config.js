@@ -46,7 +46,7 @@ export default {
      * 请求区域的数值应该大于等于预加载区两倍，
      * 以减少请求次数，减少渲染次数
      */
-    scrollBufferWidth: 710,
+    scrollBufferWidth: 720,
     scrollBufferHeight: 600,
     /**
      * 工具栏宽度

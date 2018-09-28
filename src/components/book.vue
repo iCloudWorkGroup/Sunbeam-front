@@ -1,7 +1,7 @@
 <template>
     <div :class="rootSelector" :id="rootSelector">
         <div class="book"
-             @mouseup="offStatus"
+             @mousedown="offStatus"
              :style="{ width, height}">
             <sheet></sheet>
             <sheet-sider/>

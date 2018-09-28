@@ -83,7 +83,6 @@ export default {
                 rowAlias: visibleRows[0].alias
             })
             commit('M_INPUT_CREATE')
-            commit('M_UPDATE_LOAD', false)
         })
     },
     [A_CLEAR_QUEUE]({

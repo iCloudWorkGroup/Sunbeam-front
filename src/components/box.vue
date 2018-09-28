@@ -97,7 +97,10 @@ export default {
                     this.$store.dispatch('A_INPUT_EDITDONE', { texts, status })
                 }
             }
-            this.$store.commit('M_INPUT_RESET')
+            // 只有编辑类型是texts或comment时，才重置输入框
+            if (status === 'texts' || status === 'comment') {
+                this.$store.commit('M_INPUT_RESET')
+            }
         },
         copyData(e) {
             let selects = this.$store.getters.allSelects

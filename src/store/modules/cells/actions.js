@@ -608,7 +608,6 @@ export default {
         // 清空目标区域所有单元格
         let avoidRepeat = []
         let destoryCells = []
-        console.log(targetEndColIndex, targetEndRowIndex)
         for (let i = targetStartColIndex; i < targetEndColIndex + 1; i++) {
             for (let j = targetStartRowIndex; j < targetEndRowIndex + 1; j++) {
                 let allCells = getters.cells

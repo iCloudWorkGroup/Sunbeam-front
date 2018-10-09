@@ -56,7 +56,6 @@ export default {
             // 单元格的occpuy
             let occupyCols = fixedCell.occupy.col
             let occupyRows = fixedCell.occupy.row
-
             // 单元格在行列中占的索引位置
             // 从哪行、列开始，结束
             let startColIndex = getters.colIndexByAlias(occupyCols[0])
@@ -141,9 +140,7 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
-        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
-            throw new Error('index out of loaded arrange')
-        }
+
         let rows = getters.allRows
         let cols = getters.allCols
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
@@ -154,8 +151,8 @@ export default {
         let signalSort = coordinate === false ? select.signalSort : {
             startCol: cols[startColIndex].sort,
             startRow: rows[startRowIndex].sort,
-            endCol: cols[endColIndex].sort,
-            endRow: rows[endRowIndex].sort
+            endCol: cols[endColIndex] ? cols[endColIndex].sort : -1,
+            endRow: rows[endRowIndex] ? rows[endRowIndex].sort : -1
         }
         let sendArgs = {
             coordinate: [signalSort]
@@ -246,10 +243,23 @@ export default {
             url: config.url[fixPropName],
             body: JSON.stringify(sendArgs)
         })
+        if (endRowIndex === -1) {
+            dispatch(COLS_OPERCOLS, {
+                startIndex: startColIndex,
+                endIndex: endColIndex,
+                props: propStruct
+            })
+        } else if (endColIndex === -1) {
+            dispatch(ROWS_OPERROWS, {
+                startIndex: startRowIndex,
+                endIndex: endRowIndex,
+                props: propStruct
+            })
+        }
+
         // 修正参数
         endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
-
         // 如果有对应的单元格，修改属性
         // 如果没有对应的单元格，插入单元格
         let avoidRepeat = {}
@@ -311,17 +321,17 @@ export default {
         if (endRowIndex === -1 || endColIndex === -1) {
             return
         }
-        let cells = getters.cellsByTransverse({
+        let cells = getters.cellsByTransverseHaveTexts({
             startColIndex,
             endColIndex,
             startRowIndex,
             endRowIndex
         })
 
-        // 左上角位置的单元格，作为合并单元格的模板原型，
-        // 如果没有单元格，以横向优先，竖向次之查找
-        // 如果所有都没有，就按照template属性合并
+        // 以横向优先，竖向次之查找有内容的单元格
+        // 如果所有都没有内容，就查找左上角第一个单元格
         // 无边框
+        // 优先以有文本内容的单元格为模板
         let templateCell = cells.length !== 0 ?
             extend(cells[0], {
                 border: {
@@ -416,6 +426,7 @@ export default {
                 dispatch(A_CELLS_DESTORY, [cell])
             }
         })
+        console.log(insertCells)
         dispatch('A_CELLS_ADD', insertCells)
     },
     [CELLS_FORMAT]({
@@ -448,8 +459,8 @@ export default {
             coordinate: [{
                 startCol: startColIndex,
                 startRow: startRowIndex,
-                endCol: endColIndex === 'MAX' ? -1 : endColIndex,
-                endRow: endRowIndex === 'MAX' ? -1 : endRowIndex,
+                endCol: endColIndex === -1 ? -1 : endColIndex,
+                endRow: endRowIndex === -1 ? -1 : endRowIndex,
             }],
             format,
             express
@@ -465,6 +476,10 @@ export default {
                 express
             }
         }
+        // let cols = getters.allCols
+        // let rows = getters.allRows
+        // endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        // endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         if (endRowIndex === -1) {
             dispatch(COLS_OPERCOLS, {
                 startIndex: startColIndex,
@@ -838,7 +853,8 @@ export default {
             if (value) {
                 oprRows = getAdaptRows()
             }
-            if (oprRows) {
+            console.log(oprRows)
+            if (oprRows && oprRows.length !== 0) {
                 oprRows.forEach(info => {
                     dispatch(ROWS_EXECADJUSTHEIGHT, {
                         sort: info.index,

@@ -253,6 +253,7 @@ textarea {
     margin: 1px;
     width: inherit;
     height: inherit;
+    background-clip: padding-box;
 }
 
 .cell-content {

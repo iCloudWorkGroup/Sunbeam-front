@@ -2,14 +2,14 @@
 <div class="edit-panel"
      @mousedown="locateSelect"
      :style="{ width, height }">
+    <col-grid-group
+            :start="colStart"
+            :over="colOver"
+            :offsetLeft="offsetLeft"/>
     <row-grid-group
         :start="rowStart"
         :over="rowOver"
         :offsetTop="offsetTop"/>
-    <col-grid-group
-        :start="colStart"
-        :over="colOver"
-        :offsetLeft="offsetLeft"/>
     <cell-group
         :row-start="rowStart"
         :row-over="rowOver"
@@ -35,10 +35,10 @@ import ColGridGroup from './col-grid-group.vue'
 import RowGridGroup from './row-grid-group.vue'
 import CellGroup from './cell-group.vue'
 import SelectGroup from './select-group.vue'
-import {
-    LOCATE,
-    DRAG
-} from '../tools/constant'
+// import {
+//     LOCATE,
+//     DRAG
+// } from '../tools/constant'
 import {
     unit
 } from '../filters/unit'
@@ -71,9 +71,6 @@ export default {
             let overRow = rowMap.get(this.rowOver)
             return unit(overRow.top + overRow.height - startRow.top)
         },
-        mouseState() {
-            return this.$store.state.mouseState
-        },
         selectState() {
             return this.$store.getters.activeType
         }
@@ -105,6 +102,39 @@ export default {
                 for (let i = 0, len = mousedownEvents.length; i < len; i++) {
                     let select = getters.selectByType(this.selectState)
                     let startColIdx = select.signalSort.startCol
+                    let startRowIdx = select.signalSort.startRow
+                    let arrCol = []
+                    let col = cols[startColIdx]
+                    arrCol.push(col.displayName)
+                    let arrRow = []
+                    let row = rows[startRowIdx]
+                    arrRow.push(row.displayName)
+                    let cell = this.$store.getters.cellsByVertical({
+                        startColIndex: startColIdx,
+                        startRowIndex: startRowIdx
+                    })
+                    let text
+                    if (cell.length !== 0) {
+                        text = cell[0].content.texts
+                    } else {
+                        text = ''
+                    }
+                    cache.evenetList['mousedown'][i].apply(this, [{
+                        point: {
+                            col: arrCol,
+                            row: arrRow
+                        },
+                        text
+                    }])
+                }
+            }
+            let regionChangeEvents = cache.evenetList['regionChange']
+            if (regionChangeEvents != null) {
+                let cols = this.$store.getters.allCols
+                let rows = this.$store.getters.allRows
+                for (let i = 0, len = regionChangeEvents.length; i < len; i++) {
+                    let select = getters.selectByType(selectState)
+                    let startColIdx = select.signalSort.startCol
                     let endColIdx = select.signalSort.endCol
                     let startRowIdx = select.signalSort.startRow
                     let endRowIdx = select.signalSort.endRow
@@ -118,7 +148,7 @@ export default {
                         let row = rows[i]
                         arrRow.push(row.displayName)
                     }
-                    cache.evenetList['mousedown'][i].apply(this, [{
+                    cache.evenetList['regionChange'][i].apply(this, [{
                         point: {
                             col: arrCol,
                             row: arrRow
@@ -197,17 +227,6 @@ export default {
                 startRowIndex: rowIndex
             })
         }
-    },
-    mounted() {
-        this.currentMouseMoveState = this.routineMoveState
-        this.$watch('mouseState', function(val) {
-            if (val === DRAG) {
-                this.currentMouseMoveState = this.dragState
-            }
-            if (val === LOCATE) {
-                this.currentMouseMoveState = this.routineMoveState
-            }
-        })
     }
 }
 </script>

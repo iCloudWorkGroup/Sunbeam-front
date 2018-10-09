@@ -100,7 +100,7 @@ export default {
                 })
             }
             let direction = structName.split('.')[1]
-            let coordinate = this.$store.getters.selectByType('SELECT').wholePosi
+            let coordinate = extend(this.$store.getters.selectByType('SELECT').wholePosi)
             // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
             if (direction === 'top') {
                 coordinate.endRowAlias = coordinate.startRowAlias

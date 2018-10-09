@@ -926,14 +926,16 @@ SpreadSheet.prototype = {
 
     // 重新加载所有数据，表格会进行局部刷新，并滚动回初始位置
     reload() {
-        this.bookVm.$store.commit('M_UPDATE_LOAD', true)
         // 销毁vue实例
+        cache.bookVm.$destroy()
         this.bookVm.$destroy()
         if (typeof this.toolBarVm !== 'undefined') {
+            cache.toolVm.$destroy()
             this.toolBarVm.$destroy()
         }
-        let bottom = this.bookVm.$el.offsetHeight + config.scrollBufferHeight
-        let right = this.bookVm.$el.offsetWidth + config.scrollBufferWidth
+
+        let bottom = cache.bookVm.$el.offsetHeight + config.scrollBufferHeight
+        let right = cache.bookVm.$el.offsetWidth + config.scrollBufferWidth
         // // 清空 store 行 列 单元格 sheet select 信息
         this.bookVm.$store.commit(M_types.M_CLEAR_CELLS)
         this.bookVm.$store.commit(M_types.M_CLEAR_SELECT)
@@ -967,7 +969,7 @@ SpreadSheet.prototype = {
                     store,
                     render: h => h(Main)
                 }).$mount(toolsSelector)
-                cache.bookVm = this.toolBarVm
+                cache.toolVm = this.toolBarVm
             }
         })
     },

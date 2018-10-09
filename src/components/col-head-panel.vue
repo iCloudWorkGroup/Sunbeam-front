@@ -31,9 +31,9 @@ import {
     SELECTS_CHANGE,
     COLS_ADJUSTWIDTH
 } from '../store/action-types'
-import {
-    UPDATE_MOUSESTATE
-} from '../store/mutation-types'
+// import {
+//     UPDATE_MOUSESTATE
+// } from '../store/mutation-types'
 import {
     LOCATE,
     DRAG
@@ -48,7 +48,8 @@ export default {
         return {
             adjustState: false,
             adjustCol: '',
-            adjustColIndex: ''
+            adjustColIndex: '',
+            firstColAlias: ''
         }
     },
     computed: {
@@ -60,7 +61,7 @@ export default {
             return cols.slice(this.adjustColIndex + 1)
         },
         mouseState() {
-            return this.$store.state.mouseState
+            return this.$store.state.selects.mouseState
         }
     },
     methods: {
@@ -82,22 +83,40 @@ export default {
         currentMouseMoveState(e) {
             this.routineMoveState(e)
         },
-        locateState(e) {
-            let colPosi = this.getRelativePosi(e.clientX)
-            let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
+        routineMoveState(e) {
+            if (this.adjustState) {
+                return
+            }
+            let posi = this.getRelativePosi(e.clientX)
+            let col = this.$store.getters.getColByPosi(posi)
+            let cols = this.$store.getters.allCols
+            let colIndex = this.$store.getters.getColIndexByPosi(posi)
+            let panel = this.$refs.panel
+            if (col.left + col.width - posi < 3) {
+                panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex
+                this.adjustCol = cols[colIndex]
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else if (posi - col.left < 3 && colIndex !== 0) {
+                if (cols[colIndex - 1].hidden) {
+                    return
+                }
+                panel.style.cursor = 'col-resize'
+                this.adjustColIndex = colIndex - 1
+                this.adjustCol = cols[colIndex - 1]
+                this.currentMouseDownState = this.startAdjustHandleState
+            } else {
+                panel.style.cursor = 'pointer'
+                this.currentMouseDownState = this.locateState
 
-            this.$store.dispatch(SELECTS_CHANGE, {
-                startColIndex: colIndex,
-                startRowIndex: 'MAX'
-            })
-            this.$store.commit(UPDATE_MOUSESTATE, {
-                state: DRAG
-            })
+            }
         },
+
         startAdjustHandleState(e) {
             let adjustHandle
             let self = this
 
+            this.$store.commit('M_SELECT_UPDATE_MOUSESTATUS', 'LOCATE')
             this.adjustState = true
 
             if (!(adjustHandle = this.adjustHandle)) {
@@ -117,46 +136,7 @@ export default {
             }
             document.addEventListener('mouseup', stopAdjustHandle)
         },
-        routineMoveState(e) {
-            if (this.adjustState) {
-                return
-            }
-            let posi = this.getRelativePosi(e.clientX)
-            let col = this.$store.getters.getColByPosi(posi)
-            let cols = this.$store.getters.allCols
-            let colIndex = this.$store.getters.getColIndexByPosi(posi)
-            let panel = this.$refs.panel
-            if (col.left + col.width - posi < 5) {
-                panel.style.cursor = 'col-resize'
-                this.adjustColIndex = colIndex
-                this.adjustCol = cols[colIndex]
-                this.currentMouseDownState = this.startAdjustHandleState
-            } else if (posi - col.left < 5 && colIndex !== 0) {
-                if (cols[colIndex - 1].hidden) {
-                    return
-                }
-                panel.style.cursor = 'col-resize'
-                this.adjustColIndex = colIndex - 1
-                this.adjustCol = cols[colIndex - 1]
-                this.currentMouseDownState = this.startAdjustHandleState
-            } else {
-                panel.style.cursor = 'pointer'
-                // this.currentMouseDownState = this.locateState
-                this.currentMouseDownState = this.dragState
-            }
-        },
-        dragState(e) {
-            let colPosi = this.getRelativePosi(e.clientX)
-            let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
-            let colAlias = this.$store.getters.allCols[colIndex].alias
-            let firstRowAlias = this.$store.getters.visibleColList()[0].alias
-            // let lastColAlias = this.$store.getters.visibleColList()[this.$store.getters.visibleColList().length - 1].alias
-            this.$store.dispatch(SELECTS_CHANGE, {
-                activeRowAlias: firstRowAlias,
-                endRowAlias: 'MAX',
-                activeColAlias: colAlias
-            })
-        },
+
         adjustHandleState(e) {
             let colView = this.$refs.adjustColView.$el
             let panelView = this.$refs.adjustPanelView
@@ -180,15 +160,41 @@ export default {
                 width,
                 index: this.adjustColIndex
             })
-        }
+        },
+        locateState(e) {
+            this.$store.commit('M_SELECT_UPDATE_MOUSESTATUS', 'DRAG')
+            let colPosi = this.getRelativePosi(e.clientX)
+            let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
+            let colAlias = this.$store.getters.allCols[colIndex].alias
+            let firstRowAlias = this.$store.getters.visibleRowList()[0].alias
+            this.$store.dispatch(SELECTS_CHANGE, {
+                activeRowAlias: firstRowAlias,
+                endRowAlias: 'MAX',
+                activeColAlias: colAlias
+            })
+            this.firstColAlias = colAlias
+        },
+        dragState(e) {
+            let colPosi = this.getRelativePosi(e.clientX)
+            let colIndex = this.$store.getters.getColIndexByPosi(colPosi)
+            let cols = this.$store.getters.allCols
+            let colAlias = cols[colIndex].alias
+            let firstRowAlias = this.$store.getters.visibleRowList()[0].alias
+            this.$store.dispatch(SELECTS_CHANGE, {
+                activeRowAlias: firstRowAlias,
+                endRowAlias: 'MAX',
+                activeColAlias: this.firstColAlias,
+                endColAlias: colAlias,
+            })
+        },
     },
     mounted() {
         this.currentMouseMoveState = this.routineMoveState
-        this.$watch('mouseState', function(val) {
-            if (val === DRAG) {
+        this.$watch('mouseState', function(newVal, oldVal) {
+            if (newVal === DRAG) {
                 this.currentMouseMoveState = this.dragState
             }
-            if (val === LOCATE) {
+            if (newVal === LOCATE) {
                 this.currentMouseMoveState = this.routineMoveState
             }
         })

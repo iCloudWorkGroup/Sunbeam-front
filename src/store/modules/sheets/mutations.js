@@ -104,8 +104,8 @@ export default {
         state.list = []
         state.events = []
         state.loaded = {
-            cols: ['1'],
-            rows: ['1'],
+            cols: [],
+            rows: [],
             colMap: new Map(),
             rowMap: new Map()
         }
@@ -123,6 +123,17 @@ export default {
             colAlias: null,
             rowPixel: 0,
             colPixel: 0
+        }
+
+        // 当前表格冻结信息
+        state.frozen = {
+            col: [],
+            row: [],
+            // 存储冻结处的别名
+            alias: {
+                row: null,
+                col: null
+            }
         }
     }
 }

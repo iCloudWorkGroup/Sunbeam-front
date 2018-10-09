@@ -13,7 +13,8 @@ const state = {
      * @type {Object}
      */
     list: [],
-    activeType: 'SELECT'
+    activeType: 'SELECT',
+    mouseState: 'LOCATE'
 }
 export default {
     state,

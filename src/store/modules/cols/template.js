@@ -23,5 +23,9 @@ export default {
      * 记录整列操作
      * @type {Object}
      */
-    props: {}
+    props: {
+        content: {
+            background: 'transparent'
+        }
+    }
 }

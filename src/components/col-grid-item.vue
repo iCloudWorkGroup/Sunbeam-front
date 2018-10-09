@@ -1,6 +1,6 @@
 <template>
 <div class="col"
-     :style="{ left, width }">
+     :style="{ left, width, background }">
 </div>
 </template>
 <script>
@@ -15,6 +15,9 @@ export default {
         },
         width() {
             return unit(this.col.width)
+        },
+        background() {
+            return this.col.props.content.background
         }
     }
 }

@@ -22,7 +22,6 @@ const state = {
     loading: false,
     rootSelector: '',
     toolbarSelector: '',
-    mouseState: ''
 }
 export default new Vuex.Store({
     state,

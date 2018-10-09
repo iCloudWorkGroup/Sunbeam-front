@@ -224,6 +224,7 @@ export default {
             } else if (keyCode === 229 && !altKey && !ctrlKey && status === '') {
                 this.$store.dispatch('EDIT_SHOW', {
                     type: 'EDIT',
+                    value: key
                 })
                 if (clipSelect != null) {
                     this.$store.commit('DELETE_SELECT', {
@@ -235,6 +236,17 @@ export default {
                 this.doneEdit(e)
             } else if (keyCode === 13 && altKey && status !== '') {
                 this.insertAtCursor('\n', e.target)
+            } else if (keyCode === 46 && !altKey && !ctrlKey && status === '') {
+                // 清空单元格内容
+                this.$store.dispatch('A_CELLS_UPDATE', {
+                    propName: 'texts',
+                    propStruct: {
+                        content: {
+                            texts: '',
+                            displayTexts: ''
+                        }
+                    },
+                })
             }
         },
         insertAtCursor(insertChar, elem) {

@@ -30,44 +30,44 @@ export default {
             let first = cols[0].alias
             let last = cols[cols.length - 1].alias
             let neighbor = getters.neighborColByAlias(sheet.frozen.colAlias,
-                'NEXT')
+                'PRE')
             if (neighbor == null) {
                 throw new Error('frozen position error from col')
             }
             fixedSheet.frozen.col = [{
                 start: first,
-                over: sheet.frozen.colAlias
+                over: neighbor.alias,
             }, {
-                start: neighbor.alias,
+                start: sheet.frozen.colAlias,
                 over: last
             }]
             let alias = fixedSheet.frozen.alias
             if (alias == null) {
                 fixedSheet.frozen.alias = {}
             }
-            fixedSheet.frozen.alias.col = sheet.frozen.colAlias
+            fixedSheet.frozen.alias.col = neighbor.alias
         }
         if (sheet.frozen && sheet.frozen.rowAlias) {
             let rows = rootState.rows.list
             let first = rows[0].alias
             let last = rows[rows.length - 1].alias
             let neighbor = getters.neighborRowByAlias(sheet.frozen.rowAlias,
-                'NEXT')
+                'PRE')
             if (neighbor == null) {
                 throw new Error('frozen position error from row')
             }
             fixedSheet.frozen.row = [{
                 start: first,
-                over: sheet.frozen.rowAlias
+                over: neighbor.alias,
             }, {
-                start: neighbor.alias,
+                start: sheet.frozen.rowAlias,
                 over: last
             }]
             let alias = fixedSheet.frozen.alias
             if (alias == null) {
                 fixedSheet.frozen.alias = {}
             }
-            fixedSheet.frozen.alias.row = sheet.frozen.rowAlias
+            fixedSheet.frozen.alias.row = neighbor.alias
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
     },
@@ -425,6 +425,13 @@ export default {
                     if (i === num - 1) {
                         last = lastRow()
                         addView(last.alias)
+                        console.log('expand start')
+                        console.log(last.alias)
+                        console.log('expand end')
+                        commit('M_SHEETS_ADD_LOADED', {
+                            rowAlias: rootGetters.allRows[rootGetters.allRows.length - 1].alias,
+                            colAlias: lastCol.alias
+                        })
                     }
                 }
                 let select = rootGetters.selectByType('SELECT')
@@ -432,7 +439,8 @@ export default {
                     dispatch('SELECTS_CHANGE', {
                         activeRowAlias: select.wholePosi.startRowAlias,
                         endRowAlias: 'MAX',
-                        activeColAlias: select.wholePosi.startColAlias
+                        activeColAlias: select.wholePosi.startColAlias,
+                        endColAlias: select.wholePosi.endColAlias
                     })
                 }
                 function lastRow() {
@@ -478,7 +486,8 @@ export default {
                     dispatch('SELECTS_CHANGE', {
                         activeRowAlias: select.wholePosi.startRowAlias,
                         endRowAlias: 'MAX',
-                        activeColAlias: select.wholePosi.startColAlias
+                        activeColAlias: select.wholePosi.startColAlias,
+                        endColAlias: select.wholePosi.endColAlias
                     })
                 }
                 addView(backRowAlias)
@@ -731,7 +740,6 @@ export default {
             let needRequire = allRowMap != null &&
                 allRowMap.get(lastRowAlias) &&
                 idx - lastColIndex > 1 ? false : true
-            console.log(needRequire)
             if (needRequire) {
 
                 // 考虑到行、列都会有一个边框，所以需要在每个元素上 +1
@@ -803,7 +811,8 @@ export default {
                     dispatch('SELECTS_CHANGE', {
                         activeColAlias: select.wholePosi.startColAlias,
                         endColAlias: 'MAX',
-                        activeRowAlias: select.wholePosi.startRowAlias
+                        activeRowAlias: select.wholePosi.startRowAlias,
+                        endRowAlias: select.wholePosi.endRowAlias
                     })
                 }
                 function lastCol() {
@@ -849,7 +858,8 @@ export default {
                     dispatch('SELECTS_CHANGE', {
                         activeColAlias: select.wholePosi.startColAlias,
                         endColAlias: 'MAX',
-                        activeRowAlias: select.wholePosi.startRowAlias
+                        activeRowAlias: select.wholePosi.startRowAlias,
+                        endRowAlias: select.wholePosi.endRowAlias
                     })
                 }
                 addView(backColAlias)

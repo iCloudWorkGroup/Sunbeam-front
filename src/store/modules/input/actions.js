@@ -2,7 +2,7 @@ import * as actionTypes from '../../action-types'
 import {
     isDate, formatText,
     isNum, parseExpress,
-    isPercent, isCurrency
+    parsePropStruct
 } from '../../../tools/format'
 import cache from '../../../tools/cache'
 // import config from '../../../config'
@@ -81,6 +81,9 @@ export default {
             // 有传入值时，更新输入框的值
             if (typeof value !== 'undefined') {
                 propStruct.physical.texts = value
+            }
+            if (value === 'Process') {
+                propStruct.physical.texts = ''
             }
             // 批注
         } else if (type === 'COMMENT') {
@@ -173,56 +176,17 @@ export default {
         let express
         if (status === 'texts') {
             // 判断输入类型
-            let inputExpress = ''
-            if (isPercent(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
-                inputExpress = '0.00%'
-                fixText = texts.replace(/\%/, '') / 100
-                if (fixText.toString().indexOf('.') > -1) {
-                    fixText = fixText.toFixed(4)
-                }
-            } else if (isCurrency(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
-                inputExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
-                fixText = texts.replace(/\$|¥/, '')
-                if (fixText.toString().indexOf('.') > -1) {
-                    fixText = parseFloat(fixText).toFixed(2)
-                }
-            } else {
-                fixText = texts
-            }
-            if (cell) {
-                // 当原本express为常规时，根据输入类型修改express
-                if (cell.content.express === 'G' || cell.content.express === 'General') {
-                    express = inputExpress
-                    propStruct.content = {
-                        texts: fixText,
-                        express
-                    }
-                } else {
-                    express = cell.content.express
-                    date = cell.content.express === 'm/d/yy' || cell.content.express === 'yyyy"年"m"月"d"日"' || cell.content.express === 'yyyy"年"m"月"' ? true : false
-                    propStruct.content = {
-                        texts: fixText,
-                    }
-                }
-            } else {
-                express = inputExpress === '' ? 'G' : inputExpress
-                propStruct.content = {
-                    texts: fixText,
-                    express
-                }
-            }
-            // 修正单元格对齐方式
+            let parseProp = parsePropStruct(cell, propStruct, texts)
+            console.log(parseProp)
+            fixText = parseProp.fixText
+            express = parseProp.express
             rules = parseExpress(express)
+            date = parseProp.date
+            propStruct = parseProp.propStruct
+            // 修正单元格显示文本
             propStruct.content.displayTexts = parseText(fixText)
-            if (express === '@') {
-                propStruct.content.alignRow = 'left'
-            } else if ((express === 'G' || express === 'General' || express === '0' || express === '0.0' || express === '0.00' || express === '0.000'
-                || express === '0.0000' || express === '0.00%' || express === '$#,##0.00' || express === '¥#,##0.00')
-                && isNum(fixText)) {
-                propStruct.content.alignRow = 'right'
-            } else if ((express === 'm/d/yy' || express === 'yyyy"年"m"月"d"日"' || express === 'yyyy"年"m"月"' || express === 'G' || express === 'General') && isDate(texts)) {
-                propStruct.content.alignRow = 'right'
-            }
+            // 修正单元格对齐方式
+            propStruct.content.alignRow = parseProp.align
         }
         if (status === 'comment') {
             propStruct = {

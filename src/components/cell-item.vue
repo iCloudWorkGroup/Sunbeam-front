@@ -4,14 +4,7 @@
         <div class="cell-content"
              :style="viewProps"
              v-html="text">
-            <!--{{cell.content.displayTexts}}-->
         </div>
-        <!--<div class="comment-ico" v-if="comment">-->
-            <!--<div-->
-                <!--class="triangle"-->
-                <!--@mouseleave="commentHide"-->
-                <!--@mouseenter="commentShow"></div>-->
-        <!--</div>-->
     </div>
 </template>
 <script>
@@ -46,16 +39,19 @@ function caclBorder({
             width = 1
             color = 'transparent'
             padding = 1
+            margin = 1
             break
         case 1:
             width = 1
             color = '#000'
             padding = 1
+            margin = 1
             break
         case 2:
             width = 2
             color = '#000'
             padding = 0
+            margin = 0
             break
     }
     return {
@@ -123,18 +119,6 @@ export default {
             if (this.cell.occupy.col.length > 1 || this.cell.occupy.row.length > 1) {
                 if (typeof this.cell.content.background === 'undefined' || this.cell.content.background === 'transparent' || this.cell.content.background === 'rgba(255, 255, 255, 0)') {
                     background = 'rgb(255, 255, 255)'
-                    if (this.cell.border.top === 0) {
-                        topBorder.borderTopColor = '#ccc'
-                    }
-                    if (this.cell.border.bottom === 0) {
-                        bottomBorder.borderBottomColor = '#ccc'
-                    }
-                    if (this.cell.border.left === 0) {
-                        leftBorder.borderLeftColor = '#ccc'
-                    }
-                    if (this.cell.border.right === 0) {
-                        rightBorder.borderRightColor = '#ccc'
-                    }
                 }
             }
             return extend({

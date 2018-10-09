@@ -385,6 +385,44 @@ export default {
             return result
         }
     },
+    cellsByTransverseHaveTexts(state, getters, rootState) {
+        return function({
+            startColIndex,
+            startRowIndex,
+            endColIndex = startColIndex,
+            endRowIndex = startRowIndex
+        }) {
+            let rows = getters.allRows
+            let cols = getters.allCols
+            let startCol = startColIndex
+            let startRow = startRowIndex
+            let endCol = endColIndex === -1 ? cols.length - 1 : endColIndex
+            let endRow = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+            let result = []
+            let avoidRepeat = {}
+            for (let i = startRow, rowLen = endRow + 1; i < rowLen; i++) {
+                for (let j = startCol, colLen = endCol + 1; j < colLen; j++) {
+                    let rowAlias = rows[i].alias
+                    let colAlias = cols[j].alias
+                    let idx = getters.IdxByCol(colAlias, rowAlias)
+                    if (idx !== -1 && !avoidRepeat[idx] && state.list[idx].content.texts != null && state.list[idx].content.texts !== '') {
+                        avoidRepeat[idx] = true
+                        result.push(state.list[idx])
+                    }
+                }
+            }
+            if (result.length === 0) {
+                let rowAlias = rows[startRow].alias
+                let colAlias = cols[startCol].alias
+                let idx = getters.IdxByCol(colAlias, rowAlias)
+                if (idx !== -1 && !avoidRepeat[idx]) {
+                    avoidRepeat[idx] = true
+                    result.push(state.list[idx])
+                }
+            }
+            return result
+        }
+    },
     topRegionCellList(state, getters, rootState) {
         return function() {
             let rules = getters.frozenState.rules

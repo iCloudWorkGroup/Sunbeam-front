@@ -1,6 +1,6 @@
 <template>
 <div class="row"
-     :style="{ top, height }">
+     :style="{ top, height, background }">
 </div>
 </template>
 <script>
@@ -15,6 +15,12 @@ export default {
         },
         height() {
             return unit(this.row.height)
+        },
+        background() {
+            if (typeof this.row.props.content !== 'undefined') {
+                return this.row.props.content.background
+            }
+            return null
         }
     }
 }

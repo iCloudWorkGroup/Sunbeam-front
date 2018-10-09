@@ -64,7 +64,9 @@ export default {
                 _this.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
                 _this.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
             }, 100)
-
+        }
+        window.onmouseup = () => {
+            _this.$store.commit('M_SELECT_UPDATE_MOUSESTATUS', 'LOCATE')
         }
     },
     methods: {
@@ -74,7 +76,7 @@ export default {
                 this.$store.commit('M_INPUT_UPDATE_STATUS', !props.assist.status)
             }
         }
-    }
+    },
 }
 </script>
 <style type="text/css">

@@ -49,5 +49,8 @@ export default {
     M_CLEAR_SELECT(state) {
         state.list = []
         state.activeType = 'SELECT'
+    },
+    M_SELECT_UPDATE_MOUSESTATUS(state, status) {
+        state.mouseState = status
     }
 }

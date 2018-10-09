@@ -40,6 +40,15 @@ const state = {
         colAlias: null,
         rowPixel: 0,
         colPixel: 0
+    },
+    frozen: {
+        col: [],
+        row: [],
+        // 存储冻结处的别名
+        alias: {
+            row: null,
+            col: null
+        }
     }
 
 }

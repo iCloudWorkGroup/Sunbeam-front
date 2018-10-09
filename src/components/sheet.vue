@@ -82,8 +82,8 @@
          :scroll-left="scrollLeft"/>
     <div class="comment"
          :style="objStyle"
-         v-if="commentShow">
-        {{comment}}
+         v-if="commentShow"
+        v-html="comment">
     </div>
 </div>
 </template>
@@ -108,7 +108,7 @@ export default {
         localSheet() {
             return this.localState.sheets.list[0]
         },
-        frozenMode() {
+        frozenMode: function () {
             let colLen = this.localSheet.frozen.col.length
             let rowLen = this.localSheet.frozen.row.length
             if (colLen !== 0 && rowLen !== 0) {
@@ -132,14 +132,17 @@ export default {
             let cell = this.$store.getters.mouseInCell
             return {
                 fontSize: '10pt',
-                width: unit(100),
-                height: unit(100),
+                width: unit(150),
+                height: unit(150),
                 left: unit(cell.physicsBox.left + cell.physicsBox.width - this.localState.sheets.scroll.left + config.cornerWidth + 2),
                 top: unit(cell.physicsBox.top - this.localState.sheets.scroll.top + config.cornerHeight - 2),
             }
         },
         comment() {
-            return this.$store.getters.mouseInCell.customProp.comment
+            let comment = this.$store.getters.mouseInCell.customProp.comment
+            let reg = new RegExp('\n', 'g')
+            let spaceReg = new RegExp(' ', 'g')
+            return comment.toString().replace(reg, '<br>').replace(spaceReg, '&ensp;')
         },
         commentShow() {
             return this.$store.getters.mouseInCell != null

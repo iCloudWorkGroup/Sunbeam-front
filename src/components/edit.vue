@@ -42,21 +42,21 @@ export default {
     },
     created() {
         // 当前可视区域所占用的加载区域
-        let isFrozen = this.$store.getters.isFrozen()
-        let frozenAlias = this.$store.getters.frozenAlias()
-        let neighborRow = this.$store.getters.neighborRowByAlias(this.rowStart, 'PRE')
-        let rowAlias = isFrozen &&
-            neighborRow != null &&
-            frozenAlias.row === neighborRow.alias ?
-            neighborRow.alias :
-            this.rowStart
-        let neighborCol = this.$store.getters.neighborColByAlias(this.colStart,
-            'PRE')
-        let colAlias = isFrozen &&
-            neighborCol != null &&
-            frozenAlias.col === neighborCol.alias ?
-            neighborCol.alias :
-            this.colStart
+        // let isFrozen = this.$store.getters.isFrozen()
+        // let frozenAlias = this.$store.getters.frozenAlias()
+        // let neighborRow = this.$store.getters.neighborRowByAlias(this.rowStart, 'PRE')
+        let rowAlias = this.rowStart
+        // isFrozen &&
+        // neighborRow != null &&
+        // frozenAlias.row === neighborRow.alias ?
+        //     neighborRow.alias :
+
+        // let neighborCol = this.$store.getters.neighborColByAlias(this.colStart, 'PRE')
+        let colAlias = this.colStart
+        // isFrozen &&
+        // neighborCol != null &&
+        // frozenAlias.col === neighborCol.alias ?
+        //     neighborCol.alias :
         this.viewLoaded = {
             rows: [rowAlias, this.rowOver],
             cols: [colAlias, this.colOver],

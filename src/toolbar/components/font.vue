@@ -134,11 +134,29 @@ export default {
         activeProps() {
             let cell = activeStatus(this)
             let content = cell.content
+            let familyCn
+            switch (content.family) {
+                case 'microsoft Yahei':
+                    familyCn = '微软雅黑'
+                    break
+                case 'SimSun':
+                    familyCn = '宋体'
+                    break
+                case 'SimHei':
+                    familyCn = '黑体'
+                    break
+                case 'KaiTi':
+                    familyCn = '楷体'
+                    break
+                default:
+                    familyCn = content.family
+                    break
+            }
             return {
                 weight: content.weight,
                 italic: content.italic,
                 underline: content.underline,
-                family: content.family,
+                family: familyCn,
                 size: content.size
             }
         }

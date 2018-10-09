@@ -1199,7 +1199,7 @@ export default {
         endIndex = endIndex == null ? startIndex : endIndex
 
         let updateRowInfo = []
-        let rows = getters.rowList
+        let rows = getters.allRows
 
         for (let i = startIndex; i < endIndex + 1; i++) {
             updateRowInfo.push({

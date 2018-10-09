@@ -426,7 +426,6 @@ export default {
                 dispatch(A_CELLS_DESTORY, [cell])
             }
         })
-        console.log(insertCells)
         dispatch('A_CELLS_ADD', insertCells)
     },
     [CELLS_FORMAT]({

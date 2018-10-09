@@ -268,7 +268,6 @@ export function parseAlign(express, fixText, texts) {
 }
 
 export function parsePropStruct(cell, propStruct, texts) {
-    // console.log(cell)
     let parseCell = parseFormat(texts, cell)
     let inputExpress = parseCell.inputExpress
     let fixText = parseCell.fixText

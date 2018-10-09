@@ -92,12 +92,12 @@ export default {
             let lastRow = rows.list[rows.list.length - 1]
             let firstRow = rows.list[0]
             let limitHeight = 0
-            // 如果视图的最后元素和已经加载元素一致
-            // 说明不是冻结视图 需要考虑上下边框的距离
             limitHeight = this.$store.getters.offsetHeight - config.cornerHeight - config.sheetSider
             if (this.needSider) {
                 limitHeight -= scrollbar()
             }
+            // 如果视图的最后元素和已经加载元素一致
+            // 说明不是冻结视图 需要考虑上下边框的距离
             if (startRow.alias === firstRow.alias &&
                 overRow.alias === lastRow.alias) {
                 return unit(limitHeight)
@@ -112,7 +112,7 @@ export default {
                     frozenAliasRow)
                 let topDistance = frozenRow.top + frozenRow.height - userView.top
                 let neighborRow = this.$store.getters.neighborRowByAlias(frozenAliasRow, 'NEXT')
-                // 如果冻结的行等于这个视图的行开始值，说明是上半部分的视图
+                // 如果冻结的行等于这个视图的行结束值，说明是上半部分的视图
                 // 所以, 高度就是topDistance
                 // 不然就是，limitHeight -  topDistance
                 if (frozenAliasRow === this.rowOver) {
@@ -147,7 +147,7 @@ export default {
                     scrollTop,
                     toward: this.toward
                 })
-            }.bind(this), 30)
+            }.bind(this), 0)
         },
         handleScroll({
             scrollLeft,

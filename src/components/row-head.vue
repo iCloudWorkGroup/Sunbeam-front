@@ -47,10 +47,6 @@ export default {
             let overRow = rows.map.get(this.over)
             let lastRow = rows.list[rows.list.length - 1]
             let limitHeight = 0
-            console.log('row-head start')
-            console.log(lastRow.alias)
-            console.log(this.over, rows.map)
-            console.log('row-head end')
             if (overRow.alias === lastRow.alias) {
                 limitHeight = this.$store.getters.offsetHeight -
                     config.cornerHeight - config.sheetSider

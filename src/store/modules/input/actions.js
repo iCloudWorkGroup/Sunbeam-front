@@ -177,7 +177,6 @@ export default {
         if (status === 'texts') {
             // 判断输入类型
             let parseProp = parsePropStruct(cell, propStruct, texts)
-            console.log(parseProp)
             fixText = parseProp.fixText
             express = parseProp.express
             rules = parseExpress(express)

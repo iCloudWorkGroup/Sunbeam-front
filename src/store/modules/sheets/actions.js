@@ -407,7 +407,15 @@ export default {
          * @return {[type]} [description]
          */
         function expand() {
+            let length = rootGetters.allRows.length
+            if (length >= 10000) {
+                return
+            }
+
             let num = config.prestrainHeight / (config.rowHeight + 1)
+            if (length + num > 10000) {
+                num = 10000 - length
+            }
             send({
                 url: config.url.createLine,
                 body: JSON.stringify({
@@ -425,9 +433,6 @@ export default {
                     if (i === num - 1) {
                         last = lastRow()
                         addView(last.alias)
-                        console.log('expand start')
-                        console.log(last.alias)
-                        console.log('expand end')
                         commit('M_SHEETS_ADD_LOADED', {
                             rowAlias: rootGetters.allRows[rootGetters.allRows.length - 1].alias,
                             colAlias: lastCol.alias
@@ -786,7 +791,14 @@ export default {
          * @return {[type]} [description]
          */
         function expand() {
+            let length = rootGetters.allCols.length
+            if (length >= 100) {
+                return
+            }
             let num = config.prestrainWidth / (config.colWidth + 1)
+            if (length + num > 100) {
+                num = 100 - length
+            }
             send({
                 url: config.url.createLine,
                 body: JSON.stringify({

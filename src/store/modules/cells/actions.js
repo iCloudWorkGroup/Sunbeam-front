@@ -217,13 +217,13 @@ export default {
         }
         function fixText(text) {
             let txt = text
-            if (propStruct.content.express === '$#,##0.00') {
+            if (propStruct.content.express === '$#,##0.00' && isNum(txt)) {
                 txt = '$' + txt
             }
-            if (propStruct.content.express === '¥#,##0.00') {
+            if (propStruct.content.express === '¥#,##0.00' && isNum(txt)) {
                 txt = '¥' + txt
             }
-            if (propStruct.content.express === '0.00%') {
+            if (propStruct.content.express === '0.00%' && isNum(txt)) {
                 txt = txt * 100 + '%'
             }
             return txt
@@ -514,6 +514,8 @@ export default {
                             })
                         }
                     } else {
+                        let align = parseAddAglin()
+                        props.content.alignRow = align
                         dispatch('A_CELLS_ADD', extend(template, props, {
                             occupy: {
                                 col: [colAlias],
@@ -524,7 +526,23 @@ export default {
                 }
             }
         }
-
+        function parseAddAglin() {
+            let align
+            if (format === 'text') {
+                align = {
+                    content: {
+                        alignRowFormat: 'left'
+                    }
+                }
+            } else if (format === 'number' || format === 'percent' || format === 'currency' || format === 'routine' || format === 'data') {
+                align = {
+                    content: {
+                        alignRowFormat: 'right'
+                    }
+                }
+            }
+            return align
+        }
         function parseText(cell) {
             let text = cell.content.texts
             let align = {}
@@ -532,19 +550,19 @@ export default {
             if (format === 'text') {
                 align = {
                     content: {
-                        alignRow: 'left'
+                        alignRowFormat: 'left'
                     }
                 }
-            } else if ((format === 'number' || format === 'percent' || format === 'currency' || format === 'routine') && isNum(text)) {
+            } else if ((format === 'number' || format === 'percent' || format === 'currency' || format === 'routine') && (isNum(text) || text === '')) {
                 align = {
                     content: {
-                        alignRow: 'right'
+                        alignRowFormat: 'right'
                     }
                 }
-            } else if ((format === 'data' || format === 'routine') && isDate(text)) {
+            } else if ((format === 'date' || format === 'routine') && (isDate(text) || text === '')) {
                 align = {
                     content: {
-                        alignRow: 'right'
+                        alignRowFormat: 'right'
                     }
                 }
             }

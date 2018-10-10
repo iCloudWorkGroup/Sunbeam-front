@@ -136,7 +136,6 @@ export default {
             let attrs = this.cell.content
             let props = {
                 color: attrs.color,
-                textAlign: attrs.alignRow,
                 fontSize: attrs.size + 'pt',
                 fontFamily: attrs.family,
                 textDecoration: attrs.underline ? 'underline' : '',
@@ -148,6 +147,11 @@ export default {
                 // props.whiteSpace = 'pre-line'
             } else {
                 props.whiteSpace = 'nowrap'
+            }
+            if (attrs.alignRow !== '') {
+                props.textAlign = attrs.alignRow
+            } else {
+                props.textAlign = attrs.alignRowFormat
             }
             if (attrs.alignCol !== '') {
                 props.verticalAlign = attrs.alignCol

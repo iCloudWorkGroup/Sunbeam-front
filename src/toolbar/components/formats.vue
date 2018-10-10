@@ -3,7 +3,7 @@
          @mousedown.stop="setFormat">
         <div class="widget-panel">
             <ul class="widget-menu">
-                <li data-value="routine-G">
+                <li data-value="routine-General">
                     <span class="fui-cf-ico ico-routine  widget-ico"></span>
                     <span class="widget-content">
                             <div class="widget-pad">常规</div>

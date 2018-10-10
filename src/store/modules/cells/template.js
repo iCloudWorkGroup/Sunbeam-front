@@ -21,17 +21,18 @@ export default {
         texts: null,
         displayTexts: null,
         type: 'routine',
-        express: 'G',
+        express: 'General',
         size: 11,
         family: 'SimSun',
         color: 'rgb(0, 0, 0)',
         weight: false,
         italic: false,
-        alignRow: 'left',
+        alignRow: '',
         alignCol: 'middle',
         wordWrap: false,
         underline: 0,
-        background: 'transparent'
+        background: 'transparent',
+        alignRowFormat: ''
     },
     // 批注属性
     customProp: {

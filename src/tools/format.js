@@ -230,78 +230,65 @@ export function pathToStruct({
 }
 
 export function parseFormat(texts, cell) {
-    let inputExpress = ''
-    let fixText
-    if (isPercent(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
-        inputExpress = '0.00%'
-        fixText = texts.replace(/\%/, '') / 100
-        if (fixText.toString().indexOf('.') > -1) {
-            fixText = fixText.toFixed(4)
-        }
-    } else if (isCurrency(texts) && (!cell || cell.content.express === 'General' || cell.content.express === 'G')) {
-        inputExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
-        fixText = texts.replace(/\$|¥/, '')
-        if (fixText.toString().indexOf('.') > -1) {
-            fixText = parseFloat(fixText).toFixed(2)
-        }
-    } else {
-        fixText = texts
-    }
-    return {
-        fixText,
-        inputExpress
-    }
+
 }
 
 export function parseAlign(express, fixText, texts) {
-    let align
-    if (express === '@') {
-        align = 'left'
-    } else if ((express === 'G' || express === 'General' || express === '0' || express === '0.0' || express === '0.00' || express === '0.000'
-        || express === '0.0000' || express === '0.00%' || express === '$#,##0.00' || express === '¥#,##0.00')
-        && isNum(fixText)) {
-        align = 'right'
-    } else if ((express === 'm/d/yy' || express === 'yyyy"年"m"月"d"日"' || express === 'yyyy"年"m"月"' || express === 'G' || express === 'General') && isDate(texts)) {
-        align = 'right'
-    }
-    return align
+
 }
 
-export function parsePropStruct(cell, propStruct, texts) {
-    let parseCell = parseFormat(texts, cell)
-    let inputExpress = parseCell.inputExpress
-    let fixText = parseCell.fixText
-    let express
-    let date = false
-    if (cell) {
-        // 当原本express为常规时，根据输入类型修改express
-        if (cell.content.express === 'G' || cell.content.express === 'General') {
-            express = inputExpress
-            propStruct.content = {
-                texts: fixText,
-                express,
-                // type: 'percent'
-            }
-        } else {
-            express = cell.content.express
-            date = cell.content.express === 'm/d/yy' || cell.content.express === 'yyyy"年"m"月"d"日"' || cell.content.express === 'yyyy"年"m"月"' ? true : false
-            propStruct.content = {
-                texts: fixText,
-            }
-        }
+export function parsePropStruct(cell, formatObj, texts) {
+    let fixObj = { content: {}}
+    if (!cell || cell.content.type === '' || cell.content.type === 'routine') {
+        fixObj.content.alignRowFormat = formatObj.autoAlign
+        fixObj.content.express = formatObj.autoRecExpress
+        fixObj.content.type = formatObj.autoRecType
+        fixObj.content.texts = formatObj.autoRecText
     } else {
-        express = inputExpress === '' ? 'G' : inputExpress
-        propStruct.content = {
-            texts: fixText,
-            express
+        fixObj.content.alignRowFormat = cell.content.alignRowFormat
+        fixObj.content.express = cell.content.express
+        fixObj.content.type = cell.content.type
+        fixObj.content.texts = formatObj.autoRecText
+    }
+    return fixObj
+}
+
+export function parseType(texts) {
+    let formatObj = {
+        autoRecExpress: 'General',
+        autoRecType: 'routine',
+        autoRecText: texts,
+        autoAlign: 'right',
+        date: false
+    }
+    if (isPercent(texts)) {
+        formatObj.autoRecExpress = '0.00%'
+        formatObj.autoRecType = 'percent'
+        formatObj.autoRecText = texts.replace(/\%/, '') / 100
+        if (formatObj.autoRecText.toString().indexOf('.') > -1) {
+            formatObj.autoRecText = formatObj.autoRecText.toFixed(4)
         }
+    } else if (isCurrency(texts)) {
+        formatObj.autoRecExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
+        formatObj.autoRecType = 'currency'
+        formatObj.autoRecText = texts.replace(/\$|¥/, '')
+        if (formatObj.autoRecText.toString().indexOf('.') > -1) {
+            formatObj.autoRecText = parseFloat(formatObj.autoRecText).toFixed(2)
+        }
+    } else if (isNum(texts)) {
+        formatObj.autoRecType = 'number'
+    } else if (isDate(texts)) {
+        formatObj.autoRecType = 'date'
+        if (texts.indexOf('/') > -1) {
+            formatObj.autoRecExpress = 'm/d/yy'
+        } else if (texts.indexOf('日') > -1) {
+            formatObj.autoRecExpress = 'yyyy"年"m"月"d"日"'
+        } else {
+            formatObj.autoRecExpress = 'yyyy"年"m"月"'
+        }
+        formatObj.date = true
+    } else {
+        formatObj.autoRecType = 'text'
     }
-    let align = parseAlign(express, fixText, texts)
-    return {
-        propStruct,
-        fixText,
-        align,
-        date,
-        express
-    }
+    return formatObj
 }

@@ -117,6 +117,9 @@ export default {
                 structName,
                 value
             })
+            if (this.activeProps.alignRow === value) {
+                propStruct.content.alignRow = ''
+            }
             this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'alignRow',
                 propStruct

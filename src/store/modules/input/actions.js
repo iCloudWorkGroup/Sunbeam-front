@@ -2,7 +2,7 @@ import * as actionTypes from '../../action-types'
 import {
     isDate, formatText,
     isNum, parseExpress,
-    parsePropStruct
+    parsePropStruct, parseType
 } from '../../../tools/format'
 import cache from '../../../tools/cache'
 // import config from '../../../config'
@@ -172,20 +172,45 @@ export default {
         let rules
         let date = false
         let propStruct = { content: {}}
-        let fixText
-        let express
         if (status === 'texts') {
             // 判断输入类型
-            let parseProp = parsePropStruct(cell, propStruct, texts)
-            fixText = parseProp.fixText
-            express = parseProp.express
-            rules = parseExpress(express)
-            date = parseProp.date
-            propStruct = parseProp.propStruct
+            let formatObj = parseType(texts)
+            if (formatObj.autoRecType === 'text') {
+                propStruct.content.texts = texts
+                propStruct.content.displayTexts = texts
+                // 修正单元格对齐方式
+                propStruct.content.alignRowFormat = 'left'
+            } else {
+                let fixProp = parsePropStruct(cell, formatObj, texts)
+                let express = fixProp.content.express
+                let fixText = fixProp.content.texts
+                propStruct.content = fixProp.content
+                if (express !== '@') {
+                    rules = parseExpress(express)
+                    date = formatObj.date
+                    if (date && fixProp.content.type !== 'date') {
+                        propStruct.content.displayTexts = fixText
+                    } else {
+                        propStruct.content.displayTexts = parseText(fixText)
+                    }
+                } else {
+                    propStruct.content.displayTexts = fixText
+                }
+            }
+
             // 修正单元格显示文本
-            propStruct.content.displayTexts = parseText(fixText)
-            // 修正单元格对齐方式
-            propStruct.content.alignRow = parseProp.align
+            // if (fixProp.formatDis) {
+            //     rules = parseExpress(express)
+            //     date = fixProp.date
+            //     propStruct.content.displayTexts = parseText(fixText)
+            // } else {
+            //     propStruct.content.displayTexts = texts
+            // }
+            // propStruct.content.texts = fixProp.autoRecText
+            // propStruct.content.express = fixProp.autoRecExpress
+            // propStruct.content.type = fixProp.autoRecType
+            // // 修正单元格对齐方式
+            // propStruct.content.alignRow = fixProp.autoAlign
         }
         if (status === 'comment') {
             propStruct = {

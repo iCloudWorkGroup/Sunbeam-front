@@ -192,7 +192,7 @@ export default {
                 if (express !== '@') {
                     rules = parseExpress(express)
                     date = formatObj.date
-                    if (date && fixProp.content.type !== 'date') {
+                    if (date && fixProp.recType !== 'date') {
                         propStruct.content.displayTexts = fixText
                     } else {
                         propStruct.content.displayTexts = parseText(fixText)

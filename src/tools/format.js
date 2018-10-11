@@ -229,24 +229,17 @@ export function pathToStruct({
     return propStruct
 }
 
-export function parseFormat(texts, cell) {
-
-}
-
-export function parseAlign(express, fixText, texts) {
-
-}
-
 export function parsePropStruct(cell, formatObj, texts) {
     let fixObj = { content: {}}
+    fixObj.content.type = formatObj.autoRecType
     if (!cell || cell.content.type === '' || cell.content.type === 'routine') {
         fixObj.content.alignRowFormat = formatObj.autoAlign
         fixObj.content.express = formatObj.autoRecExpress
-        fixObj.content.type = formatObj.autoRecType
         fixObj.content.texts = formatObj.autoRecText
+        fixObj.recType = formatObj.autoRecType
     } else {
         fixObj.content.express = cell.content.express
-        fixObj.content.type = cell.content.type
+        fixObj.recType = cell.content.type
         fixObj.content.texts = formatObj.autoRecText
         if (cell.content.type === fixObj.content.type) {
             fixObj.content.alignRowFormat = formatObj.autoAlign

@@ -8,10 +8,9 @@ let ss = new Sunbeam({
 
 
 ss.load().then(() => {
-    console.log('over')
-    ss.rowHide('1', '1')
-    ss.rowHide('1', '2')
-    ss.colHide('1', 'A')
+    // ss.rowCancelHide('1', '1')
+    // ss.rowCancelHide('1', '2')
+    // ss.colCancelHide('1', 'A')
     // ss.colHide('1', 'A').then(() => {
     //     return ss.rowHide('1', '1')
     // }).then(() => {
@@ -22,10 +21,9 @@ ss.load().then(() => {
 })
 
 ss.addEventListener('regionChange', function (e) {
-    // console.log(e.point.row.length)
-    // console.log(e.point.col.length)
-    // console.log(e.point.row[0])
-    // console.log(e.point.col[0])
+    // ss.rowCancelHide('1', '1')
+    // ss.rowCancelHide('1', '2')
+    // ss.colCancelHide('1', 'A')
 })
 ss.addEventListener('mousedown', function (e) {
     // console.log(e)
@@ -46,14 +44,13 @@ document.getElementById('dd').addEventListener('click', function () {
     })
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.reload()
+    ss.rowCancelHide('1', '1')
+    ss.rowCancelHide('1', '2')
+    ss.colCancelHide('1', 'A')
 })
 document.getElementById('clear').addEventListener('click', function () {
-    ss.colHide('1', 'A').then(() => {
-        return ss.rowHide('1', '1')
-    }).then(() => {
-        return ss.rowHide('1', '2')
-    }).then(() => {
-        // ss.reload()
-    })
+    ss.rowHide('1', '1')
+    ss.rowHide('1', '2')
+    ss.colHide('1', 'A')
 })
+

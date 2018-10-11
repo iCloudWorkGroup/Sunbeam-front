@@ -65,15 +65,10 @@ export default {
             let endRowIndex = getters.rowIndexByAlias(occupyRows[occupyRows.length - 1])
             let rowProp = rows[startRowIndex].props
             let colProp = cols[startColIndex].props
+            // 新增单元格先去判断有无对应的行列属性
             let fixedCell = extend(template, rowProp)
             fixedCell = extend(fixedCell, colProp)
             fixedCell = extend(fixedCell, cell)
-            // // 单元格的occpuy
-            // let occupyCols = fixedCell.occupy.col
-            // let occupyRows = fixedCell.occupy.row
-            // 修正参数
-            // endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
-            // endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
             let top = rows[startRowIndex].top
@@ -605,7 +600,7 @@ export default {
                         }
                     } else {
                         let align = parseAddAglin()
-                        props.content.alignRow = align
+                        props.content.alignRowFormat = align
                         dispatch('A_CELLS_ADD', extend(props, {
                             occupy: {
                                 col: [colAlias],

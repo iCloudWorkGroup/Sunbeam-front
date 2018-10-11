@@ -303,7 +303,8 @@ export default {
                     let colAlias = allCols[i].alias
                     let rowAlias = allRows[j].alias
                     let idx = getters.IdxByRow(colAlias, rowAlias)
-                    if (idx !== -1 && !avoidRepeat[idx] && !cells[idx].status.hidden && !cells[idx].status.destroy) {
+                    if (idx !== -1 && !avoidRepeat[idx] && !cells[idx].status.hidden && !cells[idx].status.destroy
+                        && cells[idx].physicsBox.width !== 0 && cells[idx].physicsBox.height !== 0) {
                         avoidRepeat[idx] = true
                         result.push(cells[idx])
                     }

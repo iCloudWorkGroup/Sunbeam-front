@@ -54,8 +54,8 @@ export default {
                 beginIdx = Math.max(visibleCols[0].sort, beginIdx)
                 endIdx = Math.min(visibleCols[visibleCols.length - 1].sort, endIdx)
                 // 因为索引总是 -1，所以结束要 +1
-                return state.list.slice(beginIdx, endIdx + 1).filter(cell => {
-                    return cell.visible === true
+                return state.list.slice(beginIdx, endIdx + 1).filter(col => {
+                    return col.visible === true && col.hidden === false
                 })
             }
             return null

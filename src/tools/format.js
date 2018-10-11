@@ -245,10 +245,14 @@ export function parsePropStruct(cell, formatObj, texts) {
         fixObj.content.type = formatObj.autoRecType
         fixObj.content.texts = formatObj.autoRecText
     } else {
-        fixObj.content.alignRowFormat = cell.content.alignRowFormat
         fixObj.content.express = cell.content.express
         fixObj.content.type = cell.content.type
         fixObj.content.texts = formatObj.autoRecText
+        if (cell.content.type === fixObj.content.type) {
+            fixObj.content.alignRowFormat = formatObj.autoAlign
+        } else {
+            fixObj.content.alignRowFormat = cell.content.alignRowFormat
+        }
     }
     return fixObj
 }
@@ -271,12 +275,13 @@ export function parseType(texts) {
     } else if (isCurrency(texts)) {
         formatObj.autoRecExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
         formatObj.autoRecType = 'currency'
-        formatObj.autoRecText = texts.replace(/\$|¥/, '')
+        formatObj.autoRecText = Number(texts.replace(/\$|¥/, '')).toString()
         if (formatObj.autoRecText.toString().indexOf('.') > -1) {
             formatObj.autoRecText = parseFloat(formatObj.autoRecText).toFixed(2)
         }
     } else if (isNum(texts)) {
         formatObj.autoRecType = 'number'
+        formatObj.autoRecText = Number(texts).toString()
     } else if (isDate(texts)) {
         formatObj.autoRecType = 'date'
         if (texts.indexOf('/') > -1) {

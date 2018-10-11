@@ -18,6 +18,7 @@ export default function(textArgs) {
         }
         for (let j = 0, len = cells.length; j < len; j++) {
             let cell = cells[j]
+            cell = cell.toString().replace(/[\n\r]/g, '')
             result.data.push({
                 colRelative: j,
                 rowRelative: i,

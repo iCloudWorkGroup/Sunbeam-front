@@ -30,7 +30,6 @@ import {
 import {
     getTextHeight
 } from '../tools/calcbox'
-// import extend from '../util/extend'
 export default {
     props: [
         'scrollTop',
@@ -237,8 +236,8 @@ export default {
             } else if (keyCode === 13 && altKey && status !== '') {
                 this.insertAtCursor('\n', e.target)
             } else if (keyCode === 46 && !altKey && !ctrlKey && status === '') {
-                // 清空单元格内容
-                this.$store.dispatch('A_CELLS_UPDATE', {
+                // 批量清空单元格内容
+                this.$store.dispatch('A_CELLS_CLEAN', {
                     propName: 'texts',
                     propStruct: {
                         content: {

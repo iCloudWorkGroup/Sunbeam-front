@@ -156,8 +156,8 @@ export default {
         let props = getters.inputProps
         let colAlias = props.assist.colAlias
         let rowAlias = props.assist.rowAlias
-        // let endcolAlias = props.assist.endcolAlias
-        // let endrowAlias = props.assist.endrowAlias
+        let endcolAlias = colAlias
+        let endrowAlias = rowAlias
         if (colAlias == null || rowAlias == null) {
             return
         }
@@ -169,6 +169,10 @@ export default {
             endColIndex: colIndex,
             endRowIndex: rowIndex
         })[0]
+        if (cell) {
+            endcolAlias = cell.occupy.col[cell.occupy.col.length - 1]
+            endrowAlias = cell.occupy.row[cell.occupy.row.length - 1]
+        }
         let rules
         let date = false
         let propStruct = { content: {}}
@@ -197,20 +201,6 @@ export default {
                     propStruct.content.displayTexts = fixText
                 }
             }
-
-            // 修正单元格显示文本
-            // if (fixProp.formatDis) {
-            //     rules = parseExpress(express)
-            //     date = fixProp.date
-            //     propStruct.content.displayTexts = parseText(fixText)
-            // } else {
-            //     propStruct.content.displayTexts = texts
-            // }
-            // propStruct.content.texts = fixProp.autoRecText
-            // propStruct.content.express = fixProp.autoRecExpress
-            // propStruct.content.type = fixProp.autoRecType
-            // // 修正单元格对齐方式
-            // propStruct.content.alignRow = fixProp.autoAlign
         }
         if (status === 'comment') {
             propStruct = {
@@ -224,9 +214,9 @@ export default {
             propStruct,
             coordinate: {
                 startColAlias: colAlias,
-                endColAlias: colAlias,
+                endColAlias: endcolAlias,
                 startRowAlias: rowAlias,
-                endRowAlias: rowAlias,
+                endRowAlias: endrowAlias,
             }
         })
         // 恢复到初始状态

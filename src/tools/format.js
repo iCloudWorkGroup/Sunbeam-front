@@ -231,21 +231,37 @@ export function pathToStruct({
 
 export function parsePropStruct(cell, formatObj, texts) {
     let fixObj = { content: {}}
-    fixObj.content.type = formatObj.autoRecType
-    if (!cell || cell.content.type === '' || cell.content.type === 'routine') {
+    fixObj.date = false
+    if (!cell || cell.content.express === '' || cell.content.express === 'General') {
         fixObj.content.alignRowFormat = formatObj.autoAlign
         fixObj.content.express = formatObj.autoRecExpress
         fixObj.content.texts = formatObj.autoRecText
         fixObj.recType = formatObj.autoRecType
     } else {
-        fixObj.content.express = cell.content.express
-        fixObj.recType = cell.content.type
-        fixObj.content.texts = formatObj.autoRecText
-        if (cell.content.type === fixObj.content.type) {
-            fixObj.content.alignRowFormat = formatObj.autoAlign
+        if (cell.content.express === '@') {
+            fixObj.content.texts = texts
+            fixObj.content.alignRowFormat = 'left'
+        } else if ((cell.content.type === 'number' || cell.content.type === 'percent' || cell.content.type === 'currency') && formatObj.autoRecType === 'date') {
+            fixObj.content.texts = 0
+            fixObj.content.alignRowFormat = 'right'
+        } else if (cell.content.type === 'date' && (formatObj.autoRecType === 'number' || formatObj.autoRecType === 'percent' || formatObj.autoRecType === 'currency')) {
+            if (cell.content.express === 'm/d/yy') {
+                fixObj.content.texts = '1970/1/1'
+            }
+            if (cell.content.express === 'yyyy"年"m"月"d"日"') {
+                fixObj.content.texts = '1970年1月1日'
+            }
+            if (cell.content.express === 'yyyy"年"m"月"') {
+                fixObj.content.texts = '1970年1月'
+            }
+            fixObj.content.alignRowFormat = 'right'
+            fixObj.date = true
         } else {
-            fixObj.content.alignRowFormat = cell.content.alignRowFormat
+            fixObj.content.alignRowFormat = formatObj.autoAlign
+            fixObj.content.texts = formatObj.autoRecText
         }
+        fixObj.content.express = cell.content.express
+        fixObj.content.type = cell.content.type
     }
     return fixObj
 }
@@ -256,7 +272,6 @@ export function parseType(texts) {
         autoRecType: 'routine',
         autoRecText: texts,
         autoAlign: 'right',
-        date: false
     }
     if (isPercent(texts)) {
         formatObj.autoRecExpress = '0.00%'
@@ -284,7 +299,6 @@ export function parseType(texts) {
         } else {
             formatObj.autoRecExpress = 'yyyy"年"m"月"'
         }
-        formatObj.date = true
     } else {
         formatObj.autoRecType = 'text'
     }

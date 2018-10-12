@@ -189,14 +189,12 @@ export default {
                 let express = fixProp.content.express
                 let fixText = fixProp.content.texts
                 propStruct.content = fixProp.content
+                rules = parseExpress(express)
+                date = fixProp.date
                 if (express !== '@') {
                     rules = parseExpress(express)
                     date = formatObj.date
-                    if (date && fixProp.recType !== 'date') {
-                        propStruct.content.displayTexts = fixText
-                    } else {
-                        propStruct.content.displayTexts = parseText(fixText)
-                    }
+                    propStruct.content.displayTexts = parseText(fixText)
                 } else {
                     propStruct.content.displayTexts = fixText
                 }

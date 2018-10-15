@@ -632,7 +632,7 @@ export default {
         })
         // 当前行不为第一行时, 以前一行单元格模板插入/修改单元格occupy、alias、texts、displayTexts
         if (index !== 0) {
-            cells = getters.cellsByVertical({
+            cells = getters.cellsByOpr({
                 startColIndex: 0,
                 startRowIndex: index - 1,
                 endColIndex: -1,
@@ -741,7 +741,7 @@ export default {
             })
         }
         let updateCellInfo = []
-        let cells = getters.cellsByVertical({
+        let cells = getters.cellsByOpr({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: -1,
@@ -868,7 +868,7 @@ export default {
         dispatch
     }, sort) {
         let index = getters.getRowIndexBySort(sort)
-        let cells = getters.cellsByVertical({
+        let cells = getters.cellsByOpr({
             startRowIndex: index,
             startColIndex: 0,
             endColIndex: -1,

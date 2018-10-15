@@ -21,8 +21,8 @@ import {
 import {
     parseExpress,
     formatText,
-    isNum,
-    isDate, parseType,
+    isNum, isDate,
+    parseType, parseAddAglin, parseText,
     parsePropStruct
 } from '../../../tools/format'
 import extend from '../../../util/extend'
@@ -527,9 +527,9 @@ export default {
         let wholePosi = coordinate === false ?
             select.wholePosi :
             coordinate
-        if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
-            throw new Error('index out of loaded arrange')
-        }
+        // if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
+        //     throw new Error('index out of loaded arrange')
+        // }
         let values = value.split('-')
         let format = values[0]
         let express = values[1]
@@ -560,10 +560,10 @@ export default {
                 express
             }
         }
-        // let cols = getters.allCols
-        // let rows = getters.allRows
-        // endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
-        // endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+        let cols = getters.allCols
+        let rows = getters.allRows
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         if (endRowIndex === -1) {
             dispatch(COLS_OPERCOLS, {
                 startIndex: startColIndex,
@@ -591,7 +591,7 @@ export default {
                     if (idx !== -1) {
                         if (!avoidRepeat[idx]) {
                             avoidRepeat[idx] = true
-                            let display = parseText(cells[idx])
+                            let display = parseText(cells[idx], format, rules, express)
                             let updateProps = extend(props, display)
                             commit(mutationTypes.UPDATE_CELL, {
                                 idx,
@@ -610,78 +610,6 @@ export default {
                     }
                 }
             }
-        }
-        function parseAddAglin() {
-            let align
-            if (format === 'text') {
-                align = {
-                    content: {
-                        alignRowFormat: 'left'
-                    }
-                }
-            } else if (format === 'number' || format === 'percent' || format === 'currency' || format === 'routine' || format === 'data') {
-                align = {
-                    content: {
-                        alignRowFormat: 'right'
-                    }
-                }
-            }
-            return align
-        }
-        function parseText(cell) {
-            let texts = cell.content.texts
-            let displayTexts = texts
-            let alignRowFormat
-            // 强制修改文本内容
-            if (format === 'number' || format === 'percent' || format === 'currency') {
-                if (isDate(texts)) {
-                    texts = 0
-                }
-                if (isNum(texts)) {
-                    texts = texts - 0
-                    displayTexts = formatText(rules, parseFloat(texts, 10))
-                }
-            } else if (format === 'routine') {
-                if (isDate(texts)) {
-                    displayTexts = formatText(rules, texts)
-                } else if (isNum(texts)) {
-                    texts = texts - 0
-                    displayTexts = formatText(rules, parseFloat(texts, 10))
-                }
-            } else if (format === 'date') {
-                if (isNum(texts)) {
-                    if (express === 'm/d/yy') {
-                        texts = '1970/1/1'
-                    }
-                    if (express === 'yyyy"年"m"月"d"日"') {
-                        texts = '1970年1月1日'
-                    }
-                    if (express === 'yyyy"年"m"月"') {
-                        texts = '1970年1月'
-                    }
-                }
-                if (format === 'date' && isDate(texts)) {
-                    displayTexts = formatText(rules, texts)
-                }
-            }
-            // 判断对齐方式
-            if (format === 'text') {
-                alignRowFormat = 'left'
-            } else if ((format === 'number' || format === 'percent' || format === 'currency' || format === 'routine') && (isNum(texts) || texts === '')) {
-                alignRowFormat = 'right'
-            } else if ((format === 'date' || format === 'routine') && (isDate(texts) || texts === '')) {
-                alignRowFormat = 'right'
-            } else {
-                alignRowFormat = 'left'
-            }
-
-            return extend({
-                content: {
-                    texts,
-                    displayTexts,
-                    alignRowFormat
-                }
-            })
         }
     },
     async A_CELLS_INNERPASTE({

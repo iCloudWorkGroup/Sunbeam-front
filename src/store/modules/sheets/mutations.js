@@ -114,7 +114,8 @@ export default {
             left: 0
         }
         state.el = {
-            offsetWidth: 0
+            offsetWidth: 0,
+            offsetHeight: 0
         }
 
         // 当前表格的最大行、列的别名和像素

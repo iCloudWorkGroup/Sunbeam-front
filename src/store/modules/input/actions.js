@@ -169,6 +169,8 @@ export default {
             endColIndex: colIndex,
             endRowIndex: rowIndex
         })[0]
+        // let row = getters.allRows[rowIndex].props.content
+        // let col = getters.allCols[colIndex].props.content
         if (cell) {
             endcolAlias = cell.occupy.col[cell.occupy.col.length - 1]
             endrowAlias = cell.occupy.row[cell.occupy.row.length - 1]

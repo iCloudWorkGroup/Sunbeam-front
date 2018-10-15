@@ -1,6 +1,6 @@
 import Sunbeam from './api/sunbeam'
-import send from './util/send'
-import config from './config'
+// import send from './util/send'
+// import config from './config'
 let ss = new Sunbeam({
     root: '.table',
     toolbar: '.tools'
@@ -29,19 +29,7 @@ ss.addEventListener('mousedown', function (e) {
     // console.log(e)
 })
 document.getElementById('dd').addEventListener('click', function () {
-    send({
-        url: config.url.clean,
-        body: JSON.stringify({
-            coordinate: [
-                {
-                    startCol: 3,
-                    endCol: 5,
-                    startRow: 2,
-                    endRow: 3
-                }
-            ]
-        })
-    })
+    ss.reload()
 })
 document.getElementById('aa').addEventListener('click', function () {
     ss.rowCancelHide('1', '1')

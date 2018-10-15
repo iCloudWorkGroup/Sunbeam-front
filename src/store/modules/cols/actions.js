@@ -118,7 +118,7 @@ export default {
                 colPixel: max.colPixel + adjustWidth
             })
         }
-        let cells = getters.cellsByVertical({
+        let cells = getters.cellsByOpr({
             startColIndex: index,
             startRowIndex: 0,
             endColIndex: -1,
@@ -264,7 +264,7 @@ export default {
         dispatch
     }, sort) {
         let index = getters.getColIndexBySort(sort)
-        let cells = getters.cellsByVertical({
+        let cells = getters.cellsByOpr({
             startColIndex: index,
             startRowIndex: 0,
             endColIndex: -1,
@@ -987,7 +987,7 @@ export default {
         let insertColLeft = insertCol.left
         let cells
 
-        cells = getters.cellsByVertical({
+        cells = getters.cellsByOpr({
             startColIndex: index,
             startRowIndex: 0,
             endColIndex: -1,
@@ -1106,7 +1106,7 @@ export default {
         })
         // 当前行不为第一列时, 以前一列单元格模板插入/修改单元格occupy、alias、texts、displayTexts
         if (index !== 0) {
-            cells = getters.cellsByVertical({
+            cells = getters.cellsByOpr({
                 startColIndex: index - 1,
                 startRowIndex: 0,
                 endColIndex: index - 1,

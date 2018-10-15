@@ -1,3 +1,5 @@
+import extend from '../util/extend'
+
 export function parseExpress(str) {
     let localStr = str
     let keyRegs = [{
@@ -229,14 +231,26 @@ export function pathToStruct({
     return propStruct
 }
 
-export function parsePropStruct(cell, formatObj, texts) {
+export function parsePropStruct(cell, formatObj, texts, col, row) {
     let fixObj = { content: {}}
     fixObj.date = false
     if (!cell || cell.content.express === '' || cell.content.express === 'General') {
+        // if ((!col.express || col.express === '' || col.express === 'General') && (!row.express || row.express === '' || row.express === 'General')) {
         fixObj.content.alignRowFormat = formatObj.autoAlign
         fixObj.content.express = formatObj.autoRecExpress
         fixObj.content.texts = formatObj.autoRecText
         fixObj.recType = formatObj.autoRecType
+        // } else if (col.express) {
+        //     fixObj.content.alignRowFormat = formatObj.autoAlign
+        //     fixObj.content.express = col.express
+        //     fixObj.content.texts = formatObj.autoRecText
+        //     fixObj.recType = col.type
+        // } else {
+        //     fixObj.content.alignRowFormat = formatObj.autoAlign
+        //     fixObj.content.express = row.express
+        //     fixObj.content.texts = formatObj.autoRecText
+        //     fixObj.recType = row.type
+        // }
     } else {
         if (cell.content.express === '@') {
             fixObj.content.texts = texts
@@ -284,7 +298,7 @@ export function parseType(texts) {
         formatObj.autoRecExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
         formatObj.autoRecType = 'currency'
         formatObj.autoRecText = Number(texts.replace(/\$|¥/, '')).toString()
-        if (formatObj.autoRecText.toString().indexOf('.') > -1) {
+        if (formatObj.autoRecText.indexOf('.') > -1) {
             formatObj.autoRecText = parseFloat(formatObj.autoRecText).toFixed(2)
         }
     } else if (isNum(texts)) {
@@ -303,4 +317,108 @@ export function parseType(texts) {
         formatObj.autoRecType = 'text'
     }
     return formatObj
+}
+
+
+export function parseAddAglin(format) {
+    let align
+    if (format === 'text') {
+        align = {
+            content: {
+                alignRowFormat: 'left'
+            }
+        }
+    } else if (format === 'number' || format === 'percent' || format === 'currency' || format === 'routine' || format === 'data') {
+        align = {
+            content: {
+                alignRowFormat: 'right'
+            }
+        }
+    }
+    return align
+}
+
+export function parseText(cell, format, rules, express) {
+    let texts = cell.content.texts
+    let displayTexts = texts
+    let alignRowFormat
+    let fixFormat = format
+    let fixExpress = express
+    let fixRules = rules
+    // 强制修改文本内容
+    if (format === 'number' || format === 'percent' || format === 'currency') {
+        if (isDate(texts)) {
+            texts = 0
+        }
+        if (isNum(texts)) {
+            texts = texts - 0
+            displayTexts = formatText(rules, parseFloat(texts, 10))
+        }
+        if (isCurrency(texts)) {
+            texts = Number(texts.replace(/\$|¥/, '')).toString()
+            displayTexts = formatText(rules, parseFloat(texts, 10))
+        }
+        if (isPercent(texts)) {
+            texts = (texts.replace(/\%/, '') / 100).toString()
+            displayTexts = formatText(rules, parseFloat(texts, 10))
+        }
+    } else if (format === 'routine') {
+        if (isDate(texts)) {
+            displayTexts = formatText(rules, texts)
+        } else if (isNum(texts)) {
+            texts = texts - 0
+            displayTexts = formatText(rules, parseFloat(texts, 10))
+        } else if (isCurrency(texts)) {
+            fixFormat = 'currency'
+            if (texts.indexOf('$') > -1) {
+                fixExpress = '$#,##0.00'
+            } else {
+                fixExpress = '¥#,##0.00'
+            }
+            texts = Number(texts.replace(/\$|¥/, '')).toString()
+            fixRules = parseExpress(fixFormat + '-' + fixExpress)
+            displayTexts = formatText(fixRules, parseFloat(texts, 10))
+        } else if (isPercent(texts)) {
+            fixFormat = 'percent'
+            fixExpress = '0.00%'
+            texts = (texts.replace(/\%/, '') / 100).toString()
+            fixRules = parseExpress(fixFormat + '-' + fixExpress)
+            displayTexts = formatText(fixRules, parseFloat(texts, 10))
+        }
+    } else if (format === 'date') {
+        if (isNum(texts)) {
+            if (express === 'm/d/yy') {
+                texts = '1970/1/1'
+            }
+            if (express === 'yyyy"年"m"月"d"日"') {
+                texts = '1970年1月1日'
+            }
+            if (express === 'yyyy"年"m"月"') {
+                texts = '1970年1月'
+            }
+        }
+        if (isDate(texts)) {
+            displayTexts = formatText(rules, texts)
+        }
+    }
+    // 判断对齐方式
+    if (fixFormat === 'text') {
+        alignRowFormat = 'left'
+    } else if ((fixFormat === 'number' || fixFormat === 'percent' || fixFormat === 'currency' || fixFormat === 'routine') && (isNum(texts) || texts === '')) {
+        alignRowFormat = 'right'
+    } else if ((fixFormat === 'date' || fixFormat === 'routine') && (isDate(texts) || texts === '')) {
+        alignRowFormat = 'right'
+    } else {
+        alignRowFormat = 'left'
+    }
+
+    return extend({
+        content: {
+            texts,
+            displayTexts,
+            alignRowFormat,
+            type: fixFormat,
+            express: fixExpress
+        }
+    })
 }

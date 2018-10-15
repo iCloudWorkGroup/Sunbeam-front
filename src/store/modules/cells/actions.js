@@ -43,7 +43,10 @@ export default {
         commit,
         state,
         getters
-    }, props) {
+    }, {
+        props,
+        flag = true
+    }) {
         let cells = []
         if (!Array.isArray(props)) {
             cells.push(props)
@@ -66,8 +69,13 @@ export default {
             let rowProp = rows[startRowIndex].props
             let colProp = cols[startColIndex].props
             // 新增单元格先去判断有无对应的行列属性
-            let fixedCell = extend(template, rowProp)
-            fixedCell = extend(fixedCell, colProp)
+            let fixedCell
+            if (flag) {
+                fixedCell = extend(template, rowProp)
+                fixedCell = extend(fixedCell, colProp)
+            } else {
+                fixedCell = extend(template, cell)
+            }
             fixedCell = extend(fixedCell, cell)
             // 从occupy转成为单元格的盒模型属性
             // 用于处理合并单元格的情况
@@ -288,12 +296,14 @@ export default {
                         }
                     }
                 } else {
-                    dispatch('A_CELLS_ADD', extend(propStruct, {
-                        occupy: {
-                            col: [colAlias],
-                            row: [rowAlias]
-                        }
-                    }))
+                    dispatch('A_CELLS_ADD', {
+                        props: extend(propStruct, {
+                            occupy: {
+                                col: [colAlias],
+                                row: [rowAlias]
+                            }
+                        }),
+                    })
                 }
             }
         }
@@ -439,7 +449,9 @@ export default {
             col: cols
         }
         dispatch(A_CELLS_DESTORY, cells)
-        dispatch('A_CELLS_ADD', templateCell)
+        dispatch('A_CELLS_ADD', {
+            props: templateCell
+        })
     },
     async [A_CELLS_SPLIT]({
         rootState,
@@ -511,7 +523,9 @@ export default {
                 dispatch(A_CELLS_DESTORY, [cell])
             }
         })
-        dispatch('A_CELLS_ADD', insertCells)
+        dispatch('A_CELLS_ADD', {
+            props: insertCells
+        })
     },
     [CELLS_FORMAT]({
         commit,
@@ -601,12 +615,14 @@ export default {
                     } else {
                         let align = parseAddAglin()
                         props.content.alignRowFormat = align
-                        dispatch('A_CELLS_ADD', extend(props, {
-                            occupy: {
-                                col: [colAlias],
-                                row: [rowAlias]
-                            }
-                        }))
+                        dispatch('A_CELLS_ADD', {
+                            props: extend(props, {
+                                occupy: {
+                                    col: [colAlias],
+                                    row: [rowAlias]
+                                }
+                            })
+                        })
                     }
                 }
             }
@@ -715,7 +731,9 @@ export default {
             })
             addCells.push(addCell)
         })
-        dispatch('A_CELLS_ADD', addCells)
+        dispatch('A_CELLS_ADD', {
+            props: addCells
+        })
         if (cache.clipState === 'cut') {
             dispatch('A_CELLS_DESTORY', clipCells)
         }
@@ -806,6 +824,10 @@ export default {
             let nowCell
             let colAlias = cols[cell.colRelative + startColIndex].alias
             let rowAlias = rows[cell.rowRelative + startRowIndex].alias
+            let rowIndex = getters.rowIndexByAlias(rowAlias)
+            let colIndex = getters.colIndexByAlias(colAlias)
+            let row = getters.allRows[rowIndex].props.content
+            let col = getters.allCols[colIndex].props.content
             let idx = getters.IdxByRow(colAlias, rowAlias)
             if (idx !== -1) {
                 nowCell = cells[idx]
@@ -816,18 +838,16 @@ export default {
                 // 修正单元格对齐方式
                 propStruct.content.alignRowFormat = 'left'
             } else {
-                let fixProp = parsePropStruct(nowCell, formatObj, cell.text)
+                let fixProp = parsePropStruct(nowCell, formatObj, cell.text, row, col)
                 let express = fixProp.content.express
                 let fixText = fixProp.content.texts
                 propStruct.content = fixProp.content
+                rules = parseExpress(express)
+                date = fixProp.date
                 if (express !== '@') {
                     rules = parseExpress(express)
                     date = formatObj.date
-                    if (date && fixProp.content.type !== 'date') {
-                        propStruct.content.displayTexts = fixText
-                    } else {
-                        propStruct.content.displayTexts = parseText(fixText)
-                    }
+                    propStruct.content.displayTexts = parseText(fixText)
                 } else {
                     propStruct.content.displayTexts = fixText
                 }

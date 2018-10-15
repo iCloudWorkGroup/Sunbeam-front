@@ -640,17 +640,19 @@ export default {
             })
             cells.forEach((item, index) => {
                 if (item.occupy.row.length === 1) {
-                    dispatch('A_CELLS_ADD', extend(item, {
-                        alias: null,
-                        content: {
-                            texts: null,
-                            displayTexts: null
-                        },
-                        occupy: {
-                            col: item.occupy.col,
-                            row: [insertRow.alias]
-                        }
-                    }))
+                    dispatch('A_CELLS_ADD', {
+                        props: extend(item, {
+                            alias: null,
+                            content: {
+                                texts: null,
+                                displayTexts: null
+                            },
+                            occupy: {
+                                col: item.occupy.col,
+                                row: [insertRow.alias]
+                            }
+                        })
+                    })
                 }
             })
         }
@@ -686,7 +688,9 @@ export default {
                     })
                 }
             })
-            dispatch(actionTypes.A_CELLS_ADD, insertCellList)
+            dispatch(actionTypes.A_CELLS_ADD, {
+                props: insertCellList
+            })
         }
     },
     [actionTypes.ROWS_ADJUSTHEIGHT]({

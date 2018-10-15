@@ -58,7 +58,10 @@ export default {
             })
             dispatch(ROWS_ADD, rows)
             dispatch(COLS_ADD, cols)
-            dispatch('A_CELLS_ADD', cells)
+            dispatch('A_CELLS_ADD', {
+                props: cells,
+                flag: false
+            })
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,

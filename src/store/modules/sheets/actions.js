@@ -479,7 +479,10 @@ export default {
                     })
                 }
                 if (data.cells.length !== 0) {
-                    dispatch(actionTypes.A_CELLS_ADD, data.cells)
+                    dispatch(actionTypes.A_CELLS_ADD, {
+                        props: data.cells,
+                        flag: false
+                    })
                 }
                 let backRowAlias = rows[rows.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {
@@ -858,7 +861,10 @@ export default {
                     })
                 }
                 if (data.cells.length !== 0) {
-                    dispatch(actionTypes.A_CELLS_ADD, data.cells)
+                    dispatch(actionTypes.A_CELLS_ADD, {
+                        props: data.cells,
+                        flag: false
+                    })
                 }
                 let backColAlias = cols[cols.length - 1].alias
                 commit('M_SHEETS_ADD_LOADED', {

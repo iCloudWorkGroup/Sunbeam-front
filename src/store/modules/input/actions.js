@@ -169,8 +169,8 @@ export default {
             endColIndex: colIndex,
             endRowIndex: rowIndex
         })[0]
-        // let row = getters.allRows[rowIndex].props.content
-        // let col = getters.allCols[colIndex].props.content
+        let row = getters.allRows[rowIndex].props.content
+        let col = getters.allCols[colIndex].props.content
         if (cell) {
             endcolAlias = cell.occupy.col[cell.occupy.col.length - 1]
             endrowAlias = cell.occupy.row[cell.occupy.row.length - 1]
@@ -187,7 +187,7 @@ export default {
                 // 修正单元格对齐方式
                 propStruct.content.alignRowFormat = 'left'
             } else {
-                let fixProp = parsePropStruct(cell, formatObj, texts)
+                let fixProp = parsePropStruct(cell, formatObj, texts, row, col)
                 let express = fixProp.content.express
                 let fixText = fixProp.content.texts
                 propStruct.content = fixProp.content

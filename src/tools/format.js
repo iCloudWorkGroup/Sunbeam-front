@@ -231,41 +231,43 @@ export function pathToStruct({
     return propStruct
 }
 
-export function parsePropStruct(cell, formatObj, texts, col, row) {
+export function parsePropStruct(cell, formatObj, texts, row, col) {
     let fixObj = { content: {}}
     fixObj.date = false
-    if (!cell || cell.content.express === '' || cell.content.express === 'General') {
-        // if ((!col.express || col.express === '' || col.express === 'General') && (!row.express || row.express === '' || row.express === 'General')) {
+    if ((!cell || cell.content.express === '' || cell.content.express === 'General') &&
+        (col.express === '' || col.express === 'General') &&
+        (row.express === '' || row.express === 'General')) {
         fixObj.content.alignRowFormat = formatObj.autoAlign
         fixObj.content.express = formatObj.autoRecExpress
         fixObj.content.texts = formatObj.autoRecText
         fixObj.recType = formatObj.autoRecType
-        // } else if (col.express) {
-        //     fixObj.content.alignRowFormat = formatObj.autoAlign
-        //     fixObj.content.express = col.express
-        //     fixObj.content.texts = formatObj.autoRecText
-        //     fixObj.recType = col.type
-        // } else {
-        //     fixObj.content.alignRowFormat = formatObj.autoAlign
-        //     fixObj.content.express = row.express
-        //     fixObj.content.texts = formatObj.autoRecText
-        //     fixObj.recType = row.type
-        // }
     } else {
-        if (cell.content.express === '@') {
+        let express
+        let type
+        if (cell) {
+            express = cell.content.express
+            type = cell.content.type
+        } else if (col.express !== 'General') {
+            express = col.express
+            type = col.type
+        } else {
+            express = row.express
+            type = row.type
+        }
+        if (express === '@') {
             fixObj.content.texts = texts
             fixObj.content.alignRowFormat = 'left'
-        } else if ((cell.content.type === 'number' || cell.content.type === 'percent' || cell.content.type === 'currency') && formatObj.autoRecType === 'date') {
+        } else if ((type === 'number' || type === 'percent' || type === 'currency') && formatObj.autoRecType === 'date') {
             fixObj.content.texts = 0
             fixObj.content.alignRowFormat = 'right'
-        } else if (cell.content.type === 'date' && (formatObj.autoRecType === 'number' || formatObj.autoRecType === 'percent' || formatObj.autoRecType === 'currency')) {
-            if (cell.content.express === 'm/d/yy') {
+        } else if (type === 'date' && (formatObj.autoRecType === 'number' || formatObj.autoRecType === 'percent' || formatObj.autoRecType === 'currency')) {
+            if (express === 'm/d/yy') {
                 fixObj.content.texts = '1970/1/1'
             }
-            if (cell.content.express === 'yyyy"年"m"月"d"日"') {
+            if (express === 'yyyy"年"m"月"d"日"') {
                 fixObj.content.texts = '1970年1月1日'
             }
-            if (cell.content.express === 'yyyy"年"m"月"') {
+            if (express === 'yyyy"年"m"月"') {
                 fixObj.content.texts = '1970年1月'
             }
             fixObj.content.alignRowFormat = 'right'
@@ -274,8 +276,8 @@ export function parsePropStruct(cell, formatObj, texts, col, row) {
             fixObj.content.alignRowFormat = formatObj.autoAlign
             fixObj.content.texts = formatObj.autoRecText
         }
-        fixObj.content.express = cell.content.express
-        fixObj.content.type = cell.content.type
+        fixObj.content.express = express
+        fixObj.content.type = type
     }
     return fixObj
 }

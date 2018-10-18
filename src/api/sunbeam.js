@@ -31,7 +31,18 @@ SpreadSheet.prototype = {
             }.bind(this))
         }
     },
-
+    test(obj) {
+        let toolShow = this.bookVm.$store.state.toolbar.toolShow
+        let fixObj = {}
+        fixObj.font = typeof obj.font !== 'undefined' ? obj.font : toolShow.font
+        fixObj.align = typeof obj.align !== 'undefined' ? obj.align : toolShow.align
+        fixObj.format = typeof obj.format !== 'undefined' ? obj.format : toolShow.format
+        fixObj.frozen = typeof obj.frozen !== 'undefined' ? obj.frozen : toolShow.frozen
+        fixObj.rowcol = typeof obj.rowcol !== 'undefined' ? obj.rowcol : toolShow.rowcol
+        fixObj.hide = typeof obj.hide !== 'undefined' ? obj.hide : toolShow.hide
+        fixObj.comment = typeof obj.comment !== 'undefined' ? obj.comment : toolShow.comment
+        this.bookVm.$store.commit('M_CHANGE_TOOL', fixObj)
+    },
     // 获取字母对应数值
     getLetterNum(str) {
         let num = 0
@@ -625,7 +636,7 @@ SpreadSheet.prototype = {
 
     // 获取冻结状态
     getFrozenState() {
-        console.log('函数被弃置！')
+        return this.bookVm.$store.getters.isFrozen()
     },
 
     // 自适应容器大小，使用js调整spreadsheet容器大小时，调用该方法，触发自适应大小
@@ -860,6 +871,10 @@ SpreadSheet.prototype = {
         }
         let colIdx = this.getLetterNum(c)
         await this.bookVm.$store.dispatch(A_types.COLS_CANCELHIDE, colIdx)
+    },
+
+    changeTool(obj) {
+        this.bookVm.$store.commit('M_CHANGE_TOOL', obj)
     },
 
     // 自定义监听事件

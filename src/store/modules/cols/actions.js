@@ -69,11 +69,19 @@ export default {
     },
     [actionTypes.COLS_ADJUSTWIDTH]({
         dispatch,
+        commit,
         getters
     }, {
         index,
         width
     }) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可调整列宽，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let cols = getters.allCols
         let col = cols[index]
         let limitWidth = width > 5 ? width : 5
@@ -235,8 +243,16 @@ export default {
     },
     [actionTypes.COLS_DELETECOL]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可删除列，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let index = payload
         if (typeof index === 'undefined') {
             let select = getters.selectByType(SELECT)
@@ -518,8 +534,16 @@ export default {
     },
     async [actionTypes.COLS_HIDE]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可隐藏列，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         if (getters.visibleColList().length < 2) {
             return
         }
@@ -721,8 +745,16 @@ export default {
     },
     async [actionTypes.COLS_CANCELHIDE]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可显示列，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let visibleCols = getters.visibleColList()
         let cols = getters.allCols
         let index = payload
@@ -929,8 +961,16 @@ export default {
     },
     [actionTypes.COLS_INSERTCOL]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可插入列，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let index = payload
         if (typeof index === 'undefined') {
             let select = getters.selectByType(getters.activeType)

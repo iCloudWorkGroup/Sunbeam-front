@@ -116,6 +116,14 @@ export default {
             endColIndex: getters.colIndexByAlias(endColAlias),
             endRowIndex: getters.rowIndexByAlias(endRowAlias)
         })
+        if (endRowAlias === 'MAX') {
+            startColIndex = getters.colIndexByAlias(activeColAlias)
+            endColIndex = startColIndex
+        }
+        if (endColAlias === 'MAX') {
+            startRowIndex = getters.rowIndexByAlias(activeRowAlias)
+            endRowIndex = startRowIndex
+        }
         if (startRowIndex === -1 || endRowIndex === -1 || startColIndex === -1 || endColIndex === -1) {
             // throw new Error('index out of loaded arrange')
             if (startColIndex === -1) {

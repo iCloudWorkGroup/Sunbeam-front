@@ -1,6 +1,8 @@
 <template>
     <div class="edit"
          @scroll="tabSurface"
+         @mouseup="updateShowScreen"
+         @mousedown="mousedown"
          :style="{ width, height }">
         <edit-panel
             :row-start="rowStart"
@@ -37,7 +39,10 @@ export default {
             timeoutId: -1,
             toward: null,
             offsetLeft: this.$store.getters.offsetLeft(this.colStart, this.colOver),
-            offsetTop: this.$store.getters.offsetTop(this.rowStart, this.rowOver)
+            offsetTop: this.$store.getters.offsetTop(this.rowStart, this.rowOver),
+            nowTop: '',
+            nowLeft: '',
+            flag: true
         }
     },
     created() {
@@ -129,7 +134,210 @@ export default {
         EditPanel
     },
     methods: {
+        mousedown() {
+            this.flag = false
+            this.nowTop = this.$el.scrollTop
+            this.nowLeft = this.$el.scrollLeft
+        },
+        updateShowScreen() {
+            let scrollLeft = this.$el.scrollLeft
+            let scrollTop = this.$el.scrollTop
+            if (!this.flag) {
+                return
+            }
+            if (this.toward === 'LEFT' || this.toward === 'RIGHT') {
+                let nowSrceen = this.getTransverseSrceen(this.viewLoaded.cols)
+                let screen = this.fixTransverseScreen(scrollLeft)
+                let fixScreen = []
+                if (this.toward === 'LEFT') {
+                    for (let i = 0; i < screen.length; i++) {
+                        fixScreen[i] = screen[i] - 2
+                    }
+                } else {
+                    fixScreen = screen
+                }
+                if (JSON.stringify(nowSrceen) === JSON.stringify(fixScreen)) {
+                    return
+                }
+                for (let i = screen.length - 1; i >= 0; i--) {
+                    let cols = this.fixCols(screen, i)
+                    let rowsMap = this.fixRowMap(this.viewLoaded.rows, cols)
+                    let colsMap = this.fixColMap(this.viewLoaded.rows, cols)
+                    this.viewLoaded.cols = cols
+                    this.viewLoaded.rowMap = rowsMap
+                    this.viewLoaded.colMap = colsMap
+                    this.handleScroll({
+                        scrollLeft,
+                        scrollTop,
+                        toward: this.toward
+                    })
+                }
+            } else if (this.toward === 'UP' || this.toward === 'DOWN') {
+                let nowSrceen = this.getVerticalSrceen(this.viewLoaded.rows)
+                let screen = this.fixVerticalScreen(scrollTop)
+                let fixScreen = []
+                if (this.toward === 'UP') {
+                    for (let i = 0; i < screen.length; i++) {
+                        fixScreen[i] = screen[i] - 2
+                    }
+                } else {
+                    fixScreen = screen
+                }
+                if (JSON.stringify(nowSrceen) === JSON.stringify(fixScreen)) {
+                    return
+                }
+                for (let i = screen.length - 1; i >= 0; i--) {
+                    let rows = this.fixRows(screen, i)
+                    let rowsMap = this.fixRowMap(rows, this.viewLoaded.cols)
+                    let colsMap = this.fixColMap(rows, this.viewLoaded.cols)
+                    this.viewLoaded.rows = rows
+                    this.viewLoaded.rowMap = rowsMap
+                    this.viewLoaded.colMap = colsMap
+                    this.handleScroll({
+                        scrollLeft,
+                        scrollTop,
+                        toward: this.toward
+                    })
+                }
+            } else {
+                return
+            }
+        },
+        getTransverseSrceen(cols) {
+            let loadedCols = this.$store.state.sheets.loaded.cols
+            let nowSrceen = []
+            let startSrceen
+            let endSrceen
+            loadedCols.forEach((item, index) => {
+                if (item === cols[0]) {
+                    startSrceen = index
+                }
+                if (item === cols[cols.length - 1]) {
+                    endSrceen = index - 1
+                }
+            })
+            for (let i = startSrceen; i <= endSrceen; i++) {
+                nowSrceen.push(i)
+            }
+            return nowSrceen
+        },
+        getVerticalSrceen(rows) {
+            let loadedRows = this.$store.state.sheets.loaded.rows
+            let nowSrceen = []
+            let startSrceen
+            let endSrceen
+            loadedRows.forEach((item, index) => {
+                if (item === rows[0]) {
+                    startSrceen = index
+                }
+                if (item === rows[rows.length - 1]) {
+                    endSrceen = index - 1
+                }
+            })
+            for (let i = startSrceen; i <= endSrceen; i++) {
+                nowSrceen.push(i)
+            }
+            return nowSrceen
+        },
+        fixColMap(rows, cols) {
+            let colMap = new Map()
+            for (let j = 1; j < cols.length; j++) {
+                for (let k = 0; k < rows.length; k++) {
+                    // 列Map填充
+                    let colItemMap
+                    if (colMap.get(cols[j]) == null) {
+                        colItemMap = new Map()
+                        colMap.set(cols[j], colItemMap)
+                    } else {
+                        colItemMap = colMap.get(cols[j])
+                    }
+                    colItemMap.set(rows[k], true)
+                }
+            }
+            return colMap
+        },
+        fixRowMap(rows, cols) {
+            let rowMap = new Map()
+            for (let j = 0; j < rows.length; j++) {
+                for (let k = 1; k < cols.length; k++) {
+                    // 列Map填充
+                    let rowItemMap
+                    if (rowMap.get(rows[j]) == null) {
+                        rowItemMap = new Map()
+                        rowMap.set(rows[j], rowItemMap)
+                    } else {
+                        rowItemMap = rowMap.get(rows[j])
+                    }
+                    rowItemMap.set(cols[k], true)
+                }
+            }
+            return rowMap
+        },
+        fixRows(screen, i) {
+            let rows
+            let loadedRows = this.$store.state.sheets.loaded.rows
+            rows = loadedRows.slice(screen[i] - 1, screen[i] + 1)
+            return rows
+        },
+        fixCols(screen, i) {
+            let cols
+            let loadedCols = this.$store.state.sheets.loaded.cols
+            cols = loadedCols.slice(screen[i] - 1, screen[i] + 1)
+            return cols
+        },
+        fixTransverseScreen(scrollLeft) {
+            let limitLeft = scrollLeft - config.scrollBufferWidth
+            limitLeft = limitLeft > 0 ? limitLeft : 0
+            limitLeft += this.offsetLeft
+            let limitRight = limitLeft + this.$el.clientWidth +
+                config.scrollBufferWidth + this.offsetLeft
+            let loadedCols = this.$store.state.sheets.loaded.cols
+            let allCol = this.$store.getters.allCols
+            let screen = []
+            loadedCols.forEach((item, index) => {
+                if (index + 1 > loadedCols.length - 1) {
+                    return
+                }
+                let colStartIdx = this.$store.getters.colIndexByAlias(item)
+                let colEndIdx = this.$store.getters.colIndexByAlias(loadedCols[index + 1])
+                if ((allCol[colStartIdx].left + allCol[colStartIdx].width) <= limitRight && (allCol[colEndIdx].left + allCol[colEndIdx].width) >= limitLeft) {
+                    if (this.toward === 'LEFT') {
+                        screen.push(index + 2)
+                    } else {
+                        screen.push(index)
+                    }
+                }
+            })
+            return screen
+        },
+        fixVerticalScreen(scrollTop) {
+            let limitTop = scrollTop - config.scrollBufferHeight
+            // limitTop 小于等于0，就是最顶端
+            limitTop = limitTop > 0 ? limitTop : 0
+            limitTop += this.offsetTop
+            let limitBottom = limitTop + this.$el.clientHeight +
+                config.scrollBufferHeight + this.offsetTop
+            let loadedRows = this.$store.state.sheets.loaded.rows
+            let allRow = this.$store.getters.allRows
+            let screen = []
+            loadedRows.forEach((item, index) => {
+                if (index + 1 > loadedRows.length - 1) {
+                    return
+                }
+                let rowStartIdx = this.$store.getters.rowIndexByAlias(item)
+                let rowEndIdx = this.$store.getters.rowIndexByAlias(loadedRows[index + 1])
+                if ((allRow[rowStartIdx].top + allRow[rowStartIdx].height) <= limitBottom && (allRow[rowEndIdx].top + allRow[rowEndIdx].height) >= limitTop) {
+                    if (this.toward === 'UP') {
+                        screen.push(index + 2)
+                    } else {
+                        screen.push(index)
+                    }
+                }
+            })
+            return screen
+        },
         tabSurface() {
+            this.flag = true
             let scrollLeft = this.$el.scrollLeft
             let scrollTop = this.$el.scrollTop
             if (this._events['scrollPanel'] != null) {
@@ -147,7 +355,7 @@ export default {
                     scrollTop,
                     toward: this.toward
                 })
-            }.bind(this), 0)
+            }.bind(this), 10)
         },
         handleScroll({
             scrollLeft,

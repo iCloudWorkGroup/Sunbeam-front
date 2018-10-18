@@ -79,6 +79,25 @@ export default {
         commit
     }, type) {
         let select = getters.selectByType('SELECT')
+        let signalSort = select.signalSort
+        let startrow = signalSort.startRow
+        let startcol = signalSort.startCol
+        if (startrow <= 0 || startcol <= 0 || startrow > 30 || startcol > 30) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结区域错误！只可在2-30行/列区域内冻结',
+                show: true
+            })
+            return
+        }
+        let rows = getters.allRows
+        let cols = getters.allCols
+        if (rows[startrow - 1].hidden || cols[startcol - 1].hidden) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结前一行/列不可为隐藏！',
+                show: true
+            })
+            return
+        }
         send({
             url: config.url.frozen,
             body: JSON.stringify({

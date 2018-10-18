@@ -49,8 +49,11 @@ const state = {
             row: null,
             col: null
         }
+    },
+    prompt: {
+        show: false,
+        texts: ''
     }
-
 }
 
 export default {

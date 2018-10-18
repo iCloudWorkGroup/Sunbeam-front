@@ -875,8 +875,16 @@ export default {
     },
     async [CELLS_WORDWRAP]({
         dispatch,
+        commit,
         getters
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可调整换行，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let startColIndex
         let startRowIndex
         let endColIndex

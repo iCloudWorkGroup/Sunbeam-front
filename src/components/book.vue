@@ -6,12 +6,13 @@
             <sheet></sheet>
             <sheet-sider/>
         </div>
-        <!--<div class="loadmark" v-show="show"></div>-->
+        <prompt-box v-show="show"></prompt-box>
     </div>
 </template>
 <script type="text/javascript">
 import Sheet from './sheet.vue'
 import SheetSider from './sheet-sider.vue'
+import PromptBox from './prompt-box.vue'
 import {
     unit
 } from '../filters/unit'
@@ -31,21 +32,22 @@ export default {
     },
     components: {
         Sheet,
-        SheetSider
+        SheetSider,
+        PromptBox
     },
     computed: {
         rootSelector() {
             return this.$store.state.rootSelector.replace(/\.|\#/, '')
         },
         show() {
-            return this.$store.state.loading
+            return this.$store.state.sheets.prompt.show
         },
         width() {
             return unit(this.$store.getters.offsetWidth)
         },
         height() {
             return unit(this.$store.getters.offsetHeight)
-        }
+        },
     },
     beforeDestroy() {
         this.$store.commit(M_UPDATE_LOAD, true)

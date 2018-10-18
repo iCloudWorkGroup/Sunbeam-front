@@ -61,6 +61,51 @@ function caclBorder({
         [marginName]: unit(margin)
     }
 }
+// function caclFixBorder({
+//     type
+// }, {
+//     colorName,
+//     widthName,
+//     paddingName,
+//     marginName
+// }) {
+//     let color
+//     let width
+//     let padding
+//     let margin
+//     /**
+//      * type代表边框的类型，
+//      * 0, 无边框
+//      * 1, 细边框
+//      * 2, 粗边框
+//      */
+//     switch (type) {
+//         case 0:
+//             width = 1
+//             color = 'transparent'
+//             padding = 1
+//             margin = 1
+//             break
+//         case 1:
+//             width = 1
+//             color = '#000'
+//             padding = 1
+//             margin = 1
+//             break
+//         case 2:
+//             width = 1
+//             color = '#000'
+//             padding = 1
+//             margin = 1
+//             break
+//     }
+//     return {
+//         [widthName]: unit(width),
+//         [colorName]: color,
+//         [paddingName]: unit(padding),
+//         [marginName]: unit(margin)
+//     }
+// }
 export default {
     props: ['cell', 'offsetTop', 'offsetLeft'],
     computed: {
@@ -115,6 +160,14 @@ export default {
                 widthName: 'borderLeftWidth',
                 paddingName: 'paddingLeft'
             })
+            if (leftBorder.borderLeftWidth === '2px') {
+                left = left - 1
+                width = width + 1
+            }
+            if (topBorder.borderTopWidth === '2px') {
+                top = top - 1
+                height = height + 1
+            }
             // 为合并单元格且背景色为透明时，处理背景与边框颜色
             if (this.cell.occupy.col.length > 1 || this.cell.occupy.row.length > 1) {
                 if (typeof this.cell.content.background === 'undefined' || this.cell.content.background === 'transparent' || this.cell.content.background === 'rgba(255, 255, 255, 0)') {

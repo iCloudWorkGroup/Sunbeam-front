@@ -54,6 +54,13 @@ export default {
         getters,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可隐藏行，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         if (getters.visibleRowList().length < 2) {
             return
         }
@@ -260,8 +267,16 @@ export default {
     },
     async [actionTypes.ROWS_CANCELHIDE]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可显示行，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let index = payload
         let rows = getters.allRows
         let visibleRows = getters.visibleRowList()
@@ -463,8 +478,16 @@ export default {
     },
     [actionTypes.ROWS_INSERTROW]({
         getters,
+        commit,
         dispatch
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可插入行，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let index = payload
         if (typeof index === 'undefined') {
             let select = getters.selectByType(getters.activeType)
@@ -695,11 +718,19 @@ export default {
     },
     [actionTypes.ROWS_ADJUSTHEIGHT]({
         dispatch,
+        commit,
         getters
     }, {
         index,
         height
     }) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可调整行高，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let rows = getters.allRows
         let row = rows[index]
         let limitHeight = height > 5 ? height : 5
@@ -844,8 +875,16 @@ export default {
     },
     [actionTypes.ROWS_DELETEROW]({
         getters,
+        commit,
         dispatch,
     }, payload) {
+        if (getters.isFrozen()) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '冻结状态下不可删除行，请取消冻结后重试！',
+                show: true
+            })
+            return
+        }
         let index = payload
         if (typeof index === 'undefined') {
             let select = getters.selectByType(SELECT)

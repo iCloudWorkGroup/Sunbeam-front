@@ -67,7 +67,7 @@ export function isPercent(value) {
     return percentReg.test(value)
 }
 export function isCurrency(value) {
-    let currency = /^\$\d+(\.\d+)?$|^¥\d+(\.\d+)?$/
+    let currency = /^\$\d+(\.\d+)?$|^¥\d+(\.\d+)?$|^￥\d+(\.\d+)?$/
     if (value === '' || value == null) {
         return false
     }
@@ -297,9 +297,9 @@ export function parseType(texts) {
             formatObj.autoRecText = formatObj.autoRecText.toFixed(4)
         }
     } else if (isCurrency(texts)) {
-        formatObj.autoRecExpress = texts.indexOf('¥') > -1 ? '¥#,##0.00' : '$#,##0.00'
+        formatObj.autoRecExpress = texts.indexOf('$') > -1 ? '$#,##0.00' : '¥#,##0.00'
         formatObj.autoRecType = 'currency'
-        formatObj.autoRecText = Number(texts.replace(/\$|¥/, '')).toString()
+        formatObj.autoRecText = Number(texts.replace(/\$|¥|￥/, '')).toString()
         if (formatObj.autoRecText.indexOf('.') > -1) {
             formatObj.autoRecText = parseFloat(formatObj.autoRecText).toFixed(2)
         }
@@ -357,7 +357,7 @@ export function parseText(cell, format, rules, express) {
             displayTexts = formatText(rules, parseFloat(texts, 10))
         }
         if (isCurrency(texts)) {
-            texts = Number(texts.replace(/\$|¥/, '')).toString()
+            texts = Number(texts.replace(/\$|¥|￥/, '')).toString()
             displayTexts = formatText(rules, parseFloat(texts, 10))
         }
         if (isPercent(texts)) {
@@ -377,7 +377,7 @@ export function parseText(cell, format, rules, express) {
             } else {
                 fixExpress = '¥#,##0.00'
             }
-            texts = Number(texts.replace(/\$|¥/, '')).toString()
+            texts = Number(texts.replace(/\$|¥|￥/, '')).toString()
             fixRules = parseExpress(fixFormat + '-' + fixExpress)
             displayTexts = formatText(fixRules, parseFloat(texts, 10))
         } else if (isPercent(texts)) {

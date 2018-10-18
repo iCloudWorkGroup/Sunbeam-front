@@ -100,6 +100,10 @@ export default {
     M_UPDATE_OFFSETHEIGHT(state, height) {
         state.el.offsetHeight = height
     },
+    M_UPDATE_PROMPT(state, payload) {
+        state.prompt.texts = payload.texts
+        state.prompt.show = payload.show
+    },
     M_CLEAR_SHEET(state) {
         state.list = []
         state.events = []
@@ -135,6 +139,12 @@ export default {
                 row: null,
                 col: null
             }
+        }
+
+        // 提示栏信息
+        state.prompt = {
+            show: false,
+            texts: ''
         }
     }
 }

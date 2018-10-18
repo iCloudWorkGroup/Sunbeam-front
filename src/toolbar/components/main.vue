@@ -9,25 +9,25 @@
                <!--  <tool-panel title="剪切板">
                     <clip/>
                 </tool-panel> -->
-                <panel title="字体">
+                <panel title="字体" v-show="toolShow.font">
                     <font/>
                 </panel>
-                <panel title="对齐方式">
+                <panel title="对齐方式" v-show="toolShow.align">
                     <align/>
                 </panel>
-                <panel title="数字">
+                <panel title="数字" v-show="toolShow.format">
                     <format/>
                 </panel>
-                <panel title="视图">
+                <panel title="视图" v-show="toolShow.frozen">
                     <frozen/>
                 </panel>
-                <panel title="隐藏">
+                <panel title="隐藏" v-show="toolShow.hide">
                     <hide/>
                 </panel>
-                <panel  title="行列">
+                <panel  title="行列" v-show="toolShow.rowcol">
                     <rowcol/>
                 </panel>
-                <panel  title="批注">
+                <panel  title="批注" v-show="toolShow.comment">
                     <comment/>
                 </panel>
             </ul>
@@ -67,6 +67,9 @@ export default {
     computed: {
         toolbarSelector() {
             return this.$store.state.toolbarSelector.replace(/\.|\#/, '')
+        },
+        toolShow() {
+            return this.$store.state.toolbar.toolShow
         },
     },
     mounted() {

@@ -90,6 +90,7 @@ export default {
     bottom:0;
 }
 .book {
+    line-height: 1;
     position: relative;
     overflow: hidden;
     z-index: 0;

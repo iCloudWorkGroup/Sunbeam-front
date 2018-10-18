@@ -162,11 +162,14 @@ export default {
             endCol: cols[endColIndex] ? cols[endColIndex].sort : -1,
             endRow: rows[endRowIndex] ? rows[endRowIndex].sort : -1
         }
+        if ((signalSort.startCol !== 1 && signalSort.endCol === -1)
+            || (signalSort.startRow !== 1 && signalSort.endRow === -1)) {
+            return
+        }
         let sendArgs = {
             coordinate: [signalSort]
         }
         let fixPropName = propName
-        let direction
         let txt
         switch (propName) {
             case 'wordWrap':
@@ -189,14 +192,6 @@ export default {
                 }, {
                     content: txt
                 })
-                break
-            case 'border.top':
-            case 'border.right':
-            case 'border.bottom':
-            case 'border.left':
-            case 'border.all':
-            case 'border.none':
-                fixBorder()
                 break
             case 'alignRow':
             case 'alignCol':
@@ -235,17 +230,6 @@ export default {
                 txt = txt * 100 + '%'
             }
             return txt
-        }
-        function fixBorder() {
-            fixPropName = 'border'
-            direction = propName.split('.')[1]
-            let line = direction === 'all' || direction === 'none' ?
-                propStruct.border.top :
-                propStruct.border[direction]
-            sendArgs = extend(sendArgs, {
-                direction,
-                line
-            })
         }
         send({
             url: config.url[fixPropName],
@@ -304,6 +288,234 @@ export default {
                             }
                         }),
                     })
+                }
+            }
+        }
+    },
+    /*
+    * 设置单元格边框
+    * */
+    A_CELLS_BORDER({
+        state,
+        commit,
+        dispatch,
+        getters
+    }, {
+        propName,
+        propStruct,
+        coordinate = false
+    }) {
+        let select = coordinate === false ?
+            getters.selectByType(SELECT) : {}
+        let wholePosi = coordinate === false ?
+            select.wholePosi :
+            coordinate
+        let rows = getters.allRows
+        let cols = getters.allCols
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        let signalSort = coordinate === false ? select.signalSort : {
+            startCol: cols[startColIndex].sort,
+            startRow: rows[startRowIndex].sort,
+            endCol: cols[endColIndex] ? cols[endColIndex].sort : -1,
+            endRow: rows[endRowIndex] ? rows[endRowIndex].sort : -1
+        }
+        if ((signalSort.startCol !== 1 && signalSort.endCol === -1)
+            || (signalSort.startRow !== 1 && signalSort.endRow === -1)) {
+            return
+        }
+        let sendArgs = {
+            coordinate: [signalSort]
+        }
+        let fixPropName = propName
+        let direction
+        fixBorder()
+        function fixBorder() {
+            fixPropName = 'border'
+            direction = propName.split('.')[1]
+            let line = direction === 'all' || direction === 'none' ?
+                propStruct.border.top :
+                propStruct.border[direction]
+            sendArgs = extend(sendArgs, {
+                direction,
+                line
+            })
+        }
+        send({
+            url: config.url[fixPropName],
+            body: JSON.stringify(sendArgs)
+        })
+        if (endRowIndex === -1) {
+            dispatch(COLS_OPERCOLS, {
+                startIndex: startColIndex,
+                endIndex: endColIndex,
+                props: propStruct
+            })
+        } else if (endColIndex === -1) {
+            dispatch(ROWS_OPERROWS, {
+                startIndex: startRowIndex,
+                endIndex: endRowIndex,
+                props: propStruct
+            })
+        }
+
+        // 修正参数
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        // 如果有对应的单元格，修改属性
+        // 如果没有对应的单元格，插入单元格
+        let avoidRepeat = {}
+        for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+            for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                let colAlias = cols[i].alias
+                let rowAlias = rows[j].alias
+                let idx = getters.IdxByRow(colAlias, rowAlias)
+                if (idx !== -1) {
+                    if (!avoidRepeat[idx]) {
+                        avoidRepeat[idx] = true
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx,
+                            prop: propStruct
+                        })
+                        if (direction === 'top') {
+                            fixTopCell(idx)
+                        } else if (direction === 'left') {
+                            fixLeftCell(idx)
+                        } else if (direction === 'right') {
+                            fixRightCell(idx)
+                        } else if (direction === 'bottom') {
+                            fixBottomCell(idx)
+                        } else {
+                            fixTopCell(idx)
+                            fixLeftCell(idx)
+                            fixRightCell(idx)
+                            fixBottomCell(idx)
+                        }
+                    }
+                } else {
+                    dispatch('A_CELLS_ADD', {
+                        props: extend(propStruct, {
+                            occupy: {
+                                col: [colAlias],
+                                row: [rowAlias]
+                            }
+                        }),
+                    })
+                }
+            }
+        }
+        function fixBottomCell(idx) {
+            let cells = getters.cells
+            let cell = cells[idx]
+            let rows = getters.allRows
+            let cols = getters.allCols
+            let occupyEndRowIdx = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            if (occupyEndRowIdx > rows.length) {
+                return
+            }
+            let topRow = rows[occupyEndRowIdx + 1]
+            let occupyStartCol = getters.colIndexByAlias(cell.occupy.col[0])
+            let occupyEndCol = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            for (let i = occupyStartCol; i < occupyEndCol + 1; i++) {
+                let cellIdx = getters.IdxByRow(cols[i].alias, topRow.alias)
+                if (cellIdx !== -1) {
+                    if (cells[cellIdx].border.top !== propStruct.border.bottom) {
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx: cellIdx,
+                            prop: {
+                                border: {
+                                    top: 0
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        }
+        function fixTopCell(idx) {
+            let cells = getters.cells
+            let cell = cells[idx]
+            let rows = getters.allRows
+            let cols = getters.allCols
+            let occupyStartRowIdx = getters.rowIndexByAlias(cell.occupy.row[0])
+            if (occupyStartRowIdx === 0) {
+                return
+            }
+            let topRow = rows[occupyStartRowIdx - 1]
+            let occupyStartCol = getters.colIndexByAlias(cell.occupy.col[0])
+            let occupyEndCol = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            for (let i = occupyStartCol; i < occupyEndCol + 1; i++) {
+                let cellIdx = getters.IdxByRow(cols[i].alias, topRow.alias)
+                if (cellIdx !== -1) {
+                    if (cells[cellIdx].border.bottom !== propStruct.border.top) {
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx: cellIdx,
+                            prop: {
+                                border: {
+                                    bottom: 0
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        }
+        function fixLeftCell(idx) {
+            let cells = getters.cells
+            let cell = cells[idx]
+            let rows = getters.allRows
+            let cols = getters.allCols
+            let occupyStartColIdx = getters.colIndexByAlias(cell.occupy.col[0])
+            if (occupyStartColIdx === 0) {
+                return
+            }
+            let leftCol = cols[occupyStartColIdx - 1]
+            let occupyStartRow = getters.rowIndexByAlias(cell.occupy.row[0])
+            let occupyEndRow = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            for (let i = occupyStartRow; i < occupyEndRow + 1; i++) {
+                let cellIdx = getters.IdxByRow(leftCol.alias, rows[i].alias)
+                if (cellIdx !== -1) {
+                    if (cells[cellIdx].border.right !== propStruct.border.left) {
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx: cellIdx,
+                            prop: {
+                                border: {
+                                    right: 0
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        }
+        function fixRightCell(idx) {
+            let cells = getters.cells
+            let cell = cells[idx]
+            let rows = getters.allRows
+            let cols = getters.allCols
+            let occupyEndColIdx = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            if (occupyEndColIdx > cols) {
+                return
+            }
+            let leftCol = rows[occupyEndColIdx + 1]
+            let occupyStartRow = getters.rowIndexByAlias(cell.occupy.row[0])
+            let occupyEndRow = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            for (let i = occupyStartRow; i < occupyEndRow + 1; i++) {
+                let cellIdx = getters.IdxByRow(leftCol.alias, rows[i].alias)
+                if (cellIdx !== -1) {
+                    // fixCells.push(cells[cellIdx])
+                    if (cells[cellIdx].border.left !== propStruct.border.right) {
+                        commit(mutationTypes.UPDATE_CELL, {
+                            idx: cellIdx,
+                            prop: {
+                                border: {
+                                    left: 0
+                                }
+                            }
+                        })
+                    }
                 }
             }
         }

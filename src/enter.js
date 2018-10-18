@@ -29,15 +29,10 @@ ss.addEventListener('mousedown', function (e) {
     // console.log(e)
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.test({
-        rowcol: false,
-        hide: true
-    })
+    ss.setDataSourceState()
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.rowCancelHide('1', '1')
-    ss.rowCancelHide('1', '2')
-    ss.colCancelHide('1', 'A')
+    // ss.
 })
 document.getElementById('clear').addEventListener('click', function () {
     ss.rowHide('1', '1')

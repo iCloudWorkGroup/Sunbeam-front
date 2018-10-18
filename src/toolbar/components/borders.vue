@@ -114,7 +114,7 @@ export default {
             if (direction === 'right') {
                 coordinate.startColAlias = coordinate.endColAlias
             }
-            this.$store.dispatch('A_CELLS_UPDATE', {
+            this.$store.dispatch('A_CELLS_BORDER', {
                 propName: structName,
                 propStruct,
                 coordinate

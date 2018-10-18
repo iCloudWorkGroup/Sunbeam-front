@@ -61,51 +61,6 @@ function caclBorder({
         [marginName]: unit(margin)
     }
 }
-// function caclFixBorder({
-//     type
-// }, {
-//     colorName,
-//     widthName,
-//     paddingName,
-//     marginName
-// }) {
-//     let color
-//     let width
-//     let padding
-//     let margin
-//     /**
-//      * type代表边框的类型，
-//      * 0, 无边框
-//      * 1, 细边框
-//      * 2, 粗边框
-//      */
-//     switch (type) {
-//         case 0:
-//             width = 1
-//             color = 'transparent'
-//             padding = 1
-//             margin = 1
-//             break
-//         case 1:
-//             width = 1
-//             color = '#000'
-//             padding = 1
-//             margin = 1
-//             break
-//         case 2:
-//             width = 1
-//             color = '#000'
-//             padding = 1
-//             margin = 1
-//             break
-//     }
-//     return {
-//         [widthName]: unit(width),
-//         [colorName]: color,
-//         [paddingName]: unit(padding),
-//         [marginName]: unit(margin)
-//     }
-// }
 export default {
     props: ['cell', 'offsetTop', 'offsetLeft'],
     computed: {

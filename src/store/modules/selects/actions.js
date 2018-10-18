@@ -55,14 +55,18 @@ export default {
             endRow: getters.getRowByIndex(endRowIndex).sort
         }
         let physicsBox = {
-            top: rows[startRowIndex].top,
-            left: cols[startColIndex].left,
-            width: cols[endColIndex].width +
-                cols[endColIndex].left -
-                cols[startColIndex].left,
-            height: rows[endRowIndex].height +
-                rows[endRowIndex].top -
-                rows[startRowIndex].top
+            // top: rows[startRowIndex].top,
+            // left: cols[startColIndex].left,
+            // width: cols[endColIndex].width +
+            //     cols[endColIndex].left -
+            //     cols[startColIndex].left,
+            // height: rows[endRowIndex].height +
+            //     rows[endRowIndex].top -
+            //     rows[startRowIndex].top
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0
         }
         let activePosi = {
             rowAlias,

@@ -79,11 +79,11 @@ export default {
                 colAlias: cols[cols.length - 1].alias,
                 rowAlias: rows[rows.length - 1].alias
             })
-            let visibleRows = getters.visibleRowList()
-            let visibleCols = getters.visibleColList()
+            // let visibleRows = getters.visibleRowList()
+            // let visibleCols = getters.visibleColList()
             dispatch(SELECTS_INSERT, {
-                colAlias: visibleCols[0].alias,
-                rowAlias: visibleRows[0].alias
+                colAlias: cols[0].alias,
+                rowAlias: rows[0].alias
             })
             commit('M_INPUT_CREATE')
         })

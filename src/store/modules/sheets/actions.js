@@ -838,6 +838,10 @@ export default {
                     if (i === num - 1) {
                         last = lastCol()
                         addView(last.alias)
+                        commit('M_SHEETS_ADD_LOADED', {
+                            rowAlias: lastRow.alias,
+                            colAlias: rootGetters.allRows[rootGetters.allRows.length - 1].alias,
+                        })
                     }
                 }
                 let select = rootGetters.selectByType('SELECT')

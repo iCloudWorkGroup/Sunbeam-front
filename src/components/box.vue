@@ -66,7 +66,7 @@ export default {
                 left: unit(left),
                 width: unit(width),
                 height: unit(height),
-                fontFamily: physical.family,
+                // fontFamily: physical.family,
                 fontSize: physical.size + 'pt',
                 fontStyle: physical.italic,
                 color: physical.color,

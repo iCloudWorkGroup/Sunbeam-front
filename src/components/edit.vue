@@ -166,6 +166,9 @@ export default {
                     this.viewLoaded.cols = cols
                     this.viewLoaded.rowMap = rowsMap
                     this.viewLoaded.colMap = colsMap
+                    if (cols.length === 0) {
+                        return
+                    }
                     this.handleScroll({
                         scrollLeft,
                         scrollTop,
@@ -190,6 +193,9 @@ export default {
                     let rows = this.fixRows(screen, i)
                     let rowsMap = this.fixRowMap(rows, this.viewLoaded.cols)
                     let colsMap = this.fixColMap(rows, this.viewLoaded.cols)
+                    if (rows.length === 0) {
+                        return
+                    }
                     this.viewLoaded.rows = rows
                     this.viewLoaded.rowMap = rowsMap
                     this.viewLoaded.colMap = colsMap

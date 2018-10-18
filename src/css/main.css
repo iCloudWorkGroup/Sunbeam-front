@@ -319,6 +319,7 @@ textarea {
     padding: 3px;
     z-index: 1000;
     background: #fff;
+    font-family: 'SimSun' !important
 }
 
 

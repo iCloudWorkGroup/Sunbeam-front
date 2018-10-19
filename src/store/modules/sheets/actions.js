@@ -430,7 +430,6 @@ export default {
             if (length >= 10000) {
                 return
             }
-
             let num = config.prestrainHeight / (config.rowHeight + 1)
             if (length + num > 10000) {
                 num = 10000 - length
@@ -446,15 +445,19 @@ export default {
                 for (let i = 0; i < num; i++) {
                     dispatch(actionTypes.ROWS_ADD, [{
                         sort: last.sort + i + 1,
-                        top: last.top + last.height + 1 +
+                        top: last.top + last.height + i + 1 +
                             config.rowHeight * i
                     }])
                     if (i === num - 1) {
                         last = lastRow()
                         addView(last.alias)
                         commit('M_SHEETS_ADD_LOADED', {
-                            rowAlias: rootGetters.allRows[rootGetters.allRows.length - 1].alias,
+                            rowAlias: last.alias,
                             colAlias: lastCol.alias
+                        })
+                        commit('M_SHEETS_UPDATE_FROZEN', {
+                            type: 'ROW',
+                            value: last.alias
                         })
                     }
                 }
@@ -832,7 +835,7 @@ export default {
                 for (let i = 0; i < num; i++) {
                     dispatch(actionTypes.COLS_ADD, [{
                         sort: last.sort + i + 1,
-                        left: last.left + last.width + 1 +
+                        left: last.left + last.width + i + 1 +
                             config.colWidth * i
                     }])
                     if (i === num - 1) {
@@ -840,7 +843,11 @@ export default {
                         addView(last.alias)
                         commit('M_SHEETS_ADD_LOADED', {
                             rowAlias: lastRow.alias,
-                            colAlias: rootGetters.allRows[rootGetters.allRows.length - 1].alias,
+                            colAlias: last.alias,
+                        })
+                        commit('M_SHEETS_UPDATE_FROZEN', {
+                            type: 'COL',
+                            value: last.alias
                         })
                     }
                 }

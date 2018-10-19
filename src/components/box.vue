@@ -197,6 +197,13 @@ export default {
             }
         },
         keydownHandle(e) {
+            if (this.$store.state.sheets.prompt.show) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '',
+                    show: false
+                })
+                return
+            }
             let status = this.$store.getters.inputProps.physical.edit
             let altKey = e.altKey
             let ctrlKey = e.ctrlKey

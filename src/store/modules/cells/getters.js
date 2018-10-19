@@ -238,23 +238,15 @@ export default {
             endRowIndex = startRowIndex,
 
         }) {
-            let rows = getters.visibleRowList()
-            let cols = getters.visibleColList()
             let allRows = getters.allRows
             let allCols = getters.allCols
-            // let endCol = endColIndex === -1 ?
-            //     cols.length - 1 :
-            //     endColIndex
-            // let endRow = endRowIndex === -1 ?
-            //     rows.length - 1 :
-            //     endRowIndex
             let result = []
             let avoidRepeat = {}
 
             let startCol = startColIndex
             let startRow = startRowIndex
-            let endColLen = cols[cols.length - 1].sort
-            let endRowLen = rows[rows.length - 1].sort
+            let endColLen = allCols[allCols.length - 1].sort
+            let endRowLen = allRows[allRows.length - 1].sort
             for (let i = startCol; i <= endColLen; i++) {
                 for (let j = startRow; j <= endRowLen; j++) {
                     let colAlias = allCols[i].alias

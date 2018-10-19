@@ -65,6 +65,7 @@ export default {
                     texts: '冻结状态下不可进行此操作，请取消冻结后重试！',
                     show: true
                 })
+                this.$store.commit(SWITCH_NAME, '')
             } else {
                 let el = e.currentTarget
                 this.opr = el.dataset.opr

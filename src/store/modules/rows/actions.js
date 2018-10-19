@@ -543,7 +543,7 @@ export default {
         let insertRowTop = insertRow.top
         let cells
 
-        cells = getters.cellsByVertical({
+        cells = getters.cellsByOpr({
             startColIndex: 0,
             startRowIndex: index,
             endColIndex: -1,

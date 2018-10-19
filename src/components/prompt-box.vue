@@ -1,8 +1,13 @@
 <template>
-    <div class="prompt">
-        <span>{{texts}}</span>
-        <div class="close-prompt"
-        @click="closePrompt">X</div>
+    <div class="sheets-shadow" @click="closePrompt">
+        <div class="prompt-box">
+            <div class="prompt-img">
+                <img src="../img/error.png" alt="">
+            </div>
+            <div class="prompt-text">
+                {{texts}}
+            </div>
+        </div>
     </div>
 </template>
 <script type="text/javascript">
@@ -23,26 +28,4 @@ export default {
 }
 </script>
 <style type="text/css">
-    .prompt{
-        padding: 20px;
-        text-align: center;
-        background: #888888;
-        width: 400px;
-        position: absolute;
-        left: 50%;
-        transform: translate(-50%, 0);
-        top: 50px;
-        border-radius: 5px;
-    }
-    .close-prompt{
-        text-align: center;
-        width: 20px;
-        height: 20px;
-        background: red;
-        border-radius: 50%;
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        cursor: pointer;
-    }
 </style>

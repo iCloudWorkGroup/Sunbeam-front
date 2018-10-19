@@ -113,6 +113,8 @@ export default {
             }
         },
         startAdjustHandleState(e) {
+
+            this.$store.commit('SWITCH_NAME', '')
             let adjustHandle
             let self = this
 

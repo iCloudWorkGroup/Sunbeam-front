@@ -648,3 +648,53 @@ textarea {
     background: url(../img/loading.gif) 50% 50% no-repeat rgba(255,255,255,0.5);
     z-index: 100;
 }
+
+
+/**
+ * prompt-box
+ */
+
+.sheets-shadow{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+.prompt-box{
+    border: 5px solid #333;
+    height: 50px;
+    background: white;
+    position: absolute;
+    left: 50%;
+    top: 50px;
+    transform: translate(-50%, 0);
+    width: 400px;
+}
+.prompt-img{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+}
+.prompt-img img{
+    width: 100%;
+    height: 100%;
+}
+.prompt-text{
+    color: red;
+    text-align: center;
+    line-height: 50px;
+    font-size: 10pt;
+    width: 350px;
+    height: 50px;
+    position: absolute;
+    left: 50px;
+    top: 0;
+}
+
+/**
+ * end
+ */

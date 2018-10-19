@@ -33,6 +33,9 @@
             </ul>
         </div>
     </div>
+    <div class="sheets-shadow"
+         v-show="show"
+        @click="closePrompt"></div>
 </div>
 </template>
 <script type="text/javascript">
@@ -71,6 +74,9 @@ export default {
         toolShow() {
             return this.$store.state.toolbar.toolShow
         },
+        show() {
+            return this.$store.state.sheets.prompt.show
+        }
     },
     mounted() {
         document.getElementsByTagName('body')[0]
@@ -102,6 +108,14 @@ export default {
                         this.$store.commit(SWITCH_NAME, activeName)
                     }
                 }.bind(this))
+    },
+    methods: {
+        closePrompt() {
+            this.$store.commit('M_UPDATE_PROMPT', {
+                texts: '',
+                show: false
+            })
+        }
     }
 }
 </script>

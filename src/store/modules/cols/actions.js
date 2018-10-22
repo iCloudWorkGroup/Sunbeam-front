@@ -557,6 +557,9 @@ export default {
         }
         let cols = getters.allCols
         let col = cols[index]
+        if (col.hidden) {
+            return
+        }
         dispatch(actionTypes.COLS_EXECHIDE, col.sort)
         await send({
             url: config.url.hidecol,

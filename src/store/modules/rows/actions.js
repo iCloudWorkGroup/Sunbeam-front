@@ -74,6 +74,9 @@ export default {
         }
         let rows = getters.allRows
         let row = rows[index]
+        if (row.hidden) {
+            return
+        }
         dispatch(actionTypes.ROWS_EXECHIDE, row.sort)
         await send({
             url: config.url.hiderow,

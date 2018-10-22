@@ -364,8 +364,11 @@ export default {
         // 修正参数
         endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        // 储存目标单元格站位信息
+        let cellOccupy
         // 如果有对应的单元格，修改属性
         // 如果没有对应的单元格，插入单元格
+        let cells = getters.cells
         let avoidRepeat = {}
         for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
             for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
@@ -379,19 +382,22 @@ export default {
                             idx,
                             prop: propStruct
                         })
+                        cellOccupy = {
+                            occupy: cells[idx].occupy
+                        }
                         if (direction === 'top') {
-                            fixTopCell(idx)
+                            fixTopCell(cellOccupy)
                         } else if (direction === 'left') {
-                            fixLeftCell(idx)
+                            fixLeftCell(cellOccupy)
                         } else if (direction === 'right') {
-                            fixRightCell(idx)
+                            fixRightCell(cellOccupy)
                         } else if (direction === 'bottom') {
-                            fixBottomCell(idx)
+                            fixBottomCell(cellOccupy)
                         } else {
-                            fixTopCell(idx)
-                            fixLeftCell(idx)
-                            fixRightCell(idx)
-                            fixBottomCell(idx)
+                            fixTopCell(cellOccupy)
+                            fixLeftCell(cellOccupy)
+                            fixRightCell(cellOccupy)
+                            fixBottomCell(cellOccupy)
                         }
                     }
                 } else {
@@ -403,21 +409,39 @@ export default {
                             }
                         }),
                     })
+                    cellOccupy = {
+                        occupy: {
+                            col: [colAlias],
+                            row: [rowAlias]
+                        }
+                    }
+                    if (direction === 'top') {
+                        fixTopCell(cellOccupy)
+                    } else if (direction === 'left') {
+                        fixLeftCell(cellOccupy)
+                    } else if (direction === 'right') {
+                        fixRightCell(cellOccupy)
+                    } else if (direction === 'bottom') {
+                        fixBottomCell(cellOccupy)
+                    } else {
+                        fixTopCell(cellOccupy)
+                        fixLeftCell(cellOccupy)
+                        fixRightCell(cellOccupy)
+                        fixBottomCell(cellOccupy)
+                    }
                 }
             }
         }
-        function fixBottomCell(idx) {
-            let cells = getters.cells
-            let cell = cells[idx]
+        function fixBottomCell(cellOccupy) {
             let rows = getters.allRows
             let cols = getters.allCols
-            let occupyEndRowIdx = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            let occupyEndRowIdx = getters.rowIndexByAlias(cellOccupy.occupy.row[cellOccupy.occupy.row.length - 1])
             if (occupyEndRowIdx > rows.length) {
                 return
             }
             let topRow = rows[occupyEndRowIdx + 1]
-            let occupyStartCol = getters.colIndexByAlias(cell.occupy.col[0])
-            let occupyEndCol = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            let occupyStartCol = getters.colIndexByAlias(cellOccupy.occupy.col[0])
+            let occupyEndCol = getters.colIndexByAlias(cellOccupy.occupy.col[cellOccupy.occupy.col.length - 1])
             for (let i = occupyStartCol; i < occupyEndCol + 1; i++) {
                 let cellIdx = getters.IdxByRow(cols[i].alias, topRow.alias)
                 if (cellIdx !== -1) {
@@ -434,18 +458,16 @@ export default {
                 }
             }
         }
-        function fixTopCell(idx) {
-            let cells = getters.cells
-            let cell = cells[idx]
+        function fixTopCell(cellOccupy) {
             let rows = getters.allRows
             let cols = getters.allCols
-            let occupyStartRowIdx = getters.rowIndexByAlias(cell.occupy.row[0])
+            let occupyStartRowIdx = getters.rowIndexByAlias(cellOccupy.occupy.row[0])
             if (occupyStartRowIdx === 0) {
                 return
             }
             let topRow = rows[occupyStartRowIdx - 1]
-            let occupyStartCol = getters.colIndexByAlias(cell.occupy.col[0])
-            let occupyEndCol = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            let occupyStartCol = getters.colIndexByAlias(cellOccupy.occupy.col[0])
+            let occupyEndCol = getters.colIndexByAlias(cellOccupy.occupy.col[cellOccupy.occupy.col.length - 1])
             for (let i = occupyStartCol; i < occupyEndCol + 1; i++) {
                 let cellIdx = getters.IdxByRow(cols[i].alias, topRow.alias)
                 if (cellIdx !== -1) {
@@ -462,18 +484,16 @@ export default {
                 }
             }
         }
-        function fixLeftCell(idx) {
-            let cells = getters.cells
-            let cell = cells[idx]
+        function fixLeftCell(cellOccupy) {
             let rows = getters.allRows
             let cols = getters.allCols
-            let occupyStartColIdx = getters.colIndexByAlias(cell.occupy.col[0])
+            let occupyStartColIdx = getters.colIndexByAlias(cellOccupy.occupy.col[0])
             if (occupyStartColIdx === 0) {
                 return
             }
             let leftCol = cols[occupyStartColIdx - 1]
-            let occupyStartRow = getters.rowIndexByAlias(cell.occupy.row[0])
-            let occupyEndRow = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            let occupyStartRow = getters.rowIndexByAlias(cellOccupy.occupy.row[0])
+            let occupyEndRow = getters.rowIndexByAlias(cellOccupy.occupy.row[cellOccupy.occupy.row.length - 1])
             for (let i = occupyStartRow; i < occupyEndRow + 1; i++) {
                 let cellIdx = getters.IdxByRow(leftCol.alias, rows[i].alias)
                 if (cellIdx !== -1) {
@@ -490,18 +510,16 @@ export default {
                 }
             }
         }
-        function fixRightCell(idx) {
-            let cells = getters.cells
-            let cell = cells[idx]
+        function fixRightCell(cellOccupy) {
             let rows = getters.allRows
             let cols = getters.allCols
-            let occupyEndColIdx = getters.colIndexByAlias(cell.occupy.col[cell.occupy.col.length - 1])
+            let occupyEndColIdx = getters.colIndexByAlias(cellOccupy.occupy.col[cellOccupy.occupy.col.length - 1])
             if (occupyEndColIdx > cols) {
                 return
             }
             let leftCol = rows[occupyEndColIdx + 1]
-            let occupyStartRow = getters.rowIndexByAlias(cell.occupy.row[0])
-            let occupyEndRow = getters.rowIndexByAlias(cell.occupy.row[cell.occupy.row.length - 1])
+            let occupyStartRow = getters.rowIndexByAlias(cellOccupy.occupy.row[0])
+            let occupyEndRow = getters.rowIndexByAlias(cellOccupy.occupy.row[cellOccupy.occupy.row.length - 1])
             for (let i = occupyStartRow; i < occupyEndRow + 1; i++) {
                 let cellIdx = getters.IdxByRow(leftCol.alias, rows[i].alias)
                 if (cellIdx !== -1) {

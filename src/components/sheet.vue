@@ -152,7 +152,7 @@ export default {
             return rowRule.length > 0 ? rowRule[0] : {}
         },
         rowLast() {
-            if (this.frozenMode === 'NO') {
+            if (this.frozenMode === 'NO' || this.frozenMode === 'COL') {
                 let rows = this.$store.getters.allRows
                 return {
                     start: rows[0].alias,
@@ -169,7 +169,7 @@ export default {
             return colRule.length > 0 ? colRule[0] : {}
         },
         colLast() {
-            if (this.frozenMode === 'NO') {
+            if (this.frozenMode === 'NO' || this.frozenMode === 'ROW') {
                 let cols = this.$store.getters.allCols
                 return {
                     start: cols[0].alias,

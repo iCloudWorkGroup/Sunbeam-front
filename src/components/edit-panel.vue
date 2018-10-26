@@ -3,9 +3,9 @@
      @mousedown="locateSelect"
      :style="{ width, height }">
     <col-grid-group
-            :start="colStart"
-            :over="colOver"
-            :offsetLeft="offsetLeft"/>
+        :start="colStart"
+        :over="colOver"
+        :offsetLeft="offsetLeft"/>
     <row-grid-group
         :start="rowStart"
         :over="rowOver"

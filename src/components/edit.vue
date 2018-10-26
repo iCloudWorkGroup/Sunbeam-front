@@ -110,12 +110,12 @@ export default {
             let isFrozen = this.$store.getters.isFrozen()
             let frozenAlias = this.$store.getters.frozenAlias()
             let frozenAliasRow = frozenAlias.row
-            let userView = this.$store.getters.userView()
+            // let userView = this.$store.getters.userView()
             // 是冻结，并且行被冻结
             if (isFrozen && frozenAliasRow != null) {
                 let frozenRow = this.$store.getters.getRowByAlias(
                     frozenAliasRow)
-                let topDistance = frozenRow.top + frozenRow.height - userView.top
+                let topDistance = frozenRow.top + frozenRow.height
                 let neighborRow = this.$store.getters.neighborRowByAlias(frozenAliasRow, 'NEXT')
                 // 如果冻结的行等于这个视图的行结束值，说明是上半部分的视图
                 // 所以, 高度就是topDistance
@@ -452,7 +452,8 @@ export default {
         // this.setOccupy()
         // this.updateUserView()
         // 火狐浏览器 添加鼠标滚轮事件监听
-        if (navigator.userAgent.indexOf('Firefox') > -1) {
+        let userAgent = navigator.userAgent
+        if (userAgent.indexOf('Firefox') > -1) {
             let _this = this
             this.$el.addEventListener('DOMMouseScroll', function (e) {
                 let delta = e.detail

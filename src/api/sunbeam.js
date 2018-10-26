@@ -2,6 +2,9 @@ import * as A_types from '../store/action-types'
 import * as M_types from '../store/mutation-types'
 import App from '../app'
 import {
+    formatText, isDate, isNum,
+    parseExpress, parsePropStruct,
+    parseType,
     pathToStruct
 } from '../tools/format'
 import extend from '../util/extend'
@@ -545,6 +548,16 @@ SpreadSheet.prototype = {
         this.bookVm.$store.dispatch(A_types.A_CELLS_SPLIT, select)
     },
 
+    parseText(date, rules, texts) {
+        let text = texts
+        if (date && isDate(text)) {
+            text = formatText(rules, text)
+        } else if (!date && isNum(text)) {
+            text = formatText(rules, parseFloat(text, 10))
+        }
+        return text
+    },
+
     // 设置单元格文本内容（每次只能设置一个单元格的文本）
     setCellContent(sheetId, text, point) {
         let p
@@ -558,17 +571,43 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        this.setFont(select, {
-            content: {
-                displayTexts: txt,
-                texts: txt
+        let rowIndex = this.bookVm.$store.getters.rowIndexByAlias(select.startRowAlias)
+        let colIndex = this.bookVm.$store.getters.colIndexByAlias(select.startColAlias)
+        let cell = this.bookVm.$store.getters.cellsByTransverse({
+            startColIndex: colIndex,
+            startRowIndex: rowIndex
+        })[0]
+        let propStruct = { content: {}}
+        let rules
+        let date = false
+        let row = this.bookVm.$store.getters.allRows[rowIndex].props.content
+        let col = this.bookVm.$store.getters.allCols[colIndex].props.content
+        let formatObj = parseType(txt)
+        if (formatObj.autoRecType === 'text') {
+            propStruct.content.texts = txt
+            propStruct.content.displayTexts = txt
+            // 修正单元格对齐方式
+            propStruct.content.alignRowFormat = 'left'
+        } else {
+            let fixProp = parsePropStruct(cell, formatObj, txt, row, col)
+            let express = fixProp.content.express
+            let fixText = fixProp.content.texts
+            propStruct.content = fixProp.content
+            rules = parseExpress(express)
+            date = fixProp.date
+            if (express !== '@') {
+                rules = parseExpress(express)
+                date = formatObj.date
+                propStruct.content.displayTexts = this.parseText(date, rules, fixText)
+            } else {
+                propStruct.content.displayTexts = fixText
             }
-        }, 'texts')
+        }
+        this.setFont(select, propStruct, 'texts')
     },
 
     // 冻结窗口
     frozen(sheetId, point) {
-        console.log('empty')
         // let p = this.getPoint(point)
         // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, {
         //     startColIndex: p.startCol,
@@ -580,19 +619,16 @@ SpreadSheet.prototype = {
 
     // 解冻冻结
     unFrozen() {
-        console.log('empty')
         // this.bookVm.$store.dispatch(A_types.SHEET_UNFROZEN)
     },
 
     // 冻结视图区域首列
     colFrozen() {
-        console.log('empty')
         // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, 'firstColFrozen')
     },
 
     // 冻结视图区域首行
     rowFrozen() {
-        console.log('empty')
         // this.bookVm.$store.dispatch(A_types.SHEET_FROZEN, 'firstRowFrozen')
     },
 

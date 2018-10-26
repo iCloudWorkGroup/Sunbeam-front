@@ -78,34 +78,95 @@ export default {
         dispatch,
         commit
     }, type) {
+        let texts = ''
         let select = getters.selectByType('SELECT')
+        let rows = getters.allRows
+        let cols = getters.allCols
         let signalSort = select.signalSort
         let startrow = signalSort.startRow
         let startcol = signalSort.startCol
-        if (startrow <= 0 || startcol <= 0 || startrow > 30 || startcol > 30) {
+        let sendData = {
+            viewRow: 0,
+            viewCol: 0,
+            oprCol: select.signalSort.startCol,
+            oprRow: select.signalSort.startRow
+        }
+        if (type === 'ROW') {
+            if (rows[0].hidden) {
+                texts = '冻结区域错误！首行已经隐藏！'
+            }
+            sendData.oprCol = 0
+            sendData.oprRow = 1
+        } else if (type === 'COL') {
+            if (rows[0].hidden) {
+                texts = '冻结区域错误！首列已经隐藏！'
+            }
+            sendData.oprCol = 1
+            sendData.oprRow = 0
+        } else {
+            if (startrow < 0 || startcol < 0 || startrow > 30 || startcol > 30) {
+                texts = '冻结区域错误！只可在30行/列内冻结'
+            }
+            if (startrow === 0 && startcol === 0) {
+                texts = '冻结区域错误！左上角单元格不可冻结！'
+            }
+            if ((startrow !== 0 && rows[startrow - 1].hidden) || (startcol !== 0 && cols[startcol - 1].hidden)) {
+                texts = '冻结区域错误！冻结前一行/列不可为隐藏！'
+            }
+        }
+        if (texts !== '') {
             commit('M_UPDATE_PROMPT', {
-                texts: '冻结区域错误！只可在2-30行/列区域内冻结',
+                texts,
                 show: true
             })
             return
         }
-        let rows = getters.allRows
-        let cols = getters.allCols
-        if (rows[startrow - 1].hidden || cols[startcol - 1].hidden) {
-            commit('M_UPDATE_PROMPT', {
-                texts: '冻结前一行/列不可为隐藏！',
-                show: true
-            })
-            return
-        }
+        // state.loaded = {
+        //     cols: [],
+        //     rows: [],
+        //     colMap: new Map(),
+        //     rowMap: new Map()
+        // }
+        // commit('M_SHEETS_ADD_LOADED', { colAlias: select.wholePosi.startColAlias, rowAlias: select.wholePosi.startRowAlias })
+        // commit('M_SHEETS_ADD_LOADED', {
+        //     colAlias: cols[cols.length - 1].alias,
+        //     rowAlias: rows[rows.length - 1].alias
+        // })
+        // let fixedSheet = {
+        //     frozen: {}
+        // }
+        // let firstCol = cols[0].alias
+        // let lastCol = cols[cols.length - 1].alias
+        // let neighborCol = getters.neighborColByAlias(select.wholePosi.startColAlias,
+        //     'PRE')
+        // fixedSheet.frozen.col = [{
+        //     start: firstCol,
+        //     over: neighborCol.alias,
+        // }, {
+        //     start: select.wholePosi.startColAlias,
+        //     over: lastCol
+        // }]
+        // let firstRow = rows[0].alias
+        // let lastRow = rows[rows.length - 1].alias
+        // let neighborRow = getters.neighborRowByAlias(select.wholePosi.startRowAlias,
+        //     'PRE')
+        // fixedSheet.frozen.row = [{
+        //     start: firstRow,
+        //     over: neighborRow.alias,
+        // }, {
+        //     start: select.wholePosi.startRowAlias,
+        //     over: lastRow
+        // }]
+        // let alias = fixedSheet.frozen.alias
+        // if (alias == null) {
+        //     fixedSheet.frozen.alias = {}
+        // }
+        // fixedSheet.frozen.alias.col = cols[getters.colIndexByAlias(select.wholePosi.startColAlias) - 1].alias
+        // fixedSheet.frozen.alias.row = rows[getters.rowIndexByAlias(select.wholePosi.startRowAlias) - 1].alias
+        // commit('UPDATE_SHEET_FROZEN', fixedSheet)
         send({
             url: config.url.frozen,
-            body: JSON.stringify({
-                viewRow: 0,
-                viewCol: 0,
-                oprCol: select.signalSort.startCol,
-                oprRow: select.signalSort.startRow
-            })
+            body: JSON.stringify(sendData)
         }).then(function(data) {
             // 销毁vue实例
             cache.bookVm.$destroy()
@@ -114,7 +175,7 @@ export default {
             }
             let bottom = cache.bookVm.$el.offsetHeight + config.scrollBufferHeight
             let right = cache.bookVm.$el.offsetWidth + config.scrollBufferWidth
-            // // 清空 store 行 列 单元格 sheet select 信息
+            // 清空 store 行 列 单元格 sheet select 信息
             cache.bookVm.$store.commit('M_CLEAR_CELLS')
             cache.bookVm.$store.commit('M_CLEAR_SELECT')
             cache.bookVm.$store.commit('M_CLEAR_SHEET')

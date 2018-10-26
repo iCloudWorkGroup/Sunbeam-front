@@ -879,9 +879,9 @@ export default {
         if (clipCells.length === 0) {
             return
         }
-        let targetActivePosi = getters.selectByType('SELECT').activePosi
-        let targetStartRowIndex = getters.rowIndexByAlias(targetActivePosi.rowAlias)
-        let targetStartColIndex = getters.colIndexByAlias(targetActivePosi.colAlias)
+        let targetWholePosi = getters.selectByType('SELECT').wholePosi
+        let targetStartRowIndex = getters.rowIndexByAlias(targetWholePosi.startRowAlias)
+        let targetStartColIndex = getters.colIndexByAlias(targetWholePosi.startColAlias)
         let targetEndRowIndex = targetStartRowIndex + clipEndRowIndex - clipStartRowIndex
         let targetEndColIndex = targetStartColIndex + clipEndColIndex - clipStartColIndex
 
@@ -913,6 +913,10 @@ export default {
             }
         })
         if (!isLegal) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '粘贴区域错误！合并单元格冲突！',
+                show: true
+            })
             return
         }
         let disRow = targetStartRowIndex - clipStartRowIndex
@@ -1007,8 +1011,10 @@ export default {
         // let colAlias = activeCell.occupy.col[0]
         // let rowAlias = activeCell.occupy.row[0]
         let select = getters.selectByType('SELECT')
-        let colAlias = select.activePosi.colAlias
-        let rowAlias = select.activePosi.rowAlias
+        let colAlias = select.wholePosi.startColAlias
+        let rowAlias = select.wholePosi.startRowAlias
+        // let endcolAlias = select.wholePosi.endColAlias
+        // let endrowAlias = select.wholePosi.endRowAlias
         let cells = getters.cells
         let rules
         let date
@@ -1042,6 +1048,10 @@ export default {
             }
         })
         if (!isLegal) {
+            commit('M_UPDATE_PROMPT', {
+                texts: '粘贴区域错误！无法对合并单元格进行此操作！',
+                show: true
+            })
             return
         }
 
@@ -1082,16 +1092,21 @@ export default {
                     propStruct.content.displayTexts = fixText
                 }
             }
-            dispatch('A_CELLS_UPDATE', {
-                propName: 'texts',
-                propStruct,
-                coordinate: {
-                    startColAlias: colAlias,
-                    endColAlias: colAlias,
-                    startRowAlias: rowAlias,
-                    endRowAlias: rowAlias,
-                }
-            })
+            if (idx === -1) {
+                dispatch('A_CELLS_ADD', {
+                    props: extend(propStruct, {
+                        occupy: {
+                            col: [colAlias],
+                            row: [rowAlias]
+                        }
+                    }),
+                })
+            } else {
+                commit(mutationTypes.UPDATE_CELL, {
+                    idx,
+                    prop: propStruct
+                })
+            }
         })
         function parseText(texts) {
             let text = texts

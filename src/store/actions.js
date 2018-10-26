@@ -40,16 +40,6 @@ export default {
                 0))
             generator.cellAliasGenerator(0)
 
-            // 模拟数据的行为
-            // bookItem.frozen = {
-            //     rowAlias: '6',
-            //     colAlias: '6'
-            // }
-            // commit('M_SHEETS_ADD_LOADED', {
-            //     colAlias: '6',
-            //     rowAlias: '6'
-            // })
-            // 模拟数据行为结束
             commit('UPDATE_SHEETS_MAX', {
                 colAlias: bookItem.maxColAlias,
                 colPixel: bookItem.maxColPixel,
@@ -62,13 +52,26 @@ export default {
                 props: cells,
                 flag: false
             })
+            let firstRowAlias = rows[0].alias
+            let firstColAlias = cols[0].alias
+            let frozen = bookItem.frozen
+            if (bookItem.frozen != null) {
+                let colIndex = getters.colIndexByAlias(frozen.colAlias)
+                let rowIndex = getters.rowIndexByAlias(frozen.rowAlias)
+                if (firstRowAlias === frozen.rowAlias || rowIndex > 30 || rowIndex === -1) {
+                    frozen.rowAlias = null
+                }
+                if (firstColAlias === frozen.colAlias || colIndex > 30 || colIndex === -1) {
+                    frozen.colAlias = null
+                }
+            }
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
-                frozen: bookItem.frozen
+                frozen: frozen
             })
-            if (bookItem.frozen != null) {
-                commit('M_SHEETS_ADD_LOADED', bookItem.frozen)
+            if (frozen != null) {
+                commit('M_SHEETS_ADD_LOADED', frozen)
             } else {
                 commit('M_SHEETS_ADD_LOADED', {
                     colAlias: cols[0].alias,

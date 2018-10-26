@@ -1,8 +1,11 @@
 import * as types from '../../mutation-types'
-
+import extend from '../../../util/extend'
 export default {
     [types.INSERT_SHEET](state, sheet) {
         state.list.push(sheet)
+    },
+    UPDATE_SHEET_FROZEN(state, frozen) {
+        extend(true, state.list[0], frozen)
     },
     [types.UPDATE_OCCUPY](state, payload) {
         let list = state.list

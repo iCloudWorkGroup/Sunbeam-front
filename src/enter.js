@@ -29,7 +29,7 @@ ss.addEventListener('mousedown', function (e) {
     // console.log(e)
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.setDataSourceState()
+    ss.setCellContent('102.4847', 'D4')
 })
 document.getElementById('aa').addEventListener('click', function () {
     // ss.

@@ -851,7 +851,15 @@ export default {
             commit(mutationTypes.UPDATE_SELECT, item)
         })
         let updateRowInfo = []
-        for (let i = index, len = rows.length; i < len; i++) {
+        let len = rows.length
+        // if (getters.isFrozen) {
+        //     let frozenRow = getters.rowIndexByAlias(getters.frozenAlias().row)
+        //     console.log(frozenRow, index)
+        //     if (frozenRow >= index) {
+        //         len = frozenRow + 1
+        //     }
+        // }
+        for (let i = index; i < len; i++) {
             let row = rows[i]
             if (i === index) {
                 updateRowInfo.push({

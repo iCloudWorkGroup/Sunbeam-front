@@ -54,7 +54,7 @@ export default {
             if (type !== 'OFF') {
                 this.$store.dispatch('A_SHEETS_FROZEN', type)
             } else {
-                this.$store.dispatch('A_SHEETS_UNFROZEN')
+                this.$store.dispatch('A_SHEETS_UNFROZEN', type)
             }
         }
     }

@@ -129,7 +129,6 @@ export default {
             endRowIndex = startRowIndex
         }
         if (startRowIndex === -1 || endRowIndex === -1 || startColIndex === -1 || endColIndex === -1) {
-            // throw new Error('index out of loaded arrange')
             if (startColIndex === -1) {
                 let temp
                 temp = startColIndex

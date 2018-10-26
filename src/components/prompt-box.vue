@@ -1,8 +1,7 @@
 <template>
     <div class="sheets-shadow" @click="closePrompt">
         <div class="prompt-box">
-            <div class="prompt-img">
-                <img src="../img/error.png" alt="">
+            <div class="prompt-left">
             </div>
             <div class="prompt-text">
                 {{texts}}

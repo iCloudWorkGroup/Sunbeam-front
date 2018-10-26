@@ -208,6 +208,8 @@ export default {
                     comment: texts
                 }
             }
+            endcolAlias = props.assist.endcolAlias
+            endrowAlias = props.assist.endrowAlias
         }
         await dispatch('A_CELLS_UPDATE', {
             propName: status,

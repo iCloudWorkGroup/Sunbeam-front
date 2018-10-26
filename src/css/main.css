@@ -663,38 +663,42 @@ textarea {
     background: rgba(0, 0, 0, 0.5);
 }
 .prompt-box{
-    border: 5px solid #333;
     height: 50px;
-    background: white;
     position: absolute;
     left: 50%;
     top: 50px;
     transform: translate(-50%, 0);
-    width: 400px;
+    width: 300px;
+    border: 5px solid #6b6d6b;
+    z-index: 9999;
+    background: #fff url(../img/uiStyle.gif) repeat-x 0px -130px;
+    padding: 0 25px 0 68px;
+    margin-top: 1px;
+    float: left;
+    line-height: normal;
 }
-.prompt-img{
+.prompt-left{
     position: absolute;
-    left: 10px;
-    top: 10px;
-    width: 30px;
-    height: 30px;
-}
-.prompt-img img{
-    width: 100%;
-    height: 100%;
+    left: 0;
+    top: 0;
+    width: 68px;
+    height: 50px;
 }
 .prompt-text{
-    color: red;
+    color: #f90;
     text-align: center;
     line-height: 50px;
     font-size: 10pt;
-    width: 350px;
+    width: 324px;
     height: 50px;
     position: absolute;
-    left: 50px;
+    left: 68px;
     top: 0;
 }
 
 /**
  * end
  */
+
+
+

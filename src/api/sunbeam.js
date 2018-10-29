@@ -373,7 +373,11 @@ SpreadSheet.prototype = {
         if (direction === 'right') {
             select.startColAlias = select.endColAlias
         }
-        this.setFont(select, propStruct, 'border')
+        this.bookVm.$store.dispatch('A_CELLS_BORDER', {
+            propName: 'border',
+            propStruct: propStruct,
+            coordinate: select
+        })
     },
 
     // 设置文本对齐方式

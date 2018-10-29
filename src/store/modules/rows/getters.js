@@ -20,13 +20,14 @@ export default {
      */
     offsetTop(state, getters) {
         return function(start, over) {
+            let userView = getters.userView()
             let overRow = getters.getRowByAlias(over)
             let rows = state.list
             let lastRow = rows[rows.length - 1]
             if (lastRow.alias === overRow.alias) {
                 return getters.getRowByAlias(start).top
             }
-            return 0
+            return userView.top
         }
     },
     /**

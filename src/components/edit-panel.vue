@@ -80,8 +80,10 @@ export default {
             let getters = this.$store.getters
             let el = downEvent.currentTarget
             let clientRect = el.getBoundingClientRect()
-            let col = getters.getColByPosi(downEvent.clientX - clientRect.left + this.offsetLeft)
-            let row = getters.getRowByPosi(downEvent.clientY - clientRect.top + this.offsetTop)
+            let colPosi = downEvent.clientX - clientRect.left + this.offsetLeft
+            let rowPosi = downEvent.clientY - clientRect.top + this.offsetTop
+            let col = getters.getColByPosi(colPosi)
+            let row = getters.getRowByPosi(rowPosi)
             // 如果是选择数据源，需要判断数据源是否存在
             let selectState = this.$store.getters.activeType
             if (selectState === 'DATASOURCE' &&

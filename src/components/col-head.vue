@@ -49,7 +49,8 @@ export default {
             let lastCol = cols.list[cols.list.length - 1]
             let limitWidth = 0
             if (overCol.alias === lastCol.alias) {
-                limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
+                let userView = this.$store.getters.userView()
+                limitWidth = this.$store.getters.offsetWidth - config.cornerWidth + userView.left
                 if (this.needSider) {
                     limitWidth -= scrollbar()
                 }

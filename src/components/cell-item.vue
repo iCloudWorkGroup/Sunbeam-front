@@ -78,8 +78,12 @@ export default {
         viewPosi() {
             const physicsBox = this.cell.physicsBox
             const borderProp = this.cell.border
+            // let rowIndex = this.$store.getters.rowIndexByAlias(this.cell.occupy.row[0])
+            // let viewRowTop = this.$store.getters.viewTop(rowIndex)
             let top = physicsBox.top - this.offsetTop
             // top = top < 2 ? top + 2 : top
+            // let colIndex = this.$store.getters.colIndexByAlias(this.cell.occupy.col[0])
+            // let viewColLeft = this.$store.getters.viewLeft(colIndex)
             let left = physicsBox.left - this.offsetLeft
             // left = left < 2 ? left + 2 : left
             let width = physicsBox.width

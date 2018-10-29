@@ -130,12 +130,13 @@ export default {
         },
         objStyle() {
             let cell = this.$store.getters.mouseInCell
+            let userView = this.$store.getters.userView()
             return {
                 fontSize: '10pt',
                 width: unit(150),
                 height: unit(150),
-                left: unit(cell.physicsBox.left + cell.physicsBox.width - this.localState.sheets.scroll.left + config.cornerWidth + 2),
-                top: unit(cell.physicsBox.top - this.localState.sheets.scroll.top + config.cornerHeight - 2),
+                left: unit(cell.physicsBox.left + cell.physicsBox.width - this.localState.sheets.scroll.left + config.cornerWidth + 2 - userView.left),
+                top: unit(cell.physicsBox.top - this.localState.sheets.scroll.top + config.cornerHeight - 2 - userView.top),
             }
         },
         comment() {

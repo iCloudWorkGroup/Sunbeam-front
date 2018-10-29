@@ -68,7 +68,9 @@ export default {
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
-                frozen: frozen
+                frozen: frozen,
+                viewRow: bookItem.viewRowAlias,
+                viewCol: bookItem.viewColAlias
             })
             if (frozen != null) {
                 commit('M_SHEETS_ADD_LOADED', frozen)

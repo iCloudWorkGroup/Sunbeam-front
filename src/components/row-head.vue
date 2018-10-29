@@ -48,8 +48,9 @@ export default {
             let lastRow = rows.list[rows.list.length - 1]
             let limitHeight = 0
             if (overRow.alias === lastRow.alias) {
+                let userView = this.$store.getters.userView()
                 limitHeight = this.$store.getters.offsetHeight -
-                    config.cornerHeight - config.sheetSider
+                    config.cornerHeight - config.sheetSider + userView.top
                 if (this.needSider) {
                     limitHeight -= scrollbar()
                 }

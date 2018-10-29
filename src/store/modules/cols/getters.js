@@ -30,13 +30,14 @@ export default {
      */
     offsetLeft(state, getters) {
         return function(start, over) {
+            let userView = getters.userView()
             let overCol = getters.getColByAlias(over)
             let cols = state.list
             let lastCol = cols[cols.length - 1]
             if (lastCol.alias === overCol.alias) {
                 return getters.getColByAlias(start).left
             }
-            return 0
+            return userView.left
         }
     },
     /**

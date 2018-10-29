@@ -14,6 +14,8 @@ export default {
     props: ['col', 'offsetLeft'],
     computed: {
         left() {
+            // let colIndex = this.$store.getters.colIndexByAlias(this.col.alias)
+            // let viewColLeft = this.$store.getters.viewLeft(colIndex)
             return unit(this.col.left - this.offsetLeft)
         },
         width() {

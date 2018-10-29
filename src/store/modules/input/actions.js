@@ -21,6 +21,7 @@ export default {
         // 设置该模型覆盖其位置
         let activeCell = getters.activeCell()
         let propStruct = {}
+        let userView = getters.userView()
         // 编辑单元格内容
         if (type === 'EDIT') {
             if (activeCell != null) {
@@ -29,8 +30,8 @@ export default {
                 cache.initText = content.texts
                 propStruct = {
                     physical: {
-                        left: physicsBox.left,
-                        top: physicsBox.top,
+                        left: physicsBox.left - userView.left,
+                        top: physicsBox.top - userView.top,
                         width: physicsBox.width,
                         height: physicsBox.height,
                         texts: content.texts,
@@ -64,8 +65,8 @@ export default {
                 let rowItem = rows[rowIndex]
                 propStruct = {
                     physical: {
-                        left: colItem.left,
-                        top: rowItem.top,
+                        left: colItem.left - userView.left,
+                        top: rowItem.top - userView.top,
                         width: colItem.width,
                         height: rowItem.height,
                         edit: 'texts'
@@ -99,8 +100,8 @@ export default {
                 cache.initText = customProp.comment
                 propStruct = {
                     physical: {
-                        left: physicsBox.left + select.physicsBox.width + 5,
-                        top: physicsBox.top,
+                        left: physicsBox.left + select.physicsBox.width + 5 - userView.left,
+                        top: physicsBox.top - userView.top,
                         width: 150,
                         height: 150,
                         texts: customProp.comment,
@@ -129,8 +130,8 @@ export default {
                 let rowItem = rows[rowIndex]
                 propStruct = {
                     physical: {
-                        left: colItem.left + select.physicsBox.width + 5,
-                        top: rowItem.top,
+                        left: colItem.left + select.physicsBox.width + 5 - userView.left,
+                        top: rowItem.top - userView.top,
                         width: 150,
                         height: 150,
                         edit: 'comment'

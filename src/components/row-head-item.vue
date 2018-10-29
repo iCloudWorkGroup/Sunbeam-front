@@ -13,6 +13,8 @@ export default {
     props: ['row', 'offsetTop'],
     computed: {
         top() {
+            // let rowIndex = this.$store.getters.rowIndexByAlias(this.row.alias)
+            // let viewRowTop = this.$store.getters.viewTop(rowIndex)
             return unit(this.row.top - this.offsetTop)
         },
         height() {

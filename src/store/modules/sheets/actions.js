@@ -23,17 +23,30 @@ export default {
         let fixedSheet = {
             alias: sheet.alias,
             name: sheet.name,
-            frozen: {}
+            frozen: {},
+            userViewIndex: {
+                viewCol: sheet.viewCol,
+                viewRow: sheet.viewRow
+            },
+            userView: {
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0
+            }
         }
         if (sheet.frozen && sheet.frozen.colAlias) {
             let cols = rootState.cols.list
-            let first = cols[0].alias
+            // let first = cols[0].alias
+            let first = sheet.viewCol
+            let firstIndex = getters.colIndexByAlias(first)
             let last = cols[cols.length - 1].alias
             let neighbor = getters.neighborColByAlias(sheet.frozen.colAlias,
                 'PRE')
             if (neighbor == null) {
                 throw new Error('frozen position error from col')
             }
+            fixedSheet.userView.left = cols[firstIndex].left
             fixedSheet.frozen.col = [{
                 start: first,
                 over: neighbor.alias,
@@ -49,10 +62,13 @@ export default {
         }
         if (sheet.frozen && sheet.frozen.rowAlias) {
             let rows = rootState.rows.list
-            let first = rows[0].alias
+            // let first = rows[0].alias
+            let first = sheet.viewRow
+            let firstIndex = getters.rowIndexByAlias(first)
             let last = rows[rows.length - 1].alias
             let neighbor = getters.neighborRowByAlias(sheet.frozen.rowAlias,
                 'PRE')
+            fixedSheet.userView.top = rows[firstIndex].top
             if (neighbor == null) {
                 throw new Error('frozen position error from row')
             }
@@ -120,6 +136,21 @@ export default {
                 show: true
             })
             return
+        }
+        let scroll = state.scroll
+        for (let i = 0; i < rows.length + 1; i++) {
+            if (rows[i].top >= scroll.top) {
+                let rowAlias = rows[i].alias
+                sendData.viewRow = getters.rowIndexByAlias(rowAlias)
+                break
+            }
+        }
+        for (let i = 0; i < cols.length + 1; i++) {
+            if (cols[i].left >= scroll.left) {
+                let colAlias = cols[i].alias
+                sendData.viewCol = getters.colIndexByAlias(colAlias)
+                break
+            }
         }
         // state.loaded = {
         //     cols: [],

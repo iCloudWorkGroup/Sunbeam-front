@@ -79,16 +79,40 @@ export default {
             let startCol = cols.map.get(this.colStart)
             let overCol = cols.map.get(this.colOver)
             let lastCol = cols.list[cols.list.length - 1]
+            let firstCol = cols.list[0]
             let limitWidth = 0
-            if (overCol.alias === lastCol.alias) {
-                limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
-                if (this.needSider) {
-                    limitWidth -= scrollbar()
-                }
-            } else {
-                limitWidth = overCol.left + overCol.width
+            limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
+            if (this.needSider) {
+                limitWidth -= scrollbar()
             }
-            return unit(limitWidth - startCol.left)
+            // 如果视图的最后元素和已经加载元素一致
+            // 说明不是冻结视图 需要考虑上下边框的距离
+            if (startCol.alias === firstCol.alias &&
+                overCol.alias === lastCol.alias) {
+                return unit(limitWidth)
+            }
+            let isFrozen = this.$store.getters.isFrozen()
+            let frozenAlias = this.$store.getters.frozenAlias()
+            let frozenAliasCol = frozenAlias.col
+            // let userView = this.$store.getters.userView()
+            // 是冻结，并且行被冻结
+            if (isFrozen && frozenAliasCol != null) {
+                let frozenCol = this.$store.getters.getColByAlias(
+                    frozenAliasCol)
+                let userView = this.$store.getters.userView()
+                let leftDistance = frozenCol.left + frozenCol.width - userView.left
+                let neighborCol = this.$store.getters.neighborColByAlias(frozenAliasCol, 'NEXT')
+                // 如果冻结的行等于这个视图的行结束值，说明是上半部分的视图
+                // 所以, 高度就是topDistance
+                // 不然就是，limitHeight -  topDistance
+                if (frozenAliasCol === this.colOver) {
+                    limitWidth = leftDistance
+                }
+                if (neighborCol.alias === this.colStart) {
+                    limitWidth -= leftDistance
+                }
+            }
+            return unit(limitWidth)
         },
         height() {
             let rows = this.$store.state.rows
@@ -115,7 +139,8 @@ export default {
             if (isFrozen && frozenAliasRow != null) {
                 let frozenRow = this.$store.getters.getRowByAlias(
                     frozenAliasRow)
-                let topDistance = frozenRow.top + frozenRow.height
+                let userView = this.$store.getters.userView()
+                let topDistance = frozenRow.top + frozenRow.height - userView.top
                 let neighborRow = this.$store.getters.neighborRowByAlias(frozenAliasRow, 'NEXT')
                 // 如果冻结的行等于这个视图的行结束值，说明是上半部分的视图
                 // 所以, 高度就是topDistance

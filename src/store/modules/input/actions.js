@@ -216,10 +216,18 @@ export default {
             propName: status,
             propStruct,
             coordinate: {
-                startColAlias: colAlias,
-                endColAlias: endcolAlias,
-                startRowAlias: rowAlias,
-                endRowAlias: endrowAlias,
+                wholePosi: {
+                    startColAlias: colAlias,
+                    endColAlias: endcolAlias,
+                    startRowAlias: rowAlias,
+                    endRowAlias: endrowAlias,
+                },
+                signalSort: {
+                    startCol: getters.colIndexByAlias(colAlias),
+                    startRow: getters.rowIndexByAlias(rowAlias),
+                    endCol: getters.colIndexByAlias(endcolAlias),
+                    endRow: getters.rowIndexByAlias(endrowAlias)
+                }
             }
         })
         // 恢复到初始状态

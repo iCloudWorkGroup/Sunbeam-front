@@ -59,6 +59,10 @@ export default {
      */
     commentWidth: 100,
     commentHeigth: 100,
+    /**
+     * 是否禁止自动输入
+     */
+    autoInput: true,
     url: {
         family: 'cell/font-family',
         size: 'cell/font-size',

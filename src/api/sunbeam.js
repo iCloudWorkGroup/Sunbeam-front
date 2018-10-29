@@ -108,15 +108,25 @@ SpreadSheet.prototype = {
             throw new Error('error point typeof')
         }
         let select = {}
-        let startRow = this.bookVm.$store.getters.allRows[startRowIndex]
-        let endRow = this.bookVm.$store.getters.allRows[endRowIndex]
-        let startCol = this.bookVm.$store.getters.allCols[startColIndex]
-        let endCol = this.bookVm.$store.getters.allCols[endColIndex]
+        let rows = this.bookVm.$store.getters.allRows
+        let cols = this.bookVm.$store.getters.allCols
+        let startRow = rows[startRowIndex]
+        let endRow = rows[endRowIndex] ? rows[endRowIndex] : rows[rows.length - 1]
+        let startCol = cols[startColIndex]
+        let endCol = cols[endColIndex] ? cols[endColIndex] : cols[cols.length - 1]
         select = {
-            startColAlias: startCol.alias,
-            startRowAlias: startRow.alias,
-            endColAlias: endCol.alias,
-            endRowAlias: endRow.alias
+            wholePosi: {
+                startColAlias: startCol ? startCol.alias : null,
+                startRowAlias: startRow ? startRow.alias : null,
+                endColAlias: endCol ? endCol.alias : null,
+                endRowAlias: endRow ? endRow.alias : null
+            },
+            signalSort: {
+                startCol: startColIndex,
+                startRow: startRowIndex,
+                endCol: endColIndex,
+                endRow: endRowIndex
+            }
         }
         return select
     },
@@ -190,23 +200,31 @@ SpreadSheet.prototype = {
             clo = color
             p = points
         }
+        let selects = {
+            wholePosi: [],
+            signalSort: []
+        }
         p.forEach((point, index) => {
             // 修正参数
             let select
             if (typeof point.endCol === 'undefined') {
                 select = this.getPoint([point.startCol + point.startRow,
-                    point.startCol + point.startRow
-                ])
+                    point.startCol + point.startRow])
             } else {
                 select = this.getPoint([point.startCol + point.startRow,
-                    point.endCol + point.endRow
-                ])
+                    point.endCol + point.endRow])
             }
-            this.setFont(select, {
+            selects.wholePosi.push(select.wholePosi)
+            selects.signalSort.push(select.signalSort)
+        })
+        this.bookVm.$store.dispatch('A_CELLS_ARRAY_BG', {
+            propName: 'background',
+            propStruct: {
                 content: {
                     background: clo
                 }
-            }, 'background')
+            },
+            coordinate: selects
         })
     },
 

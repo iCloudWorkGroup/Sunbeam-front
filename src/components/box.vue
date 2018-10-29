@@ -217,25 +217,29 @@ export default {
             if (((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 105)
                 || (keyCode >= 106 && keyCode <= 111 && keyCode !== 108) || (keyCode >= 186 && keyCode <= 191)
                 || (keyCode >= 219 && keyCode <= 222)) && !altKey && !ctrlKey && status === '') {
-                this.$store.dispatch('EDIT_SHOW', {
-                    type: 'EDIT',
-                    value: key
-                })
-                if (clipSelect != null) {
-                    this.$store.commit('DELETE_SELECT', {
-                        select: clipSelect
+                if (!config.autoInput) {
+                    this.$store.dispatch('EDIT_SHOW', {
+                        type: 'EDIT',
+                        value: key
                     })
+                    if (clipSelect != null) {
+                        this.$store.commit('DELETE_SELECT', {
+                            select: clipSelect
+                        })
+                    }
                 }
                 return
             } else if (keyCode === 229 && !altKey && !ctrlKey && status === '') {
-                this.$store.dispatch('EDIT_SHOW', {
-                    type: 'EDIT',
-                    value: key
-                })
-                if (clipSelect != null) {
-                    this.$store.commit('DELETE_SELECT', {
-                        select: clipSelect
+                if (!config.autoInput) {
+                    this.$store.dispatch('EDIT_SHOW', {
+                        type: 'EDIT',
+                        value: key
                     })
+                    if (clipSelect != null) {
+                        this.$store.commit('DELETE_SELECT', {
+                            select: clipSelect
+                        })
+                    }
                 }
                 return
             } else if (keyCode === 13 && !altKey && status !== '') {

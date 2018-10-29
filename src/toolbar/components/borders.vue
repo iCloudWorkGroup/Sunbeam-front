@@ -100,19 +100,22 @@ export default {
                 })
             }
             let direction = structName.split('.')[1]
-            let coordinate = extend(this.$store.getters.selectByType('SELECT').wholePosi)
+            let coordinate = {
+                wholePosi: this.$store.getters.selectByType('SELECT').wholePosi,
+                signalSort: this.$store.getters.selectByType('SELECT').signalSort
+            }
             // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
             if (direction === 'top') {
-                coordinate.endRowAlias = coordinate.startRowAlias
+                coordinate.wholePosi.endRowAlias = coordinate.wholePosi.startRowAlias
             }
             if (direction === 'bottom') {
-                coordinate.startRowAlias = coordinate.endRowAlias
+                coordinate.wholePosi.startRowAlias = coordinate.wholePosi.endRowAlias
             }
             if (direction === 'left') {
-                coordinate.endColAlias = coordinate.startColAlias
+                coordinate.wholePosi.endColAlias = coordinate.wholePosi.startColAlias
             }
             if (direction === 'right') {
-                coordinate.startColAlias = coordinate.endColAlias
+                coordinate.wholePosi.startColAlias = coordinate.wholePosi.endColAlias
             }
             this.$store.dispatch('A_CELLS_BORDER', {
                 propName: structName,

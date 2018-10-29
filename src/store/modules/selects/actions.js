@@ -9,6 +9,7 @@ import {
 } from '../../action-types'
 import generator from '../../../tools/generator'
 import template from './template'
+import config from '../../../config'
 // import {
 //     SELECT,
 //     LOCATE,
@@ -33,21 +34,19 @@ export default {
         let rows = getters.allRows
         let cols = getters.allCols
         let alias = generator.selectAliasGenerator()
-        let {
-            startColIndex,
-            startRowIndex,
-            endColIndex,
-            endRowIndex
-        } = getters.fullRegion({
-            startColIndex: getters.colIndexByAlias(colAlias),
-            startRowIndex: getters.rowIndexByAlias(rowAlias)
-        })
-        if (startRowIndex === -1 ||
-            endRowIndex === -1 ||
-            startColIndex === -1 ||
-            endColIndex === -1) {
-            throw new Error('CUSTOM ERROR: index out of loaded arrange')
-        }
+        // let {
+        //     startColIndex,
+        //     startRowIndex,
+        //     endColIndex,
+        //     endRowIndex
+        // } = getters.fullRegion({
+        //     startColIndex: getters.colIndexByAlias(colAlias),
+        //     startRowIndex: getters.rowIndexByAlias(rowAlias)
+        // })
+        let startRowIndex = 0
+        let startColIndex = 0
+        let endColIndex = 0
+        let endRowIndex = 0
         let signalSort = {
             startCol: getters.getColByIndex(startColIndex).sort,
             endCol: getters.getColByIndex(endColIndex).sort,
@@ -55,22 +54,14 @@ export default {
             endRow: getters.getRowByIndex(endRowIndex).sort
         }
         let physicsBox = {
-            // top: rows[startRowIndex].top,
-            // left: cols[startColIndex].left,
-            // width: cols[endColIndex].width +
-            //     cols[endColIndex].left -
-            //     cols[startColIndex].left,
-            // height: rows[endRowIndex].height +
-            //     rows[endRowIndex].top -
-            //     rows[startRowIndex].top
             top: 0,
             left: 0,
             width: 0,
             height: 0
         }
         let activePosi = {
-            rowAlias,
-            colAlias
+            rowAlias: rows[startRowIndex].alias,
+            colAlias: cols[startColIndex].alias
         }
         let wholePosi = {
             startColAlias: cols[startColIndex].alias,
@@ -109,6 +100,9 @@ export default {
         endColAlias = activeColAlias,
         endRowAlias = activeRowAlias,
     }) {
+        config.autoInput = false
+        let rows = getters.allRows
+        let cols = getters.allCols
         let {
             startColIndex,
             startRowIndex,
@@ -120,11 +114,15 @@ export default {
             endColIndex: getters.colIndexByAlias(endColAlias),
             endRowIndex: getters.rowIndexByAlias(endRowAlias)
         })
-        if (endRowAlias === 'MAX') {
+        if (endRowAlias === 'MAX' && activeRowAlias === rows[0].alias) {
+            startRowIndex = 0
+            endRowIndex = -1
             startColIndex = getters.colIndexByAlias(activeColAlias)
             endColIndex = startColIndex
         }
-        if (endColAlias === 'MAX') {
+        if (endColAlias === 'MAX' && activeColAlias === cols[0].alias) {
+            startColIndex = 0
+            endColIndex = -1
             startRowIndex = getters.rowIndexByAlias(activeRowAlias)
             endRowIndex = startRowIndex
         }
@@ -142,8 +140,6 @@ export default {
                 endRowIndex = temp
             }
         }
-        let rows = getters.allRows
-        let cols = getters.allCols
         let wholePosi = {
             startColAlias: cols[startColIndex].alias,
             startRowAlias: rows[startRowIndex].alias,

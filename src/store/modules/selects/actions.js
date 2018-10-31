@@ -100,7 +100,7 @@ export default {
         endColAlias = activeColAlias,
         endRowAlias = activeRowAlias,
     }) {
-        config.autoInput = false
+        config.autoInput = true
         let rows = getters.allRows
         let cols = getters.allCols
         let {

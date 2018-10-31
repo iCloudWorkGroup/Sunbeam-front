@@ -152,6 +152,12 @@ export default {
                 break
             }
         }
+        if (sendData.viewCol > sendData.oprCol) {
+            sendData.viewCol = sendData.oprCol - 1
+        }
+        if (sendData.viewRow > sendData.oprRow) {
+            sendData.viewRow = sendData.oprRow - 1
+        }
         // state.loaded = {
         //     cols: [],
         //     rows: [],

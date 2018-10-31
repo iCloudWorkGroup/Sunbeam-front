@@ -166,7 +166,7 @@ export default {
             let rowPosi = this.getRelativePosi(e.clientY)
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)
             let rowAlias = this.$store.getters.allRows[rowIndex].alias
-            let firstColAlias = this.$store.getters.allCols()[0].alias
+            let firstColAlias = this.$store.getters.allCols[0].alias
             this.$store.dispatch(SELECTS_CHANGE, {
                 activeColAlias: firstColAlias,
                 endColAlias: 'MAX',

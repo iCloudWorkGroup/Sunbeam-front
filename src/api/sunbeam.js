@@ -380,16 +380,16 @@ SpreadSheet.prototype = {
         let direction = structName.split('.')[1]
         // 当边框为上下左右时， 只修改选中区域四周单元格对应边框
         if (direction === 'top') {
-            select.endRowAlias = select.startRowAlias
+            select.wholePosi.endRowAlias = select.wholePosi.startRowAlias
         }
         if (direction === 'bottom') {
-            select.startRowAlias = select.endRowAlias
+            select.wholePosi.startRowAlias = select.wholePosi.endRowAlias
         }
         if (direction === 'left') {
-            select.endColAlias = select.startColAlias
+            select.wholePosi.endColAlias = select.wholePosi.startColAlias
         }
         if (direction === 'right') {
-            select.startColAlias = select.endColAlias
+            select.wholePosi.startColAlias = select.wholePosi.endColAlias
         }
         this.bookVm.$store.dispatch('A_CELLS_BORDER', {
             propName: 'border',
@@ -593,8 +593,8 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        let rowIndex = this.bookVm.$store.getters.rowIndexByAlias(select.startRowAlias)
-        let colIndex = this.bookVm.$store.getters.colIndexByAlias(select.startColAlias)
+        let rowIndex = this.bookVm.$store.getters.rowIndexByAlias(select.wholePosi.startRowAlias)
+        let colIndex = this.bookVm.$store.getters.colIndexByAlias(select.wholePosi.startColAlias)
         let cell = this.bookVm.$store.getters.cellsByTransverse({
             startColIndex: colIndex,
             startRowIndex: rowIndex
@@ -716,7 +716,7 @@ SpreadSheet.prototype = {
             p = point
         }
         let select = this.getPoint(p)
-        let cellIdx = this.bookVm.$store.getters.IdxByRow(select.startColAlias, select.startRowAlias)
+        let cellIdx = this.bookVm.$store.getters.IdxByRow(select.wholePosi.startColAlias, select.wholePosi.startRowAlias)
         if (cellIdx === -1) {
             return ''
         }

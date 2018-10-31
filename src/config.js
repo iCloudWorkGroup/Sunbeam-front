@@ -62,7 +62,7 @@ export default {
     /**
      * 是否禁止自动输入
      */
-    autoInput: true,
+    autoInput: false,
     url: {
         family: 'cell/font-family',
         size: 'cell/font-size',

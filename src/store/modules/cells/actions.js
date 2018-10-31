@@ -400,7 +400,6 @@ export default {
     }) {
         let select = coordinate === false ?
             getters.selectByType(SELECT) : coordinate
-        console.log(select)
         let wholePosi = select.wholePosi
         let rows = getters.allRows
         let cols = getters.allCols
@@ -430,7 +429,6 @@ export default {
             url: config.url[fixPropName],
             body: JSON.stringify(sendArgs)
         })
-        console.log(wholePosi)
         if (wholePosi.startRowAlias == null || wholePosi.startColAlias == null || wholePosi.endColAlias == null || wholePosi.endRowAlias == null) {
             return
         }

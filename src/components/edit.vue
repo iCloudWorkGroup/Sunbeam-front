@@ -102,8 +102,8 @@ export default {
                 let userView = this.$store.getters.userView()
                 let leftDistance = frozenCol.left + frozenCol.width - userView.left
                 let neighborCol = this.$store.getters.neighborColByAlias(frozenAliasCol, 'NEXT')
-                // 如果冻结的行等于这个视图的行结束值，说明是上半部分的视图
-                // 所以, 高度就是topDistance
+                // 如果冻结的行等于这个视图的行结束值，说明是左半部分的视图
+                // 所以, 高度就是leftDistance
                 // 不然就是，limitHeight -  topDistance
                 if (frozenAliasCol === this.colOver) {
                     limitWidth = leftDistance

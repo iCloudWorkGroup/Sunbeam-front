@@ -7,12 +7,14 @@
             <sheet-sider/>
         </div>
         <prompt-box v-show="show"></prompt-box>
+        <!--<popup></popup>-->
     </div>
 </template>
 <script type="text/javascript">
 import Sheet from './sheet.vue'
 import SheetSider from './sheet-sider.vue'
 import PromptBox from './prompt-box.vue'
+import Popup from './popup.vue'
 import {
     unit
 } from '../filters/unit'
@@ -33,7 +35,8 @@ export default {
     components: {
         Sheet,
         SheetSider,
-        PromptBox
+        PromptBox,
+        Popup
     },
     computed: {
         rootSelector() {

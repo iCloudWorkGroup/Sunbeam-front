@@ -257,7 +257,90 @@ export default {
                         }
                     },
                 })
+            } else if (keyCode >= 37 && keyCode <= 40) {
+                // 方向键
+                let {
+                    activeColAlias,
+                    activeRowAlias
+                } = this.directionkey(keyCode)
+                if (activeColAlias !== -1 && activeRowAlias !== -1) {
+                    // 当能找到旁边行/列时，修改select
+                    this.$store.dispatch(SELECTS_CHANGE, {
+                        activeColAlias,
+                        activeRowAlias,
+                    })
+                }
             }
+        },
+        directionkey(keyCode) {
+            let select = this.$store.getters.selectByType('SELECT')
+            let wholePosi = select.wholePosi
+            let activePosi = select.activePosi
+            let rows = this.$store.getters.allRows
+            let cols = this.$store.getters.allCols
+            let activeRowIndex = this.$store.getters.rowIndexByAlias(activePosi.rowAlias)
+            let activeColIndex = this.$store.getters.rowIndexByAlias(activePosi.colAlias)
+            let selectObj = {
+                startRowIndex: this.$store.getters.rowIndexByAlias(wholePosi.startRowAlias),
+                startColIndex: this.$store.getters.colIndexByAlias(wholePosi.startColAlias),
+                endRowIndex: this.$store.getters.rowIndexByAlias(wholePosi.endRowAlias),
+                endColIndex: this.$store.getters.colIndexByAlias(wholePosi.endColAlias)
+            }
+            let activeColAlias = cols[activeColIndex].alias
+            let activeRowAlias = rows[activeRowIndex].alias
+            // 左
+            if (keyCode === 37) {
+                activeColAlias = this.neiberRowAlias(selectObj, 'LEFT')
+            }
+            // 上
+            if (keyCode === 38) {
+                activeRowAlias = this.neiberRowAlias(selectObj, 'UP')
+            }
+            // 右
+            if (keyCode === 39) {
+                activeColAlias = this.neiberRowAlias(selectObj, 'RIGHT')
+            }
+            // 下
+            if (keyCode === 40) {
+                activeRowAlias = this.neiberRowAlias(selectObj, 'DOWN')
+            }
+            return {
+                activeColAlias,
+                activeRowAlias
+            }
+        },
+        neiberRowAlias(payload, toward) {
+            let rows = this.$store.getters.allRows
+            let cols = this.$store.getters.allCols
+            if (toward === 'UP') {
+                for (let i = payload.startRowIndex - 1; i >= 0; i--) {
+                    if (!rows[i].hidden) {
+                        return rows[i].alias
+                    }
+                }
+            }
+            if (toward === 'DOWN') {
+                for (let i = payload.endRowIndex + 1; i <= rows.length - 1; i++) {
+                    if (!rows[i].hidden) {
+                        return rows[i].alias
+                    }
+                }
+            }
+            if (toward === 'LEFT') {
+                for (let i = payload.startColIndex - 1; i >= 0; i--) {
+                    if (!cols[i].hidden) {
+                        return cols[i].alias
+                    }
+                }
+            }
+            if (toward === 'RIGHT') {
+                for (let i = payload.endColIndex + 1; i <= cols.length - 1; i++) {
+                    if (!cols[i].hidden) {
+                        return cols[i].alias
+                    }
+                }
+            }
+            return -1
         },
         insertAtCursor(insertChar, elem) {
             let cursor

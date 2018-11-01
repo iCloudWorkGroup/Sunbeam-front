@@ -235,8 +235,8 @@ export function parsePropStruct(cell, formatObj, texts, row, col) {
     let fixObj = { content: {}}
     fixObj.date = false
     if ((!cell || cell.content.express === '' || cell.content.express === 'General') &&
-        (col.express === '' || col.express === 'General') &&
-        (row.express === '' || row.express === 'General')) {
+        (typeof col === 'undefined' || col.express === '' || col.express === 'General') &&
+        (typeof row === 'undefined' || row.express === '' || row.express === 'General')) {
         fixObj.content.alignRowFormat = formatObj.autoAlign
         fixObj.content.express = formatObj.autoRecExpress
         fixObj.content.texts = formatObj.autoRecText

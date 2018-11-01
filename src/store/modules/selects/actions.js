@@ -164,6 +164,12 @@ export default {
                 rows[endRowIndex].top -
                 rows[startRowIndex].top
         }
+        if (rows[endRowIndex].hidden) {
+            physicsBox.height -= rows[endRowIndex].height
+        }
+        if (cols[endColIndex].hidden) {
+            physicsBox.width -= cols[endColIndex].width
+        }
         let activePosi = {
             rowAlias: activeRowAlias,
             colAlias: activeColAlias

@@ -933,7 +933,7 @@ export default {
                 for (let i = 0; i < num; i++) {
                     dispatch(actionTypes.COLS_ADD, [{
                         sort: last.sort + i + 1,
-                        left: last.left + last.width + i + 1 +
+                        left: last.left + last.width + 1 + i +
                             config.colWidth * i
                     }])
                     if (i === num - 1) {

@@ -108,7 +108,7 @@ export default {
          * 隐藏行
          * 将需要隐藏的行hidden设为true
          * 并修改前一行bottomAjacentHide属性为true
-         * 隐藏行后面所有行top上移
+         * 隐藏行下方所有行top上移(所有已加载行)
          */
         let updateRowInfo = [{
             row: rows[index],

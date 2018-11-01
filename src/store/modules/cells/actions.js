@@ -25,6 +25,9 @@ import {
     parseType, parseAddAglin, parseText,
     parsePropStruct
 } from '../../../tools/format'
+import {
+    fixCellUpdateSend,
+} from '../../../tools/fixparams'
 import extend from '../../../util/extend'
 import template from './template'
 import generator from '../../../tools/generator'
@@ -155,73 +158,9 @@ export default {
         //     || (signalSort.startRow !== 1 && signalSort.endRow === -1)) {
         //     return
         // }
-        let sendArgs = {
-            coordinate: [signalSort]
-        }
-        let fixPropName = propName
-        let txt
-        switch (propName) {
-            case 'wordWrap':
-                sendArgs = extend(sendArgs, {
-                    auto: propStruct.content[propName]
-                })
-                if (propStruct.row) {
-                    sendArgs = extend(sendArgs, {
-                        effect: [{
-                            row: propStruct.row.index,
-                            offset: propStruct.row.height
-                        }]
-                    })
-                }
-                break
-            case 'texts':
-                txt = fixText(propStruct.content[propName])
-                sendArgs = extend({
-                    coordinate: signalSort
-                }, {
-                    content: txt
-                })
-                break
-            case 'alignRow':
-            case 'alignCol':
-                sendArgs = extend(sendArgs, {
-                    align: propStruct.content[propName]
-                })
-                break
-            case 'background':
-                sendArgs = extend(sendArgs, {
-                    color: propStruct.content[propName]
-                })
-                break
-            case 'comment':
-                sendArgs = extend(sendArgs, {
-                    [propName]: propStruct.customProp[propName]
-                })
-                break
-            case 'recomment':
-                sendArgs = extend(sendArgs)
-                break
-            default:
-                sendArgs = extend(sendArgs, {
-                    [propName]: propStruct.content[propName]
-                })
-                break
-        }
-        function fixText(text) {
-            let txt = text
-            if (propStruct.content.express === '$#,##0.00' && isNum(txt)) {
-                txt = '$' + txt
-            }
-            if (propStruct.content.express === '¥#,##0.00' && isNum(txt)) {
-                txt = '¥' + txt
-            }
-            if (propStruct.content.express === '0.00%' && isNum(txt)) {
-                txt = txt * 100 + '%'
-            }
-            return txt
-        }
+        let sendArgs = fixCellUpdateSend(propStruct, propName, signalSort)
         send({
-            url: config.url[fixPropName],
+            url: config.url[propName],
             body: JSON.stringify(sendArgs)
         })
         if (wholePosi.startRowAlias == null || wholePosi.startColAlias == null || wholePosi.endColAlias == null || wholePosi.endRowAlias == null) {
@@ -411,12 +350,9 @@ export default {
         let sendArgs = {
             coordinate: [signalSort]
         }
-        let fixPropName = propName
-        let direction
+        let direction = propName.split('.')[1]
         fixBorder()
         function fixBorder() {
-            fixPropName = 'border'
-            direction = propName.split('.')[1]
             let line = direction === 'all' || direction === 'none' ?
                 propStruct.border.top :
                 propStruct.border[direction]
@@ -425,31 +361,140 @@ export default {
                 line
             })
         }
+
+        // 整行/整列操作不允许添加全边框
+        if (direction === 'all' && (signalSort.endCol === -1 || signalSort.endRow === -1)) {
+            return
+        }
         send({
-            url: config.url[fixPropName],
+            url: config.url.border,
             body: JSON.stringify(sendArgs)
         })
         if (wholePosi.startRowAlias == null || wholePosi.startColAlias == null || wholePosi.endColAlias == null || wholePosi.endRowAlias == null) {
             return
         }
+        let cells = getters.cells
         let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
         let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
         let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
         let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        // 整行操作不能添加左/右边框
+        if ((direction === 'left' || direction === 'right') && endColIndex === -1) {
+            return
+        }
+        // 整列操作不能添加上/下边框
+        if ((direction === 'top' || direction === 'bottom') && endRowIndex === -1) {
+            return
+        }
         if (endRowIndex === -1) {
             dispatch(COLS_OPERCOLS, {
                 startIndex: startColIndex,
                 endIndex: endColIndex,
                 props: propStruct
             })
+            if (direction === 'none') {
+                if (startColIndex !== 0) {
+                    let fixPropStruct = {
+                        border: {
+                            right: 0
+                        }
+                    }
+                    dispatch(COLS_OPERCOLS, {
+                        startIndex: startColIndex - 1,
+                        endIndex: startColIndex - 1,
+                        props: fixPropStruct
+                    })
+                }
+                if (endColIndex !== cols.length - 1) {
+                    let fixPropStruct = {
+                        border: {
+                            left: 0
+                        }
+                    }
+                    dispatch(COLS_OPERCOLS, {
+                        startIndex: endColIndex + 1,
+                        endIndex: endColIndex + 1,
+                        props: fixPropStruct
+                    })
+                }
+            } else if (direction === 'left' && startColIndex !== 0) {
+                let fixPropStruct = {
+                    border: {
+                        right: 1
+                    }
+                }
+                dispatch(COLS_OPERCOLS, {
+                    startIndex: startColIndex - 1,
+                    endIndex: startColIndex - 1,
+                    props: fixPropStruct
+                })
+            } else if (direction === 'right' && endColIndex !== cols.length - 1) {
+                let fixPropStruct = {
+                    border: {
+                        left: 1
+                    }
+                }
+                dispatch(COLS_OPERCOLS, {
+                    startIndex: endColIndex + 1,
+                    endIndex: endColIndex + 1,
+                    props: fixPropStruct
+                })
+            }
         } else if (endColIndex === -1) {
             dispatch(ROWS_OPERROWS, {
                 startIndex: startRowIndex,
                 endIndex: endRowIndex,
                 props: propStruct
             })
+            if (direction === 'none') {
+                if (startRowIndex !== 0) {
+                    let fixPropStruct = {
+                        border: {
+                            bottom: 0
+                        }
+                    }
+                    dispatch(ROWS_OPERROWS, {
+                        startIndex: startRowIndex - 1,
+                        endIndex: startRowIndex - 1,
+                        props: fixPropStruct
+                    })
+                }
+                if (endRowIndex !== rows.length - 1) {
+                    let fixPropStruct = {
+                        border: {
+                            top: 0
+                        }
+                    }
+                    dispatch(ROWS_OPERROWS, {
+                        startIndex: endRowIndex + 1,
+                        endIndex: endRowIndex + 1,
+                        props: fixPropStruct
+                    })
+                }
+            } else if (direction === 'top' && startRowIndex !== 0) {
+                let fixPropStruct = {
+                    border: {
+                        bottom: 1
+                    }
+                }
+                dispatch(ROWS_OPERROWS, {
+                    startIndex: startRowIndex - 1,
+                    endIndex: startRowIndex - 1,
+                    props: fixPropStruct
+                })
+            } else if (direction === 'bottom' && endRowIndex !== rows.length - 1) {
+                let fixPropStruct = {
+                    border: {
+                        top: 1
+                    }
+                }
+                dispatch(ROWS_OPERROWS, {
+                    startIndex: endRowIndex + 1,
+                    endIndex: endRowIndex + 1,
+                    props: fixPropStruct
+                })
+            }
         }
-
         // 修正参数
         endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
         endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
@@ -457,7 +502,6 @@ export default {
         let cellOccupy
         // 如果有对应的单元格，修改属性
         // 如果没有对应的单元格，插入单元格
-        let cells = getters.cells
         let avoidRepeat = {}
         for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
             for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
@@ -474,6 +518,7 @@ export default {
                         cellOccupy = {
                             occupy: cells[idx].occupy
                         }
+                        // 修改单元格边框会对周边单元格有连锁操作
                         if (direction === 'top') {
                             fixTopCell(cellOccupy)
                         } else if (direction === 'left') {
@@ -521,11 +566,14 @@ export default {
                 }
             }
         }
+
+
+
         function fixBottomCell(cellOccupy) {
             let rows = getters.allRows
             let cols = getters.allCols
             let occupyEndRowIdx = getters.rowIndexByAlias(cellOccupy.occupy.row[cellOccupy.occupy.row.length - 1])
-            if (occupyEndRowIdx > rows.length) {
+            if (occupyEndRowIdx >= rows.length - 1) {
                 return
             }
             let topRow = rows[occupyEndRowIdx + 1]
@@ -603,7 +651,7 @@ export default {
             let rows = getters.allRows
             let cols = getters.allCols
             let occupyEndColIdx = getters.colIndexByAlias(cellOccupy.occupy.col[cellOccupy.occupy.col.length - 1])
-            if (occupyEndColIdx > cols) {
+            if (occupyEndColIdx >= cols.length - 1) {
                 return
             }
             let leftCol = rows[occupyEndColIdx + 1]

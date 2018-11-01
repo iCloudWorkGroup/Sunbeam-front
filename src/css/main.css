@@ -229,10 +229,12 @@ textarea {
 
 .row {
     width: inherit;
+    border-top: 1px solid transparent;
 }
 
 .col {
     border-right: 1px solid #d4d4d4;
+    border-left: 1px solid transparent;
     height: inherit;
 }
 

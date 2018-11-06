@@ -28,6 +28,7 @@ export default {
                 viewCol: sheet.viewCol,
                 viewRow: sheet.viewRow
             },
+            protect: sheet.protect,
             userView: {
                 top: 0,
                 left: 0,
@@ -87,6 +88,67 @@ export default {
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
     },
+    A_SHEETS_PROTECT({
+        state,
+        getters,
+        rootState,
+        dispatch,
+        commit
+    }, payload) {
+        let protect = getters.isProtect()
+        let sendArgs = { protect: payload.protect }
+        sendArgs.passwd = payload.passwd
+        send({
+            url: config.url.protect,
+            body: JSON.stringify(sendArgs)
+        }, false).then(function (data) {
+            if (data.isLegal === false) {
+                cache.step++
+            }
+            // 不可以 上锁 或者 解锁
+            if (!data.isLegal) {
+                if (protect) {
+                    commit('M_UPDATE_PROMPT', {
+                        texts: '密码错误！请重新输入密码！',
+                        show: true,
+                        type: 'error'
+                    })
+                } else {
+                    commit('M_UPDATE_PROMPT', {
+                        texts: '添加密码超时！请重新操作！',
+                        show: true,
+                        type: 'error'
+                    })
+                }
+            } else {
+                if (protect) {
+                    commit('UPDATE_SHEET_PASSWORD', payload)
+                    commit('M_UPDATE_PROMPT', {
+                        texts: '取消保护工作簿成功！',
+                        show: true,
+                        type: 'success'
+                    })
+                    commit('UPDATE_SHEET_POPUP', {
+                        show: false,
+                        title: '',
+                        type: ''
+                    })
+                } else {
+                    commit('UPDATE_SHEET_PASSWORD', payload)
+                    commit('M_UPDATE_PROMPT', {
+                        texts: '保护工作簿成功！',
+                        show: true,
+                        type: 'success'
+                    })
+                    commit('UPDATE_SHEET_POPUP', {
+                        show: false,
+                        title: '',
+                        type: ''
+                    })
+                }
+            }
+        })
+    },
     A_SHEETS_FROZEN({
         state,
         getters,
@@ -133,7 +195,8 @@ export default {
         if (texts !== '') {
             commit('M_UPDATE_PROMPT', {
                 texts,
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }

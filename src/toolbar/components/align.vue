@@ -110,6 +110,15 @@ export default {
     },
     methods: {
         setAlignRow(e) {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             let el = e.currentTarget
             let structName = el.dataset.struct
             let value = el.dataset.value
@@ -126,6 +135,15 @@ export default {
             })
         },
         setAlignCol(e) {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             let el = e.currentTarget
             let structName = el.dataset.struct
             let value = el.dataset.value
@@ -139,6 +157,15 @@ export default {
             })
         },
         setMerge() {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             if (this.hasMerge) {
                 this.$store.dispatch(A_CELLS_SPLIT)
             } else {
@@ -146,6 +173,15 @@ export default {
             }
         },
         setWordWrap() {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             this.$store.dispatch(CELLS_WORDWRAP)
         }
     }

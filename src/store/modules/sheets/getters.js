@@ -6,6 +6,12 @@ export default {
                 true : false
         }
     },
+    isProtect(state) {
+        return function() {
+            let protect = state.list[0].protect
+            return protect
+        }
+    },
     frozenAlias(state) {
         return function() {
             return state.list[0].frozen.alias

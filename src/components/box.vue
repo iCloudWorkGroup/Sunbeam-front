@@ -182,6 +182,15 @@ export default {
             clipboardData.setData('Text', text)
         },
         pasteData(e) {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             let clipboardData = window.clipboardData != null ?
                 window.clipboardData :
                 e.clipboardData
@@ -200,7 +209,8 @@ export default {
             if (this.$store.state.sheets.prompt.show) {
                 this.$store.commit('M_UPDATE_PROMPT', {
                     texts: '',
-                    show: false
+                    show: false,
+                    type: ''
                 })
                 return
             }
@@ -290,26 +300,26 @@ export default {
             let activeRowAlias = rows[activeRowIndex].alias
             // 左
             if (keyCode === 37) {
-                activeColAlias = this.neiberRowAlias(selectObj, 'LEFT')
+                activeColAlias = this.neiberAlias(selectObj, 'LEFT')
             }
             // 上
             if (keyCode === 38) {
-                activeRowAlias = this.neiberRowAlias(selectObj, 'UP')
+                activeRowAlias = this.neiberAlias(selectObj, 'UP')
             }
             // 右
             if (keyCode === 39) {
-                activeColAlias = this.neiberRowAlias(selectObj, 'RIGHT')
+                activeColAlias = this.neiberAlias(selectObj, 'RIGHT')
             }
             // 下
             if (keyCode === 40) {
-                activeRowAlias = this.neiberRowAlias(selectObj, 'DOWN')
+                activeRowAlias = this.neiberAlias(selectObj, 'DOWN')
             }
             return {
                 activeColAlias,
                 activeRowAlias
             }
         },
-        neiberRowAlias(payload, toward) {
+        neiberAlias(payload, toward) {
             let rows = this.$store.getters.allRows
             let cols = this.$store.getters.allCols
             if (toward === 'UP') {

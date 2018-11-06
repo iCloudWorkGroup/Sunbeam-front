@@ -24,3 +24,17 @@ export function getRowDisplayName(index) {
     }
     return (index + 1).toString()
 }
+
+export function getColIndex(displayName) {
+    let num = 0
+    let arr = displayName.split('')
+    arr.forEach((value, index) => {
+        num += (displayName.charCodeAt(displayName.length - index - 1) - 64) *
+            Math.pow(26, index)
+    })
+    return num - 1
+}
+
+export function getRowIndex(displayName) {
+    return displayName - 1
+}

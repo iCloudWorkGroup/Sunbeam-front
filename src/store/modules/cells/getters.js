@@ -556,6 +556,46 @@ export default {
         }
     },
     /**
+     * 是否包含锁定单元格
+     * @param  {[type]}  state   [description]
+     * @param  {[type]}  getters [description]
+     * @return {Boolean}         [description]
+     */
+    hasLockCell(state, getters) {
+        return function() {
+            let allCells = state.list
+            let selects = getters.allSelects
+            let select
+            for (let i = 0, len = selects.length; i < len; i++) {
+                if (selects[i].type === SELECT) {
+                    select = selects[i]
+                    break
+                }
+            }
+            let wholePosi = select.wholePosi
+            let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+            let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+            let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+            let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+            let verticalCells = getters.cellsByVertical({
+                startColIndex,
+                startRowIndex,
+                endColIndex,
+                endRowIndex
+            })
+            for (let i = 0, len = verticalCells.length; i < len; i++) {
+                let cell = verticalCells[i] || allCells
+                if (cell.content.locked) {
+                    return true
+                }
+            }
+            if (verticalCells.length === 0) {
+                return true
+            }
+            return false
+        }
+    },
+    /**
      * 选中单元格是否换行
      * @param  {[type]}  state   [description]
      * @param  {[type]}  getters [description]

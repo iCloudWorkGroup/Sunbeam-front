@@ -43,5 +43,6 @@ export default {
             row: null,
             col: null
         }
-    }
+    },
+    protect: false
 }

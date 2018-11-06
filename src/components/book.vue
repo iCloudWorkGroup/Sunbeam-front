@@ -7,7 +7,7 @@
             <sheet-sider/>
         </div>
         <prompt-box v-show="show"></prompt-box>
-        <!--<popup></popup>-->
+        <popup></popup>
     </div>
 </template>
 <script type="text/javascript">

@@ -1,6 +1,7 @@
 <template>
     <div class="sheets-shadow" @click="closePrompt">
-        <div class="prompt-box">
+        <div class="prompt-box"
+             :class="{ promptError: type==='error', promptSuccess: type ==='success' }">
             <div class="prompt-left">
             </div>
             <div class="prompt-text">
@@ -14,13 +15,17 @@ export default {
     computed: {
         texts() {
             return this.$store.state.sheets.prompt.texts
+        },
+        type() {
+            return this.$store.state.sheets.prompt.type
         }
     },
     methods: {
         closePrompt() {
             this.$store.commit('M_UPDATE_PROMPT', {
                 texts: '',
-                show: false
+                show: false,
+                type: ''
             })
         }
     }

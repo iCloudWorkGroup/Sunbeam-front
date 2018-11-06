@@ -70,7 +70,8 @@ export default {
                 name: bookItem.name,
                 frozen: frozen,
                 viewRow: bookItem.viewRowAlias,
-                viewCol: bookItem.viewColAlias
+                viewCol: bookItem.viewColAlias,
+                protect: bookItem.protect
             })
             if (frozen != null) {
                 commit('M_SHEETS_ADD_LOADED', frozen)

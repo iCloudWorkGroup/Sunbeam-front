@@ -78,7 +78,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可调整列宽，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -176,7 +177,7 @@ export default {
             let endPosi
 
             startPosi = getters.getColByAlias(wholePosi.startColAlias).left
-            endPosi = getters.getColByAlias(wholePosi.endColAlias).left
+            endPosi = getters.getColByAlias(wholePosi.endColAlias).left + getters.getColByAlias(wholePosi.endColAlias).width
             if (startPosi === colLeft) {
                 updateSelectInfo.push({
                     type: getters.activeType,
@@ -249,7 +250,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可删除列，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -540,7 +542,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可隐藏列，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -754,7 +757,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可显示列，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -970,7 +974,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可插入列，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }

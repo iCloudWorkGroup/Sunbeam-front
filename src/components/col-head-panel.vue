@@ -1,6 +1,7 @@
 <template>
     <div class="col-head-panel"
          ref="panel"
+         @dblclick="dbclickHandle"
          @mousedown="mouseDownHandle"
          @mousemove="mouseMoveHandle">
         <col-head-item
@@ -77,11 +78,24 @@ export default {
         mouseMoveHandle(e) {
             this.currentMouseMoveState(e)
         },
+        dbclickHandle(e) {
+            this.currentDbclickState(e)
+        },
         currentMouseDownState(e) {
             this.locateState(e)
         },
         currentMouseMoveState(e) {
             this.routineMoveState(e)
+        },
+        currentDbclickState(e) {
+            this.inputWidth(e)
+        },
+        inputWidth(e) {
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: true,
+                title: '设置列宽',
+                type: 'width',
+            })
         },
         routineMoveState(e) {
             if (this.adjustState) {
@@ -97,6 +111,7 @@ export default {
                 this.adjustColIndex = colIndex
                 this.adjustCol = cols[colIndex]
                 this.currentMouseDownState = this.startAdjustHandleState
+                this.currentDbclickState = {}
             } else if (posi - col.left < 3 && colIndex !== 0) {
                 if (cols[colIndex - 1].hidden) {
                     return
@@ -105,10 +120,11 @@ export default {
                 this.adjustColIndex = colIndex - 1
                 this.adjustCol = cols[colIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
+                this.currentDbclickState = {}
             } else {
                 panel.style.cursor = 'pointer'
                 this.currentMouseDownState = this.locateState
-
+                this.currentDbclickState = this.inputWidth
             }
         },
 
@@ -163,6 +179,14 @@ export default {
             })
         },
         locateState(e) {
+            let popup = this.$store.state.sheets.popup
+            if (popup.type === 'height') {
+                this.$store.commit('UPDATE_SHEET_POPUP', {
+                    show: popup.show,
+                    title: '设置列宽',
+                    type: 'width',
+                })
+            }
             this.$store.commit('M_SELECT_UPDATE_MOUSESTATUS', 'DRAG')
             let colPosi = this.getRelativePosi(e.clientX)
             let colIndex = this.$store.getters.getColIndexByPosi(colPosi)

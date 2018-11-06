@@ -40,6 +40,16 @@ export default {
     },
     methods: {
         ejectMenu(e, menuName) {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                this.$store.commit(SWITCH_NAME, '')
+                return
+            }
             let el = e.currentTarget
             let menu = this.$refs[menuName]
             let menuEl

@@ -57,7 +57,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可隐藏行，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -276,7 +277,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可显示行，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -487,7 +489,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可插入行，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -730,7 +733,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可调整行高，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -892,7 +896,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可删除行，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }

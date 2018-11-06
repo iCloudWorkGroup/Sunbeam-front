@@ -52,7 +52,13 @@ const state = {
     },
     prompt: {
         show: false,
-        texts: ''
+        texts: '',
+        type: ''
+    },
+    popup: {
+        show: false,
+        title: '',
+        type: ''
     }
 }
 

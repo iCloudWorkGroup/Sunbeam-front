@@ -18,6 +18,7 @@
                 </tr>
             </table>
         </div>
+        <div class="other-color" @click="adjustColor">其他颜色...</div>
     </div>
 </div>
 </template>
@@ -69,6 +70,13 @@ export default {
         }
     },
     methods: {
+        adjustColor() {
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: true,
+                title: '修改背景色',
+                type: 'color',
+            })
+        },
         setBackground(e) {
             let el = e.target
             if (el.className !== 'color-body') {

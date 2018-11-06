@@ -32,11 +32,29 @@ export default {
     },
     methods: {
         addComment() {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             this.$store.dispatch('EDIT_SHOW', {
                 type: 'COMMENT'
             })
         },
         deleteComment() {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'recomment',
                 propStruct: {
@@ -47,6 +65,15 @@ export default {
             })
         },
         editComment() {
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             this.$store.dispatch('EDIT_SHOW', {
                 type: 'COMMENT'
             })

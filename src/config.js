@@ -103,7 +103,9 @@ export default {
         wordWrap: 'cell/wordwrap',
         comment: 'cell/comment-plus',
         recomment: 'cell/comment-reduce',
-        clean: 'cell/data-clean'
+        clean: 'cell/data-clean',
+        lock: 'cell/lock',
+        protect: 'sheet/protect'
     },
     operSendPropName: {
         'alignRow': 'align',

@@ -32,7 +32,8 @@ export default {
         wordWrap: false,
         underline: 0,
         background: 'transparent',
-        alignRowFormat: ''
+        alignRowFormat: '',
+        locked: true
     },
     // 批注属性
     customProp: {

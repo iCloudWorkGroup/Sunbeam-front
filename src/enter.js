@@ -22,7 +22,7 @@ ss.addEventListener('mousedown', function (e) {
     // console.log(e)
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.batchFillBg('#123456', [{ startCol: 'D', endCol: 'F', startRow: 4, endRow: 5 }, { startCol: 'B', endCol: 'C', startRow: 10, endRow: 12 }])
+    ss.batchFillBg('#ccc', [{ startCol: 'D', endCol: 'F', startRow: 4, endRow: 5 }, { startCol: 'B', endCol: 'C', startRow: 10, endRow: 12 }])
 })
 document.getElementById('aa').addEventListener('click', function () {
     ss.rowCancelHide('1', '1')

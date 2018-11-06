@@ -81,9 +81,13 @@ export default {
             let lastCol = cols.list[cols.list.length - 1]
             let firstCol = cols.list[0]
             let limitWidth = 0
+            let rightShow = this.$store.state.sheets.popup
             limitWidth = this.$store.getters.offsetWidth - config.cornerWidth
             if (this.needSider) {
                 limitWidth -= scrollbar()
+            }
+            if (rightShow.show) {
+                limitWidth -= 280
             }
             // 如果视图的最后元素和已经加载元素一致
             // 说明不是冻结视图 需要考虑上下边框的距离

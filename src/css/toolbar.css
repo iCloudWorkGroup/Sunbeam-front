@@ -42,6 +42,7 @@ span { display: inline-block; }
 .ico-borderbottom { width: 16px; height: 16px; background-position: -1px -137px; }
 .ico-bordertop { width: 16px; height: 16px; background-position: -19px -173px; }
 .ico-borderleft { width: 16px; height: 16px; background-position: -1px -173px; }
+.ico-close { width: 16px; height: 16px; background-position: -55px -173px;  }
 .ico-borderright { width: 16px; height: 16px; background-position: -55px -173px; }
 .ico-bordernone { width: 16px; height: 16px; background-position: -37px -173px; }
 .ico-borderall { width: 16px; height: 16px; background-position: -163px -145px; }

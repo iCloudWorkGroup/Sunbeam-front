@@ -49,6 +49,11 @@ export function fixCellUpdateSend(propStruct, propName, signalSort) {
         case 'recomment':
             sendArgs = extend(sendArgs)
             break
+        case 'lock':
+            sendArgs = extend(sendArgs, {
+                lock: propStruct.content.locked
+            })
+            break
         default:
             sendArgs = extend(sendArgs, {
                 [propName]: propStruct.content[propName]

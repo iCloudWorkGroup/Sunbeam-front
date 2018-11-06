@@ -24,6 +24,16 @@ export default {
         let userView = getters.userView()
         // 编辑单元格内容
         if (type === 'EDIT') {
+            let protect = getters.isProtect()
+            let lock = activeCell == null ? true : activeCell.content.locked
+            if (protect && lock) {
+                commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             if (activeCell != null) {
                 let content = activeCell.content
                 let physicsBox = activeCell.physicsBox

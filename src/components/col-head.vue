@@ -47,12 +47,16 @@ export default {
             let startCol = cols.map.get(this.start)
             let overCol = cols.map.get(this.over)
             let lastCol = cols.list[cols.list.length - 1]
+            let popupShow = this.$store.state.sheets.popup
             let limitWidth = 0
             if (overCol.alias === lastCol.alias) {
                 let userView = this.$store.getters.userView()
                 limitWidth = this.$store.getters.offsetWidth - config.cornerWidth + userView.left
                 if (this.needSider) {
                     limitWidth -= scrollbar()
+                }
+                if (popupShow.show) {
+                    limitWidth -= 280
                 }
             } else {
                 limitWidth = overCol.left + overCol.width

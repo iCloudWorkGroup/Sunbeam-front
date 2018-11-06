@@ -7,6 +7,12 @@ export default {
     UPDATE_SHEET_FROZEN(state, frozen) {
         extend(true, state.list[0], frozen)
     },
+    UPDATE_SHEET_POPUP(state, payload) {
+        state.popup = payload
+    },
+    UPDATE_SHEET_PASSWORD(state, payload) {
+        state.list[0].protect = payload.protect
+    },
     [types.UPDATE_OCCUPY](state, payload) {
         let list = state.list
         let currentSheet = payload.currentSheet
@@ -106,6 +112,7 @@ export default {
     M_UPDATE_PROMPT(state, payload) {
         state.prompt.texts = payload.texts
         state.prompt.show = payload.show
+        state.prompt.type = payload.type
     },
     M_CLEAR_SHEET(state) {
         state.list = []

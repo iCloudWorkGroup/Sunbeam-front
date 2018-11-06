@@ -673,11 +673,18 @@ textarea {
     width: 300px;
     border: 5px solid #6b6d6b;
     z-index: 9999;
-    background: #fff url(../img/uiStyle.gif) repeat-x 0px -130px;
     padding: 0 25px 0 68px;
     margin-top: 1px;
     float: left;
     line-height: normal;
+}
+.promptError{
+    color: #f90;
+    background: #fff url(../img/uiStyle.gif) repeat-x 0px -130px;
+}
+.promptSuccess{
+    color: #12d361;
+    background: #fff url(../img/uiStyle.gif) repeat-x 0px -5px;
 }
 .prompt-left{
     position: absolute;
@@ -687,7 +694,6 @@ textarea {
     height: 50px;
 }
 .prompt-text{
-    color: #f90;
     text-align: center;
     line-height: 50px;
     font-size: 10pt;
@@ -702,5 +708,11 @@ textarea {
  * end
  */
 
+.other-color{
+    border-top: 1px #ccc solid;
+    padding:6px;
+    background:#e1e1e1;
+    cursor: pointer;
+}
 
 

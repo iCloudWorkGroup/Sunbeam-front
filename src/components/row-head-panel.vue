@@ -1,6 +1,7 @@
 <template>
 <div class="row-head-panel"
      ref="panel"
+     @dblclick="dbclickHandle"
      @mousedown="mouseDownHandle"
      @mousemove="mouseMoveHandle" >
     <row-head-item
@@ -77,11 +78,24 @@ export default {
         mouseMoveHandle(e) {
             this.currentMouseMoveState(e)
         },
+        dbclickHandle(e) {
+            this.currentDbclickState(e)
+        },
         currentMouseMoveState(e) {
             console.log('empty function')
         },
         currentMouseDownState(e) {
             console.log('empty function')
+        },
+        currentDbclickState(e) {
+            this.inputHeight(e)
+        },
+        inputHeight(e) {
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: true,
+                title: '设置行高',
+                type: 'height',
+            })
         },
         routineMoveState(e) {
             if (this.adjustState) {
@@ -98,6 +112,7 @@ export default {
                 this.adjustRowIndex = rowIndex
                 this.adjustRow = rows[rowIndex]
                 this.currentMouseDownState = this.startAdjustHandleState
+                this.currentDbclickState = {}
             } else if (posi - row.top < 3 && rowIndex !== 0) {
                 if (rows[rowIndex - 1].hidden) {
                     return
@@ -106,10 +121,11 @@ export default {
                 this.adjustRowIndex = rowIndex - 1
                 this.adjustRow = rows[rowIndex - 1]
                 this.currentMouseDownState = this.startAdjustHandleState
+                this.currentDbclickState = {}
             } else {
                 panel.style.cursor = 'pointer'
                 this.currentMouseDownState = this.locateState
-                // this.currentMouseDownState = this.dragState
+                this.currentDbclickState = this.inputHeight
             }
         },
         startAdjustHandleState(e) {
@@ -162,6 +178,14 @@ export default {
             })
         },
         locateState(e) {
+            let popup = this.$store.state.sheets.popup
+            if (popup.type === 'width') {
+                this.$store.commit('UPDATE_SHEET_POPUP', {
+                    show: popup.show,
+                    title: '设置行高',
+                    type: 'height',
+                })
+            }
             this.$store.commit('M_SELECT_UPDATE_MOUSESTATUS', 'DRAG')
             let rowPosi = this.getRelativePosi(e.clientY)
             let rowIndex = this.$store.getters.getRowIndexByPosi(rowPosi)

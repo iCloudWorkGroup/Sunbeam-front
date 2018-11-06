@@ -9,7 +9,9 @@ const state = {
         frozen: true,
         rowcol: true,
         hide: true,
-        comment: true
+        comment: true,
+        validation: true,
+        protect: true
     }
 }
 export default {

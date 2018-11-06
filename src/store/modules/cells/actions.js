@@ -228,12 +228,7 @@ export default {
         }
     },
     /**
-     * 修改单元格属性
-     * @param {[type]}  options.propName   [属性名，发送到后台，根据命令的不同]
-     * @param {[type]}  options.propStruct [属性结构，直接覆盖独享的结构]
-     * @param {Boolean} options.coordinate [修改的范围，如果是boolean值，就按照给定的方位
-     * 如果是boolean值，根据视图的选中区域执行操作]
-     * coordinate 内部存储的是alias
+     * 批量修改单元格背景色
      */
     A_CELLS_ARRAY_BG({
         state,
@@ -747,13 +742,19 @@ export default {
     },
     async [A_CELLS_MERGE]({
         dispatch,
+        commit,
         getters
     }, coordinate = false) {
         let select = coordinate === false ?
             getters.selectByType(SELECT) : coordinate
         let wholePosi = select.wholePosi
         if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
-            throw new Error('index out of loaded arrange')
+            commit('M_UPDATE_PROMPT', {
+                texts: '合并单元格错误！不可整行/整列合并单元格',
+                show: true,
+                type: 'error'
+            })
+            return
         }
         let signalSort = select.signalSort
         let data = {
@@ -820,7 +821,12 @@ export default {
             getters.selectByType(SELECT) : coordinate
         let wholePosi = select.wholePosi
         if (wholePosi.startRowAlias === 'MAX' || wholePosi.endRowAlias === 'MAX' || wholePosi.startColAlias === 'MAX' || wholePosi.endColAlias === 'MAX') {
-            throw new Error('index out of loaded arrange')
+            commit('M_UPDATE_PROMPT', {
+                texts: '拆分单元格错误！不可整行/整列拆分单元格',
+                show: true,
+                type: 'error'
+            })
+            return
         }
         let signalSort = select.signalSort
         let data = {
@@ -1031,7 +1037,8 @@ export default {
         if (!isLegal) {
             commit('M_UPDATE_PROMPT', {
                 texts: '粘贴区域错误！合并单元格冲突！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -1166,7 +1173,8 @@ export default {
         if (!isLegal) {
             commit('M_UPDATE_PROMPT', {
                 texts: '粘贴区域错误！无法对合并单元格进行此操作！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }
@@ -1242,7 +1250,8 @@ export default {
         if (getters.isFrozen()) {
             commit('M_UPDATE_PROMPT', {
                 texts: '冻结状态下不可调整换行，请取消冻结后重试！',
-                show: true
+                show: true,
+                type: 'error'
             })
             return
         }

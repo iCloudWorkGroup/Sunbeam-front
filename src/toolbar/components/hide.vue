@@ -60,22 +60,34 @@ export default {
     },
     methods: {
         ejectMenu(e, menuName) {
-            if (this.$store.getters.isFrozen()) {
+            let frozen = this.$store.getters.isFrozen()
+            if (frozen) {
                 this.$store.commit('M_UPDATE_PROMPT', {
                     texts: '冻结状态下不可进行此操作，请取消冻结后重试！',
-                    show: true
+                    show: true,
+                    type: 'error'
                 })
                 this.$store.commit(SWITCH_NAME, '')
-            } else {
-                let el = e.currentTarget
-                this.opr = el.dataset.opr
-                let menu = this.$refs[menuName]
-                let menuEl
-                if (menu != null && (menuEl = menu.$el) != null) {
-                    menuEl.style.top = unit(el.offsetHeight + el.offsetTop - 2)
-                    menuEl.style.left = unit(el.offsetLeft)
-                    this.$store.commit(SWITCH_NAME, menuName)
-                }
+                return
+            }
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                this.$store.commit(SWITCH_NAME, '')
+                return
+            }
+            let el = e.currentTarget
+            this.opr = el.dataset.opr
+            let menu = this.$refs[menuName]
+            let menuEl
+            if (menu != null && (menuEl = menu.$el) != null) {
+                menuEl.style.top = unit(el.offsetHeight + el.offsetTop - 2)
+                menuEl.style.left = unit(el.offsetLeft)
+                this.$store.commit(SWITCH_NAME, menuName)
             }
         }
     },

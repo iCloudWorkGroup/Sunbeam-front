@@ -1,4 +1,5 @@
 import './css/main.css'
+import './css/siderbar.css'
 import Vue from 'vue'
 import store from './store'
 import Book from './components/book.vue'

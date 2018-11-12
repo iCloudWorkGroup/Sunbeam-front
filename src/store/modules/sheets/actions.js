@@ -34,7 +34,8 @@ export default {
                 left: 0,
                 bottom: 0,
                 right: 0
-            }
+            },
+            validate: sheet.validate
         }
         if (sheet.frozen && sheet.frozen.colAlias) {
             let cols = rootState.cols.list
@@ -95,7 +96,6 @@ export default {
         dispatch,
         commit
     }, payload) {
-        let protect = getters.isProtect()
         let sendArgs = { protect: payload.protect }
         sendArgs.passwd = payload.passwd
         send({
@@ -107,24 +107,24 @@ export default {
             }
             // 不可以 上锁 或者 解锁
             if (!data.isLegal) {
-                if (protect) {
-                    commit('M_UPDATE_PROMPT', {
-                        texts: '密码错误！请重新输入密码！',
-                        show: true,
-                        type: 'error'
-                    })
-                } else {
+                if (payload.protect) {
                     commit('M_UPDATE_PROMPT', {
                         texts: '添加密码超时！请重新操作！',
                         show: true,
                         type: 'error'
                     })
+                } else {
+                    commit('M_UPDATE_PROMPT', {
+                        texts: '密码错误！请重新输入密码！',
+                        show: true,
+                        type: 'error'
+                    })
                 }
             } else {
-                if (protect) {
+                if (payload.protect) {
                     commit('UPDATE_SHEET_PASSWORD', payload)
                     commit('M_UPDATE_PROMPT', {
-                        texts: '取消保护工作簿成功！',
+                        texts: '保护工作簿成功！仅可修改数据区数据！',
                         show: true,
                         type: 'success'
                     })
@@ -136,7 +136,7 @@ export default {
                 } else {
                     commit('UPDATE_SHEET_PASSWORD', payload)
                     commit('M_UPDATE_PROMPT', {
-                        texts: '保护工作簿成功！',
+                        texts: '取消保护工作簿成功！',
                         show: true,
                         type: 'success'
                     })

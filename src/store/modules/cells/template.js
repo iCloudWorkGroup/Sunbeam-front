@@ -33,7 +33,8 @@ export default {
         underline: 0,
         background: 'transparent',
         alignRowFormat: '',
-        locked: true
+        locked: true,
+        ruleIndex: '1'
     },
     // 批注属性
     customProp: {

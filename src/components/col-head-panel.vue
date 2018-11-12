@@ -96,6 +96,17 @@ export default {
                 title: '设置列宽',
                 type: 'width',
             })
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
+            })
         },
         routineMoveState(e) {
             if (this.adjustState) {
@@ -130,6 +141,15 @@ export default {
 
         startAdjustHandleState(e) {
             this.$store.commit('SWITCH_NAME', '')
+            let protect = this.$store.getters.isProtect()
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
             let adjustHandle
             let self = this
 

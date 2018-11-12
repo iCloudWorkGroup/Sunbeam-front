@@ -17,28 +17,29 @@
                         <form class="validate-content">
                             <div>
                                 <label>类型:</label>
-                                <select name="type" class="">
-                                    <option class="default" value="default">任意值</option>
-                                    <option value="intType" class="intType">整数</option>
-                                    <option value="decimalType" class="decimalType">小数</option>
-                                    <option value="textType" class="textType">文本长度</option>
-                                    <option value="sequenceType">序列</option></select>
+                                <select v-model="selected" @change="update">
+                                    <option v-for="select in selects" :value="select.value">{{ select.text }}</option>
+                                </select>
                             </div>
-                            <div class="range">
+                            <div class="range" v-show="selected !== 'sequenceType' && selected !== 'default'">
                                 <label>最小值:</label>
-                                <input type="text" name="min" class="min"><br>
+                                <input type="text" name="min" class="min" v-model="min"><br>
                                 <label>最大值:</label>
-                                <input type="text" name="max" class="max">
+                                <input type="text" name="max" class="max" v-model="max">
                             </div>
-                            <div class="source">
+                            <div class="source" v-show="selected === 'sequenceType'">
                                 <label>来源:</label>
-                                <input type="text" class="source-data" maxlength="50" name="source">
-                                <div class="select-out"></div>
+                                <input type="text" class="source-data"
+                                        maxlength="50" name="source"
+                                        v-model="dateCellIndex">
+                                <div class="select-out"
+                                     :class="{ on: dateSource}"
+                                     @click="changeSelect"></div>
                             </div>
                         </form>
                         <div class="error">选中区域内包含多种验证规则</div>
                         <div class="oper">
-                            <span class="confirm">确定</span>
+                            <span class="confirm" @click="adjuctValidation">确定</span>
                             <span class="cancel" @click="close">取消</span>
                         </div>
                     </div>
@@ -101,43 +102,6 @@
                     </div>
                 </div>
             </div>
-            <div class="siderbar-body" v-show="popup.type === 'lock'">
-                <div>
-                    <div class="siderbar-item clearfix">
-                        <div class="lock-content">
-                            <div class="title">
-                                <span>锁定</span>
-                                <div class="checkbox lock-toggle"
-                                     :class="{ checked: locked }"
-                                    @click="updateLock"></div>
-                            </div><div class="content">
-                            <label>所选区域：</label>
-                            <input type="text" v-model="cellIndex" disabled="disabled">
-                        </div>
-                            <div class="oper">
-                                <span class="confirm" @click="adjuctLock">确定</span>
-                                <span class="cancel" @click="close">取消</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="siderbar-body"  v-show="popup.type === 'protect'">
-                <div>
-                    <div class="siderbar-item clearfix">
-                        <div class="protect-content">
-                            <div class="content">
-                                <label>密码：</label>
-                                <input v-model="password" type="password">
-                            </div>
-                            <div class="oper">
-                                <span class="confirm" @click="updatePass">确定</span>
-                                <span class="cancel" @click="close">取消</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -145,6 +109,9 @@
 import {
     unit
 } from '../filters/unit'
+import {
+    hexToRgb
+} from '../tools/format'
 import {
     getColDisplayName
 } from '../util/displayname'
@@ -156,8 +123,18 @@ export default {
             colArr: [],
             rowArr: [],
             value: '',
-            locked: true,
-            password: ''
+            selected: 'default',
+            max: '',
+            min: '',
+            sort: '',
+            selects: [
+                { value: 'default', text: '任意值' },
+                { value: 'intType', text: '整数' },
+                { value: 'decimalType', text: '小数' },
+                { value: 'textType', text: '文本长度' },
+                { value: 'sequenceType', text: '序列' },
+            ],
+            dateSource: false,
         }
     },
     computed: {
@@ -200,7 +177,55 @@ export default {
             let endCol = signalSort.endCol
             let scol = getColDisplayName(startCol)
             let ecol = getColDisplayName(endCol)
-            this.locked = this.$store.getters.hasLockCell()
+            let ruleID = this.$store.getters.cellValidation()
+            if (ruleID == null) {
+                this.selected = 'default'
+            } else {
+                let validates = this.$store.getters.validate()
+                for (let k = 0, lenk = validates.length; k < lenk; k++) {
+                    let validate = validates[k]
+                    if (ruleID === validate.index) {
+                        if (validate.rule.type === 1) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'intType'
+                        }
+                        if (validate.rule.type === 2) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'decimalType'
+                        }
+                        if (validate.rule.type === 3) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'textType'
+                        }
+                        if (validate.rule.type === 4) {
+                            this.selected = 'sequenceType'
+                        }
+                    }
+                }
+            }
+            if (endRow === -1) {
+                return '=$' + scol + ':$' + ecol
+            }
+            if (endCol === -1) {
+                return '=$' + (startRow + 1) + ':$' + (endRow + 1)
+            }
+            return '=$' + scol + (startRow + 1) + ':$' + ecol + (endRow + 1)
+        },
+        dateCellIndex() {
+            let select = this.$store.getters.selectByType('DATASOURCE')
+            if (select == null) {
+                return ''
+            }
+            let signalSort = select.signalSort
+            let startRow = signalSort.startRow
+            let endRow = signalSort.endRow
+            let startCol = signalSort.startCol
+            let endCol = signalSort.endCol
+            let scol = getColDisplayName(startCol)
+            let ecol = getColDisplayName(endCol)
             if (endRow === -1) {
                 return '=$' + scol + ':$' + ecol
             }
@@ -211,19 +236,101 @@ export default {
         },
     },
     methods: {
+        update() {
+            this.min = ''
+            this.max = ''
+            this.sort = '123'
+        },
+        changeSelect() {
+            if (this.dateSource) {
+                this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            } else {
+                this.$store.commit('M_SELECT_UPDATE_STATE', 'DATASOURCE')
+            }
+            this.dateSource = !this.dateSource
+        },
         close() {
             this.$store.commit('UPDATE_SHEET_POPUP', {
                 show: false,
                 title: '',
                 type: ''
             })
+            this.dateSource = false
+            this.value = ''
+            let ruleID = this.$store.getters.cellValidation()
+            if (ruleID == null) {
+                this.selected = 'default'
+            } else {
+                let validates = this.$store.getters.validate()
+                for (let k = 0, lenk = validates.length; k < lenk; k++) {
+                    let validate = validates[k]
+                    if (ruleID === validate.index) {
+                        if (validate.rule.type === 1) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'intType'
+                        }
+                        if (validate.rule.type === 2) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'decimalType'
+                        }
+                        if (validate.rule.type === 3) {
+                            this.min = validate.rule.formula1
+                            this.max = validate.rule.formula2
+                            this.selected = 'textType'
+                        }
+                        if (validate.rule.type === 4) {
+                            this.selected = 'sequenceType'
+                        }
+                    }
+                }
+            }
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
+            })
+        },
+        adjuctValidation() {
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: false,
+                title: '',
+                type: ''
+            })
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
+            })
         },
         adjustColWidht() {
+            let protect = this.$store.getters.isProtect()
             let arr = this.colArr
             let width = Number(this.value)
             if (width < 5 || width > 200) {
                 this.$store.commit('M_UPDATE_PROMPT', {
                     texts: '列宽必须大于5且小于200',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
                     show: true,
                     type: 'error'
                 })
@@ -235,14 +342,29 @@ export default {
                     index: arr[i]
                 })
             }
+            this.value = ''
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: false,
+                title: '',
+                type: ''
+            })
         },
         adjustRowHeight() {
             //  >5 且必须为数字
+            let protect = this.$store.getters.isProtect()
             let arr = this.rowArr
             let height = Number(this.value)
             if (height < 5 || height > 100) {
                 this.$store.commit('M_UPDATE_PROMPT', {
                     texts: '行高必须大于5且小于100',
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
+            if (protect) {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: '工作簿已保护，请取消保护后操作！',
                     show: true,
                     type: 'error'
                 })
@@ -254,27 +376,21 @@ export default {
                     index: arr[i]
                 })
             }
+            this.value = ''
+            this.$store.commit('UPDATE_SHEET_POPUP', {
+                show: false,
+                title: '',
+                type: ''
+            })
         },
         adjustColor() {
-            let color = this.value
+            let value = this.value === '' ? '#000000' : this.value
+            let color = hexToRgb(value)
             this.$store.dispatch('A_CELLS_UPDATE', {
                 propName: 'background',
                 propStruct: {
                     content: {
                         background: color
-                    }
-                }
-            })
-        },
-        updateLock() {
-            this.locked = !this.locked
-        },
-        adjuctLock() {
-            this.$store.dispatch('A_CELLS_UPDATE', {
-                propName: 'lock',
-                propStruct: {
-                    content: {
-                        locked: this.locked
                     }
                 }
             })
@@ -284,23 +400,6 @@ export default {
                 type: ''
             })
         },
-        updatePass() {
-            let passwd = this.password
-            let protect = this.$store.getters.isProtect()
-            if (passwd !== '' && (passwd.length > 18 || passwd.length < 4)) {
-                this.$store.commit('M_UPDATE_PROMPT', {
-                    show: true,
-                    texts: '密码格式错误！密码应为空或位数限制 4-18',
-                    type: 'error'
-                })
-                return
-            }
-            this.$store.dispatch('A_SHEETS_PROTECT', {
-                protect: !protect,
-                passwd
-            })
-            this.password = ''
-        }
     }
 }
 </script>

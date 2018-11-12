@@ -76,6 +76,17 @@ export default {
                 title: '修改背景色',
                 type: 'color',
             })
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
+            })
         },
         setBackground(e) {
             let el = e.target

@@ -268,6 +268,8 @@ export default {
                     },
                 })
             } else if (keyCode >= 37 && keyCode <= 40) {
+                // 点击方向键时，完成当前编辑
+                this.doneEdit(e)
                 // 方向键
                 let {
                     activeColAlias,

@@ -19,7 +19,7 @@ export function parseExpress(str) {
         handle: 'article'
     }, {
         // reg: /(y{4})[-/年]?(m{1,2})[-/月]?(d{1,2})[日]?$|(y{4})[-/年]?(m{1,2})[-/月]?/g,
-        reg: /(y{4})\"[-/年]\"?(m{1,2})\"[-/月]\"?(d{1,2})\"[日]\"?$|(y{4})\"[-/年]\"?(m{1,2})\"[-/月]\"?|m\/d\/yy/g,
+        reg: /(y{4})\'[-/年]\'?(m{1,2})\'[-/月]\'?(d{1,2})\'[日]\'?$|(y{4})\'[-/年]\'?(m{1,2})\'[-/月]\'?|m\/d\/yy/g,
         handle: 'whole',
         match: true
     }, {
@@ -206,7 +206,7 @@ export function formatText(rules, text) {
                 return (dateMap[localName] != null) ?
                     dateMap[localName] : ''
             })
-            ret = ret.replace(/\"/g, '')
+            ret = ret.replace(/\'/g, '')
             return ret
         }
     }
@@ -313,7 +313,7 @@ export function parseType(texts) {
         } else if (texts.indexOf('日') > -1) {
             formatObj.autoRecExpress = 'yyyy"年"m"月"d"日"'
         } else {
-            formatObj.autoRecExpress = 'yyyy"年"m"月"'
+            formatObj.autoRecExpress = 'yyy"年"m"月"'
         }
     } else {
         formatObj.autoRecType = 'text'
@@ -423,4 +423,8 @@ export function parseText(cell, format, rules, express) {
             express: fixExpress
         }
     })
+}
+
+export function hexToRgb(hex) {
+    return 'rgb(' + parseInt('0x' + hex.slice(1, 3), 16) + ', ' + parseInt('0x' + hex.slice(3, 5), 16) + ', ' + parseInt('0x' + hex.slice(5, 7), 16) + ')'
 }

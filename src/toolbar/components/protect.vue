@@ -36,7 +36,17 @@ export default {
                 title,
                 type: 'protect'
             })
-
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
+            })
         },
         lock() {
             let protect = this.$store.getters.isProtect()
@@ -52,6 +62,17 @@ export default {
                 show: true,
                 title: '锁定单元格',
                 type: 'lock'
+            })
+            this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+            let selects = this.$store.state.selects.list
+            let destroyDataSource = {}
+            selects.forEach((item, index) => {
+                if (item.type === 'DATASOURCE') {
+                    destroyDataSource = item
+                }
+            })
+            this.$store.dispatch('SELECTS_DELETE', {
+                select: destroyDataSource
             })
         }
     }

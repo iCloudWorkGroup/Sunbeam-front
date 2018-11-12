@@ -154,7 +154,8 @@ export default {
         // 提示栏信息
         state.prompt = {
             show: false,
-            texts: ''
+            texts: '',
+            type: ''
         }
     }
 }

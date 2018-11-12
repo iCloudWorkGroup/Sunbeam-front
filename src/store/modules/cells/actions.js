@@ -319,6 +319,98 @@ export default {
             }
         })
     },
+    /**
+     * 批量修改单元格背景色
+     */
+    A_CELLS_LOCK({
+        state,
+        commit,
+        dispatch,
+        getters
+    }, {
+        propName,
+        propStruct,
+        coordinate = false
+    }) {
+        let select = coordinate
+        let wholePosi = select.wholePosi
+        let rows = getters.allRows
+        let cols = getters.allCols
+        let signalSort = select.signalSort
+        let sendArgs = {
+            coordinate: signalSort,
+            lock: propStruct.content.locked
+        }
+        send({
+            url: config.url[propName],
+            body: JSON.stringify(sendArgs)
+        })
+        wholePosi.forEach((item, index) => {
+            if (item.startRowAlias == null || item.startColAlias == null || item.endColAlias == null || item.endRowAlias == null) {
+                return
+            }
+            let startColIndex = getters.colIndexByAlias(item.startColAlias)
+            let endColIndex = getters.colIndexByAlias(item.endColAlias)
+            let startRowIndex = getters.rowIndexByAlias(item.startRowAlias)
+            let endRowIndex = getters.rowIndexByAlias(item.endRowAlias)
+            if (endRowIndex === -1) {
+                dispatch(COLS_OPERCOLS, {
+                    startIndex: startColIndex,
+                    endIndex: endColIndex,
+                    props: propStruct
+                })
+            } else if (endColIndex === -1) {
+                dispatch(ROWS_OPERROWS, {
+                    startIndex: startRowIndex,
+                    endIndex: endRowIndex,
+                    props: propStruct
+                })
+            }
+
+            // 修正参数
+            endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+            endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+            // 如果有对应的单元格，修改属性
+            // 如果没有对应的单元格，插入单元格
+            let avoidRepeat = {}
+            for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+                for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                    let colAlias = cols[i].alias
+                    let rowAlias = rows[j].alias
+                    let idx = getters.IdxByRow(colAlias, rowAlias)
+                    if (idx !== -1) {
+                        if (!avoidRepeat[idx]) {
+                            avoidRepeat[idx] = true
+                            let cellOccupy = getters.cells[idx].occupy
+                            let occupyColStartIdx = getters.colIndexByAlias(cellOccupy.col[0])
+                            let occupyRowStartIdx = getters.rowIndexByAlias(cellOccupy.row[0])
+                            let occupyColEndIdx = getters.colIndexByAlias(cellOccupy.col[cellOccupy.col.length - 1])
+                            let occupyRowEndIdx = getters.rowIndexByAlias(cellOccupy.row[cellOccupy.row.length - 1])
+                            if (occupyColEndIdx === -1 || occupyRowEndIdx === -1) {
+                                return
+                            }
+                            if (occupyColStartIdx >= startColIndex && occupyColEndIdx <= endColIndex
+                                && occupyRowStartIdx >= startRowIndex && occupyRowEndIdx <= endRowIndex) {
+                                commit(mutationTypes.UPDATE_CELL, {
+                                    idx,
+                                    prop: propStruct
+                                })
+                            }
+                        }
+                    } else {
+                        dispatch('A_CELLS_ADD', {
+                            props: extend(propStruct, {
+                                occupy: {
+                                    col: [colAlias],
+                                    row: [rowAlias]
+                                }
+                            }),
+                        })
+                    }
+                }
+            }
+        })
+    },
     /*
     * 设置单元格边框
     * */

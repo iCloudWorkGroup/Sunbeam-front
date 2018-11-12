@@ -17,6 +17,11 @@ export default {
             return state.list[0].frozen.alias
         }
     },
+    validate(state) {
+        return function () {
+            return state.list[0].validate
+        }
+    },
     userView(state) {
         return function() {
             return state.list[0].userView

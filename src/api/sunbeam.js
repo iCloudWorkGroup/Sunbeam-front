@@ -724,7 +724,60 @@ SpreadSheet.prototype = {
         let cell = cells[cellIdx]
         return cell.content.texts === null ? '' : cell.content.texts
     },
-
+    lock(sheetId, point, locked) {
+        let p
+        let lock
+        if (arguments.length === 2) {
+            p = sheetId
+            lock = point
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            p = point
+            lock = locked
+        }
+        let selects = {
+            wholePosi: [],
+            signalSort: []
+        }
+        p.forEach((point, index) => {
+            // 修正参数
+            let select
+            if (typeof point.endCol === 'undefined') {
+                select = this.getPoint([point.startCol + point.startRow,
+                    point.startCol + point.startRow])
+            } else {
+                select = this.getPoint([point.startCol + point.startRow,
+                    point.endCol + point.endRow])
+            }
+            selects.wholePosi.push(select.wholePosi)
+            selects.signalSort.push(select.signalSort)
+        })
+        this.bookVm.$store.dispatch('A_CELLS_LOCK', {
+            propName: 'lock',
+            propStruct: {
+                content: {
+                    locked: lock
+                }
+            },
+            coordinate: selects
+        })
+    },
+    protect(sheetId, protect, password) {
+        let p
+        let passwd
+        if (arguments.length === 2) {
+            p = sheetId
+            passwd = protect
+        }
+        if (arguments.length === 3 && typeof arguments[0] === 'string') {
+            p = protect
+            passwd = password
+        }
+        this.bookVm.$store.dispatch('A_SHEETS_PROTECT', {
+            protect: p,
+            passwd
+        })
+    },
     // 鼠标选择操作状态切换为数据源操作状态
     setDataSourceState() {
         this.bookVm.$store.commit(M_types.M_SELECT_UPDATE_STATE, 'DATASOURCE')

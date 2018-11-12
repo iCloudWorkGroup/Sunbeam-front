@@ -30,9 +30,9 @@
                 <panel  title="批注" v-show="toolShow.comment">
                     <comment/>
                 </panel>
-                <panel  title="锁定" v-show="toolShow.protect">
-                    <protect/>
-                </panel>
+                <!--<panel  title="锁定" v-show="toolShow.protect">-->
+                    <!--<protect/>-->
+                <!--</panel>-->
                 <panel  title="数据" v-show="toolShow.validation">
                     <Validation/>
                 </panel>
@@ -53,7 +53,7 @@ import Format from './format.vue'
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Validation from './validation.vue'
-import Protect from './protect.vue'
+// import Protect from './protect.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
 import Comment from './comment.vue'
@@ -75,7 +75,7 @@ export default {
         Format,
         Comment,
         Validation,
-        Protect
+        // Protect
     },
     computed: {
         toolbarSelector() {

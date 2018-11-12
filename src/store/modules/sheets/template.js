@@ -44,5 +44,6 @@ export default {
             col: null
         }
     },
-    protect: false
+    protect: false,
+    validate: []
 }

@@ -65,13 +65,24 @@ export default {
                     frozen.colAlias = null
                 }
             }
+            // 模拟数据验证规则
+            let validate = [{
+                index: '1',
+                count: 1,
+                rule: {
+                    formula1: 1,
+                    formula2: 10,
+                    type: 1
+                },
+            }]
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,
                 frozen: frozen,
                 viewRow: bookItem.viewRowAlias,
                 viewCol: bookItem.viewColAlias,
-                protect: bookItem.protect
+                protect: bookItem.protect,
+                validate
             })
             if (frozen != null) {
                 commit('M_SHEETS_ADD_LOADED', frozen)

@@ -533,79 +533,6 @@ textarea {
  */
 
 
-/**
- * sequence
- */
-
-.sequence {
-    position: absolute;
-    background: #fff;
-}
-
-.sequence-btn {
-    position: absolute;
-    top: -15px;
-    width: 14px;
-    height: 14px;
-    background-color: #f3f5f9;
-    border: 1px solid #a6acb3;
-}
-
-.sequence-btn.sequence-btn-right {
-    right: -17px;
-}
-
-.sequence-btn.sequence-btn-left {
-    left: -17px;
-}
-
-.sequence-btn:active {
-    background-color: #e4e8ed;
-}
-
-.sequence-btn-arrow {
-    vertical-align: middle;
-    width: 0;
-    height: 0;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 6px;
-    border-top: 4px solid #6d6f71;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
-}
-
-.sequence-list {
-    display: none;
-    margin-top: 2px;
-    max-height: 200px;
-    border: 1px solid #d4d4d4;
-    overflow-x: hidden;
-    overflow-y: auto;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
-}
-
-.sequence-list.active {
-    display: block;
-}
-
-.sequence-list-item a {
-    display: block;
-    height: 20px;
-    text-decoration: none;
-    color: #000;
-}
-
-.sequence-list-item a:hover {
-    background-color: #ebebec;
-}
-
-
-
-
-/**
- * end
- */
 
 
 /**
@@ -716,4 +643,66 @@ textarea {
     cursor: pointer;
 }
 
+/**
+ * sequence
+ */
+.sequence {
+    position: absolute;
+    background: #fff;
+}
+.sequence-btn{
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    top: -15px;
+    background-color: #f3f5f9;
+    border: 1px solid #a6acb3;
+}
+.sequence-btn.sequence-btn-right{
+    right: -17px;
+}
+.sequence-btn.sequence-btn-left{
+    left: -17px;
+}
+.sequence-btn:active{
+    background-color: #e4e8ed;
+}
+.sequence-btn-arrow{
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 6px;
+    border-top: 4px solid #6d6f71;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+.sequence-list{
+    background: #fff;
+    display: none;
+    margin-top: 2px;
+    max-height: 200px;
+    border:1px solid #d4d4d4;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+}
+.sequence-list.active{
+    display: block;
+}
+.sequence-list-item span{
+    display: block;
+    height: 20px;
+    text-decoration: none;
+    color: #000;
+}
+.sequence-list-item span:hover{
+    background-color: #ebebec;
+}
+
+
+/**
+ * end
+ */
 

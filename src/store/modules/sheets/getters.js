@@ -17,6 +17,28 @@ export default {
             return state.list[0].frozen.alias
         }
     },
+    validateByIndex(state) {
+        return function (index) {
+            let validates = state.list[0].validate
+            for (let k = 0, lenk = validates.length; k < lenk; k++) {
+                let validate = validates[k]
+                if (index === validate.index) {
+                    return validate
+                }
+            }
+        }
+    },
+    validateIndexByIndex(state) {
+        return function (index) {
+            let validates = state.list[0].validate
+            for (let k = 0, lenk = validates.length; k < lenk; k++) {
+                let validate = validates[k]
+                if (index === validate.index) {
+                    return k
+                }
+            }
+        }
+    },
     validate(state) {
         return function () {
             return state.list[0].validate

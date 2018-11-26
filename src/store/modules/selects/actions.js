@@ -29,7 +29,8 @@ export default {
         dispatch
     }, {
         colAlias,
-        rowAlias
+        rowAlias,
+        type = false
     }) {
         let rows = getters.allRows
         let cols = getters.allCols
@@ -69,8 +70,9 @@ export default {
             endColAlias: cols[endColIndex].alias,
             endRowAlias: rows[endRowIndex].alias
         }
+        let activeType = type ? type : getters.activeType
         let fixedSelect = extend(template, {
-            type: getters.activeType,
+            type: activeType,
             alias,
             wholePosi,
             activePosi,

@@ -39,6 +39,9 @@ export default {
             generator.colAliasGenerator(parseInt(bookItem.maxColAlias,
                 0))
             generator.cellAliasGenerator(0)
+            let queue = bookItem.queue || 0
+            generator.validateIndexGenerator(parseInt(queue,
+                0))
 
             commit('UPDATE_SHEETS_MAX', {
                 colAlias: bookItem.maxColAlias,
@@ -65,16 +68,17 @@ export default {
                     frozen.colAlias = null
                 }
             }
+            let validate = bookItem.validate
             // 模拟数据验证规则
-            let validate = [{
-                index: '1',
-                count: 1,
-                rule: {
-                    formula1: 1,
-                    formula2: 10,
-                    type: 1
-                },
-            }]
+            // let validate = [
+            //     {
+            //         formula1: 2,
+            //         type: 1,
+            //         operator: 1,
+            //         index: '1',
+            //         count: 1
+            //     },
+            // ]
             dispatch(SHEET_INSERT, {
                 alias: bookItem.alias || '0',
                 name: bookItem.name,

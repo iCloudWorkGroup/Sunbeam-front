@@ -83,7 +83,25 @@
     <div class="comment"
          :style="objStyle"
          v-if="commentShow"
-        v-html="comment">
+         v-html="comment">
+    </div>
+    <div class="sequence"
+         v-if="sortShow"
+         :style="sortStyle">
+        <div class="sequence-btn sequence-btn-right"
+            @click="changeBtn">
+            <div class="sequence-btn-arrow"></div>
+        </div>
+        <ul class="sequence-list"
+            style="height: 60px"
+            :class="{ active: active}">
+            <li class="sequence-list-item"
+                v-for="(value, index) in sortValue"
+                date-value="sss"
+                @click="setCellText(index)">
+                <span date-value="value">{{value}}</span>
+            </li>
+        </ul>
     </div>
 </div>
 </template>
@@ -97,11 +115,19 @@ import {
     unit
 } from '../filters/unit'
 import config from '../config'
+import {
+    formatText, isNum, isDate,
+    parseExpress, parsePropStruct,
+    parseType,
+} from '../tools/format'
+import send from '../util/send'
 export default {
     data() {
         return {
             scrollbarWidth: scrollbar(),
-            localState: this.$store.state
+            localState: this.$store.state,
+            active: false,
+            sortValue: ''
         }
     },
     computed: {
@@ -139,6 +165,17 @@ export default {
                 top: unit(cell.physicsBox.top - this.localState.sheets.scroll.top + config.cornerHeight - 2 - userView.top),
             }
         },
+        sortStyle() {
+            let cell = this.$store.getters.activeCell()
+            let userView = this.$store.getters.userView()
+            // let height = this.active ? cell.physicsBox.height : 0
+            return {
+                fontSize: '10pt',
+                width: unit(cell.physicsBox.width + 2),
+                left: unit(cell.physicsBox.left - this.localState.sheets.scroll.left + config.cornerWidth - 1 - userView.left),
+                top: unit(cell.physicsBox.top + cell.physicsBox.height - this.localState.sheets.scroll.top + config.cornerHeight - 1 - userView.top),
+            }
+        },
         comment() {
             let comment = this.$store.getters.mouseInCell.customProp.comment
             let reg = new RegExp('\n', 'g')
@@ -147,6 +184,21 @@ export default {
         },
         commentShow() {
             return this.$store.getters.mouseInCell != null
+        },
+        sortShow() {
+            let cell = this.$store.getters.activeCell()
+            this.active = false
+            let flag = false
+            if (cell != null) {
+                let ruleID = cell.ruleIndex
+                if (ruleID != null) {
+                    let validate = this.$store.getters.validateByIndex(ruleID)
+                    if (validate.type === 3 || validate.type === 7) {
+                        flag = true
+                    }
+                }
+            }
+            return flag
         },
         rowFirst() {
             let rowRule = this.localSheet.frozen.row
@@ -202,7 +254,81 @@ export default {
                 scrollLeft
             })
 
-        }
+        },
+        changeBtn() {
+            if (this.active) {
+                this.active = false
+                return
+            }
+            let cell = this.$store.getters.activeCell()
+            let validate = this.$store.getters.validateByIndex(cell.ruleIndex)
+            let select = this.$store.getters.selectByType('SELECT')
+            let rowIndex = this.$store.getters.rowIndexByAlias(select.wholePosi.startRowAlias)
+            let colIndex = this.$store.getters.colIndexByAlias(select.wholePosi.startColAlias)
+            if (validate.type === 3) {
+                this.sortValue = validate.formula1.split(',')
+                this.active = !this.active
+            } else {
+                let _this = this
+                send({
+                    url: config.url.full,
+                    body: JSON.stringify({
+                        oprCol: colIndex,
+                        oprRow: rowIndex
+                    })
+                }, false).then(function(data) {
+                    _this.sortValue = data.expResult
+                    _this.active = !_this.active
+                })
+            }
+        },
+        setCellText(index) {
+            this.active = false
+            let cell = this.$store.getters.activeCell()
+            let select = this.$store.getters.selectByType('SELECT')
+            let rowIndex = this.$store.getters.rowIndexByAlias(select.wholePosi.startRowAlias)
+            let colIndex = this.$store.getters.colIndexByAlias(select.wholePosi.startColAlias)
+            let value = this.sortValue[index]
+            let propStruct = { content: {}}
+            let rules
+            let date = false
+            let row = this.$store.getters.allRows[rowIndex].props.content
+            let col = this.$store.getters.allCols[colIndex].props.content
+            let formatObj = parseType(value)
+            if (formatObj.autoRecType === 'text') {
+                propStruct.content.texts = value
+                propStruct.content.displayTexts = value
+                // 修正单元格对齐方式
+                propStruct.content.alignRowFormat = 'left'
+            } else {
+                let fixProp = parsePropStruct(cell, formatObj, value, row, col)
+                let express = fixProp.content.express
+                let fixText = fixProp.content.texts
+                propStruct.content = fixProp.content
+                rules = parseExpress(express)
+                date = fixProp.date
+                if (express !== '@') {
+                    rules = parseExpress(express)
+                    date = formatObj.date
+                    propStruct.content.displayTexts = this.parseText(date, rules, fixText)
+                } else {
+                    propStruct.content.displayTexts = fixText
+                }
+            }
+            this.$store.dispatch('A_CELLS_UPDATE', {
+                propName: 'texts',
+                propStruct,
+            })
+        },
+        parseText(date, rules, texts) {
+            let text = texts
+            if (date && isDate(text)) {
+                text = formatText(rules, text)
+            } else if (!date && isNum(text)) {
+                text = formatText(rules, parseFloat(text, 10))
+            }
+            return text
+        },
     }
 }
 </script>
@@ -226,5 +352,8 @@ export default {
     word-wrap:break-word;
     word-break:break-all;
     overflow: hidden;
+}
+.sort-value {
+    position: absolute;
 }
 </style>

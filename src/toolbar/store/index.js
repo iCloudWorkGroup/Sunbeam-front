@@ -11,7 +11,6 @@ const state = {
         hide: true,
         comment: true,
         validation: true,
-        protect: true
     }
 }
 export default {

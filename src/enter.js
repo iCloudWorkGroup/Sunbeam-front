@@ -1,6 +1,6 @@
 import Sunbeam from './api/sunbeam'
-// import send from './util/send'
-// import config from './config'
+import send from './util/send'
+import config from './config'
 let ss = new Sunbeam({
     root: '.table',
     toolbar: '.tools'
@@ -22,11 +22,27 @@ ss.addEventListener('mousedown', function (e) {
     // console.log(e)
 })
 document.getElementById('dd').addEventListener('click', function () {
-    ss.batchFillBg('transparent', [{ startCol: 'D', endCol: 'F', startRow: 4, endRow: 5 }, { startCol: 'B', endCol: 'C', startRow: 10, endRow: 12 }])
+    send({
+        url: config.url.validate,
+        body: JSON.stringify({
+            coordinate: [
+                {
+                    startCol: 4,
+                    startRow: 4,
+                    endCol: 4,
+                    endRow: 4
+                }
+            ],
+            rule: {
+                formula1: 1,
+                formula2: 10,
+                type: 1,
+                operator: 1
+            }
+        })
+    })
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.lock([{ startCol: 'C', endCol: 'D', startRow: 3, endRow: 4 }, { startCol: 'E', endCol: 'H', startRow: 11, endRow: 12 }], false)
-    ss.batchFillBg('#ccc', [{ startCol: 'C', endCol: 'D', startRow: 3, endRow: 4 }, { startCol: 'E', endCol: 'H', startRow: 11, endRow: 12 }])
     ss.protect(true, '1111')
 })
 document.getElementById('clear').addEventListener('click', function () {

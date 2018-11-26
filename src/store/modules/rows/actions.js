@@ -13,6 +13,7 @@ import {
     SELECT
 } from '../../../tools/constant'
 import send from '../../../util/send'
+import { validateExis } from '../../../tools/format'
 
 export default {
     /**
@@ -661,6 +662,7 @@ export default {
         })
         // 当前行不为第一行时, 以前一行单元格模板插入/修改单元格occupy、alias、texts、displayTexts
         if (index !== 0) {
+            let validates = getters.validate()
             cells = getters.cellsByOpr({
                 startColIndex: 0,
                 startRowIndex: index - 1,
@@ -669,19 +671,60 @@ export default {
             })
             cells.forEach((item, index) => {
                 if (item.occupy.row.length === 1) {
-                    dispatch('A_CELLS_ADD', {
-                        props: extend(item, {
-                            alias: null,
-                            content: {
-                                texts: null,
-                                displayTexts: null
-                            },
-                            occupy: {
-                                col: item.occupy.col,
-                                row: [insertRow.alias]
-                            }
+                    // 不是合并单元格
+                    if (item.occupy.col.length === 1) {
+                        let ruleID = item.ruleIndex
+                        // 原规则count加一
+                        if (ruleID != null) {
+                            let validate = getters.validateByIndex(ruleID)
+                            let validateIndex = validateExis(validates, validate)
+                            commit('ADD_SHEET_VALIDATE_COUNT', validateIndex)
+                        }
+                        dispatch('A_CELLS_ADD', {
+                            props: extend(item, {
+                                alias: null,
+                                content: {
+                                    texts: null,
+                                    displayTexts: null
+                                },
+                                occupy: {
+                                    col: item.occupy.col,
+                                    row: [insertRow.alias]
+                                }
+                            })
                         })
-                    })
+                    } else {
+                        let occupyCol = item.occupy.col
+                        occupyCol.forEach((col, index) => {
+                            let ruleIndex
+                            if (index === 0) {
+                                let ruleID = item.ruleIndex
+                                // 原规则count加一
+                                if (ruleID != null) {
+                                    let validate = getters.validateByIndex(ruleID)
+                                    let validateIndex = validateExis(validates, validate)
+                                    commit('ADD_SHEET_VALIDATE_COUNT', validateIndex)
+                                }
+                                ruleIndex = ruleID
+                            } else {
+                                ruleIndex = null
+                            }
+                            dispatch('A_CELLS_ADD', {
+                                props: extend(item, {
+                                    alias: null,
+                                    content: {
+                                        texts: null,
+                                        displayTexts: null
+                                    },
+                                    ruleIndex,
+                                    occupy: {
+                                        col: [col],
+                                        row: [insertRow.alias]
+                                    }
+                                })
+                            })
+                        })
+                    }
                 }
             })
         }
@@ -927,6 +970,7 @@ export default {
         dispatch
     }, sort) {
         let index = getters.getRowIndexBySort(sort)
+        let validates = getters.validate()
         let cells = getters.cellsByOpr({
             startRowIndex: index,
             startColIndex: 0,
@@ -954,6 +998,13 @@ export default {
                     })
                 })
                 if (occupyRow.length === 1) {
+                    let ruleID = cell.ruleIndex
+                    // 原规则count减一
+                    if (ruleID != null) {
+                        let validate = getters.validateByIndex(ruleID)
+                        let validateIndex = validateExis(validates, validate)
+                        commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                    }
                     commit(mutationTypes.M_DESTORY_CELL, cell)
                 } else {
                     let newOccupyRow = [...occupyRow]
@@ -1114,6 +1165,8 @@ export default {
         if (cache.localRowPosi > 0) {
             cache.localRowPosi -= deleteRowHeight + 1
         }
+
+        dispatch('A_DELETE_SHEET_VALIDATE')
         commit(mutationTypes.UPDATE_ROW, updateRowInfo)
         Vue.nextTick(function() {
             let rowRecord = cache.rowRecord

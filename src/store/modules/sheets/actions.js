@@ -3,6 +3,10 @@ import * as actionTypes from '../../action-types'
 import {
     INSERT_SHEET,
 } from '../../mutation-types'
+import {
+    validateExis
+} from '../../../tools/format'
+import generator from '../../../tools/generator'
 import template from './template'
 import send from '../../../util/send'
 import config from '../../../config'
@@ -89,6 +93,152 @@ export default {
         }
         commit(INSERT_SHEET, extend(template, fixedSheet))
     },
+    A_ADD_VALIDATE({
+        commit,
+        getters,
+        dispatch
+    }, payload) {
+        let propStruct = {}
+        let validates = getters.validate()
+        // 存在该规则--》 返回规则下标， 不存在返回null
+        let ruleID = validateExis(validates, payload)
+        // 规则唯一标识 index
+        let ruleIndex
+        if (ruleID == null) {
+            ruleIndex = generator.validateIndexGenerator()
+            let validate = extend(payload, { index: ruleIndex, count: 0 })
+            commit('UPDATE_SHEET_VALIDATE', validate)
+        } else {
+            ruleIndex = validates[ruleID].index
+        }
+        let newIndex = validateExis(validates, payload)
+        propStruct.ruleIndex = ruleIndex
+        let select = getters.selectByType('SELECT')
+        let wholePosi = select.wholePosi
+        let rows = getters.allRows
+        let cols = getters.allCols
+        let cells = getters.cells
+        let sendArgs = {
+            coordinate: [select.signalSort],
+            rule: payload
+        }
+        send({
+            url: config.url.validate,
+            body: JSON.stringify(sendArgs)
+        })
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        // 修正参数
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        let avoidRepeat = {}
+        for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+            for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                let colAlias = cols[i].alias
+                let rowAlias = rows[j].alias
+                let idx = getters.IdxByRow(colAlias, rowAlias)
+                if (idx !== -1) {
+                    if (!avoidRepeat[idx]) {
+                        let ruleID = cells[idx].ruleIndex
+                        // 原规则count减一
+                        if (ruleID != null) {
+                            let validate = getters.validateByIndex(ruleID)
+                            let validateIndex = validateExis(validates, validate)
+                            commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                        }
+                        // 现规则count加一
+                        commit('ADD_SHEET_VALIDATE_COUNT', newIndex)
+                        avoidRepeat[idx] = true
+                        commit('UPDATE_CELL', {
+                            idx,
+                            prop: propStruct
+                        })
+                    }
+                } else {
+                    commit('ADD_SHEET_VALIDATE_COUNT', newIndex)
+                    dispatch('A_CELLS_ADD', {
+                        props: extend(propStruct, {
+                            occupy: {
+                                col: [colAlias],
+                                row: [rowAlias]
+                            }
+                        }),
+                    })
+                }
+            }
+        }
+        dispatch('A_DELETE_SHEET_VALIDATE')
+    },
+    A_DELETE_VALIDATE({
+        commit,
+        getters,
+        dispatch
+    }) {
+        let validates = getters.validate()
+        let select = getters.selectByType('SELECT')
+        let wholePosi = select.wholePosi
+        let rows = getters.allRows
+        let cols = getters.allCols
+        let cells = getters.cells
+        let propStruct = {
+            ruleIndex: null
+        }
+        let sendArgs = {
+            coordinate: [select.signalSort],
+            rule: {
+                type: 0
+            }
+        }
+        send({
+            url: config.url.validate,
+            body: JSON.stringify(sendArgs)
+        })
+        let startColIndex = getters.colIndexByAlias(wholePosi.startColAlias)
+        let endColIndex = getters.colIndexByAlias(wholePosi.endColAlias)
+        let startRowIndex = getters.rowIndexByAlias(wholePosi.startRowAlias)
+        let endRowIndex = getters.rowIndexByAlias(wholePosi.endRowAlias)
+        // 修正参数
+        endRowIndex = endRowIndex === -1 ? rows.length - 1 : endRowIndex
+        endColIndex = endColIndex === -1 ? cols.length - 1 : endColIndex
+        let avoidRepeat = {}
+        for (let i = startColIndex, colLen = endColIndex + 1; i < colLen; i++) {
+            for (let j = startRowIndex, rowLen = endRowIndex + 1; j < rowLen; j++) {
+                let colAlias = cols[i].alias
+                let rowAlias = rows[j].alias
+                let idx = getters.IdxByRow(colAlias, rowAlias)
+                if (idx !== -1) {
+                    if (!avoidRepeat[idx]) {
+                        let ruleID = cells[idx].ruleIndex
+                        // 原规则count减一
+                        if (ruleID != null) {
+                            let validate = getters.validateByIndex(ruleID)
+                            let validateIndex = validateExis(validates, validate)
+                            commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                        }
+                        avoidRepeat[idx] = true
+                        commit('UPDATE_CELL', {
+                            idx,
+                            prop: propStruct
+                        })
+                    }
+                }
+            }
+        }
+        dispatch('A_DELETE_SHEET_VALIDATE')
+    },
+    A_DELETE_SHEET_VALIDATE({
+        getters,
+        commit
+    }) {
+        let validates = getters.validate()
+        validates.forEach((item, index) => {
+            if (item.count <= 0) {
+                commit('M_DELETE_SHEET_VALIDATE', index)
+            }
+        })
+    },
     A_SHEETS_PROTECT({
         state,
         getters,
@@ -96,58 +246,17 @@ export default {
         dispatch,
         commit
     }, payload) {
-        let sendArgs = { protect: payload.protect }
-        sendArgs.passwd = payload.passwd
-        send({
-            url: config.url.protect,
-            body: JSON.stringify(sendArgs)
-        }, false).then(function (data) {
-            if (data.isLegal === false) {
-                cache.step++
-            }
-            // 不可以 上锁 或者 解锁
-            if (!data.isLegal) {
-                if (payload.protect) {
-                    commit('M_UPDATE_PROMPT', {
-                        texts: '添加密码超时！请重新操作！',
-                        show: true,
-                        type: 'error'
-                    })
-                } else {
-                    commit('M_UPDATE_PROMPT', {
-                        texts: '密码错误！请重新输入密码！',
-                        show: true,
-                        type: 'error'
-                    })
-                }
-            } else {
-                if (payload.protect) {
-                    commit('UPDATE_SHEET_PASSWORD', payload)
-                    commit('M_UPDATE_PROMPT', {
-                        texts: '保护工作簿成功！仅可修改数据区数据！',
-                        show: true,
-                        type: 'success'
-                    })
-                    commit('UPDATE_SHEET_POPUP', {
-                        show: false,
-                        title: '',
-                        type: ''
-                    })
-                } else {
-                    commit('UPDATE_SHEET_PASSWORD', payload)
-                    commit('M_UPDATE_PROMPT', {
-                        texts: '取消保护工作簿成功！',
-                        show: true,
-                        type: 'success'
-                    })
-                    commit('UPDATE_SHEET_POPUP', {
-                        show: false,
-                        title: '',
-                        type: ''
-                    })
-                }
-            }
+        commit('UPDATE_SHEET_PASSWORD', payload)
+        commit('UPDATE_SHEET_POPUP', {
+            show: false,
+            title: '',
+            type: ''
         })
+        // commit('M_UPDATE_PROMPT', {
+        //     texts: '取消保护工作簿成功！',
+        //     show: true,
+        //     type: 'success'
+        // })
     },
     A_SHEETS_FROZEN({
         state,

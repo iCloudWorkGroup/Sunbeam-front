@@ -17,21 +17,38 @@
                         <form class="validate-content">
                             <div>
                                 <label>类型:</label>
-                                <select v-model="selected" @change="update">
-                                    <option v-for="select in selects" :value="select.value">{{ select.text }}</option>
+                                <select v-model="validationed" @change="typeChange">
+                                    <option v-for="validation in validations" :value="validation.value">{{ validation.text }}</option>
                                 </select>
                             </div>
-                            <div class="range" v-show="selected !== 'sequenceType' && selected !== 'default'">
-                                <label>最小值:</label>
-                                <input type="text" name="min" class="min" v-model="min"><br>
-                                <label>最大值:</label>
-                                <input type="text" name="max" class="max" v-model="max">
+                            <div v-show="validationed !== 0 && validationed !== 3">
+                                <label>范围:</label>
+                                <select v-model="ranged" @change="rangeChange">
+                                    <option v-for="range in ranges" :value="range.value">{{ range.text }}</option>
+                                </select>
                             </div>
-                            <div class="source" v-show="selected === 'sequenceType'">
+                            <div class="range" v-show="validationed !== 3 && validationed !== 0">
+                                <div v-show="ranged !== 2 && ranged !== 3 && ranged !== 5 && ranged !== 7">
+                                    <label>最小值:</label>
+                                    <input type="number" name="min" class="min" v-model="min">
+                                </div>
+                                <div v-show="ranged !== 2 && ranged !== 3 && ranged !== 4 && ranged !== 6">
+                                    <label>最大值:</label>
+                                    <input type="number" name="max" class="max" v-model="max">
+                                </div>
+                                <div v-show="ranged === 2 || ranged === 3">
+                                    <label>数值:</label>
+                                    <input type="number" name="number" class="number" v-model="number">
+                                </div>
+                            </div>
+                            <div class="source" v-show="validationed === 3">
                                 <label>来源:</label>
                                 <input type="text" class="source-data"
                                         maxlength="50" name="source"
-                                        v-model="dateCellIndex">
+                                        v-model="sort">
+                                <input type="hidden" class="source-data"
+                                       maxlength="50" name="source1"
+                                       v-model="dateCellIndex">
                                 <div class="select-out"
                                      :class="{ on: dateSource}"
                                      @click="changeSelect"></div>
@@ -110,7 +127,8 @@ import {
     unit
 } from '../filters/unit'
 import {
-    hexToRgb
+    hexToRgb, validateSendPara,
+    validateReason
 } from '../tools/format'
 import {
     getColDisplayName
@@ -120,19 +138,34 @@ import config from '../config'
 export default {
     data() {
         return {
+            select: '',
             colArr: [],
             rowArr: [],
+            colLength: '',
+            rowLength: '',
             value: '',
-            selected: 'default',
+            validationed: 'default',
             max: '',
             min: '',
+            number: '',
             sort: '',
-            selects: [
-                { value: 'default', text: '任意值' },
-                { value: 'intType', text: '整数' },
-                { value: 'decimalType', text: '小数' },
-                { value: 'textType', text: '文本长度' },
-                { value: 'sequenceType', text: '序列' },
+            validations: [
+                { value: 0, text: '任意值' },
+                { value: 1, text: '整数' },
+                { value: 2, text: '小数' },
+                { value: 6, text: '文本长度' },
+                { value: 3, text: '序列' },
+            ],
+            ranged: 0,
+            ranges: [
+                { value: 0, text: '介于' },
+                { value: 1, text: '不介于' },
+                { value: 2, text: '等于' },
+                { value: 3, text: '不等于' },
+                { value: 4, text: '大于' },
+                { value: 5, text: '小于' },
+                { value: 6, text: '大于等于' },
+                { value: 7, text: '小于等于' },
             ],
             dateSource: false,
         }
@@ -142,6 +175,15 @@ export default {
             return unit(this.$store.getters.offsetHeight - scrollbar() - config.sheetSider)
         },
         popup() {
+            let type = this.$store.state.sheets.popup.type
+            if (type === 'validation' &&
+                this.$store.getters.selectByType('DATASOURCE') == null) {
+                this.$store.dispatch('SELECTS_INSERT', {
+                    colAlias: this.$store.getters.allCols[0].alias,
+                    rowAlias: this.$store.getters.allRows[0].alias,
+                    type: 'DATASOURCE'
+                })
+            }
             return this.$store.state.sheets.popup
         },
         colIndex() {
@@ -179,31 +221,20 @@ export default {
             let ecol = getColDisplayName(endCol)
             let ruleID = this.$store.getters.cellValidation()
             if (ruleID == null) {
-                this.selected = 'default'
+                this.validationed = 0
             } else {
-                let validates = this.$store.getters.validate()
-                for (let k = 0, lenk = validates.length; k < lenk; k++) {
-                    let validate = validates[k]
-                    if (ruleID === validate.index) {
-                        if (validate.rule.type === 1) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'intType'
-                        }
-                        if (validate.rule.type === 2) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'decimalType'
-                        }
-                        if (validate.rule.type === 3) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'textType'
-                        }
-                        if (validate.rule.type === 4) {
-                            this.selected = 'sequenceType'
-                        }
-                    }
+                let validate = this.$store.getters.validateByIndex(ruleID)
+                this.validationed = validate.type
+                if (validate.type === 7) {
+                    this.validationed = 3
+                }
+                this.sort = validate.formula1
+                this.ranged = validate.operator
+                this.min = validate.formula1
+                this.number = validate.formula1
+                this.max = validate.formula2
+                if (validate.operator === 5 || validate.operator === 7) {
+                    this.max = validate.formula1
                 }
             }
             if (endRow === -1) {
@@ -217,7 +248,7 @@ export default {
         dateCellIndex() {
             let select = this.$store.getters.selectByType('DATASOURCE')
             if (select == null) {
-                return ''
+                return this.sort
             }
             let signalSort = select.signalSort
             let startRow = signalSort.startRow
@@ -227,19 +258,41 @@ export default {
             let scol = getColDisplayName(startCol)
             let ecol = getColDisplayName(endCol)
             if (endRow === -1) {
+                this.sort = '=$' + scol + ':$' + ecol
+                this.rowLength = 'MAX'
                 return '=$' + scol + ':$' + ecol
             }
             if (endCol === -1) {
+                this.sort = '=$' + (startRow + 1) + ':$' + (endRow + 1)
+                this.colLength = 'MAX'
                 return '=$' + (startRow + 1) + ':$' + (endRow + 1)
             }
-            return '=$' + scol + (startRow + 1) + ':$' + ecol + (endRow + 1)
+            if ('=$' + scol + (startRow + 1) + ':$' + ecol + (endRow + 1) === '=$A1:$A1') {
+                return ''
+            }
+            this.rowLength = endRow - startRow + 1
+            this.colLength = endCol - startCol + 1
+            this.sort = '$' + scol + '$' + (startRow + 1) + ':$' + ecol + '$' + (endRow + 1)
+            return '$' + scol + '$' + (startRow + 1) + ':$' + ecol + '$' + (endRow + 1)
         },
     },
     methods: {
-        update() {
+        typeChange() {
+            this.number = ''
             this.min = ''
             this.max = ''
-            this.sort = '123'
+            this.sort = ''
+            this.colLength = ''
+            this.rowLength = ''
+            this.ranged = 0
+        },
+        rangeChange() {
+            this.number = ''
+            this.min = ''
+            this.max = ''
+            this.sort = ''
+            this.colLength = ''
+            this.rowLength = ''
         },
         changeSelect() {
             if (this.dateSource) {
@@ -259,30 +312,13 @@ export default {
             this.value = ''
             let ruleID = this.$store.getters.cellValidation()
             if (ruleID == null) {
-                this.selected = 'default'
+                this.validationed = 0
             } else {
                 let validates = this.$store.getters.validate()
                 for (let k = 0, lenk = validates.length; k < lenk; k++) {
                     let validate = validates[k]
                     if (ruleID === validate.index) {
-                        if (validate.rule.type === 1) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'intType'
-                        }
-                        if (validate.rule.type === 2) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'decimalType'
-                        }
-                        if (validate.rule.type === 3) {
-                            this.min = validate.rule.formula1
-                            this.max = validate.rule.formula2
-                            this.selected = 'textType'
-                        }
-                        if (validate.rule.type === 4) {
-                            this.selected = 'sequenceType'
-                        }
+                        this.validationed = validate.type
                     }
                 }
             }
@@ -299,6 +335,58 @@ export default {
             })
         },
         adjuctValidation() {
+            if (this.validationed === 0) {
+                this.$store.dispatch('A_DELETE_VALIDATE')
+                this.$store.commit('UPDATE_SHEET_POPUP', {
+                    show: false,
+                    title: '',
+                    type: ''
+                })
+                this.$store.commit('M_SELECT_UPDATE_STATE', 'SELECT')
+                let selects = this.$store.state.selects.list
+                let destroyDataSource = {}
+                selects.forEach((item, index) => {
+                    if (item.type === 'DATASOURCE') {
+                        destroyDataSource = item
+                    }
+                })
+                this.$store.dispatch('SELECTS_DELETE', {
+                    select: destroyDataSource
+                })
+                return
+            }
+            let selected = this.validationed
+            if (selected === 3) {
+                selected = this.sort.indexOf('$') > -1 && this.sort.indexOf(':') > -1 ? 7 : 3
+            }
+            let sendObj = {
+                ranged: this.ranged,
+                type: selected,
+                max: this.max,
+                min: this.min,
+                number: this.number,
+                sort: this.sort,
+            }
+            let reason = validateReason(sendObj)
+            if (this.rowLength === 'MAX' || this.colLength === 'MAX') {
+                reason = '选择范围错误！来源不可整行/整列选择！'
+            }
+            if (this.rowLength > 1 && this.colLength > 1) {
+                reason = '选择范围错误！来源必须为单一行/列！'
+            }
+            if (this.validationed === 6 && (this.max < 0 || this.min < 0 || this.number < 0)) {
+                reason = '文本长度错误！最大值最小值不可为负数！'
+            }
+            if (reason !== '') {
+                this.$store.commit('M_UPDATE_PROMPT', {
+                    texts: reason,
+                    show: true,
+                    type: 'error'
+                })
+                return
+            }
+            let sendParm = validateSendPara(sendObj)
+            this.$store.dispatch('A_ADD_VALIDATE', sendParm)
             this.$store.commit('UPDATE_SHEET_POPUP', {
                 show: false,
                 title: '',

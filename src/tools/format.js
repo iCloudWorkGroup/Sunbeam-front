@@ -1,5 +1,6 @@
 import extend from '../util/extend'
-
+import send from '../util/send'
+import config from '../config'
 export function parseExpress(str) {
     let localStr = str
     let keyRegs = [{
@@ -230,7 +231,7 @@ export function pathToStruct({
     }
     return propStruct
 }
-
+// 自动识别 开始
 export function parsePropStruct(cell, formatObj, texts, row, col) {
     let fixObj = { content: {}}
     fixObj.date = false
@@ -425,6 +426,189 @@ export function parseText(cell, format, rules, express) {
     })
 }
 
+// 自动识别 结束
+
+// 颜色 16进制6位码 转 rgb
 export function hexToRgb(hex) {
     return 'rgb(' + parseInt('0x' + hex.slice(1, 3), 16) + ', ' + parseInt('0x' + hex.slice(3, 5), 16) + ', ' + parseInt('0x' + hex.slice(5, 7), 16) + ')'
+}
+
+// 数据验证 判断是否符合规则
+
+export async function dataValidate(validate, text, rowIndex, colIndex) {
+    let flag = false
+    let length = text.toString().length
+    switch (validate.type) {
+        case 0:
+            break
+        case 1:
+            if (isNum(text) && text.toString().indexOf('.') < 0) {
+                flag = inRange(text, validate)
+            } else {
+                flag = true
+            }
+            break
+        case 2:
+            if (isNum(text)) {
+                flag = inRange(text, validate)
+            } else {
+                flag = true
+            }
+            break
+        case 6:
+            flag = inRange(length, validate)
+            break
+        case 3:
+            flag = inSortRange(text, validate)
+            break
+        case 7:
+            await inSendSortRange(text, rowIndex, colIndex).then(function (data) {
+                flag = data
+            })
+            break
+    }
+    return flag
+}
+
+export function inSortRange(text, validate) {
+    let sortValue = validate.formula1.split(',')
+    for (let i = 0; i < sortValue.length; i++) {
+        if (text.toString() === sortValue[i].toString()) {
+            return false
+        }
+    }
+    return true
+}
+export async function inSendSortRange(text, rowIndex, colIndex) {
+    let flag = true
+    await send({
+        url: config.url.full,
+        body: JSON.stringify({
+            oprCol: colIndex,
+            oprRow: rowIndex
+        })
+    }, false).then(function(data) {
+        let sortValue = data.expResult
+        for (let i = 0; i < sortValue.length; i++) {
+            if (text.toString() === sortValue[i].toString()) {
+                flag = false
+            }
+        }
+    })
+    return flag
+}
+export function inRange(text, validate) {
+    let flag = false
+    let num = Number(text)
+    if (validate.operator === 0) {
+        flag = validate.formula1 <= num && validate.formula2 >= num ? false : true
+    }
+    if (validate.operator === 1) {
+        flag = validate.formula1 > num || validate.formula2 < num ? false : true
+    }
+    if (validate.operator === 2) {
+        flag = Number(validate.formula1) === num ? false : true
+    }
+    if (validate.operator === 3) {
+        flag = Number(validate.formula1) !== num ? false : true
+    }
+    if (validate.operator === 4) {
+        flag = validate.formula1 < num ? false : true
+    }
+    if (validate.operator === 5) {
+        flag = validate.formula1 > num ? false : true
+    }
+    if (validate.operator === 6) {
+        flag = validate.formula1 <= num ? false : true
+    }
+    if (validate.operator === 7) {
+        flag = validate.formula1 >= num ? false : true
+    }
+    return flag
+}
+
+
+// 添加规则 修复参数
+export function validateSendPara(validateObj) {
+    let sendParm = {
+        type: validateObj.type,
+    }
+    if (validateObj.type === 3 || validateObj.type === 7) {
+        sendParm.formula1 = validateObj.sort
+    } else {
+        sendParm.operator = validateObj.ranged
+        if (validateObj.ranged === 0 || validateObj.ranged === 1) {
+            sendParm.formula1 = validateObj.min
+            sendParm.formula2 = validateObj.max
+        }
+        if (validateObj.ranged === 2 || validateObj.ranged === 3) {
+            sendParm.formula1 = validateObj.number
+        }
+        if (validateObj.ranged === 4 || validateObj.ranged === 6) {
+            sendParm.formula1 = validateObj.min
+        }
+        if (validateObj.ranged === 5 || validateObj.ranged === 7) {
+            sendParm.formula1 = validateObj.max
+        }
+    }
+    return sendParm
+}
+
+
+// 判断规则是否存在
+export function validateExis(validates, payload) {
+    for (let i = 0; i < validates.length; i++) {
+        if (payload.type === validates[i].type && payload.formula1 === validates[i].formula1
+            && payload.formula2 === validates[i].formula2 && payload.operator === validates[i].operator) {
+            return i
+        }
+    }
+    return null
+}
+
+// 判断规则数值是否合理
+export function validateReason(validateObj) {
+    if (validateObj.type === 0) {
+        return ''
+    } else if (validateObj.type === 3 || validateObj.type === 7) {
+        if (validateObj.sort === '') {
+            return '来源不能为空！'
+        }
+    } else {
+        if (validateObj.ranged === 0 || validateObj.ranged === 1) {
+            if (validateObj.min === '') {
+                return '最小值不能为空！'
+            }
+            if (validateObj.max === '') {
+                return '最大值不能为空！'
+            }
+            if (validateObj.min > validateObj.max) {
+                return '最小值不能大于最大值！'
+            }
+        }
+        if (validateObj.ranged === 2 || validateObj.ranged === 3) {
+            if (validateObj.number === '') {
+                return '数值不能为空！'
+            }
+        }
+        if (validateObj.ranged === 4 || validateObj.ranged === 6) {
+            if (validateObj.min === '') {
+                return '最小值不能为空！'
+            }
+        }
+        if (validateObj.ranged === 5 || validateObj.ranged === 7) {
+            if (validateObj.max === '') {
+                return '最大值不能为空！'
+            }
+        }
+    }
+    if (validateObj.type === 1 || validateObj.type === 6) {
+        let min = validateObj.min || ''
+        let max = validateObj.max || ''
+        let number = validateObj.number || ''
+        if (min.toString().indexOf('.') > 0 || max.toString().indexOf('.') > 0 || number.toString().indexOf('.') > 0) {
+            return '数值必须为整数！'
+        }
+    }
+    return ''
 }

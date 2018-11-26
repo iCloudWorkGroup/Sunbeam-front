@@ -29,5 +29,9 @@ export default {
     selectAliasGenerator(counter = 0) {
         this.selectAliasGenerator = createGenerator(counter)
         return counter.toString()
+    },
+    validateIndexGenerator(counter = 0) {
+        this.validateIndexGenerator = createGenerator(counter)
+        return counter
     }
 }

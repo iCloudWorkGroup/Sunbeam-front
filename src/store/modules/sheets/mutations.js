@@ -13,6 +13,18 @@ export default {
     UPDATE_SHEET_PASSWORD(state, payload) {
         state.list[0].protect = payload.protect
     },
+    UPDATE_SHEET_VALIDATE(state, payload) {
+        state.list[0].validate.push(payload)
+    },
+    ADD_SHEET_VALIDATE_COUNT(state, index) {
+        state.list[0].validate[index].count++
+    },
+    REDUCE_SHEET_VALIDATE_COUNT(state, index) {
+        state.list[0].validate[index].count--
+    },
+    M_DELETE_SHEET_VALIDATE(state, index) {
+        state.list[0].validate.splice(index, 1)
+    },
     [types.UPDATE_OCCUPY](state, payload) {
         let list = state.list
         let currentSheet = payload.currentSheet

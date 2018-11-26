@@ -219,6 +219,7 @@ export default {
             let ctrlKey = e.ctrlKey
             let keyCode = e.keyCode
             let key = e.key
+            let type = this.$store.state.selects.activeType
             /* *
              * 自动获取焦点
              * keyCode 229表示中文输入法
@@ -227,7 +228,7 @@ export default {
             if (((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 105)
                 || (keyCode >= 106 && keyCode <= 111 && keyCode !== 108) || (keyCode >= 186 && keyCode <= 191)
                 || (keyCode >= 219 && keyCode <= 222)) && !altKey && !ctrlKey && status === '') {
-                if (config.autoInput) {
+                if (config.autoInput && type !== 'DATASOURCE') {
                     this.$store.dispatch('EDIT_SHOW', {
                         type: 'EDIT',
                         value: key
@@ -240,7 +241,7 @@ export default {
                 }
                 return
             } else if (keyCode === 229 && !altKey && !ctrlKey && status === '') {
-                if (config.autoInput) {
+                if (config.autoInput && type !== 'DATASOURCE') {
                     this.$store.dispatch('EDIT_SHOW', {
                         type: 'EDIT',
                         value: key

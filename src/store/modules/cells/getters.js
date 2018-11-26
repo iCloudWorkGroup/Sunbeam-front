@@ -245,8 +245,8 @@ export default {
 
             let startCol = startColIndex
             let startRow = startRowIndex
-            let endColLen = allCols[allCols.length - 1].sort
-            let endRowLen = allRows[allRows.length - 1].sort
+            let endColLen = endColIndex === -1 ? allCols[allCols.length - 1].sort : allCols[endColIndex].sort
+            let endRowLen = endRowIndex === -1 ? allRows[allRows.length - 1].sort : allRows[endRowIndex].sort
             for (let i = startCol; i <= endColLen; i++) {
                 for (let j = startRow; j <= endRowLen; j++) {
                     let colAlias = allCols[i].alias
@@ -596,7 +596,7 @@ export default {
         }
     },
     /**
-     * 是否包含锁定单元格
+     * 是否包含规则
      * @param  {[type]}  state   [description]
      * @param  {[type]}  getters [description]
      * @return {Boolean}         [description]
@@ -625,7 +625,7 @@ export default {
             })
             for (let i = 0, len = verticalCells.length; i < len; i++) {
                 let cell = verticalCells[i] || allCells
-                return cell.content.ruleIndex
+                return cell.ruleIndex
             }
             if (verticalCells.length === 0) {
                 return null

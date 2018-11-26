@@ -2,7 +2,8 @@ import * as actionTypes from '../../action-types'
 import {
     isDate, formatText,
     isNum, parseExpress,
-    parsePropStruct, parseType
+    parsePropStruct, parseType,
+    dataValidate
 } from '../../../tools/format'
 import cache from '../../../tools/cache'
 // import config from '../../../config'
@@ -221,6 +222,22 @@ export default {
             }
             endcolAlias = props.assist.endcolAlias
             endrowAlias = props.assist.endrowAlias
+        }
+        let flag = false
+        if (cell != null && status === 'texts') {
+            let ruleID = cell.ruleIndex
+            if (ruleID != null) {
+                let validate = getters.validateByIndex(ruleID)
+                flag = await dataValidate(validate, texts, rowIndex, colIndex)
+            }
+        }
+        if (flag && texts !== '') {
+            commit('M_UPDATE_PROMPT', {
+                texts: '输入非法值！已经限定了可以输入的数值！',
+                show: true,
+                type: 'error'
+            })
+            return
         }
         await dispatch('A_CELLS_UPDATE', {
             propName: status,

@@ -23,7 +23,7 @@ import {
     formatText,
     isNum, isDate,
     parseType, parseAddAglin, parseText,
-    parsePropStruct
+    parsePropStruct, validateExis
 } from '../../../tools/format'
 import {
     fixCellUpdateSend,
@@ -121,7 +121,6 @@ export default {
                 fixedCell.alias = generator.cellAliasGenerator()
             }
             commit(mutationTypes.M_INSERT_CELL, fixedCell)
-
             // 更新坐标关系表
             commit(mutationTypes.M_UPDATE_POINTS, {
                 occupyCols,
@@ -872,7 +871,35 @@ export default {
             startRowIndex,
             endRowIndex
         })
-
+        let allCells = getters.cellsByTransverse({
+            startColIndex,
+            endColIndex,
+            startRowIndex,
+            endRowIndex
+        })
+        let validates = getters.validate()
+        // 消除不是模板单元格上的数据验证规则
+        for (let i = 0; i < allCells.length; i++) {
+            if (cells.length !== 0) {
+                if (allCells[i].alias !== cells[0].alias) {
+                    let ruleID = allCells[i].ruleIndex
+                    // 原规则count减一
+                    if (ruleID != null) {
+                        let validate = getters.validateByIndex(ruleID)
+                        let validateIndex = validateExis(validates, validate)
+                        commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                    }
+                }
+            } else {
+                let ruleID = allCells[i].ruleIndex
+                // 原规则count减一
+                if (ruleID != null) {
+                    let validate = getters.validateByIndex(ruleID)
+                    let validateIndex = validateExis(validates, validate)
+                    commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                }
+            }
+        }
         // 以横向优先，竖向次之查找有内容的单元格
         // 如果所有都没有内容，就查找左上角第一个单元格
         // 无边框
@@ -898,6 +925,8 @@ export default {
             row: rows,
             col: cols
         }
+
+        dispatch('A_DELETE_SHEET_VALIDATE')
         dispatch(A_CELLS_DESTORY, cells)
         dispatch('A_CELLS_ADD', {
             props: templateCell
@@ -958,6 +987,7 @@ export default {
                             }
                         })
                         if (i !== 0 || j !== 0) {
+                            insertCell.ruleIndex = null
                             insertCell.content.texts = null
                             insertCell.content.displayTexts = null
                             insertCell.alias = generator.cellAliasGenerator()
@@ -1136,6 +1166,7 @@ export default {
         }
         let disRow = targetStartRowIndex - clipStartRowIndex
         let disCol = targetStartColIndex - clipStartColIndex
+        let validates = getters.validate()
         // 清空目标区域所有单元格
         let avoidRepeat = []
         let destoryCells = []
@@ -1147,6 +1178,12 @@ export default {
                 let targetCellIdx = getters.IdxByCol(targetColAlias, targetRowAlias)
                 if (targetCellIdx !== -1 && !avoidRepeat[targetCellIdx]) {
                     avoidRepeat[targetCellIdx] = true
+                    let ruleID = allCells[targetCellIdx].ruleIndex
+                    if (ruleID != null) {
+                        let validate = getters.validateByIndex(ruleID)
+                        let validateIndex = validateExis(validates, validate)
+                        commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                    }
                     destoryCells.push(allCells[targetCellIdx])
                 }
             }
@@ -1171,6 +1208,12 @@ export default {
                 }
                 newRowOccupy.push(rows[newRowIndex].alias)
             })
+            let ruleID = item.ruleIndex
+            if (ruleID != null) {
+                let validate = getters.validateByIndex(ruleID)
+                let validateIndex = validateExis(validates, validate)
+                commit('ADD_SHEET_VALIDATE_COUNT', validateIndex)
+            }
             let addCell = extend(item, {
                 alias: null,
                 occupy: {
@@ -1183,7 +1226,16 @@ export default {
         dispatch('A_CELLS_ADD', {
             props: addCells
         })
+        dispatch('A_DELETE_SHEET_VALIDATE')
         if (cache.clipState === 'cut') {
+            clipCells.forEach((item, index) => {
+                let ruleID = item.ruleIndex
+                if (ruleID != null) {
+                    let validate = getters.validateByIndex(ruleID)
+                    let validateIndex = validateExis(validates, validate)
+                    commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
+                }
+            })
             dispatch('A_CELLS_DESTORY', clipCells)
         }
         destoryClip()

@@ -105,7 +105,9 @@ export default {
         recomment: 'cell/comment-reduce',
         clean: 'cell/data-clean',
         lock: 'cell/lock',
-        protect: 'sheet/protect'
+        protect: 'sheet/protect',
+        validate: 'sheet/validate-set',
+        full: 'sheet/validate-full'
     },
     operSendPropName: {
         'alignRow': 'align',

@@ -34,8 +34,9 @@ export default {
         background: 'transparent',
         alignRowFormat: '',
         locked: true,
-        ruleIndex: '1'
     },
+    // 规则属性
+    ruleIndex: null,
     // 批注属性
     customProp: {
         comment: null

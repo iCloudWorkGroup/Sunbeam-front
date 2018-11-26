@@ -77,6 +77,10 @@ export default {
     },
     methods: {
         editing() {
+            let type = this.$store.state.selects.activeType
+            if (type === 'DATASOURCE') {
+                return
+            }
             let clipSelect = this.$store.getters.selectByType('CLIP')
             if (clipSelect != null) {
                 this.$store.commit('DELETE_SELECT', {

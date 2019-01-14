@@ -51,7 +51,7 @@
         </span>
         <span class="fui-layout">
              <div class="fui-transverse">
-                <div class="fui-section fui-transverse"
+                <div class="fui-section fui-transverse" id="mergeCell"
                      @click="setMerge">
                     <div class="fui-transverse-model"
                          :class="{ active: hasMerge }">
@@ -106,6 +106,9 @@ export default {
         },
         wordWrapState() {
             return this.$store.getters.isWordWrapCell()
+        },
+        mergeFlag() {
+            return this.$store.state.oprclick.mergeFlag
         }
     },
     methods: {
@@ -157,6 +160,9 @@ export default {
             })
         },
         setMerge() {
+            if (!this.mergeFlag) {
+                return
+            }
             let protect = this.$store.getters.isProtect()
             if (protect) {
                 this.$store.commit('M_UPDATE_PROMPT', {

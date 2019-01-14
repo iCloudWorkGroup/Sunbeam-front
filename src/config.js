@@ -123,6 +123,7 @@ export default {
      * 请求地址根路径
      * @type {String}
      */
-    rootPath: 'http://excel-inc.acmr.com.cn:20064/master/'
+    // rootPath: 'http://excel-inc.acmr.com.cn:20064/master/'
+    rootPath: 'http://192.168.1.250:8088/sunbeam/'
     // rootPath: 'http://192.168.3.84:8080/sunbeam/'
 }

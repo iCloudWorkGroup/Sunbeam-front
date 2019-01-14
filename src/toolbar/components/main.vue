@@ -36,6 +36,9 @@
                 <panel  title="数据" v-show="toolShow.validation">
                     <Validation/>
                 </panel>
+                <panel  title="" v-show="toolShow.btn">
+                    <btn/>
+                </panel>
             </ul>
         </div>
     </div>
@@ -53,6 +56,7 @@ import Format from './format.vue'
 import Rowcol from './rowcol.vue'
 import Hide from './hide.vue'
 import Validation from './validation.vue'
+import Btn from './btn.vue'
 // import Protect from './protect.vue'
 // import Undo from './undo.vue'
 // import Clip from './clip.vue'
@@ -75,7 +79,8 @@ export default {
         Format,
         Comment,
         Validation,
-        // Protect
+        // Protect,
+        Btn
     },
     computed: {
         toolbarSelector() {

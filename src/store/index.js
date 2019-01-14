@@ -22,6 +22,17 @@ const state = {
     loading: false,
     rootSelector: '',
     toolbarSelector: '',
+    oprclick: {
+        deleteColFlag: true,
+        deleteRowFlag: true,
+        insertColFlag: true,
+        insertRowFlag: true,
+        hideColFlag: true,
+        hideRowFlag: true,
+        showColFlag: true,
+        showRowFlag: true,
+        mergeFlag: true
+    }
 }
 export default new Vuex.Store({
     state,

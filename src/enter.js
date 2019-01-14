@@ -5,12 +5,10 @@ let ss = new Sunbeam({
     root: '.table',
     toolbar: '.tools'
 })
-
+// let flag = false
 
 ss.load().then(() => {
-    ss.rowHide('1', '1')
-    ss.rowHide('1', '2')
-    ss.colHide('1', 'A')
+    ss.protect('1', true)
 })
 
 ss.addEventListener('regionChange', function (e) {
@@ -43,9 +41,10 @@ document.getElementById('dd').addEventListener('click', function () {
     })
 })
 document.getElementById('aa').addEventListener('click', function () {
-    ss.protect(true, '1111')
+    ss.reload()
 })
 document.getElementById('clear').addEventListener('click', function () {
-    ss.protect(false, '1111')
+    ss.changeTool({
+        btn: true
+    })
 })
-

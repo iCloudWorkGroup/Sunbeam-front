@@ -34,17 +34,16 @@ SpreadSheet.prototype = {
             }.bind(this))
         }
     },
-    test(obj) {
-        let toolShow = this.bookVm.$store.state.toolbar.toolShow
-        let fixObj = {}
-        fixObj.font = typeof obj.font !== 'undefined' ? obj.font : toolShow.font
-        fixObj.align = typeof obj.align !== 'undefined' ? obj.align : toolShow.align
-        fixObj.format = typeof obj.format !== 'undefined' ? obj.format : toolShow.format
-        fixObj.frozen = typeof obj.frozen !== 'undefined' ? obj.frozen : toolShow.frozen
-        fixObj.rowcol = typeof obj.rowcol !== 'undefined' ? obj.rowcol : toolShow.rowcol
-        fixObj.hide = typeof obj.hide !== 'undefined' ? obj.hide : toolShow.hide
-        fixObj.comment = typeof obj.comment !== 'undefined' ? obj.comment : toolShow.comment
-        this.bookVm.$store.commit('M_CHANGE_TOOL', fixObj)
+    // 修改单元格文本格式
+    setMergeClick(sheetId, flag) {
+        let f
+        if (arguments.length === 1) {
+            f = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            f = flag
+        }
+        this.bookVm.$store.commit('M_SET_CLICK_FLAG', f)
     },
     // 获取字母对应数值
     getLetterNum(str) {
@@ -247,7 +246,6 @@ SpreadSheet.prototype = {
             }
         }, 'family')
     },
-
     // 设置字体大小
     setFontSize(sheetId, size, point) {
         let sz
@@ -705,7 +703,11 @@ SpreadSheet.prototype = {
         this.bookVm.$store.commit('M_UPDATE_OFFSETWIDTH', offsetWidth)
         this.bookVm.$store.commit('M_UPDATE_OFFSETHEIGHT', offsetHeight)
     },
-
+    // 获取当前选中区域
+    getSelect() {
+        let select = this.bookVm.$store.getters.selectByType('SELECT')
+        return select.signalSort
+    },
     //  获取相应坐标下单元格的文本
     getTextByCoordinate(sheetId, point) {
         let p
@@ -940,6 +942,34 @@ SpreadSheet.prototype = {
         if (!rows[rowIdx].hidden) {
             await this.bookVm.$store.dispatch(A_types.ROWS_HIDE, rowIdx)
         }
+    },
+
+    // 获取行是否隐藏
+    getRowHide(sheetId, row) {
+        let r
+        if (arguments.length === 1) {
+            r = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            r = row
+        }
+        let rowIdx = Number(r) - 1
+        let rows = this.bookVm.$store.getters.allRows
+        return rows[rowIdx].hidden
+    },
+
+    // 获取列是否隐藏
+    getColHide(sheetId, col) {
+        let c
+        if (arguments.length === 1) {
+            c = sheetId
+        }
+        if (arguments.length === 2 && typeof arguments[0] === 'string') {
+            c = col
+        }
+        let colIdx = this.getLetterNum(c)
+        let cols = this.bookVm.$store.getters.allCols
+        return cols[colIdx].hidden
     },
 
     // 取消隐藏行（冻结状态不可用）

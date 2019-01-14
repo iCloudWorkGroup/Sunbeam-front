@@ -8,7 +8,13 @@ export default {
     },
     isProtect(state) {
         return function() {
-            let protect = state.list[0].protect
+            let list = state.list[0]
+            let protect
+            if (list) {
+                protect = list.protect
+            } else {
+                protect = false
+            }
             return protect
         }
     },

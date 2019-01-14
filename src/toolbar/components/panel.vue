@@ -2,7 +2,7 @@
 <li class="fui-group">
     <span class="fui-container">
             <slot></slot>
-            <div class="fui-title">{{title}}</div>
+            <div class="fui-title" v-if="title !== ''">{{title}}</div>
         </span>
     <span class="fui-separator"></span>
 </li>

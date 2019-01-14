@@ -13,5 +13,7 @@ export default {
         state.toolShow.rowcol = typeof obj.rowcol !== 'undefined' ? obj.rowcol : state.toolShow.rowcol
         state.toolShow.hide = typeof obj.hide !== 'undefined' ? obj.hide : state.toolShow.hide
         state.toolShow.comment = typeof obj.comment !== 'undefined' ? obj.comment : state.toolShow.comment
+        state.toolShow.validation = typeof obj.validation !== 'undefined' ? obj.validation : state.toolShow.validation
+        state.toolShow.btn = typeof obj.btn !== 'undefined' ? obj.btn : state.toolShow.btn
     }
 }

@@ -5,7 +5,7 @@
          @mouseenter="commentShow">
         <div class="comment-ico">
         <div
-        class="triangle"></div>
+        class="excel_triangle"></div>
         </div>
     </div>
 </template>

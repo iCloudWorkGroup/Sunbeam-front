@@ -952,6 +952,9 @@ export default {
             }
             index = getters.rowIndexByAlias(select.wholePosi.startRowAlias)
         }
+        if (index === -1) {
+            return
+        }
         let rows = getters.allRows
         let row = rows[index]
 
@@ -1081,14 +1084,15 @@ export default {
                             type: getters.activeType,
                             props: {
                                 physicsBox: {
-                                    height: rows[index + 1].height
+                                    // height: rows[index + 1].height
+                                    height: 0
                                 },
-                                wholePosi: {
-                                    startRowAlias: rows[index +
-                                        1].alias,
-                                    endRowAlias: rows[index + 1]
-                                        .alias
-                                }
+                                // wholePosi: {
+                                //     startRowAlias: rows[index +
+                                //         1].alias,
+                                //     endRowAlias: rows[index + 1]
+                                //         .alias
+                                // }
                             }
                         })
                         commit(mutationTypes.ACTIVE_ROW, {

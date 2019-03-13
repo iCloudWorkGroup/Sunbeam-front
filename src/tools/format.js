@@ -116,7 +116,14 @@ export function isDate(value) {
     }
     return true
 }
+// 科学计数法转数字
+function toNonExponential(num) {
+    let m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
+    return num.toFixed(Math.max(0, (m[1] || '').length - m[2]))
+}
 export function formatText(rules, text) {
+    let texts = toNonExponential(text)
+    console.log(texts)
     let Complier = function(inptVal, type = '') {
         this.origin = this.manifest = this.inpt = inptVal
         this.dateType = type
@@ -211,7 +218,7 @@ export function formatText(rules, text) {
             return ret
         }
     }
-    let ec = new Complier(text)
+    let ec = new Complier(texts)
     return ec.initilize(rules)
 }
 // 分解命名空间, 返回合并好的对象
@@ -306,7 +313,7 @@ export function parseType(texts) {
         }
     } else if (isNum(texts)) {
         formatObj.autoRecType = 'number'
-        formatObj.autoRecText = Number(texts).toString()
+        formatObj.autoRecText = texts.toString()
     } else if (isDate(texts)) {
         formatObj.autoRecType = 'date'
         if (texts.indexOf('/') > -1) {

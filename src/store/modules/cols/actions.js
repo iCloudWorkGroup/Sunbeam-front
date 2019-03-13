@@ -264,7 +264,9 @@ export default {
             }
             index = getters.colIndexByAlias(select.wholePosi.startColAlias)
         }
-
+        if (index === -1) {
+            return
+        }
         let cols = getters.allCols
         let col = cols[index]
 
@@ -318,7 +320,7 @@ export default {
                         let validateIndex = validateExis(validates, validate)
                         commit('REDUCE_SHEET_VALIDATE_COUNT', validateIndex)
                     }
-                    dispatch(actionTypes.A_CELLS_DESTORY, [cell])
+                    commit(mutationTypes.M_DESTORY_CELL, cell)
                 } else {
                     let newOccupyCol = [...occupyCol]
                     newOccupyCol.splice(aliasIndex, 1)
@@ -394,19 +396,20 @@ export default {
                             type: getters.activeType,
                             props: {
                                 physicsBox: {
-                                    width: cols[index + 1].width
+                                    // width: cols[index + 1].width
+                                    width: 0
                                 },
-                                wholePosi: {
-                                    startColAlias: cols[index +
-                                        1].alias,
-                                    endColAlias: cols[index + 1]
-                                        .alias
-                                }
+                                // wholePosi: {
+                                //     startColAlias: cols[index +
+                                //         1].alias,
+                                //     endColAlias: cols[index + 1]
+                                //         .alias
+                                // }
                             }
                         })
-                        commit(mutationTypes.ACTIVE_COL, {
-                            startIndex: index + 1
-                        })
+                        // commit(mutationTypes.ACTIVE_COL, {
+                        //     startIndex: index + 1
+                        // })
                     }
                 } else {
                     updateSelectInfo.push({

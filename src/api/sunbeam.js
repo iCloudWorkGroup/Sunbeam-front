@@ -706,7 +706,7 @@ SpreadSheet.prototype = {
     // 获取当前选中区域
     getSelect() {
         let select = this.bookVm.$store.getters.selectByType('SELECT')
-        return select.signalSort
+        return select
     },
     //  获取相应坐标下单元格的文本
     getTextByCoordinate(sheetId, point) {
@@ -765,19 +765,19 @@ SpreadSheet.prototype = {
         })
     },
     protect(sheetId, protect, password) {
-        let p
-        let passwd
-        if (arguments.length === 2) {
-            p = sheetId
-            passwd = protect
-        }
-        if (arguments.length === 3 && typeof arguments[0] === 'string') {
-            p = protect
-            passwd = password
-        }
+        // let p
+        // let passwd
+        // if (arguments.length === 2) {
+        //     p = sheetId
+        //     passwd = protect
+        // }
+        // if (arguments.length === 3 && typeof arguments[0] === 'string') {
+        //     p = protect
+        //     passwd = password
+        // }
         this.bookVm.$store.dispatch('A_SHEETS_PROTECT', {
-            protect: p,
-            passwd
+            protect: false,
+            // passwd
         })
     },
     // 鼠标选择操作状态切换为数据源操作状态

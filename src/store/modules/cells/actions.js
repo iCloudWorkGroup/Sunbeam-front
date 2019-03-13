@@ -335,15 +335,15 @@ export default {
         let wholePosi = select.wholePosi
         let rows = getters.allRows
         let cols = getters.allCols
-        let signalSort = select.signalSort
-        let sendArgs = {
-            coordinate: signalSort,
-            lock: propStruct.content.locked
-        }
-        send({
-            url: config.url[propName],
-            body: JSON.stringify(sendArgs)
-        })
+        // let signalSort = select.signalSort
+        // let sendArgs = {
+        //     coordinate: signalSort,
+        //     lock: propStruct.content.locked
+        // }
+        // send({
+        //     url: config.url[propName],
+        //     body: JSON.stringify(sendArgs)
+        // })
         wholePosi.forEach((item, index) => {
             if (item.startRowAlias == null || item.startColAlias == null || item.endColAlias == null || item.endRowAlias == null) {
                 return

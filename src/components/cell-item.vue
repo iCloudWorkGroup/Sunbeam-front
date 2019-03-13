@@ -66,11 +66,12 @@ export default {
     computed: {
         text() {
             let reg = new RegExp('\n', 'g')
-            let spaceReg = new RegExp(' ', 'g')
+            let spaceReg1 = new RegExp(' ', 'g')
+            let spaceReg2 = new RegExp('　', 'g')
             if (this.cell.content.displayTexts == null) {
                 return null
             }
-            return this.cell.content.displayTexts.toString().replace(reg, '<br>').replace(spaceReg, '&ensp;')
+            return this.cell.content.displayTexts.toString().replace(reg, '<br>').replace(spaceReg1, '&nbsp;').replace(spaceReg2, '&ensp;')
         },
         comment() {
             return this.cell.customProp.comment != null && this.cell.customProp.comment !== ''
